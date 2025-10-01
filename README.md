@@ -1,25 +1,3 @@
-<thinking>
-사용자가 GitHub README.md 파일을 작성해달라고 요청했습니다. 제안서를 읽고 프로젝트의 핵심 내용을 정리해서 마크다운 형식의 README를 작성해야 합니다.
-
-프로젝트의 주요 특징:
-- 프로젝트명: PaceTry
-- 개인 맞춤형 보행/러닝 속도 기반 길찾기 및 코스 추천
-- React Native + FastAPI + PostgreSQL
-- Tmap, 카카오맵, Google Elevation, OpenRouteService 등 활용
-- 15주 개발 계획
-
-README는 일반적으로 다음 섹션들을 포함합니다:
-1. 프로젝트 제목 및 간단한 설명
-2. 주요 기능
-3. 기술 스택
-4. 시스템 아키텍처
-5. 설치 및 실행 방법
-6. 팀 정보
-7. 라이선스
-
-사용자가 "적당하게"라고 했으므로 너무 길지 않으면서도 핵심 정보를 잘 담은 README를 작성하겠습니다.
-</thinking>
-
 ```markdown
 # 🏃 PaceTry
 
@@ -99,19 +77,34 @@ PaceTry는 **개인의 보행 속도, 신체 특성, 환경 조건**을 종합�
 ---
 
 ## 🏗️ 시스템 아키텍처
-```mermaid
-graph TB
-    A[React Native Mobile App] -->|REST API| B[FastAPI Backend]
-    B -->|ORM| C[(PostgreSQL Database)]
-    B -->|API Call| D[Tmap 대중교통]
-    B -->|API Call| E[카카오맵]
-    B -->|API Call| F[Google Elevation]
-    B -->|API Call| G[OpenRouteService]
-    B -->|API Call| H[기상청 날씨]
-    
-    style A fill:#61DAFB
-    style B fill:#009688
-    style C fill:#316192
+
+### 📱 Frontend
+```
+React Native Mobile App (iOS/Android)
+         │
+         │ REST API (Axios)
+         ↓
+```
+
+### 🔧 Backend
+```
+FastAPI Server
+    ├─→ PostgreSQL Database (사용자 데이터, 활동 기록)
+    │
+    └─→ External APIs
+        ├─ Tmap 대중교통 API (경로 탐색)
+        ├─ 카카오맵 API (지도 시각화)
+        ├─ Google Elevation API (고도 데이터)
+        ├─ OpenRouteService API (코스 생성)
+        └─ 기상청 실시간 API (날씨 정보)
+```
+
+### 🔄 데이터 흐름
+1. **사용자 입력** → React Native App
+2. **API 요청** → FastAPI Backend
+3. **데이터 처리** → PostgreSQL + External APIs
+4. **응답 반환** → 개인화된 결과 제공
+
 ---
 
 ## 📱 주요 화면
@@ -210,12 +203,12 @@ uvicorn main:app --reload
 
 ## 👥 팀원
 
-| 이름   | 역할          | GitHub |
+| 이름   | 역할          | 학과 |
 |--------|---------------|--------|
-| 김영현 | Frontend      | [@username](https://github.com/username) |
-| 한승민 | Frontend      | [@username](https://github.com/username) |
-| 오현식 | Backend       | [@username](https://github.com/username) |
-| 박세희 | DevOps        | [@username](https://github.com/username) |
+| 김영현 | Frontend      | 경영정보학과 |
+| 한승민 | Frontend      | 경영정보학과 |
+| 오현식 | Backend       | 산업시스템공학과 |
+| 박세희 | DevOps        | 산업시스템공학과 |
 
 ---
 
@@ -227,7 +220,6 @@ uvicorn main:app --reload
 - **사용자 경험(SUS)**: ≥ 70점
 
 ---
-
 
 ## 📞 문의
 

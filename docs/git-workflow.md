@@ -33,7 +33,19 @@ git checkout -b feature/map-ui
 
 ```bash
 # 의미있는 단위로 자주 커밋
-git add .
+# 🎯 구체적인 파일만 추가 (권장)
+git add frontend/components/KakaoMap.tsx
+git add frontend/utils/coordinate.ts
+git add frontend/types/map.ts
+
+# 또는 패턴으로 추가
+git add frontend/components/*.tsx
+git add frontend/utils/
+
+# 📋 추가할 파일 미리 확인
+git status
+git diff --name-only
+
 git commit -m "✨ feat: 카카오맵 컴포넌트 추가
 
 - KakaoMap 컴포넌트 기본 구조 생성
@@ -165,7 +177,17 @@ git pull origin develop
 git checkout -b feature/새기능
 
 # 3. 개발 및 커밋
-git add .
+# 📋 변경사항 확인
+git status
+git diff
+
+# 🎯 구체적인 파일만 추가
+git add 파일명.확장자
+git add 폴더명/
+
+# 또는 interactive 모드 사용 (권장)
+git add -i
+
 git commit -m "✨ feat: 새 기능 추가"
 
 # 4. 푸시 및 PR 생성

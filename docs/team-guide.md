@@ -52,7 +52,24 @@ npm run dev
 
 ```bash
 # 자주 커밋하기 (의미있는 단위로)
-git add .
+
+# 📋 현재 변경사항 확인
+git status
+git diff --name-only
+
+# 🎯 방법 1: 구체적인 파일명 지정 (가장 안전)
+git add src/components/LoginForm.tsx
+git add src/utils/validation.ts
+
+# 🎯 방법 2: 패턴으로 추가
+git add "*.tsx" "*.ts"        # TypeScript 파일만
+git add src/components/       # components 폴더만
+git add backend/app/*.py      # Python 파일만
+
+# 🎯 방법 3: Interactive 모드 (권장)
+git add -i                    # 대화형으로 파일 선택
+
+# 📝 커밋
 git commit -m "✨ feat: 기능 설명
 
 - 상세 변경사항 1
@@ -129,7 +146,7 @@ git status
 # <<<<<<< HEAD와 >>>>>>> 마커 제거 후 올바른 코드 선택
 
 # 3. 해결 완료 후
-git add .
+git add 충돌해결한파일명.확장자  # 해결한 파일만 추가
 git commit -m "🔀 resolve merge conflict"
 ```
 

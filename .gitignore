@@ -1,0 +1,84 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyc
+*.pyo
+*.pkl
+.env
+venv/
+env/
+.Python
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+.npm
+.yarn-integrity
+
+# Expo
+.expo/
+dist/
+web-build/
+expo-env.d.ts
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+logs/
+
+# Runtime
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage
+coverage/
+.nyc_output
+
+# Dependency directories
+jspm_packages/
+
+# Build outputs
+build/
+dist/
+out/
+
+# Temporary files
+*.tmp
+*.temp
+
+# Android
+android/app/build/
+android/.gradle/
+android/gradle/
+android/gradlew
+android/gradlew.bat
+
+# Additional sensitive files
+backend/.env
+frontend/crash.txt
+*.log.tmp
+
+# History files
+.history/
+
+# Cache directories
+.pytest_cache/
+.cache/

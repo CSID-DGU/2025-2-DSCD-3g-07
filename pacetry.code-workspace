@@ -1,0 +1,105 @@
+{
+  "folders": [
+    {
+      "name": "🏠 PaceTry Root",
+      "path": "."
+    },
+    {
+      "name": "🐍 Backend (FastAPI)",
+      "path": "./backend"
+    },
+    {
+      "name": "📱 Frontend (Expo)",
+      "path": "./frontend"
+    }
+  ],
+  "settings": {
+    "python.defaultInterpreterPath": "./backend/venv/Scripts/python.exe",
+    "python.terminal.activateEnvironment": true,
+    "typescript.preferences.includePackageJsonAutoImports": "auto",
+    "eslint.workingDirectories": [
+      "frontend"
+    ],
+    "files.exclude": {
+      "**/node_modules": true,
+      "**/__pycache__": true,
+      "**/*.pyc": true,
+      ".expo": true,
+      "dist": true,
+      "web-build": true
+    },
+    "search.exclude": {
+      "**/node_modules": true,
+      "**/__pycache__": true,
+      ".expo": true,
+      "**/venv": true
+    }
+  },
+  "extensions": {
+    "recommendations": [
+      "ms-python.python",
+      "ms-python.flake8",
+      "expo.vscode-expo-tools",
+      "bradlc.vscode-tailwindcss",
+      "ms-vscode.vscode-typescript-next",
+      "esbenp.prettier-vscode",
+      "ms-vscode.powershell"
+    ]
+  },
+  "tasks": {
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "🚀 Start Development (Both)",
+        "type": "shell",
+        "command": "npm",
+        "args": [
+          "run",
+          "dev"
+        ],
+        "group": "build",
+        "presentation": {
+          "echo": true,
+          "reveal": "always",
+          "focus": false,
+          "panel": "new"
+        },
+        "problemMatcher": []
+      },
+      {
+        "label": "🐍 Start Backend Only",
+        "type": "shell",
+        "command": "npm",
+        "args": [
+          "run",
+          "backend:dev"
+        ],
+        "group": "build",
+        "presentation": {
+          "echo": true,
+          "reveal": "always",
+          "focus": false,
+          "panel": "new"
+        },
+        "problemMatcher": []
+      },
+      {
+        "label": "📱 Start Frontend Only",
+        "type": "shell",
+        "command": "npm",
+        "args": [
+          "run",
+          "frontend:dev"
+        ],
+        "group": "build",
+        "presentation": {
+          "echo": true,
+          "reveal": "always",
+          "focus": false,
+          "panel": "new"
+        },
+        "problemMatcher": []
+      }
+    ]
+  }
+}

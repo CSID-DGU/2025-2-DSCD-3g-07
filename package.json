@@ -1,0 +1,58 @@
+{
+  "name": "pacetry-monorepo",
+  "version": "1.0.0",
+  "description": "PaceTry - 보행 속도 개인화 앱",
+  "scripts": {
+    "dev": "concurrently --raw \"npm run backend:dev\" \"npm run frontend:dev\"",
+    "backend:dev": "cd backend && set PYTHONPATH=D:\\PaceTry\\backend && D:\\PaceTry\\backend\\venv\\Scripts\\python.exe -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000",
+    "frontend:dev": "cd frontend && npx expo start",
+    "backend:install": "cd backend && D:\\PaceTry\\backend\\venv\\Scripts\\pip.exe install -r requirements.txt",
+    "backend:install:dev": "cd backend && D:\\PaceTry\\backend\\venv\\Scripts\\pip.exe install -r requirements-dev.txt",
+    "frontend:install": "cd frontend && npm install",
+    "frontend:install:dev": "cd frontend && npm install --include=dev",
+    "install:all": "npm run backend:install && npm run frontend:install",
+    "install:dev": "npm run backend:install:dev && npm run frontend:install:dev && npm install",
+    "backend:test": "cd backend && set PYTHONPATH=D:\\PaceTry\\backend && D:\\PaceTry\\backend\\venv\\Scripts\\python.exe -m pytest",
+    "backend:test:watch": "cd backend && set PYTHONPATH=D:\\PaceTry\\backend && D:\\PaceTry\\backend\\venv\\Scripts\\python.exe -m pytest --watch",
+    "backend:coverage": "cd backend && set PYTHONPATH=D:\\PaceTry\\backend && D:\\PaceTry\\backend\\venv\\Scripts\\python.exe -m pytest --cov=app --cov-report=html",
+    "lint:backend": "cd backend && D:\\PaceTry\\backend\\venv\\Scripts\\python.exe -m flake8 app/",
+    "lint:frontend": "cd frontend && npx expo lint",
+    "lint:all": "npm run lint:backend && npm run lint:frontend",
+    "format:backend": "cd backend && D:\\PaceTry\\backend\\venv\\Scripts\\python.exe -m black app/ tests/ && D:\\PaceTry\\backend\\venv\\Scripts\\python.exe -m isort app/ tests/",
+    "format:frontend": "cd frontend && npx prettier --write \"**/*.{js,jsx,ts,tsx,json}\"",
+    "format:all": "npm run format:backend && npm run format:frontend",
+    "type-check:backend": "cd backend && D:\\PaceTry\\backend\\venv\\Scripts\\python.exe -m mypy app/",
+    "type-check:frontend": "cd frontend && npx tsc --noEmit",
+    "type-check:all": "npm run type-check:backend && npm run type-check:frontend",
+    "security:backend": "cd backend && D:\\PaceTry\\backend\\venv\\Scripts\\python.exe -m bandit -r app/",
+    "test:all": "npm run backend:test",
+    "backend:docs": "echo Opening API docs... && start http://192.168.35.52:8000/docs",
+    "clean:backend": "cd backend && rmdir /s /q __pycache__ 2>nul || echo Cache cleaned",
+    "clean:frontend": "cd frontend && rmdir /s /q .expo node_modules 2>nul || echo Cache cleaned",
+    "clean:all": "npm run clean:backend && npm run clean:frontend"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "keywords": [
+    "react-native",
+    "fastapi",
+    "walking",
+    "personalization",
+    "expo",
+    "python"
+  ],
+  "author": "PaceTry Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/pacetry.git"
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  },
+  "dependencies": {
+    "expo": "^54.0.12"
+  }
+}

@@ -1,0 +1,94 @@
+name: Code Quality Check
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  backend-quality:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+        
+    - name: Install dependencies
+      run: |
+        cd backend
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install -r requirements-dev.txt
+        
+    - name: Lint with flake8
+      run: |
+        cd backend
+        flake8 app/ tests/
+        
+    - name: Format check with black
+      run: |
+        cd backend
+        black --check app/ tests/
+        
+    - name: Import sort check
+      run: |
+        cd backend
+        isort --check-only app/ tests/
+        
+    - name: Type check with mypy
+      run: |
+        cd backend
+        mypy app/
+        
+    - name: Security check with bandit
+      run: |
+        cd backend
+        bandit -r app/
+        
+    - name: Test with pytest
+      run: |
+        cd backend
+        pytest --cov=app --cov-report=xml
+        
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./backend/coverage.xml
+        flags: backend
+        name: codecov-backend
+
+  frontend-quality:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: frontend/package-lock.json
+        
+    - name: Install dependencies
+      run: |
+        cd frontend
+        npm ci
+        
+    - name: Lint check
+      run: |
+        cd frontend
+        npx expo lint
+        
+    - name: Type check
+      run: |
+        cd frontend
+        npx tsc --noEmit
+        
+    - name: Format check
+      run: |
+        cd frontend
+        npx prettier --check "**/*.{js,jsx,ts,tsx,json}"

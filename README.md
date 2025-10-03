@@ -87,16 +87,26 @@ npm run dev
 ```bash
 npm run backend:dev
 ```
-- 🌐 서버: http://127.0.0.1:8000
-- 📚 API 문서: http://127.0.0.1:8000/docs
-- 📖 ReDoc: http://127.0.0.1:8000/redoc
+- 🌐 서버: http://192.168.35.52:8000 (네트워크 접근 가능)
+- 🏠 로컬: http://127.0.0.1:8000
+- 📚 API 문서: http://192.168.35.52:8000/docs
+- 📖 ReDoc: http://192.168.35.52:8000/redoc
 
 #### Frontend (Expo 앱)
 ```bash
 npm run frontend:dev
 ```
-- 📱 Expo QR 코드로 모바일에서 테스트
-- 🌐 웹 버전: http://localhost:19006
+- 📱 Expo Go: QR 코드 스캔으로 모바일 테스트
+- 🌐 웹 버전: http://localhost:8081 (또는 8082)
+- 🔄 Development Build 지원
+
+#### 전체 개발 환경 (Backend + Frontend)
+```bash
+npm run dev
+```
+- 🚀 백엔드와 프론트엔드 동시 실행
+- 📱 모바일 테스트: `s` 키로 Expo Go 모드 전환
+- 🌐 웹 테스트: 새 터미널에서 `npm run frontend:dev` 후 `w` 키
 
 ### 🎮 **배치 스크립트 (Windows)**
 ```cmd
@@ -161,10 +171,10 @@ npm run type-check:all
 
 ```bash
 # Health Check
-curl http://127.0.0.1:8000/health
+curl http://192.168.35.52:8000/health
 
-# 경로 검색 (서울역 → 강남역)
-curl "http://127.0.0.1:8000/transit-route?start_x=126.9706&start_y=37.5547&end_x=127.0276&end_y=37.4979&user_age=25&fatigue_level=3"
+# 경로 검색 (서울역 → 강남역, 개인화 적용)
+curl "http://192.168.35.52:8000/transit-route?start_x=126.9706&start_y=37.5547&end_x=127.0276&end_y=37.4979&user_age=25&fatigue_level=2&user_id=test_user"
 ```
 
 ## 🏛️ 아키텍처

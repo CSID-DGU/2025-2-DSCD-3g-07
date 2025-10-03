@@ -29,7 +29,11 @@
     "backend:docs": "echo Opening API docs... && start http://192.168.35.52:8000/docs",
     "clean:backend": "cd backend && rmdir /s /q __pycache__ 2>nul || echo Cache cleaned",
     "clean:frontend": "cd frontend && rmdir /s /q .expo node_modules 2>nul || echo Cache cleaned",
-    "clean:all": "npm run clean:backend && npm run clean:frontend"
+    "clean:all": "npm run clean:backend && npm run clean:frontend",
+    "version:patch": "npm version patch",
+    "version:minor": "npm version minor", 
+    "version:major": "npm version major",
+    "release": "git checkout main && git pull origin main && npm version patch && git push origin main --tags"
   },
   "devDependencies": {
     "concurrently": "^8.2.2"

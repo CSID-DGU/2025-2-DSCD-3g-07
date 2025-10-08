@@ -1,6 +1,7 @@
 import Constants from 'expo-constants';
+import { API_CONFIG } from '../utils/apiConfig';
 
-const API_BASE_URL = Constants.expoConfig?.extra?.API_BASE_URL || 'http://192.168.35.52:8000';
+const API_BASE_URL = API_CONFIG.BASE_URL;
 
 interface TransitRouteParams {
   start_x: number;

@@ -14,9 +14,9 @@ def test_read_root(client: TestClient):
     assert data["message"] == "Hello World"
 
 
-def test_health_check(client: TestClient):
-    """Health check 엔드포인트 테스트"""
-    response = client.get("/health")
+def test_api_health_check(client: TestClient):
+    """API health check 엔드포인트 테스트"""
+    response = client.get("/api-health")
     assert response.status_code == 200
     data = response.json()
     assert "status" in data
@@ -24,9 +24,9 @@ def test_health_check(client: TestClient):
     assert "version" in data
 
 
-def test_health_check_response_format(client: TestClient):
-    """Health check 응답 형식 검증"""
-    response = client.get("/health")
+def test_api_health_check_response_format(client: TestClient):
+    """API health check 응답 형식 검증"""
+    response = client.get("/api-health")
     data = response.json()
 
     # 필수 필드 존재 확인

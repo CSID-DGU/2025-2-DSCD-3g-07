@@ -65,9 +65,9 @@ async def read_root():
     }
 
 
-@app.get("/health", tags=["Health"])
-async def health_check():
-    """서버 상태를 확인합니다."""
+@app.get("/api-health", tags=["Health"])
+async def api_health_check():
+    """API 서버 상태를 확인합니다."""
     return {"status": "healthy", "version": "1.0.0"}
 
 

@@ -82,7 +82,7 @@ class ApiService {
   }
 
   async healthCheck(): Promise<ApiResponse<{ status: string; version: string }>> {
-    return this.makeRequest('/health');
+    return this.makeRequest('/api-health');
   }
 }
 

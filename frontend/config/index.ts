@@ -1,7 +1,7 @@
 import Constants from 'expo-constants';
 
 export const Config = {
-  API_BASE_URL: Constants.expoConfig?.extra?.API_BASE_URL || 'http://172.30.1.47:8000',
+  API_BASE_URL: Constants.expoConfig?.extra?.API_BASE_URL || 'http://172.30.1.11:8000',
   ENVIRONMENT: Constants.expoConfig?.extra?.ENVIRONMENT || 'development',
 
   // API 엔드포인트

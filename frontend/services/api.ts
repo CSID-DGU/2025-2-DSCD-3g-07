@@ -1,7 +1,4 @@
-import Constants from 'expo-constants';
-import { API_CONFIG } from '../utils/apiConfig';
-
-const API_BASE_URL = API_CONFIG.BASE_URL;
+import { Config } from '../config';
 
 interface TransitRouteParams {
   start_x: number;
@@ -23,11 +20,12 @@ interface ApiResponse<T> {
 }
 
 class ApiService {
-  private baseURL: string;
+  private get baseURL(): string {
+    return Config.API_BASE_URL;
+  }
 
   constructor() {
-    this.baseURL = API_BASE_URL;
-    console.log('🌐 API Base URL:', this.baseURL);
+    console.log('🌐 API Service initialized');
   }
 
   private async makeRequest<T>(endpoint: string, options?: RequestInit): Promise<ApiResponse<T>> {

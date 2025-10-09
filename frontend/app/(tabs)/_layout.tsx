@@ -46,6 +46,13 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <MaterialIcons size={26} name="api" color={color} />,
         }}
       />
+      <Tabs.Screen
+        name="health-connect"
+        options={{
+          title: 'Health',
+          tabBarIcon: ({ color }) => <MaterialIcons size={26} name="favorite" color={color} />,
+        }}
+      />
     </Tabs>
   );
 }

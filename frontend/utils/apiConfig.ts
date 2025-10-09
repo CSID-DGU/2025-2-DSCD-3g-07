@@ -16,8 +16,8 @@ const getApiBaseUrl = () => {
 
   // Android 에뮬레이터
   if (Platform.OS === 'android' && __DEV__) {
-    // 실제 기기 vs 에뮬레이터 감지
-    return 'http://10.0.2.2:8000'; // 에뮬레이터용
+    // 실제 기기 - PC IP 주소 사용
+    return 'http://192.168.45.161:8000';
   }
 
   // iOS 시뮬레이터나 실제 기기

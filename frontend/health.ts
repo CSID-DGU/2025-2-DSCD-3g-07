@@ -1,4 +1,4 @@
-﻿import { NativeModules, Platform } from 'react-native';
+import { NativeModules, Platform } from 'react-native';
 
 export interface HealthResult {
   granted: boolean;

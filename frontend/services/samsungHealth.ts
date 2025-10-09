@@ -372,7 +372,7 @@ export class SamsungHealthService {
   async getStepsData(
     startTime: string, 
     endTime: string
-  ): Promise<Array<{ count: number; startTime: string; endTime: string; source: string }> | null> {
+  ): Promise<{ count: number; startTime: string; endTime: string; source: string }[] | null> {
     if (Platform.OS !== 'android' || !HealthConnectModule) {
       return null;
     }
@@ -392,7 +392,7 @@ export class SamsungHealthService {
   async getDistanceData(
     startTime: string, 
     endTime: string
-  ): Promise<Array<{ distance: number; startTime: string; endTime: string; source: string }> | null> {
+  ): Promise<{ distance: number; startTime: string; endTime: string; source: string }[] | null> {
     if (Platform.OS !== 'android' || !HealthConnectModule) {
       return null;
     }
@@ -412,7 +412,7 @@ export class SamsungHealthService {
   async getCaloriesData(
     startTime: string, 
     endTime: string
-  ): Promise<Array<{ calories: number; startTime: string; endTime: string; source: string }> | null> {
+  ): Promise<{ calories: number; startTime: string; endTime: string; source: string }[] | null> {
     if (Platform.OS !== 'android' || !HealthConnectModule) {
       return null;
     }

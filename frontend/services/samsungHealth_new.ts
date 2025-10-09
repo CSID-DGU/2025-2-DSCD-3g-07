@@ -95,63 +95,6 @@ export class SamsungHealthService {
   }
 
   /**
-   * 공식문서 기반 - 모든 권한 상태 종합 확인
-   */
-  async checkAllPermissionsStatus(): Promise<{
-    sdkAvailable: boolean;
-    sdkStatus: string;
-    allPermissionsGranted: boolean;
-    grantedPermissionsCount: number;
-    totalPermissionsCount: number;
-    permissionPercentage: number;
-    missingPermissions: string[];
-    grantedPermissions: string[];
-    message: string;
-  }> {
-    if (Platform.OS !== 'android' || !HealthConnectModule) {
-      return {
-        sdkAvailable: false,
-        sdkStatus: 'UNSUPPORTED_PLATFORM',
-        allPermissionsGranted: false,
-        grantedPermissionsCount: 0,
-        totalPermissionsCount: 0,
-        permissionPercentage: 0,
-        missingPermissions: [],
-        grantedPermissions: [],
-        message: 'Health Connect is only available on Android'
-      };
-    }
-
-    try {
-      const result = await HealthConnectModule.checkAllPermissionsStatus();
-      return {
-        sdkAvailable: result.sdkAvailable,
-        sdkStatus: result.sdkStatus,
-        allPermissionsGranted: result.allPermissionsGranted,
-        grantedPermissionsCount: result.grantedPermissionsCount,
-        totalPermissionsCount: result.totalPermissionsCount,
-        permissionPercentage: result.permissionPercentage || 0,
-        missingPermissions: result.missingPermissions || [],
-        grantedPermissions: result.grantedPermissions || [],
-        message: result.message
-      };
-    } catch (error) {
-      console.error('All permissions status check failed:', error);
-      return {
-        sdkAvailable: false,
-        sdkStatus: 'ERROR',
-        allPermissionsGranted: false,
-        grantedPermissionsCount: 0,
-        totalPermissionsCount: 0,
-        permissionPercentage: 0,
-        missingPermissions: [],
-        grantedPermissions: [],
-        message: 'Failed to check permissions status'
-      };
-    }
-  }
-
-  /**
    * 삼성 헬스 앱이 설치되어 있는지 확인
    */
   async isSamsungHealthInstalled(): Promise<boolean> {
@@ -291,22 +234,6 @@ export class SamsungHealthService {
 
     try {
       const result = await HealthConnectModule.requestHealthPermissions();
-      
-      // 권한이 부여되지 않은 경우 Health Connect 설정 화면 열기 제안
-      if (!result.allPermissionsGranted) {
-        Alert.alert(
-          'Health Connect 권한 필요',
-          '건강 데이터에 접근하려면 Health Connect에서 권한을 허용해야 합니다.',
-          [
-            { text: '취소', style: 'cancel' },
-            { 
-              text: 'Health Connect 열기', 
-              onPress: () => this.openHealthConnectSettings()
-            }
-          ]
-        );
-      }
-      
       return result;
     } catch (error) {
       console.error('Failed to request health permissions:', error);
@@ -315,29 +242,6 @@ export class SamsungHealthService {
         grantedPermissions: 0,
         totalPermissions: 0,
         message: 'Failed to request health permissions'
-      };
-    }
-  }
-
-  /**
-   * Health Connect 설정 화면 열기
-   */
-  async openHealthConnectSettings(): Promise<{ success: boolean; message: string }> {
-    if (Platform.OS !== 'android' || !HealthConnectModule) {
-      return {
-        success: false,
-        message: 'Health Connect is not available on this platform'
-      };
-    }
-
-    try {
-      const result = await HealthConnectModule.openHealthConnectSettings();
-      return result;
-    } catch (error) {
-      console.error('Failed to open Health Connect settings:', error);
-      return {
-        success: false,
-        message: 'Failed to open Health Connect settings'
       };
     }
   }

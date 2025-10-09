@@ -128,7 +128,8 @@ export class HealthConnectService {
       const grantedPermissions = await requestPermission(permissions);
       console.log('✅ Granted permissions:', grantedPermissions);
       
-      return grantedPermissions.length > 0;
+      // requestPermission returns boolean, not an array
+      return grantedPermissions === true;
     } catch (error) {
       console.error('❌ Failed to request permissions:', error);
       return false;

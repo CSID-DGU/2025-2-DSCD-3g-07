@@ -139,7 +139,7 @@ class ApiConfig {
     return this._baseUrl;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+   
   private getCandidateUrls(): string[] {
     const urls: string[] = [];
     

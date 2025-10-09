@@ -35,7 +35,17 @@ app.add_middleware(
 )
 
 
-def calculate_walking_time(distance_meters, avg_speed_kmh=4.5):
+def calculate_walking_time(distance_meters: float, avg_speed_kmh: float = 4.5) -> int:
+    """
+    거리와 평균 속도로 보행 시간 계산
+    
+    Args:
+        distance_meters: 거리 (미터)
+        avg_speed_kmh: 평균 보행 속도 (km/h)
+    
+    Returns:
+        예상 보행 시간 (초)
+    """
     speed_mps = avg_speed_kmh * 1000 / 3600  # m/s로 변환
     estimated_time_seconds = distance_meters / speed_mps if speed_mps > 0 else 0
     return int(estimated_time_seconds)
@@ -55,7 +65,13 @@ except FileNotFoundError:
 
 
 @app.get("/")
-async def read_root():
+async def read_root() -> dict:
+    """
+    API 루트 엔드포인트
+    
+    Returns:
+        환영 메시지 및 서버 정보
+    """
     return {
         "message": "🚶‍♂️ PaceTry API Server",
         "version": "1.0.0",

@@ -1,5 +1,4 @@
 import { useColorScheme } from '@/hooks/use-color-scheme';
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -19,26 +18,25 @@ export default function RootLayout() {
   useEffect(() => {
     const initializeApi = async () => {
       try {
-        console.log('🚀 Initializing API URL detection...');
+        console.log('🚀 Initializing API...');
         await Config.initializeApiUrl();
-        console.log('✅ API URL initialization completed');
+        console.log('✅ API initialized');
       } catch (error) {
-        console.error('❌ API URL initialization failed:', error);
+        console.error('⚠️ API init failed:', error);
+        // 실패해도 앱은 계속 실행
       }
     };
-
-    initializeApi();
+    
+    initializeApi().catch(console.error);
   }, []);
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-        <Stack>
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
-        </Stack>
-        <StatusBar style="auto" />
-      </ThemeProvider>
+      <Stack>
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
+      </Stack>
+      <StatusBar style="auto" />
     </GestureHandlerRootView>
   );
 }

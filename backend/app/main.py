@@ -76,8 +76,8 @@ async def read_root() -> dict:
         "message": "🚶‍♂️ PaceTry API Server",
         "version": "1.0.0",
         "status": "운영 중",
-        "docs": "http://127.0.0.1:8000/docs",
-        "health": "http://127.0.0.1:8000/health"
+        "docs": "/docs",
+        "health": "/health"
     }
 
 

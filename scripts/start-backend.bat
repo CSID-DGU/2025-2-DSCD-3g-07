@@ -30,8 +30,8 @@ set "PYTHONPATH=%cd%"
 
 echo 🐍 Using Python: venv\Scripts\python.exe
 echo 🌐 Starting FastAPI server...
-echo 📚 API Documentation will be available at: http://127.0.0.1:8000/docs
-echo 💡 Network API will be available at: http://0.0.0.0:8000/docs
+echo 📚 API Documentation will be available after startup
+echo 💡 Network access URLs will be displayed by the server
 echo.
 
 REM .env 파일에서 설정 읽기 (기본값: 0.0.0.0:8000)

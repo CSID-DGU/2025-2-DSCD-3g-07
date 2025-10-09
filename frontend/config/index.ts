@@ -9,7 +9,7 @@ const testApiConnection = async (url: string): Promise<boolean> => {
     
     const response = await fetch(`${url}/health`, {
       method: 'GET',
-      signal: controller.signal,
+      signal: controller.signal as any,
     });
     
     clearTimeout(timeoutId);
@@ -19,38 +19,38 @@ const testApiConnection = async (url: string): Promise<boolean> => {
   }
 };
 
-// 여러 IP를 순차적으로 테스트하여 작동하는 IP 찾기 (사용 예정)
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const findWorkingApiUrl = async (candidateUrls: string[]): Promise<string> => {
-  console.log('🔍 Testing API URLs:', candidateUrls);
-  
-  for (const url of candidateUrls) {
-    console.log(`🧪 Testing: ${url}`);
-    const isWorking = await testApiConnection(url);
-    if (isWorking) {
-      console.log(`✅ Found working API URL: ${url}`);
-      return url;
-    }
-  }
-  
-  console.log('⚠️ No working API URL found, using first candidate');
-  return candidateUrls[0] || 'http://localhost:8000';
-};
+
 
 // 자동 IP 감지 함수
 const getAutoDetectedApiUrl = (): string => {
-  // 환경 변수에서 API URL 확인
+  // 환경 변수에서 API URL 확인 (최우선)
   const envApiUrl = Constants.expoConfig?.extra?.API_BASE_URL || process.env.EXPO_PUBLIC_API_URL;
   if (envApiUrl) {
     console.log('🌐 Using environment API URL:', envApiUrl);
     return envApiUrl;
   }
 
-  // 개발 환경 기본값
+  // Expo 개발 서버 IP 자동 감지
+  const debuggerHost = Constants.expoConfig?.hostUri?.split(':')?.[0];
+  if (debuggerHost && debuggerHost !== 'localhost' && debuggerHost !== '127.0.0.1') {
+    const autoApiUrl = `http://${debuggerHost}:8000`;
+    console.log('🔍 Auto-detected API URL from Expo hostUri:', autoApiUrl);
+    return autoApiUrl;
+  }
+
+  // 개발 환경 fallback (기존 IP는 백업용으로만)
   if (process.env.NODE_ENV !== 'production') {
-    const DEV_API_URL = 'http://192.168.45.161:8000';
-    console.log('🌐 Using development API URL:', DEV_API_URL);
-    return DEV_API_URL;
+    const fallbackIPs = [
+      'http://192.168.45.161:8000', // 기존 IP (백업용)
+      'http://192.168.1.100:8000',  // 일반적인 홈 네트워크
+      'http://192.168.0.100:8000',  // 다른 홈 네트워크
+      'http://10.0.2.2:8000'        // Android 에뮬레이터
+    ];
+    
+    // 첫 번째 fallback IP 사용
+    const fallbackUrl = fallbackIPs[0] || 'http://localhost:8000';
+    console.log('🌐 Using fallback development API URL:', fallbackUrl);
+    return fallbackUrl;
   }
 
   // 플랫폼별 자동 감지
@@ -139,41 +139,7 @@ class ApiConfig {
     return this._baseUrl;
   }
 
-   
-  private getCandidateUrls(): string[] {
-    const urls: string[] = [];
-    
-    // 환경 변수 URL이 있으면 우선 시도
-    const configUrl = Constants.expoConfig?.extra?.API_BASE_URL;
-    if (configUrl) {
-      urls.push(configUrl);
-    }
 
-    // Expo 개발 서버 IP
-    const debuggerHost = Constants.expoConfig?.hostUri?.split(':')?.[0];
-    if (debuggerHost && debuggerHost !== 'localhost') {
-      urls.push(`http://${debuggerHost}:8000`);
-    }
-
-    // 일반적인 개발 환경 IP들
-    const commonIPs = [
-      'http://192.168.45.161:8000', // 현재 알려진 IP
-      'http://172.30.1.11:8000',    // 이전 네트워크
-      'http://192.168.1.100:8000',  // 일반적인 홈 네트워크
-      'http://192.168.0.100:8000',  // 다른 홈 네트워크  
-      'http://10.0.2.2:8000',       // 안드로이드 에뮬레이터
-      'http://localhost:8000'       // 로컬호스트 fallback
-    ];
-
-    // 중복 제거하면서 추가
-    commonIPs.forEach(ip => {
-      if (!urls.includes(ip)) {
-        urls.push(ip);
-      }
-    });
-
-    return urls;
-  }
 
   // API URL 강제 업데이트
   setApiUrl(url: string): void {

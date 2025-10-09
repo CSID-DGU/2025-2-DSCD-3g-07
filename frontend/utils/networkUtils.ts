@@ -79,7 +79,7 @@ export const testApiConnection = async (baseUrl: string): Promise<boolean> => {
 
     const response = await fetch(`${baseUrl}/health`, {
       method: 'GET',
-      signal: controller.signal,
+      signal: controller.signal as any,
     });
 
     clearTimeout(timeoutId);

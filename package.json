@@ -30,7 +30,7 @@
     "type-check:all": "npm run type-check:backend && npm run type-check:frontend",
     "security:backend": "cd backend && python -m bandit -r app/",
     "test:all": "npm run backend:test",
-    "backend:docs": "echo Opening API docs... && start http://192.168.35.52:8000/docs",
+    "backend:docs": "echo Opening API docs... && start http://localhost:8000/docs",
     "clean:backend": "cd backend && (rmdir /s /q __pycache__ 2>nul || rm -rf __pycache__ 2>/dev/null || echo Cache cleaned)",
     "clean:frontend": "cd frontend && (rmdir /s /q .expo node_modules 2>nul || rm -rf .expo node_modules 2>/dev/null || echo Cache cleaned)",
     "clean:all": "npm run clean:backend && npm run clean:frontend",

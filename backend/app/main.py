@@ -37,7 +37,7 @@ app.add_middleware(
 
 def calculate_walking_time(distance_meters: float, avg_speed_kmh: float = 4.5) -> int:
     """
-    거리와 평균 속도로 보행 시간 계산
+    거리와 평균 속도로 보행 시간 계산ddddd
     
     Args:
         distance_meters: 거리 (미터)

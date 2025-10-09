@@ -176,3 +176,49 @@ async def get_transit_route(
             "error_message": error_message,
             "status_code": response.status_code,
         }
+
+# DB 용 main.py 예시 코드
+# app/main.py
+from fastapi import FastAPI, Depends
+from sqlalchemy.orm import Session
+from sqlalchemy import text
+from app import models
+from app.database import engine, get_db
+from app import crud
+
+# DB 테이블 생성 (테이블이 없으면 자동 생성)
+models.Base.metadata.create_all(bind=engine)
+
+app = FastAPI(title="PaceTry API")
+
+@app.get("/")
+async def root():
+    return {"message": "Hello World"}
+
+
+# DB 연결 확인 예시
+@app.get("/health")
+def health_check(db: Session = Depends(get_db)):
+    db.execute(text("SELECT 1"))
+    return {"status": "db connection ok"}
+
+# ORM 구조 확인 (개발용)
+@app.get("/users/count")
+def users_count(db: Session = Depends(get_db)):
+    return {"users": db.query(models.Users).count()}
+
+@app.get("/routes/sample")
+def routes_sample(db: Session = Depends(get_db)):
+    row = db.query(models.Routes).order_by(models.Routes.route_id.desc()).first()
+    return {"latest_route": row.route_name if row else None}
+
+# crud 활용예시
+# @app.post("/users")
+# def create_user(username: str, email: str, password: str, db: Session = Depends(get_db)):
+#     hash_pw = some_hash_function(password)
+#     return crud.create_user(db, username, email, hash_pw)
+
+# @app.get("/routes")
+# def read_routes(db: Session = Depends(get_db)):
+#     return crud.get_all_routes(db)
+

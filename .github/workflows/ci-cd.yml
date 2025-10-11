@@ -1,0 +1,183 @@
+name: 🚀 PaceTry CI/CD
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  NODE_VERSION: '18'
+  PYTHON_VERSION: '3.9'
+
+jobs:
+  # 🔍 코드 품질 검사
+  quality-check:
+    runs-on: ubuntu-latest
+    name: 📋 Code Quality
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+      
+    - name: 🔧 Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+        
+    - name: 🔧 Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+        cache: 'pip'
+        
+    - name: 📦 Install dependencies
+      run: |
+        npm install
+        pip install -r backend/requirements.txt
+        pip install -r backend/requirements-dev.txt
+        
+    - name: 🔍 Lint Backend
+      run: npm run lint:backend
+      
+    - name: 🔍 Lint Frontend
+      run: npm run lint:frontend
+      
+    - name: 📝 Format Check
+      run: |
+        npm run format:backend
+        npm run format:frontend
+        git diff --exit-code
+        
+  # 🧪 백엔드 테스트
+  backend-test:
+    runs-on: ubuntu-latest
+    name: 🐍 Backend Tests
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+      
+    - name: 🔧 Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+        cache: 'pip'
+        
+    - name: 📦 Install dependencies
+      run: |
+        pip install -r backend/requirements.txt
+        pip install -r backend/requirements-dev.txt
+        
+    - name: 🧪 Run tests
+      run: npm run backend:test
+      
+    - name: 📊 Generate coverage
+      run: npm run backend:coverage
+      
+    - name: 📤 Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: backend/htmlcov/coverage.xml
+        flags: backend
+        
+  # 📱 프론트엔드 테스트
+  frontend-test:
+    runs-on: ubuntu-latest
+    name: ⚛️ Frontend Tests
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+      
+    - name: 🔧 Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+        
+    - name: 📦 Install dependencies
+      run: |
+        cd frontend && npm install
+        
+    - name: 🔍 Type check
+      run: npm run type-check:frontend
+      
+    - name: 🧪 Run tests (when available)
+      run: |
+        echo "Frontend tests will be added"
+        # cd frontend && npm test
+        
+  # 🔒 보안 검사
+  security-check:
+    runs-on: ubuntu-latest
+    name: 🔐 Security Check
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+      
+    - name: 🔧 Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+        
+    - name: 📦 Install bandit
+      run: pip install bandit
+      
+    - name: 🔒 Security scan
+      run: npm run security:backend
+      
+    - name: 🔍 Dependency audit
+      run: |
+        cd frontend && npm audit --audit-level moderate
+        
+  # 📱 Android 빌드 (선택사항)
+  android-build:
+    runs-on: ubuntu-latest
+    name: 🤖 Android Build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+      
+    - name: 🔧 Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+        
+    - name: 🔧 Setup Java
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+        
+    - name: 📦 Install dependencies
+      run: |
+        cd frontend && npm install
+        
+    - name: 🏗️ Build Android (Development)
+      run: |
+        cd frontend
+        echo "Android build will be configured"
+        # npx expo build:android --type apk
+        
+  # 🚀 배포 (Production)
+  deploy:
+    runs-on: ubuntu-latest
+    name: 🚀 Deploy
+    needs: [quality-check, backend-test, frontend-test, security-check]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+      
+    - name: 🚀 Deploy notification
+      run: |
+        echo "🎉 All checks passed! Ready for deployment"
+        echo "🔗 Backend API: Ready for deployment"
+        echo "📱 Mobile App: Ready for distribution"

@@ -1,0 +1,4 @@
+# DB 연결 위한 필수 패키지 (pip install로 받으면 됨)
+sqlalchemy
+psycopg2
+python-dotenv

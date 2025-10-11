@@ -8,6 +8,11 @@
     "scheme": "pacetryapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+    "privacy": "public",
+    "platforms": ["ios", "android", "web"],
+    "description": "개인의 보행 속도에 맞춘 개인화된 교통 경로 안내 앱",
+    "keywords": ["walking", "personalization", "transit", "health"],
+    "githubUrl": "https://github.com/your-username/pacetry",
     "ios": {
       "supportsTablet": true
     },
@@ -20,7 +25,17 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.pacetry.app"
+      "package": "com.pacetry.app",
+      "permissions": [
+        "android.permission.health.READ_STEPS",
+        "android.permission.health.READ_DISTANCE",
+        "android.permission.health.READ_ACTIVE_CALORIES_BURNED",
+        "android.permission.health.READ_EXERCISE",
+        "android.permission.health.WRITE_STEPS",
+        "android.permission.health.WRITE_DISTANCE", 
+        "android.permission.health.WRITE_ACTIVE_CALORIES_BURNED",
+        "android.permission.health.WRITE_EXERCISE"
+      ]
     },
     "web": {
       "output": "static",
@@ -47,6 +62,12 @@
             "minSdkVersion": 26
           }
         }
+      ],
+      [
+        "react-native-health-connect",
+        {
+          "isBackgroundDeliveryEnabled": true
+        }
       ]
     ],
     "experiments": {
@@ -57,9 +78,13 @@
       "router": {},
       "eas": {
         "projectId": "0c127bed-978d-4929-b50e-39b172719b13"
-      },
-      "API_BASE_URL": "http://192.168.35.52:8000",
-      "ENVIRONMENT": "development"
-    }
+      }
+    },
+    "updates": {
+      "fallbackToCacheTimeout": 0
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ]
   }
 }

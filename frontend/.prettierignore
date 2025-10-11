@@ -1,0 +1,45 @@
+# Dependencies
+node_modules/
+**/node_modules/**
+
+# Build outputs
+build/
+dist/
+out/
+**/build/**
+**/dist/**
+
+# Expo
+.expo/
+**/.expo/**
+
+# Platform specific
+android/
+ios/
+**/android/**
+**/ios/**
+
+# Logs
+*.log
+logs/
+
+# Coverage reports
+coverage/
+**/coverage/**
+
+# Cache directories
+.cache/
+**/.cache/**
+
+# Environment files
+.env
+.env.local
+.env.production
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db

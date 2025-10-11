@@ -51,6 +51,9 @@ logs/
 # Coverage
 coverage/
 .nyc_output
+htmlcov/
+.coverage
+.coverage.*
 
 # Dependency directories
 jspm_packages/
@@ -70,9 +73,20 @@ android/.gradle/
 android/gradle/
 android/gradlew
 android/gradlew.bat
+android/local.properties
+android/app/src/main/assets/
+
+# iOS
+ios/build/
+ios/Pods/
+ios/*.xcworkspace
+ios/*.xcuserdata
 
 # Additional sensitive files
 backend/.env
+backend/.env.local
+frontend/.env
+frontend/.env.local
 frontend/crash.txt
 *.log.tmp
 
@@ -82,3 +96,33 @@ frontend/crash.txt
 # Cache directories
 .pytest_cache/
 .cache/
+.mypy_cache/
+.tox/
+
+# Security and API keys
+*.pem
+*.key
+*.crt
+secrets/
+.secrets
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Backup files
+*.bak
+*.backup
+*~
+
+# Editor configs
+.editorconfig.local
+
+# Test results
+test-results/
+junit.xml
+coverage.xml
+
+# Profiling
+*.prof

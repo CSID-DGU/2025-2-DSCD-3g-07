@@ -1,4 +1,4 @@
-﻿import { NativeModules, Platform } from 'react-native';
+import { NativeModules, Platform } from 'react-native';
 
 export interface HealthResult {
   granted: boolean;
@@ -15,7 +15,7 @@ type NativeHealthModule = {
   readToday: () => Promise<{ granted: boolean; steps?: number; meters?: number }>;
 } | undefined;
 
-const NativeHealth: NativeHealthModule = Platform.OS === 'android' ? (NativeModules as any)?.PacerHealthConnect : undefined;
+const NativeHealth: NativeHealthModule = Platform.OS === 'android' ? NativeModules.PacerHealthConnect : undefined;
 
 const nowISO = () => new Date().toISOString();
 
@@ -81,6 +81,12 @@ function demoFallback(): HealthResult {
 }
 
 export async function readTodayStepsAndDistance(): Promise<HealthResult> {
+  // Ensure we're using the Health Connect module, not any other health-related API
+  if (Platform.OS !== 'android' || !NativeHealth) {
+    console.warn('[health] Health Connect not available, using fallback data');
+    return demoFallback();
+  }
+  
   const native = await readFromNative();
   if (native && native.granted) {
     return native;
@@ -100,6 +106,19 @@ export async function requestHealthConnectPermissions(): Promise<{ success: bool
   }
 }
 
+export async function checkHealthConnectAvailability(): Promise<{ available: boolean; error?: string }> {
+  if (Platform.OS !== 'android' || !NativeHealth?.isAvailable) {
+    return { available: false, error: 'Health Connect is not supported on this platform' };
+  }
+  try {
+    const available = await NativeHealth.isAvailable();
+    return { available };
+  } catch (error: any) {
+    return { available: false, error: error?.message ?? String(error) };
+  }
+}
+
 export async function openHealthConnectSettings(): Promise<{ success: boolean; error?: string }> {
-  return { success: false, error: 'Health Connect settings unavailable in Expo Go' };
+  // This would need to be implemented in the native module
+  return { success: false, error: 'Health Connect settings unavailable in current implementation' };
 }

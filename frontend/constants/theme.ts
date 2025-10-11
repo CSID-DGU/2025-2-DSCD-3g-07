@@ -14,16 +14,16 @@ export const Colors = {
     background: '#fff',
     tint: tintColorLight,
     icon: '#687076',
-    tabIconDefault: '#687076',
-    tabIconSelected: tintColorLight,
+    tabIconDefault: '#8E8E93',  // 더 명확한 회색
+    tabIconSelected: '#007AFF', // iOS 블루, 더 명확한 선택 색상
   },
   dark: {
     text: '#ECEDEE',
     background: '#151718',
     tint: tintColorDark,
     icon: '#9BA1A6',
-    tabIconDefault: '#9BA1A6',
-    tabIconSelected: tintColorDark,
+    tabIconDefault: '#8E8E93', // 일관된 회색
+    tabIconSelected: '#0A84FF', // 다크모드 블루
   },
 };
 

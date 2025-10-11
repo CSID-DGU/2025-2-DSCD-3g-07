@@ -119,23 +119,36 @@ class ApiConfig {
       return this._baseUrl;
     }
 
-    // **고정된 올바른 IP 사용 - 테스트 건너뛰기**
-    const CORRECT_API_URL = 'http://192.168.45.161:8000';
+    console.log('🔍 Starting dynamic API URL detection...');
     
-    // 빠른 확인만 수행 (이미 작동하는 것을 확인했으므로)
-    console.log('🔍 Testing Health Check...');
-    const isWorking = await testApiConnection(CORRECT_API_URL);
-    
-    if (isWorking) {
-      this._baseUrl = CORRECT_API_URL;
-      console.log('✅ Confirmed working API URL:', this._baseUrl);
-    } else {
-      console.log('⚠️ Health check failed, but using known working URL anyway');
-      this._baseUrl = CORRECT_API_URL;
+    // 여러 후보 URL들을 우선순위에 따라 시도
+    const candidateUrls = [
+      this._baseUrl,                    // 자동 감지된 URL (최우선)
+      'http://localhost:8000',          // 로컬 개발
+      'http://10.0.2.2:8000',         // Android 에뮬레이터
+      process.env.EXPO_PUBLIC_API_URL,  // 환경변수 (fallback)
+      process.env.EXPO_PUBLIC_DEV_API_URL, // 개발용 환경변수
+      'http://192.168.45.161:8000',    // 이전 작동 IP (낮은 우선순위)
+    ].filter(Boolean) as string[]; // null/undefined 제거
+
+    // 각 URL을 순차적으로 테스트
+    for (const url of candidateUrls) {
+      console.log(`🔍 Testing: ${url}`);
+      const isWorking = await testApiConnection(url);
+      
+      if (isWorking) {
+        this._baseUrl = url;
+        console.log(`✅ Found working API URL: ${url}`);
+        this._isInitialized = true;
+        return this._baseUrl;
+      }
     }
     
+    // 모든 URL이 실패한 경우 첫 번째 후보를 사용
+    this._baseUrl = candidateUrls[0] || 'http://localhost:8000';
+    console.warn('⚠️ No working API URL found, using fallback:', this._baseUrl);
+    
     this._isInitialized = true;
-    console.log('🌐 Final API URL initialized:', this._baseUrl);
     return this._baseUrl;
   }
 

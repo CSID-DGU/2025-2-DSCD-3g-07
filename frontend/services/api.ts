@@ -1,4 +1,4 @@
-import { Config } from '../config';
+import { apiClient } from '../utils/apiClient';
 
 interface TransitRouteParams {
   start_x: number;
@@ -20,45 +20,31 @@ interface ApiResponse<T> {
 }
 
 class ApiService {
-  private get baseURL(): string {
-    return Config.API_BASE_URL;
-  }
-
   constructor() {
-    console.log('🌐 API Service initialized');
+    console.log('🌐 API Service initialized with auto-scanning apiClient');
   }
 
   private async makeRequest<T>(endpoint: string, options?: RequestInit): Promise<ApiResponse<T>> {
     try {
-      const url = `${this.baseURL}${endpoint}`;
-      console.log('📡 API Request:', url);
-
-      const response = await fetch(url, {
-        headers: {
-          'Content-Type': 'application/json',
-          ...options?.headers,
-        },
-        ...options,
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
+      // apiClient를 사용하여 자동 스캔 기능 활용
+      if (options?.method === 'GET' || !options?.method) {
+        const result = await apiClient.get<T>(endpoint);
         return {
-          status: response.status,
-          error: data.message || `API Error: ${response.status}`,
+          status: 200,
+          data: result,
+        };
+      } else {
+        const result = await apiClient.post<T>(endpoint, options?.body ? JSON.parse(options.body as string) : undefined);
+        return {
+          status: 200,
+          data: result,
         };
       }
-
-      return {
-        status: response.status,
-        data,
-      };
     } catch (error) {
       console.error('❌ API Request failed:', error);
       return {
         status: 0,
-        error: error instanceof Error ? error.message : 'Network error',
+        error: error instanceof Error ? error.message : 'Network error with auto-scanning apiClient',
       };
     }
   }

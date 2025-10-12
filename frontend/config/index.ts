@@ -5,9 +5,9 @@ import { Platform } from 'react-native';
 const testApiConnection = async (url: string): Promise<boolean> => {
   try {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 3000); // 3초 타임아웃
+    const timeoutId = setTimeout(() => controller.abort(), 5000); // 5초 타임아웃
     
-    const response = await fetch(`${url}/health`, {
+    const response = await fetch(`${url}/api-health`, {
       method: 'GET',
       signal: controller.signal as any,
     });

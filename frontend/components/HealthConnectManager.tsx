@@ -85,9 +85,9 @@ const HealthConnectManager: React.FC = () => {
   const getTodayHealthData = async () => {
     setLoading(true);
     try {
-      console.log('📅 오늘의 건강 데이터 가져오기 (자동)...');
-      const data = await healthConnect.getHealthData(1); // 오늘 데이터 (1일)
-      console.log('✅ 데이터 (자동):', data);
+      console.log('📅 오늘의 건강 데이터 가져오기 (자정부터)...');
+      const data = await healthConnect.getTodaysSummary(); // 오늘 자정부터 현재까지
+      console.log('✅ 데이터 (자정부터):', data);
       setHealthData(data);
     } catch (error) {
       console.error('❌ Error getting health data:', error);
@@ -174,6 +174,15 @@ const HealthConnectManager: React.FC = () => {
             <Text style={styles.dataValue}>
               {healthData.speed && healthData.speed > 0 
                 ? `${healthData.speed} km/h` 
+                : '데이터 없음'}
+            </Text>
+          </View>
+          
+          <View style={styles.dataRow}>
+            <Text style={styles.dataLabel}>⚡ 최고 속도:</Text>
+            <Text style={styles.dataValue}>
+              {healthData.maxSpeed && healthData.maxSpeed > 0 
+                ? `${healthData.maxSpeed} km/h` 
                 : '데이터 없음'}
             </Text>
           </View>

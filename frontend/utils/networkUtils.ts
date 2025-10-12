@@ -3,7 +3,6 @@
  * IP 주소 감지 및 네트워크 상태 확인
  */
 
-import NetInfo from '@react-native-community/netinfo';
 import { Platform } from 'react-native';
 import Constants from 'expo-constants';
 
@@ -60,8 +59,17 @@ export const getBackendUrl = (port: number = 8000): string => {
  */
 export const checkNetworkConnection = async (): Promise<boolean> => {
   try {
-    const state = await NetInfo.fetch();
-    return state.isConnected ?? false;
+    // 간단한 네트워크 연결 테스트 (Google DNS)
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 3000);
+    
+    await fetch('https://8.8.8.8', {
+      method: 'HEAD',
+      signal: controller.signal as any,
+    });
+    
+    clearTimeout(timeoutId);
+    return true;
   } catch (error) {
     console.error('네트워크 상태 확인 오류:', error);
     return false;
@@ -77,7 +85,7 @@ export const testApiConnection = async (baseUrl: string): Promise<boolean> => {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 5000);
 
-    const response = await fetch(`${baseUrl}/health`, {
+    const response = await fetch(`${baseUrl}/api-health`, {
       method: 'GET',
       signal: controller.signal as any,
     });

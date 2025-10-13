@@ -3,7 +3,7 @@
  * 자동 IP 감지 및 재시도 로직 포함
  */
 
-import { API_CONFIG } from './apiConfig';
+import Config from '../config';
 import { testApiConnection, findWorkingUrl } from './networkUtils';
 
 /**
@@ -12,9 +12,28 @@ import { testApiConnection, findWorkingUrl } from './networkUtils';
 class ApiClient {
   private baseUrl: string;
   private isConnected: boolean = false;
+  private initialized: boolean = false;
 
   constructor() {
-    this.baseUrl = API_CONFIG.BASE_URL;
+    this.baseUrl = Config.API_BASE_URL;
+    this.initialize();
+  }
+
+  /**
+   * 초기화 - 동적 IP 감지 실행
+   */
+  private async initialize() {
+    if (this.initialized) return;
+    
+    console.log('🚀 Initializing API Client with dynamic IP detection...');
+    
+    // Config의 동적 감지 시스템 실행
+    this.baseUrl = await Config.initializeApiUrl();
+    this.initialized = true;
+    
+    console.log('📡 API Client initialized with URL:', this.baseUrl);
+    
+    // 연결 테스트
     this.checkConnection();
   }
 
@@ -28,11 +47,12 @@ class ApiClient {
       console.warn('⚠️ 기본 URL 연결 실패, 대체 URL 탐색 중...');
       
       // 여러 가능한 URL 시도
-      const possibleUrls = [
+      const possibleUrls: string[] = [
         this.baseUrl,
         'http://localhost:8000',
         'http://10.0.2.2:8000',
-        ...Object.values(API_CONFIG.DEVELOPER_URLS),
+        'http://172.30.1.59:8000',
+        'http://192.168.45.161:8000',
       ];
 
       const workingUrl = await findWorkingUrl(possibleUrls);
@@ -48,6 +68,13 @@ class ApiClient {
    * GET 요청
    */
   async get<T>(endpoint: string, params?: Record<string, any>): Promise<T> {
+    // 초기화 보장
+    if (!this.initialized) {
+      await this.initialize();
+    }
+
+    console.log(`🔍 Making GET request to: ${this.baseUrl}${endpoint}`);
+
     const url = new URL(endpoint, this.baseUrl);
     
     if (params) {
@@ -67,13 +94,20 @@ class ApiClient {
       throw new Error(`API 오류: ${response.status} ${response.statusText}`);
     }
 
-    return response.json();
+    return response.json() as Promise<T>;
   }
 
   /**
    * POST 요청
    */
   async post<T>(endpoint: string, data: any): Promise<T> {
+    // 초기화 보장
+    if (!this.initialized) {
+      await this.initialize();
+    }
+
+    console.log(`📤 Making POST request to: ${this.baseUrl}${endpoint}`);
+
     const url = `${this.baseUrl}${endpoint}`;
 
     const response = await fetch(url, {
@@ -88,7 +122,7 @@ class ApiClient {
       throw new Error(`API 오류: ${response.status} ${response.statusText}`);
     }
 
-    return response.json();
+    return response.json() as Promise<T>;
   }
 
   /**

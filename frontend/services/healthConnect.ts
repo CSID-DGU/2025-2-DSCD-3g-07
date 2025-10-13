@@ -333,6 +333,7 @@ export class HealthConnectService {
   async readStepsData(startTime: Date, endTime: Date): Promise<any[]> {
     try {
       console.log('👟 Reading steps data from', startTime, 'to', endTime);
+      console.log('🎯 Filtering to Samsung Health only: com.sec.android.app.shealth');
       
       const result = await readRecords('Steps', {
         timeRangeFilter: {
@@ -340,10 +341,8 @@ export class HealthConnectService {
           startTime: startTime.toISOString(),
           endTime: endTime.toISOString(),
         },
-        // 선택사항: 특정 앱만 필터링하고 싶다면 주석 해제
-        // dataOriginFilter: [
-        //   { packageName: 'com.sec.android.app.shealth' }, // 삼성 헬스만
-        // ],
+        // Samsung Health에서만 걸음 수 데이터 가져오기
+        dataOriginFilter: ['com.sec.android.app.shealth'],
       });
       
       // 데이터 출처 분석 및 중복 제거

@@ -7,13 +7,47 @@ from typing import Optional, List
 def get_local_ip() -> Optional[str]:
     """
     로컬 네트워크 IP 주소를 자동으로 감지합니다.
+    우선순위: 1) ipconfig (더 정확) 2) Socket 연결 (백업)
     
     Returns:
-        str: 로컬 IP 주소 (예: 192.168.1.100)
+        str: 로컬 IP 주소 (예: 172.30.1.59)
         None: IP를 찾을 수 없는 경우
     """
+    
+    # 방법 1: Windows ipconfig 명령어 (우선순위)
+    if platform.system() == "Windows":
+        try:
+            result = subprocess.run(['ipconfig'], capture_output=True, text=True)
+            output = result.stdout
+            
+            # IPv4 주소 패턴 찾기 (사설 IP만)
+            ipv4_pattern = r'IPv4.*?: (192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+|172\.(?:1[6-9]|2\d|3[01])\.\d+\.\d+)'
+            matches = re.findall(ipv4_pattern, output)
+            
+            if matches:
+                local_ip = matches[0]
+                print(f"🔍 Method 1 - Windows ipconfig: {local_ip}")
+                return local_ip
+                
+        except Exception as e:
+            print(f"⚠️ Method 1 (ipconfig) failed: {e}")
+    
+    # 방법 1-2: Linux/Mac 시스템 명령어
+    else:
+        try:
+            result = subprocess.run(['hostname', '-I'], capture_output=True, text=True)
+            if result.returncode == 0:
+                ips = result.stdout.strip().split()
+                for ip in ips:
+                    if not ip.startswith('127.') and '.' in ip:
+                        print(f"🔍 Method 1 - Unix hostname: {ip}")
+                        return ip
+                        
+        except Exception as e:
+            print(f"⚠️ Method 1 (hostname) failed: {e}")
+
+    # 방법 2: Socket 연결 (백업)
     try:
-        # 방법 1: 외부 서버에 연결해서 로컬 IP 확인
         with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
             # Google DNS에 연결 (실제로 데이터를 보내지는 않음)
             s.connect(("8.8.8.8", 80))
@@ -21,39 +55,11 @@ def get_local_ip() -> Optional[str]:
             
             # 로컬호스트가 아닌 실제 네트워크 IP인지 확인
             if not local_ip.startswith('127.'):
-                print(f"🔍 Method 1 - Socket connection: {local_ip}")
+                print(f"🔍 Method 2 - Socket connection: {local_ip}")
                 return local_ip
                 
     except Exception as e:
-        print(f"⚠️ Method 1 failed: {e}")
-
-    try:
-        # 방법 2: 시스템 명령어를 사용한 IP 감지
-        if platform.system() == "Windows":
-            result = subprocess.run(['ipconfig'], capture_output=True, text=True)
-            output = result.stdout
-            
-            # IPv4 주소 패턴 찾기
-            ipv4_pattern = r'IPv4.*?: (192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+|172\.(?:1[6-9]|2\d|3[01])\.\d+\.\d+)'
-            matches = re.findall(ipv4_pattern, output)
-            
-            if matches:
-                local_ip = matches[0]
-                print(f"🔍 Method 2 - Windows ipconfig: {local_ip}")
-                return local_ip
-                
-        else:
-            # Linux/Mac용
-            result = subprocess.run(['hostname', '-I'], capture_output=True, text=True)
-            if result.returncode == 0:
-                ips = result.stdout.strip().split()
-                for ip in ips:
-                    if not ip.startswith('127.') and '.' in ip:
-                        print(f"🔍 Method 2 - Unix hostname: {ip}")
-                        return ip
-                        
-    except Exception as e:
-        print(f"⚠️ Method 2 failed: {e}")
+        print(f"⚠️ Method 2 (socket) failed: {e}")
 
     print("❌ Could not detect local IP address")
     return None

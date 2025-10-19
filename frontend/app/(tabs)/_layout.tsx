@@ -53,6 +53,13 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="weather"
+        options={{
+          title: '날씨',
+          tabBarIcon: ({ color }) => <MaterialIcons size={26} name="wb-sunny" color={color} />,
+        }}
+      />
+      <Tabs.Screen
         name="health-connect"
         options={{
           title: 'Health',

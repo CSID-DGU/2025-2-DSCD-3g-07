@@ -5,9 +5,6 @@ interface TransitRouteParams {
   start_y: number;
   end_x: number;
   end_y: number;
-  user_id?: string;
-  user_age?: number;
-  fatigue_level?: number;
   count?: number;
   lang?: number;
   format?: string;
@@ -55,9 +52,6 @@ class ApiService {
       start_y: params.start_y.toString(),
       end_x: params.end_x.toString(),
       end_y: params.end_y.toString(),
-      user_id: params.user_id || 'default_user',
-      user_age: params.user_age?.toString() || '30',
-      fatigue_level: params.fatigue_level?.toString() || '3',
       count: params.count?.toString() || '1',
       lang: params.lang?.toString() || '0',
       format: params.format || 'json',

@@ -67,6 +67,8 @@ export interface Leg {
   routeName?: string;
   route?: string;
   service?: number;
+  type?: number;
+  routeId?: string;
   passStopList?: PassStop;
 }
 
@@ -85,7 +87,8 @@ export interface Step {
 }
 
 export interface PassStop {
-  stations: Station[];
+  stations?: Station[];
+  stationList?: Station[];
 }
 
 export interface Station {
@@ -131,45 +134,26 @@ export interface Itinerary {
 }
 
 // ============================================
-// Personalization API Types
+// Future: Personalization API Types (예정)
 // ============================================
 
-export interface PersonalizationRequest {
-  userId: string;
-  healthData: {
-    averageSteps: number;
-    averageDistance: number;
-    recentActivities: ActivityData[];
-  };
-}
+// 향후 개인화 기능 추가시 사용할 타입들
+// export interface PersonalizationRequest {
+//   userId: string;
+//   healthData: {
+//     averageSteps: number;
+//     averageDistance: number;
+//     recentActivities: ActivityData[];
+//   };
+// }
 
-export interface ActivityData {
-  date: string;
-  steps: number;
-  distance: number;
-  duration: number;
-}
-
-export interface PersonalizationResponse {
-  userId: string;
-  walkingSpeedFactor: number;
-  fitnessLevel: 'low' | 'medium' | 'high';
-  recommendations: string[];
-  calculatedAt: string;
-}
-
-export interface PersonalizedRouteRequest extends TransitRouteRequest {
-  userId: string;
-  userWalkingSpeed?: number;
-}
-
-export interface PersonalizedRouteResponse extends TransitRouteResponse {
-  personalized: {
-    adjustedWalkTime: number;
-    adjustedTotalTime: number;
-    speedFactor: number;
-  };
-}
+// export interface PersonalizedRouteResponse extends TransitRouteResponse {
+//   personalized: {
+//     adjustedWalkTime: number;
+//     adjustedTotalTime: number;
+//     speedFactor: number;
+//   };
+// }
 
 // ============================================
 // Map API Types

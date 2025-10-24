@@ -11,6 +11,8 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTransitRoute } from '../../hooks/api/useApi';
+import RouteDetailComponent from '../../components/RouteDetailComponent';
 
 const TABS = [
   { id: 'recommended', label: '추천', helper: '맞춤 추천' },
@@ -95,6 +97,9 @@ export default function RoutesScreen() {
   const [start, setStart] = useState('현재 위치');
   const [destination, setDestination] = useState('도착지를 입력하세요');
   const [filters, setFilters] = useState<string[]>(['강변 뷰']);
+  const [showRouteResult, setShowRouteResult] = useState(false);
+
+  const { data: routeData, loading: routeLoading, error: routeError, getRoute } = useTransitRoute();
 
   const routes = useMemo(() => ROUTES[activeTab as keyof typeof ROUTES], [activeTab]);
 
@@ -102,6 +107,21 @@ export default function RoutesScreen() {
     setFilters((prev) =>
       prev.includes(item) ? prev.filter((value) => value !== item) : [...prev, item]
     );
+  };
+
+  const searchRoute = async () => {
+    // 테스트용 좌표 (서울역 -> 강남역)
+    const startCoords = { x: 126.9706, y: 37.5547 };
+    const endCoords = { x: 127.0276, y: 37.4979 };
+    
+    await getRoute({
+      start_x: startCoords.x,
+      start_y: startCoords.y,
+      end_x: endCoords.x,
+      end_y: endCoords.y,
+    });
+    
+    setShowRouteResult(true);
   };
 
   return (
@@ -148,9 +168,15 @@ export default function RoutesScreen() {
               </TouchableOpacity>
             ))}
           </View>
-          <TouchableOpacity style={styles.ctaButton}>
+          <TouchableOpacity 
+            style={[styles.ctaButton, routeLoading && styles.ctaButtonLoading]} 
+            onPress={searchRoute}
+            disabled={routeLoading}
+          >
             <MaterialIcons name="directions" size={18} color="#FFFFFF" />
-            <Text style={styles.ctaText}>경로 검색</Text>
+            <Text style={styles.ctaText}>
+              {routeLoading ? '검색 중...' : '경로 검색'}
+            </Text>
           </TouchableOpacity>
         </View>
 
@@ -184,6 +210,26 @@ export default function RoutesScreen() {
             );
           })}
         </View>
+
+        {/* 경로 검색 결과 표시 */}
+        {showRouteResult && (
+          <View style={styles.routeResultContainer}>
+            <View style={styles.resultHeader}>
+              <Text style={styles.resultTitle}>검색 결과</Text>
+              <TouchableOpacity 
+                onPress={() => setShowRouteResult(false)}
+                style={styles.closeButton}
+              >
+                <MaterialIcons name="close" size={20} color="#667085" />
+              </TouchableOpacity>
+            </View>
+            {routeError ? (
+              <Text style={styles.errorText}>❌ 오류: {routeError}</Text>
+            ) : (
+              <RouteDetailComponent routeData={routeData} />
+            )}
+          </View>
+        )}
 
         <View style={styles.routeList}>
           {routes.map((route) => (
@@ -462,5 +508,39 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     color: '#FFFFFF',
+  },
+  ctaButtonLoading: {
+    backgroundColor: '#9AA3B0',
+  },
+  routeResultContainer: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  resultHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  resultTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#1C1E21',
+  },
+  closeButton: {
+    padding: 4,
+  },
+  errorText: {
+    color: '#F44336',
+    fontSize: 14,
+    textAlign: 'center',
+    padding: 20,
   },
 });

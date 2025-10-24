@@ -2,6 +2,7 @@ import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import * as Location from 'expo-location';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
+  Alert,
   Animated,
   Dimensions,
   PanResponder,
@@ -125,7 +126,7 @@ export default function HomeScreen() {
       const { status: permission } = await Location.requestForegroundPermissionsAsync();
       if (permission !== 'granted') {
         setStatus('denied');
-        alert('위치 권한이 필요합니다. 설정에서 권한을 허용해주세요.');
+        Alert.alert('위치 권한 필요', '위치 권한이 필요합니다. 설정에서 권한을 허용해주세요.');
         return;
       }
       setStatus('granted');
@@ -136,7 +137,7 @@ export default function HomeScreen() {
     } catch (error) {
       console.warn('[location] failed', error);
       setStatus('denied');
-      alert('위치 정보를 가져올 수 없습니다. 다시 시도해주세요.');
+      Alert.alert('위치 오류', '위치 정보를 가져올 수 없습니다. 다시 시도해주세요.');
     }
   }, []);
 

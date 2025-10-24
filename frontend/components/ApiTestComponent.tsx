@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { useHealthCheck, useTransitRoute } from '../hooks/api/useApi';
+import RouteDetailComponent from './RouteDetailComponent';
 import Config from '../config';
 
 const ApiTestComponent: React.FC = () => {
@@ -14,14 +15,12 @@ const ApiTestComponent: React.FC = () => {
 
   const testTransitRoute = async () => {
     console.log('🔍 Testing Transit Route...');
-    // 서울역 -> 강남역 테스트 좌표
+    // 동국대 본관 -> 창동축구장 테스트 좌표
     await getRoute({
-      start_x: 126.9706,
-      start_y: 37.5547,
-      end_x: 127.0276,
-      end_y: 37.4979,
-      user_age: 25,
-      fatigue_level: 2,
+      start_x: 127.000000,
+      start_y: 37.557778,
+      end_x: 127.040556,
+      end_y: 37.648333,
     });
   };
 
@@ -72,20 +71,35 @@ const ApiTestComponent: React.FC = () => {
           disabled={routeLoading}
         >
           <Text style={styles.buttonText}>
-            {routeLoading ? '⏳ 검색 중...' : '🗺️ 경로 검색 (서울역→강남역)'}
+            {routeLoading ? '⏳ 검색 중...' : '🗺️ 경로 검색 (동국대 본관→창동축구장)'}
           </Text>
         </TouchableOpacity>
 
         {routeData && (
-          <Text style={styles.successText}>
-            ✅ 경로 검색 성공! 총 시간: {routeData.total_time_minutes?.toFixed(1)}분
-          </Text>
+          <View>
+            <Text style={styles.successText}>
+              ✅ 경로 검색 성공!
+            </Text>
+            {routeData.metaData?.plan?.itineraries?.[0] && (
+              <Text style={styles.successText}>
+                총 시간: {Math.round(routeData.metaData.plan.itineraries[0].totalTime / 60)}분
+              </Text>
+            )}
+          </View>
         )}
 
         {routeError && (
           <Text style={styles.errorText}>❌ 오류: {routeError}</Text>
         )}
       </View>
+
+      {/* 경로 상세 정보 표시 */}
+      {routeData && (
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>상세 경로 정보</Text>
+          <RouteDetailComponent routeData={routeData} />
+        </View>
+      )}
     </View>
   );
 };

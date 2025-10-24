@@ -1,527 +1,434 @@
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import * as Location from 'expo-location';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
-  Alert,
-  Animated,
-  Dimensions,
-  PanResponder,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
+  View,
   Text,
   TextInput,
   TouchableOpacity,
-  View,
+  StyleSheet,
+  ScrollView,
+  ActivityIndicator,
+  Alert,
+  StatusBar,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
 import KakaoMap from '@/components/KakaoMap';
-
-const KAKAO_JS_KEY = 'd377e8ba6e5edd8176c63a3f97c9e17b';
+import { apiService } from '@/services/api';
+import type { ApiResponse, TransitRouteParams } from '@/services/api';
 
 const PRIMARY_COLOR = '#2C6DE7';
 const SECONDARY_TEXT = '#4A5968';
 const LIGHT_BACKGROUND = '#F2F5FC';
 const BORDER_COLOR = '#E6E9F2';
 
-const quickSearchChips = ['한강공원', '서울숲', '강남역', '회사'];
+interface LocationData {
+  address: string;
+  latitude: number;
+  longitude: number;
+}
 
-const quickActions = [
-  { id: 'favorite', icon: 'bookmark', label: '즐겨찾기' },
-  { id: 'recent', icon: 'history', label: '최근 경로' },
-  { id: 'pace', icon: 'directions-walk', label: '페이스' },
-  { id: 'share', icon: 'share', label: '공유' },
-];
-
-const todayHighlights = [
-  {
-    id: 'steps',
-    title: '오늘 걸음 수',
-    value: '6,420보',
-    trend: '어제보다 +12%',
-    icon: 'directions-walk',
-  },
-  {
-    id: 'active',
-    title: '활동 시간',
-    value: '48분',
-    trend: '지난주 대비 +8%',
-    icon: 'schedule',
-  },
-  {
-    id: 'calories',
-    title: '칼로리 소모',
-    value: '320 kcal',
-    trend: '지난주 대비 +5%',
-    icon: 'local-fire-department',
-  },
-];
-
-const planSuggestions = [
-  {
-    id: 'plan-1',
-    title: '여유 있는 강변 산책',
-    summary: '여의나루-선셋 포인트 왕복 코스',
-    distance: '3.6 km',
-    duration: '48분',
-    calories: '180 kcal',
-    surface: '평탄한 데크와 산책로',
-    highlight: '노을 전망이 좋은 구간 포함',
-    mood: '느긋하게',
-    color: '#2C6DE7',
-  },
-  {
-    id: 'plan-2',
-    title: '점심시간 속도 플랜',
-    summary: '망원시장까지 빠르게 다녀오기',
-    distance: '2.4 km',
-    duration: '32분',
-    calories: '120 kcal',
-    surface: '도심 보도, 완만한 경사',
-    highlight: '신호 대기 적고 인파가 적은 경로',
-    mood: '빠르게',
-    color: '#2F9BFF',
-  },
-  {
-    id: 'plan-3',
-    title: '서울숲 사진 스팟',
-    summary: '서울숲 포토존을 따라 걷기',
-    distance: '4.2 km',
-    duration: '58분',
-    calories: '214 kcal',
-    surface: '포장 산책로와 잔잔한 자갈길',
-    highlight: '카페와 전망 데크를 지나는 길',
-    mood: '풍경 감상',
-    color: '#27A26E',
-  },
-];
-
-const { height } = Dimensions.get('window');
-const SHEET_HEIGHT = Math.min(height * 0.88, 750);
-const PEEK_HEIGHT = 120;
-const SHEET_POSITIONS = {
-  expanded: 20,
-  middle: SHEET_HEIGHT * 0.45,
-  collapsed: SHEET_HEIGHT - PEEK_HEIGHT,
-};
-
-function clamp(value: number, min: number, max: number) {
-  return Math.max(min, Math.min(max, value));
+interface RouteInfo {
+  totalTime: number;
+  totalWalkTime: number;
+  walkRatio: number;
+  walkingSections: any[];
+  personalizedWalkTime: number;
 }
 
 export default function HomeScreen() {
-  const [status, setStatus] = useState<'idle' | 'granted' | 'denied'>('idle');
-  const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
-  const [startText, setStartText] = useState('현재 위치');
-  const [endText, setEndText] = useState('도착지를 입력하세요');
-  const [search, setSearch] = useState('');
+  const [startLocation, setStartLocation] = useState<LocationData | null>(null);
+  const [endLocation, setEndLocation] = useState<LocationData | null>(null);
+  const [startInput, setStartInput] = useState('');
+  const [endInput, setEndInput] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [routeInfo, setRouteInfo] = useState<RouteInfo | null>(null);
+  const [searchMode, setSearchMode] = useState<'start' | 'end' | null>(null);
 
-  const sheetValue = useRef(new Animated.Value(SHEET_POSITIONS.collapsed)).current;
-  const sheetPosition = useRef(SHEET_POSITIONS.collapsed);
-  const dragOffset = useRef(SHEET_POSITIONS.collapsed);
-
-  const requestLocation = useCallback(async () => {
+  // 현재 위치 가져오기
+  const getCurrentLocation = async () => {
     try {
-      const { status: permission } = await Location.requestForegroundPermissionsAsync();
-      if (permission !== 'granted') {
-        setStatus('denied');
-        Alert.alert('위치 권한 필요', '위치 권한이 필요합니다. 설정에서 권한을 허용해주세요.');
+      setLoading(true);
+      const { status } = await Location.requestForegroundPermissionsAsync();
+
+      if (status !== 'granted') {
+        Alert.alert('위치 권한 필요', '현재 위치를 사용하려면 위치 권한이 필요합니다.');
         return;
       }
-      setStatus('granted');
-      const position = await Location.getCurrentPositionAsync({ 
-        accuracy: Location.Accuracy.Balanced
+
+      const location = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.Balanced,
       });
-      setCoords({ lat: position.coords.latitude, lng: position.coords.longitude });
+
+      const [address] = await Location.reverseGeocodeAsync({
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+      });
+
+      const addressText = address ? [
+        address.city,
+        address.district,
+        address.street,
+      ].filter(Boolean).join(' ') : '현재 위치';
+
+      const locationData: LocationData = {
+        address: addressText,
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+      };
+
+      setStartLocation(locationData);
+      setStartInput(addressText);
+
     } catch (error) {
-      console.warn('[location] failed', error);
-      setStatus('denied');
-      Alert.alert('위치 오류', '위치 정보를 가져올 수 없습니다. 다시 시도해주세요.');
+      console.error('위치 가져오기 실패:', error);
+      Alert.alert('오류', '현재 위치를 가져올 수 없습니다.');
+    } finally {
+      setLoading(false);
     }
-  }, []);
+  };
 
-  useEffect(() => {
-    requestLocation();
-  }, [requestLocation]);
-
-  const snapTo = useCallback(
-    (target: number) => {
-      Animated.spring(sheetValue, {
-        toValue: target,
-        useNativeDriver: true,
-        damping: 18,
-        stiffness: 160,
-      }).start(() => {
-        sheetPosition.current = target;
-      });
-    },
-    [sheetValue],
-  );
-
-  const panResponder = useMemo(
-    () =>
-      PanResponder.create({
-        onMoveShouldSetPanResponder: (_, gesture) => Math.abs(gesture.dy) > 6,
-        onPanResponderGrant: () => {
-          sheetValue.stopAnimation();
-          dragOffset.current = sheetPosition.current;
-        },
-        onPanResponderMove: (_, gesture) => {
-          const next = clamp(dragOffset.current + gesture.dy, SHEET_POSITIONS.expanded, SHEET_POSITIONS.collapsed);
-          sheetValue.setValue(next);
-        },
-        onPanResponderRelease: (_, gesture) => {
-          const next = clamp(dragOffset.current + gesture.dy, SHEET_POSITIONS.expanded, SHEET_POSITIONS.collapsed);
-          const targets = [SHEET_POSITIONS.expanded, SHEET_POSITIONS.middle, SHEET_POSITIONS.collapsed];
-          const closest = targets.reduce((prev, curr) => (Math.abs(curr - next) < Math.abs(prev - next) ? curr : prev));
-          snapTo(closest);
-        },
-      }),
-    [snapTo, sheetValue],
-  );
-
-  const openPlanner = useCallback(() => snapTo(SHEET_POSITIONS.middle), [snapTo]);
-  const expandPlanner = useCallback(() => snapTo(SHEET_POSITIONS.expanded), [snapTo]);
-  const collapsePlanner = useCallback(() => snapTo(SHEET_POSITIONS.collapsed), [snapTo]);
-
-  const statusLabel = useMemo(() => {
-    if (status === 'granted' && coords) {
-      return `최근 업데이트 (${coords.lat.toFixed(4)}, ${coords.lng.toFixed(4)})`;
+  // 경로 검색
+  const searchRoute = async () => {
+    if (!startLocation || !endLocation) {
+      Alert.alert('알림', '출발지와 도착지를 모두 입력해주세요.');
+      return;
     }
-    if (status === 'denied') {
-      return '위치 권한이 필요해요';
+
+    try {
+      setLoading(true);
+
+      const params: TransitRouteParams = {
+        start_x: startLocation.longitude,
+        start_y: startLocation.latitude,
+        end_x: endLocation.longitude,
+        end_y: endLocation.latitude,
+        user_id: 'default_user',
+        user_age: 25,
+        fatigue_level: 3,
+      };
+
+      const response = await apiService.getTransitRoute(params);
+
+      if (response.data) {
+        setRouteInfo({
+          totalTime: response.data.total_time_minutes,
+          totalWalkTime: response.data.total_walk_time_minutes,
+          walkRatio: response.data.walk_ratio_percent,
+          walkingSections: response.data.walking_sections,
+          personalizedWalkTime: response.data.total_personalized_walk_time_minutes,
+        });
+
+        console.log('경로 검색 성공:', response.data);
+      } else {
+        Alert.alert('오류', response.error || '경로를 검색할 수 없습니다.');
+      }
+
+    } catch (error) {
+      console.error('경로 검색 실패:', error);
+      Alert.alert('오류', '경로를 검색할 수 없습니다.');
+    } finally {
+      setLoading(false);
     }
-    return '현재 위치를 불러오는 중...';
-  }, [status, coords]);
+  };
+
+  // 장소 검색 (간단한 더미 데이터)
+  const searchPlace = (query: string, type: 'start' | 'end') => {
+    // 실제로는 카카오 로컬 API 등을 사용
+    const dummyPlaces: { [key: string]: LocationData } = {
+      '강남역': { address: '서울 강남구 강남역', latitude: 37.4979, longitude: 127.0276 },
+      '홍대입구역': { address: '서울 마포구 홍대입구역', latitude: 37.5570, longitude: 126.9229 },
+      '여의도공원': { address: '서울 영등포구 여의도공원', latitude: 37.5289, longitude: 126.9338 },
+      '서울숲': { address: '서울 성동구 서울숲', latitude: 37.5443, longitude: 127.0374 },
+      '한강공원': { address: '서울 용산구 한강공원', latitude: 37.5285, longitude: 126.9332 },
+    };
+
+    const place = dummyPlaces[query];
+    if (place) {
+      if (type === 'start') {
+        setStartLocation(place);
+        setStartInput(place.address);
+      } else {
+        setEndLocation(place);
+        setEndInput(place.address);
+      }
+      setSearchMode(null);
+    }
+  };
+
+  const quickPlaces = ['강남역', '홍대입구역', '여의도공원', '서울숲', '한강공원'];
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
+    <SafeAreaView style={styles.container}>
+      <StatusBar barStyle="dark-content" backgroundColor="white" />
 
-      <View style={styles.mapContainer}>
-        {coords ? (
-          <KakaoMap jsKey={KAKAO_JS_KEY} lat={coords.lat} lng={coords.lng} />
-        ) : (
-          <View style={styles.mapPlaceholder}>
-            <MaterialIcons name="map" size={64} color={PRIMARY_COLOR} />
-            <Text style={styles.mapPlaceholderTitle}>지도를 불러오는 중</Text>
-            <Text style={styles.mapPlaceholderSubtitle}>{statusLabel}</Text>
-          </View>
-        )}
-
-        <View style={styles.overlayTop}>
-          <View style={styles.searchBar}>
-            <MaterialIcons name="search" size={18} color="#7F8C8D" />
-            <TextInput
-              value={search}
-              onChangeText={setSearch}
-              placeholder="어디로 가시나요?"
-              placeholderTextColor="#98A2B3"
-              style={styles.searchInput}
-              onFocus={openPlanner}
-              returnKeyType="search"
-            />
-            {!!search && (
-              <TouchableOpacity onPress={() => setSearch('')} style={styles.clearButton}>
-                <MaterialIcons name="close" size={16} color="#B0B7C3" />
-              </TouchableOpacity>
-            )}
-          </View>
-          <View style={styles.chipRow}>
-            {quickSearchChips.map((item) => (
-              <TouchableOpacity key={item} style={styles.chip} onPress={openPlanner}>
-                <Text style={styles.chipText}>{item}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-        </View>
-
-        <View style={styles.overlayButtons}>
-          <TouchableOpacity style={styles.roundButton} onPress={requestLocation}>
-            <MaterialIcons name="my-location" size={20} color={PRIMARY_COLOR} />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.roundButton} onPress={expandPlanner}>
-            <MaterialIcons name="alt-route" size={20} color={PRIMARY_COLOR} />
-          </TouchableOpacity>
-        </View>
+      {/* 헤더 */}
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>PaceTry</Text>
+        <Text style={styles.headerSubtitle}>나만의 속도로 가는 길</Text>
       </View>
 
-      <Animated.View
-        style={[styles.routeSheet, { transform: [{ translateY: sheetValue }] }]}
-        {...panResponder.panHandlers}
-      >
-        <TouchableOpacity activeOpacity={1} onPress={expandPlanner}>
-          <View style={styles.sheetHandle} />
-        </TouchableOpacity>
-        <View style={styles.sheetHeader}>
-          <View>
-            <Text style={styles.sheetTitle}>걷기 계획</Text>
-            <Text style={styles.sheetSubtitle}>내 걸음에 맞는 맞춤 경로를 확인해 보세요</Text>
+      {/* 검색 영역 */}
+      <View style={styles.searchContainer}>
+        {/* 출발지 */}
+        <View style={styles.searchRow}>
+          <View style={styles.searchIconContainer}>
+            <View style={[styles.dot, styles.startDot]} />
           </View>
-          <TouchableOpacity style={styles.sheetClose} onPress={collapsePlanner}>
-            <MaterialIcons name="expand-more" size={22} color={SECONDARY_TEXT} />
+          <TextInput
+            style={styles.searchInput}
+            placeholder="출발지를 입력하세요"
+            value={startInput}
+            onChangeText={setStartInput}
+            onFocus={() => setSearchMode('start')}
+          />
+          <TouchableOpacity
+            style={styles.currentLocationButton}
+            onPress={getCurrentLocation}
+          >
+            <MaterialIcons name="my-location" size={20} color={PRIMARY_COLOR} />
           </TouchableOpacity>
         </View>
 
-        <ScrollView
-          style={styles.sheetScroll}
-          contentContainerStyle={styles.sheetScrollContent}
-          showsVerticalScrollIndicator={false}
-        >
-          <View style={styles.sectionBlock}>
-            <Text style={styles.sectionTitle}>빠른 실행</Text>
-            <View style={styles.quickActionRow}>
-              {quickActions.map((item) => (
-                <TouchableOpacity key={item.id} style={styles.quickAction} onPress={openPlanner}>
-                  <View style={styles.quickIconCircle}>
-                    <MaterialIcons name={item.icon as any} size={20} color={PRIMARY_COLOR} />
-                  </View>
-                  <Text style={styles.quickLabel}>{item.label}</Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-          </View>
+        {/* 교환 버튼 */}
+        <View style={styles.swapButtonContainer}>
+          <TouchableOpacity
+            style={styles.swapButton}
+            onPress={() => {
+              const temp = startLocation;
+              const tempInput = startInput;
+              setStartLocation(endLocation);
+              setStartInput(endInput);
+              setEndLocation(temp);
+              setEndInput(tempInput);
+            }}
+          >
+            <MaterialIcons name="swap-vert" size={20} color={SECONDARY_TEXT} />
+          </TouchableOpacity>
+        </View>
 
-          <View style={styles.sectionBlock}>
-            <Text style={styles.sectionTitle}>오늘의 요약</Text>
-            <View style={styles.highlightRow}>
-              {todayHighlights.map((item) => (
-                <View key={item.id} style={styles.highlightCard}>
-                  <View style={styles.highlightHeader}>
-                    <MaterialIcons name={item.icon as any} size={18} color={PRIMARY_COLOR} />
-                    <Text style={styles.highlightTitle}>{item.title}</Text>
-                  </View>
-                  <Text style={styles.highlightValue}>{item.value}</Text>
-                  <Text style={styles.highlightTrend}>{item.trend}</Text>
-                </View>
-              ))}
-            </View>
+        {/* 도착지 */}
+        <View style={styles.searchRow}>
+          <View style={styles.searchIconContainer}>
+            <View style={[styles.dot, styles.endDot]} />
           </View>
-
-          <View style={[styles.sectionBlock, styles.formBlock]}>
-            <Text style={styles.sectionTitle}>도보 경로 입력</Text>
-            <View style={styles.inputRow}>
-              <MaterialIcons name="my-location" size={18} color={PRIMARY_COLOR} />
-              <TextInput value={startText} onChangeText={setStartText} style={styles.inputField} />
-              <MaterialIcons name="swap-vert" size={18} color="#B0B7C3" />
-            </View>
-            <View style={styles.inputRow}>
-              <MaterialIcons name="flag" size={18} color="#FF7A64" />
-              <TextInput value={endText} onChangeText={setEndText} style={styles.inputField} />
-              <MaterialIcons name="bookmark" size={18} color="#B0B7C3" />
-            </View>
-            <View style={styles.suggestionRow}>
-              {['집', '회사', '지하철역', '공원'].map((item) => (
-                <TouchableOpacity key={item} style={styles.suggestionChip} onPress={() => setEndText(item)}>
-                  <Text style={styles.suggestionText}>{item}</Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-            <TouchableOpacity style={styles.planButton} onPress={expandPlanner}>
-              <MaterialIcons name="directions" size={18} color="#FFFFFF" />
-              <Text style={styles.planButtonText}>경로 검색</Text>
+          <TextInput
+            style={styles.searchInput}
+            placeholder="도착지를 입력하세요"
+            value={endInput}
+            onChangeText={setEndInput}
+            onFocus={() => setSearchMode('end')}
+          />
+          {endInput.length > 0 && (
+            <TouchableOpacity
+              style={styles.clearButton}
+              onPress={() => {
+                setEndInput('');
+                setEndLocation(null);
+              }}
+            >
+              <MaterialIcons name="close" size={20} color={SECONDARY_TEXT} />
             </TouchableOpacity>
-          </View>
+          )}
+        </View>
 
-          <View style={styles.sectionBlock}>
-            <View style={styles.sectionHeaderRow}>
-              <Text style={styles.sectionTitle}>추천 걷기 코스</Text>
-              <TouchableOpacity style={styles.sectionMore} onPress={expandPlanner}>
-                <Text style={styles.sectionMoreText}>더 보기</Text>
-                <MaterialIcons name="chevron-right" size={18} color={PRIMARY_COLOR} />
+        {/* 검색 버튼 */}
+        <TouchableOpacity
+          style={[styles.searchButton, (!startLocation || !endLocation) && styles.searchButtonDisabled]}
+          onPress={searchRoute}
+          disabled={!startLocation || !endLocation || loading}
+        >
+          {loading ? (
+            <ActivityIndicator color="white" />
+          ) : (
+            <>
+              <MaterialIcons name="search" size={20} color="white" />
+              <Text style={styles.searchButtonText}>경로 검색</Text>
+            </>
+          )}
+        </TouchableOpacity>
+      </View>
+
+      {/* 빠른 검색 칩 */}
+      {searchMode && (
+        <View style={styles.quickSearchContainer}>
+          <Text style={styles.quickSearchTitle}>빠른 검색</Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            {quickPlaces.map((place) => (
+              <TouchableOpacity
+                key={place}
+                style={styles.quickChip}
+                onPress={() => searchPlace(place, searchMode)}
+              >
+                <MaterialIcons name="place" size={16} color={PRIMARY_COLOR} />
+                <Text style={styles.quickChipText}>{place}</Text>
               </TouchableOpacity>
+            ))}
+          </ScrollView>
+        </View>
+      )}
+
+      {/* 지도 영역 */}
+      <View style={styles.mapContainer}>
+        <KakaoMap
+          jsKey="d377e8ba6e5edd8176c63a3f97c9e17b"
+          lat={startLocation?.latitude || 37.5665}
+          lng={startLocation?.longitude || 126.9780}
+        />
+      </View>
+
+      {/* 경로 정보 */}
+      {routeInfo && (
+        <View style={styles.routeInfoContainer}>
+          <ScrollView>
+            <View style={styles.routeInfoHeader}>
+              <MaterialIcons name="directions-transit" size={24} color={PRIMARY_COLOR} />
+              <Text style={styles.routeInfoTitle}>추천 경로</Text>
             </View>
-            <View>
-              {planSuggestions.map((plan) => (
-                <View key={plan.id} style={[styles.planCard, { borderLeftColor: plan.color }]}>
-                  <View style={styles.planHeader}>
-                    <Text style={styles.planTitle}>{plan.title}</Text>
-                    <View style={[styles.planBadge, { backgroundColor: `${plan.color}1A` }]}> 
-                      <MaterialIcons name="emoji-emotions" size={14} color={plan.color} />
-                      <Text style={[styles.planBadgeText, { color: plan.color }]}>{plan.mood}</Text>
-                    </View>
+
+            <View style={styles.routeStats}>
+              <View style={styles.statItem}>
+                <MaterialIcons name="schedule" size={20} color={SECONDARY_TEXT} />
+                <Text style={styles.statValue}>{Math.round(routeInfo.totalTime)}분</Text>
+                <Text style={styles.statLabel}>총 시간</Text>
+              </View>
+
+              <View style={styles.statDivider} />
+
+              <View style={styles.statItem}>
+                <MaterialIcons name="directions-walk" size={20} color={SECONDARY_TEXT} />
+                <Text style={styles.statValue}>{Math.round(routeInfo.totalWalkTime)}분</Text>
+                <Text style={styles.statLabel}>도보 시간</Text>
+              </View>
+
+              <View style={styles.statDivider} />
+
+              <View style={styles.statItem}>
+                <MaterialIcons name="person" size={20} color={PRIMARY_COLOR} />
+                <Text style={[styles.statValue, { color: PRIMARY_COLOR }]}>
+                  {Math.round(routeInfo.personalizedWalkTime)}분
+                </Text>
+                <Text style={styles.statLabel}>나의 속도</Text>
+              </View>
+            </View>
+
+            <View style={styles.walkingSections}>
+              <Text style={styles.sectionTitle}>
+                도보 구간 ({routeInfo.walkingSections.length}개)
+              </Text>
+              {routeInfo.walkingSections.map((section, index) => (
+                <View key={index} style={styles.sectionItem}>
+                  <View style={styles.sectionIcon}>
+                    <MaterialIcons name="directions-walk" size={16} color={PRIMARY_COLOR} />
                   </View>
-                  <Text style={styles.planSummary}>{plan.summary}</Text>
-                  <View style={styles.planMetrics}>
-                    <View style={styles.metricItem}>
-                      <MaterialIcons name="straighten" size={16} color={PRIMARY_COLOR} />
-                      <Text style={styles.metricText}>{plan.distance}</Text>
-                    </View>
-                    <View style={styles.metricItem}>
-                      <MaterialIcons name="schedule" size={16} color={PRIMARY_COLOR} />
-                      <Text style={styles.metricText}>{plan.duration}</Text>
-                    </View>
-                    <View style={styles.metricItem}>
-                      <MaterialIcons name="local-fire-department" size={16} color={PRIMARY_COLOR} />
-                      <Text style={styles.metricText}>{plan.calories}</Text>
-                    </View>
+                  <View style={styles.sectionInfo}>
+                    <Text style={styles.sectionName}>
+                      {section.start_name} → {section.end_name}
+                    </Text>
+                    <Text style={styles.sectionDetail}>
+                      {section.distance_meters}m · {Math.round(section.section_time_seconds / 60)}분
+                      {section.personalized_time_seconds && (
+                        <Text style={{ color: PRIMARY_COLOR }}>
+                          {' '}(나: {Math.round(section.personalized_time_seconds / 60)}분)
+                        </Text>
+                      )}
+                    </Text>
                   </View>
-                  <View style={styles.planDetailsRow}>
-                    <MaterialIcons name="terrain" size={16} color={plan.color} />
-                    <Text style={styles.planDetailText}>{plan.surface}</Text>
-                  </View>
-                  <View style={styles.planDetailsRow}>
-                    <MaterialIcons name="assistant" size={16} color={plan.color} />
-                    <Text style={styles.planDetailText}>{plan.highlight}</Text>
-                  </View>
-                  <TouchableOpacity style={[styles.planAction, { backgroundColor: plan.color }]}>
-                    <Text style={styles.planActionText}>이 경로로 시작</Text>
-                    <MaterialIcons name="play-arrow" size={18} color="#FFFFFF" />
-                  </TouchableOpacity>
                 </View>
               ))}
             </View>
-          </View>
-        </ScrollView>
-      </Animated.View>
+          </ScrollView>
+        </View>
+      )}
+
+      {/* 경로 정보가 없을 때 안내 */}
+      {!routeInfo && !searchMode && (
+        <View style={styles.emptyState}>
+          <MaterialIcons name="directions" size={48} color={BORDER_COLOR} />
+          <Text style={styles.emptyStateTitle}>출발지와 도착지를 입력하세요</Text>
+          <Text style={styles.emptyStateSubtitle}>
+            나만의 속도에 맞춘 경로를 찾아드립니다
+          </Text>
+        </View>
+      )}
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
+  container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: 'white',
   },
-  mapContainer: {
-    flex: 1,
-    backgroundColor: '#E8EEFF',
-    overflow: 'hidden',
+  header: {
+    padding: 20,
+    paddingBottom: 16,
   },
-  mapPlaceholder: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 12,
-    backgroundColor: '#F8FAFF',
+  headerTitle: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: PRIMARY_COLOR,
+    marginBottom: 4,
   },
-  mapPlaceholderTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#1C1E21',
-  },
-  mapPlaceholderSubtitle: {
-    fontSize: 12,
+  headerSubtitle: {
+    fontSize: 14,
     color: SECONDARY_TEXT,
   },
-  overlayTop: {
-    position: 'absolute',
-    left: 20,
-    right: 20,
-    top: 22,
-    gap: 12,
+  searchContainer: {
+    padding: 16,
+    backgroundColor: 'white',
+    borderRadius: 16,
+    marginHorizontal: 16,
+    marginBottom: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
   },
-  searchBar: {
+  searchRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 28,
-    paddingHorizontal: 18,
-    paddingVertical: 14,
-    gap: 12,
-    shadowColor: '#00000020',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-    elevation: 8,
+    marginBottom: 12,
+  },
+  searchIconContainer: {
+    width: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  dot: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+  },
+  startDot: {
+    backgroundColor: '#4CAF50',
+  },
+  endDot: {
+    backgroundColor: '#F44336',
   },
   searchInput: {
     flex: 1,
-    fontSize: 16,
-    color: '#1C1E21',
+    height: 44,
+    backgroundColor: LIGHT_BACKGROUND,
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    fontSize: 15,
+    color: '#333',
+  },
+  currentLocationButton: {
+    marginLeft: 8,
+    padding: 8,
   },
   clearButton: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
+    marginLeft: 8,
+    padding: 8,
+  },
+  swapButtonContainer: {
     alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#F0F2F6',
+    marginVertical: -6,
   },
-  chipRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
-  chip: {
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 20,
-    backgroundColor: '#FFFFFF',
-    shadowColor: '#00000010',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-    elevation: 2,
-  },
-  chipText: {
-    fontSize: 13,
-    color: PRIMARY_COLOR,
-    fontWeight: '600',
-  },
-  overlayButtons: {
-    position: 'absolute',
-    right: 20,
-    bottom: 120,
-    gap: 12,
-  },
-  roundButton: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#FFFFFF',
-    shadowColor: '#00000030',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.12,
-    shadowRadius: 6,
-    elevation: 6,
-  },
-  routeSheet: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    height: SHEET_HEIGHT,
-    bottom: 0,
-    backgroundColor: '#FFFFFF',
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    shadowColor: '#00000040',
-    shadowOffset: { width: 0, height: -4 },
-    shadowOpacity: 0.12,
-    shadowRadius: 12,
-    elevation: 12,
-    paddingBottom: 8,
-  },
-  sheetHandle: {
-    alignSelf: 'center',
-    width: 48,
-    height: 5,
-    borderRadius: 999,
-    backgroundColor: BORDER_COLOR,
-    marginTop: 12,
-    marginBottom: 8,
-  },
-  sheetHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 24,
-    paddingBottom: 12,
-  },
-  sheetTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#1C1E21',
-  },
-  sheetSubtitle: {
-    fontSize: 13,
-    color: SECONDARY_TEXT,
-    marginTop: 4,
-  },
-  sheetClose: {
+  swapButton: {
     width: 36,
     height: 36,
     borderRadius: 18,
@@ -529,227 +436,157 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  sheetScroll: {
-    flex: 1,
-  },
-  sheetScrollContent: {
-    paddingHorizontal: 24,
-    paddingBottom: 80,
-    gap: 20,
-  },
-  sectionBlock: {
-    backgroundColor: '#FFFFFF',
-  },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#1C1E21',
-  },
-  sectionCaption: {
-    fontSize: 12,
-    color: SECONDARY_TEXT,
-    marginTop: 4,
-  },
-  sectionHeaderRow: {
+  searchButton: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: PRIMARY_COLOR,
+    height: 48,
+    borderRadius: 12,
+    marginTop: 8,
+    gap: 8,
   },
-  sectionMore: {
+  searchButtonDisabled: {
+    backgroundColor: BORDER_COLOR,
+  },
+  searchButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  quickSearchContainer: {
+    paddingHorizontal: 16,
+    marginBottom: 12,
+  },
+  quickSearchTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: SECONDARY_TEXT,
+    marginBottom: 8,
+  },
+  quickChip: {
     flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: LIGHT_BACKGROUND,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    marginRight: 8,
+    gap: 4,
+  },
+  quickChipText: {
+    fontSize: 14,
+    color: '#333',
+  },
+  mapContainer: {
+    flex: 1,
+    backgroundColor: LIGHT_BACKGROUND,
+  },
+  routeInfoContainer: {
+    maxHeight: 300,
+    backgroundColor: 'white',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  routeInfoHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+    gap: 8,
+  },
+  routeInfoTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  routeStats: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: LIGHT_BACKGROUND,
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
+  },
+  statItem: {
+    flex: 1,
     alignItems: 'center',
     gap: 4,
   },
-  sectionMoreText: {
-    fontSize: 13,
-    color: PRIMARY_COLOR,
-    fontWeight: '600',
-  },
-  quickActionRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 16,
-  },
-  quickAction: {
-    flex: 1,
-    alignItems: 'center',
-    gap: 10,
-  },
-  quickIconCircle: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: `${PRIMARY_COLOR}10`,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  quickLabel: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: SECONDARY_TEXT,
-  },
-  highlightRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    gap: 12,
-    marginTop: 16,
-  },
-  highlightCard: {
-    flex: 1,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 16,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: BORDER_COLOR,
-    gap: 8,
-  },
-  highlightHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-  },
-  highlightTitle: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: SECONDARY_TEXT,
-  },
-  highlightValue: {
+  statValue: {
     fontSize: 20,
-    fontWeight: '700',
-    color: '#1C1E21',
+    fontWeight: 'bold',
+    color: '#333',
   },
-  highlightTrend: {
-    fontSize: 12,
-    color: PRIMARY_COLOR,
-  },
-  formBlock: {
-    padding: 18,
-    borderRadius: 18,
-    backgroundColor: '#F7F9FD',
-    borderWidth: 1,
-    borderColor: '#E2E7F4',
-    gap: 14,
-  },
-  inputRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    paddingVertical: 10,
-    paddingHorizontal: 14,
-    borderRadius: 14,
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1,
-    borderColor: BORDER_COLOR,
-  },
-  inputField: {
-    flex: 1,
-    fontSize: 15,
-    color: '#1C1E21',
-  },
-  suggestionRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
-  suggestionChip: {
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 999,
-    backgroundColor: '#E6EEFF',
-  },
-  suggestionText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: PRIMARY_COLOR,
-  },
-  planButton: {
-    marginTop: 4,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    paddingVertical: 14,
-    borderRadius: 14,
-    backgroundColor: PRIMARY_COLOR,
-  },
-  planButtonText: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: '#FFFFFF',
-  },
-  planCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 18,
-    padding: 18,
-    marginTop: 16,
-    borderLeftWidth: 5,
-    gap: 12,
-    shadowColor: '#00000020',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    elevation: 4,
-  },
-  planHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  planTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#1C1E21',
-  },
-  planBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    paddingVertical: 4,
-    paddingHorizontal: 10,
-    borderRadius: 999,
-  },
-  planBadgeText: {
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  planSummary: {
-    fontSize: 13,
-    color: SECONDARY_TEXT,
-  },
-  planMetrics: {
-    flexDirection: 'row',
-    gap: 16,
-  },
-  metricItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-  },
-  metricText: {
-    fontSize: 13,
-    color: SECONDARY_TEXT,
-  },
-  planDetailsRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  planDetailText: {
+  statLabel: {
     fontSize: 12,
     color: SECONDARY_TEXT,
   },
-  planAction: {
-    marginTop: 4,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 6,
-    paddingVertical: 12,
-    borderRadius: 12,
+  statDivider: {
+    width: 1,
+    height: 40,
+    backgroundColor: BORDER_COLOR,
   },
-  planActionText: {
+  walkingSections: {
+    marginTop: 8,
+  },
+  sectionTitle: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#FFFFFF',
+    color: SECONDARY_TEXT,
+    marginBottom: 12,
+  },
+  sectionItem: {
+    flexDirection: 'row',
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: LIGHT_BACKGROUND,
+  },
+  sectionIcon: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: LIGHT_BACKGROUND,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  sectionInfo: {
+    flex: 1,
+    gap: 4,
+  },
+  sectionName: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#333',
+  },
+  sectionDetail: {
+    fontSize: 12,
+    color: SECONDARY_TEXT,
+  },
+  emptyState: {
+    position: 'absolute',
+    bottom: 40,
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+    padding: 20,
+  },
+  emptyStateTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: SECONDARY_TEXT,
+    marginTop: 12,
+  },
+  emptyStateSubtitle: {
+    fontSize: 14,
+    color: SECONDARY_TEXT,
+    marginTop: 4,
+    opacity: 0.7,
   },
 });

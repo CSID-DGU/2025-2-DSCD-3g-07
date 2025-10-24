@@ -31,10 +31,57 @@ def call_tmap_transit_api(
     Returns:
         API 응답 데이터 또는 None
     """
+    tmap_key = os.getenv("TMAP_APPKEY")
+    
+    # TMAP API 키가 없으면 더미 데이터 반환
+    if not tmap_key or tmap_key == "your_tmap_api_key_here":
+        print("⚠️ TMAP API 키가 설정되지 않아 더미 데이터를 반환합니다.")
+        # 더미 응답 생성
+        class DummyResponse:
+            status_code = 200
+            content = b'{}'
+            
+            def json(self):
+                return {
+                    "metaData": {
+                        "plan": {
+                            "itineraries": [{
+                                "totalTime": 1800,  # 30분 (초)
+                                "totalWalkTime": 600,  # 10분 (초)
+                                "legs": [
+                                    {
+                                        "mode": "WALK",
+                                        "sectionTime": 300,
+                                        "distance": 400,
+                                        "start": {"name": "출발지"},
+                                        "end": {"name": "정류장1"}
+                                    },
+                                    {
+                                        "mode": "BUS",
+                                        "sectionTime": 900,
+                                        "distance": 5000,
+                                        "start": {"name": "정류장1"},
+                                        "end": {"name": "정류장2"}
+                                    },
+                                    {
+                                        "mode": "WALK",
+                                        "sectionTime": 300,
+                                        "distance": 350,
+                                        "start": {"name": "정류장2"},
+                                        "end": {"name": "도착지"}
+                                    }
+                                ]
+                            }]
+                        }
+                    }
+                }
+        
+        return DummyResponse()
+    
     url = "https://apis.openapi.sk.com/transit/routes"
     headers = {
         "accept": "application/json",
-        "appKey": os.getenv("TMAP_APPKEY"),
+        "appKey": tmap_key,
         "content-type": "application/json",
     }
     body = {

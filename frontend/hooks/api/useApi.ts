@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { apiService, ApiResponse, TransitRouteParams } from '../../services/api';
+import { TransitRouteResponse } from '../../types/api';
 
 interface UseApiState<T> {
   data: T | null;
@@ -41,7 +42,7 @@ export function useHealthCheck() {
 }
 
 export function useTransitRoute() {
-  const [state, setState] = useState<UseApiState<any>>({
+  const [state, setState] = useState<UseApiState<TransitRouteResponse>>({
     data: null,
     loading: false,
     error: null,

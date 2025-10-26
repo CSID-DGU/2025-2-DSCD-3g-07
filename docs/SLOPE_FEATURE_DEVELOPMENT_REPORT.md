@@ -17,6 +17,7 @@
 7. [발견된 문제점과 해결책](#7-발견된-문제점과-해결책)
 8. [최종 결과물](#8-최종-결과물)
 9. [성과 및 교훈](#9-성과-및-교훈)
+10. [Phase 5: UI 개선 및 설정 조정](#10-phase-5-ui-개선-및-설정-조정-2025-10-26)
 
 ---
 
@@ -66,6 +67,14 @@
     ├─ 거리 가중 평균으로 개선
     ├─ 극단값 검증 로직 추가
     └─ 데이터 품질 보고 기능 추가
+
+[Phase 5] UI 개선 및 설정 조정 (2025-10-26)
+    ├─ 극단값 제한 완화 (±40% → ±70%)
+    ├─ UI 버그 수정 (++ → + 표시)
+    ├─ 경고 시스템 개선 (40% 이상 경사 + 내리막 시간 증가)
+    ├─ 경사 미리보기 표시 개선 (순서 번호 + 줄바꿈)
+    ├─ 경로 개수 설정 조정 (1개 → 10개)
+    └─ TypeScript 에러 수정
 ```
 
 ---
@@ -1244,6 +1253,265 @@ def validate_slope_data(segment_analysis):
   </View>
 )}
 ```
+
+---
+
+## 10. Phase 5: UI 개선 및 설정 조정 (2025-10-26)
+
+### 10.1 Phase 5 개요
+
+**작업 기간**: 2025년 10월 26일  
+**작업 목표**: Phase 4 구현 후 발견된 UI 버그 수정 및 사용자 경험 개선
+
+**주요 작업**:
+1. Tobler Function 극단값 제한 완화 (±40% → ±70%)
+2. UI 버그 수정 (`++` → `+` 표시 문제)
+3. 경고 시스템 개선 (40% 이상 경사 + 내리막 시간 증가)
+4. 경사 미리보기 표시 개선 (순서 번호 + 줄바꿈)
+5. 경로 개수 설정 조정 (1개 → 10개)
+
+---
+
+### 10.2 극단값 제한 완화
+
+#### 문제 상황
+- 기존 ±40% 제한이 너무 보수적
+- 실제로 60% 경사(약 31°)도 도보 이동 가능
+- 서울 일부 지역에서 자주 나타나는 급경사가 과도하게 제한됨
+
+#### 해결 방법
+```python
+# backend/app/utils/elevation_helpers.py (line 349)
+# 변경 전
+slope_percent = max(-40, min(40, slope_percent))
+
+# 변경 후
+slope_percent = max(-70, min(70, slope_percent))
+```
+
+#### 변경 근거
+- **±40% (약 22°)**: 너무 보수적, 실제 도보 경사 범위 제한
+- **±70% (약 35°)**: 급경사이지만 도보 가능한 범위
+- Tobler's Function은 극단 경사에서 자동으로 속도 감소 적용
+
+---
+
+### 10.3 UI 버그 수정
+
+#### 문제 상황
+```
+평균 경사: -3.2%
+예상 시간 조정: ++1분 35초  ❌ (버그)
+```
+
+#### 원인 분석
+```tsx
+// RouteDetailComponent.tsx (line 145)
+// 문제 코드
+{adjustment > 0 ? '+' : ''}{Math.floor(Math.abs(adjustment) / 60)}분
+```
+- `adjustment > 0`이면 `+` 추가
+- 하지만 분/초 표시에서 이미 `+` 포함
+- 결과: `++1분 35초`
+
+#### 해결 방법
+```tsx
+// 수정 후
+{Math.floor(Math.abs(adjustment) / 60)}분
+```
+- 조건부 `+` 제거
+- 시간 값만 표시 (`1분 35초`)
+
+---
+
+### 10.4 경고 시스템 개선
+
+#### 기존 문제
+- 평균 경사 -3.2%인데 시간이 증가(+1분 35초)
+- 사용자가 이유를 이해하기 어려움
+
+#### 개선된 경고 시스템
+
+**1. 극단 경사 경고 (40% 이상)**
+```tsx
+{extremeSlopes.length > 0 && (
+  <View style={styles.warningBox}>
+    <Text style={styles.warningTitle}>⚠️ 가파른 구간 주의</Text>
+    <Text style={styles.warningText}>
+      이 경로에는 경사가 40% 이상인 매우 가파른 구간이 {extremeSlopes.length}개 있습니다.
+      가능하다면 엘리베이터나 에스컬레이터를 이용하는 것을 권장합니다.
+    </Text>
+  </View>
+)}
+```
+
+**2. 내리막 시간 증가 설명**
+```tsx
+{avgSlope < 0 && adjustment > 0 && (
+  <View style={styles.infoBox}>
+    <Text style={styles.infoTitle}>💡 경사도와 소요시간</Text>
+    <Text style={styles.infoText}>
+      평균 경사가 내리막(-{Math.abs(avgSlope).toFixed(1)}%)이지만 소요시간이 증가했습니다.
+      이는 가파른 내리막길에서 안전을 위해 걸음이 느려지는 것을 반영한 것입니다.
+      (Tobler's Hiking Function)
+    </Text>
+  </View>
+)}
+```
+
+#### 경고 시스템 특징
+- **동시 표시**: 두 경고가 모두 해당되면 동시에 표시
+- **명확한 설명**: 사용자가 이해하기 쉬운 설명 제공
+- **시각적 구분**: `⚠️` (경고), `💡` (정보) 아이콘 사용
+
+---
+
+### 10.5 경사 미리보기 표시 개선
+
+#### 기존 문제
+- 긴 텍스트가 한 줄로 표시되어 잘림
+- 여러 구간이 쉼표로만 구분되어 가독성 낮음
+
+#### 개선된 표시 방식
+```tsx
+{slopeAnalysis.segment_preview && (
+  <View style={styles.slopePreview}>
+    <Text style={styles.slopePreviewTitle}>경사 미리보기</Text>
+    <View style={styles.slopePreviewTextContainer}>
+      <Text style={styles.slopePreviewText}>
+        {slopeAnalysis.segment_preview
+          .split(', ')
+          .map((segment, index) => `${index + 1}번째 보행 구간:\n${segment}`)
+          .join('\n\n')}
+      </Text>
+    </View>
+  </View>
+)}
+```
+
+#### 개선 사항
+1. **순서 번호 추가**: "1번째 보행 구간", "2번째 보행 구간"
+2. **줄바꿈 추가**: 각 구간을 별도 줄로 표시
+3. **레이아웃 조정**: `flexDirection: 'column'`으로 세로 정렬
+
+#### 표시 예시
+```
+경사 미리보기
+1번째 보행 구간:
+완만 -4.8%
+
+2번째 보행 구간:
+가파름 ↓ -18.2%
+
+3번째 보행 구간:
+완만 1.2%
+```
+
+---
+
+### 10.6 경로 개수 설정 조정
+
+#### 기존 설정
+```typescript
+// api.ts (line 62)
+count: params.count?.toString() || '1',  // 기본값: 1개
+
+// ApiTestComponent.tsx (line 56)
+count: 1,
+```
+
+#### 변경된 설정
+```typescript
+// api.ts (line 62)
+count: params.count?.toString() || '10',  // 기본값: 10개
+
+// ApiTestComponent.tsx (line 56)
+count: 10,
+```
+
+#### 변경 이유
+- **사용자 선택권**: 여러 경로 옵션 제공
+- **경사 비교**: 다양한 경로의 경사도 비교 가능
+- **API 효율성**: Tmap API는 최대 10개 경로 지원
+
+---
+
+### 10.7 TypeScript 에러 수정
+
+#### 문제
+```typescript
+// ApiTestComponent.tsx
+const itinerary = routeData.metaData.plan.itineraries[0];
+// TypeError: Cannot read property '0' of undefined
+```
+
+#### 해결
+```typescript
+const itinerary = routeData.metaData.plan.itineraries;
+if (itinerary) {
+  // itinerary가 존재할 때만 처리
+}
+```
+
+---
+
+### 10.8 Phase 5 최종 변경 파일
+
+| 파일 | 변경 라인 | 변경 내용 |
+|------|----------|----------|
+| `backend/app/utils/elevation_helpers.py` | 349 | 극단값 제한 ±40% → ±70% |
+| `frontend/components/RouteDetailComponent.tsx` | 145 | `++` 버그 수정 |
+| `frontend/components/RouteDetailComponent.tsx` | 171-206 | 경고 시스템 추가 |
+| `frontend/components/RouteDetailComponent.tsx` | 237-244 | 경사 미리보기 개선 |
+| `frontend/components/RouteDetailComponent.tsx` | 589-592 | 스타일 추가 (column 레이아웃) |
+| `frontend/services/api.ts` | 62 | 기본 경로 개수 1 → 10 |
+| `frontend/components/ApiTestComponent.tsx` | 24-25 | TypeScript null 체크 |
+| `frontend/components/ApiTestComponent.tsx` | 56 | 경로 개수 설정 |
+
+---
+
+### 10.9 Phase 5 주요 성과
+
+#### 1. 사용자 경험 개선
+- ✅ 직관적인 경고 시스템
+- ✅ 명확한 시간 조정 표시
+- ✅ 가독성 높은 경사 미리보기
+
+#### 2. 기술적 개선
+- ✅ 극단값 제한 완화로 정확도 향상
+- ✅ TypeScript 타입 안정성 개선
+- ✅ UI 버그 수정
+
+#### 3. 설정 최적화
+- ✅ 경로 개수 기본값 10개로 증가
+- ✅ 사용자 선택권 확대
+
+---
+
+### 10.10 Phase 5 테스트 결과
+
+#### 테스트 시나리오
+1. **급경사 구간 포함 경로**
+   - 평균 경사: -3.2%
+   - 최대 경사: -60.8%
+   - 시간 조정: +1분 35초
+   - ✅ 경고 시스템 정상 작동
+   - ✅ 설명 메시지 표시
+
+2. **여러 경로 요청**
+   - 요청: 10개 경로
+   - 응답: 10개 경로 (경사도 다양)
+   - ✅ 모든 경로에 경사 분석 적용
+
+3. **표시 개선**
+   - ✅ `++` 버그 수정 확인
+   - ✅ 순서 번호 + 줄바꿈 적용
+   - ✅ 레이아웃 정상 표시
+
+---
+
+**Phase 5 완료일**: 2025년 10월 26일  
+**다음 단계**: Phase 6 - 추가 기능 개발 (예정)
 
 ---
 

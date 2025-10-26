@@ -58,7 +58,7 @@ class ApiService {
       user_id: params.user_id || 'default_user',
       user_age: params.user_age?.toString() || '30',
       fatigue_level: params.fatigue_level?.toString() || '3',
-      count: params.count?.toString() || '1',
+      count: params.count?.toString() || '10',
       lang: params.lang?.toString() || '0',
       format: params.format || 'json',
     });

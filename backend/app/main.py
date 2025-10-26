@@ -9,6 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.utils.api_helpers import call_tmap_transit_api
 from app.utils.ml_helpers import predict_adjustment, train_personalization_model
 from app.schemas import RouteResponse, WalkingSectionResponse
+from app.routers import routes
 
 load_dotenv()  # .env 로드
 
@@ -34,6 +35,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# 라우터 등록
+app.include_router(routes.router, prefix="/api")
 
 
 def calculate_walking_time(distance_meters: float, avg_speed_kmh: float = 4.5) -> int:
@@ -94,7 +98,7 @@ async def get_transit_route(
     start_y: float = Query(..., description="출발지 위도"),
     end_x: float = Query(..., description="도착지 경도"),
     end_y: float = Query(..., description="도착지 위도"),
-    count: int = Query(1, description="경로 개수"),
+    count: int = Query(10, description="경로 개수"),
     lang: int = Query(0, description="언어 설정"),
     format: str = Query("json", description="응답 형식"),
 ):

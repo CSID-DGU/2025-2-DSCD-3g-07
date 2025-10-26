@@ -134,6 +134,108 @@ export interface Itinerary {
 }
 
 // ============================================
+// Elevation & Slope Analysis Types
+// ============================================
+
+export interface SlopeSegment {
+  distance: number;
+  elevation_start: number;
+  elevation_end: number;
+  elevation_diff: number;
+  slope: number;
+  is_uphill: boolean;
+  speed_factor: number;
+  time: number;
+}
+
+export interface WalkLegAnalysis {
+  leg_index: number;
+  start_name: string;
+  end_name: string;
+  distance: number;
+  original_time: number;
+  adjusted_time: number;
+  time_diff: number;
+  avg_slope: number;
+  max_slope: number;
+  min_slope: number;
+  segments: SlopeSegment[];
+}
+
+export interface RouteElevationAnalysis {
+  walk_legs_analysis: WalkLegAnalysis[];
+  total_original_walk_time: number;
+  total_adjusted_walk_time: number;
+  total_route_time_adjustment: number;
+  sampled_coords_count?: number;
+  original_coords_count?: number;
+  error?: string;
+}
+
+export interface AnalyzeSlopeRequest {
+  itinerary: Itinerary;
+  api_key?: string;
+}
+
+export interface ElevationData {
+  location: MapCoordinates;
+  elevation: number;
+}
+
+export interface SlopeCategory {
+  type: 'flat' | 'gentle' | 'moderate' | 'steep' | 'very_steep';
+  label: string;
+  range: string;
+  speedFactor: number; // 참고용 (실제 계산은 Tobler's Function 사용)
+  color: string;
+}
+
+/**
+ * 경사도 카테고리 정의 (UI 표시용)
+ * 
+ * 주의: speedFactor는 참고용입니다.
+ * 실제 보행 시간 계산은 백엔드의 Tobler's Hiking Function을 사용하여
+ * 연속적이고 더 정확한 속도 계수를 적용합니다.
+ */
+export const SLOPE_CATEGORIES: Record<string, SlopeCategory> = {
+  flat: {
+    type: 'flat',
+    label: '평지',
+    range: '0-3%',
+    speedFactor: 1.0,
+    color: '#4CAF50'
+  },
+  gentle: {
+    type: 'gentle',
+    label: '완만한 오르막',
+    range: '3-5%',
+    speedFactor: 0.84, // Tobler's Function 근사값
+    color: '#8BC34A'
+  },
+  moderate: {
+    type: 'moderate',
+    label: '보통 오르막',
+    range: '5-10%',
+    speedFactor: 0.65, // Tobler's Function 근사값
+    color: '#FFC107'
+  },
+  steep: {
+    type: 'steep',
+    label: '가파른 오르막',
+    range: '10-15%',
+    speedFactor: 0.42, // Tobler's Function 근사값
+    color: '#FF9800'
+  },
+  very_steep: {
+    type: 'very_steep',
+    label: '매우 가파름',
+    range: '15%+',
+    speedFactor: 0.25, // Tobler's Function 근사값
+    color: '#F44336'
+  }
+};
+
+// ============================================
 // Future: Personalization API Types (예정)
 // ============================================
 

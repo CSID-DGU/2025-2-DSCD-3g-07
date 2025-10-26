@@ -16,6 +16,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import KakaoMap from '@/components/KakaoMap';
 import { apiService } from '@/services/api';
 import type { ApiResponse, TransitRouteParams } from '@/services/api';
+import { analyzeRouteSlope, formatTime as formatSlopeTime, formatTimeDifference } from '@/services/elevationService';
+import type { RouteElevationAnalysis } from '@/types/api';
 
 const PRIMARY_COLOR = '#2C6DE7';
 const SECONDARY_TEXT = '#4A5968';
@@ -34,6 +36,8 @@ interface RouteInfo {
   walkRatio: number;
   walkingSections: any[];
   personalizedWalkTime: number;
+  slopeAnalysis?: RouteElevationAnalysis | null;
+  rawItinerary?: any; // Tmap 원본 데이터
 }
 
 export default function HomeScreen() {
@@ -111,12 +115,41 @@ export default function HomeScreen() {
       const response = await apiService.getTransitRoute(params);
 
       if (response.data) {
+        let slopeAnalysis: RouteElevationAnalysis | null = null;
+        let tmapItinerary = null;
+
+        // Backend 응답에서 Tmap 데이터 추출
+        // apiService.getTransitRoute는 Tmap 원본 응답을 반환함
+        try {
+          // response.data가 Tmap 응답 형식인 경우
+          if (response.data.metaData?.plan?.itineraries?.[0]) {
+            tmapItinerary = response.data.metaData.plan.itineraries[0];
+
+            // 경사도 분석 실행
+            console.log('경사도 분석 시작...');
+            slopeAnalysis = await analyzeRouteSlope(tmapItinerary);
+            console.log('경사도 분석 완료:', slopeAnalysis);
+          }
+          // 또는 raw_tmap_data 필드가 있는 경우
+          else if (response.data.raw_tmap_data?.metaData?.plan?.itineraries?.[0]) {
+            tmapItinerary = response.data.raw_tmap_data.metaData.plan.itineraries[0];
+
+            console.log('경사도 분석 시작...');
+            slopeAnalysis = await analyzeRouteSlope(tmapItinerary);
+            console.log('경사도 분석 완료:', slopeAnalysis);
+          }
+        } catch (slopeError) {
+          console.warn('경사도 분석 실패 (경로 정보는 정상 표시):', slopeError);
+        }
+
         setRouteInfo({
           totalTime: response.data.total_time_minutes,
           totalWalkTime: response.data.total_walk_time_minutes,
           walkRatio: response.data.walk_ratio_percent,
           walkingSections: response.data.walking_sections,
           personalizedWalkTime: response.data.total_personalized_walk_time_minutes,
+          slopeAnalysis: slopeAnalysis,
+          rawItinerary: tmapItinerary,
         });
 
         console.log('경로 검색 성공:', response.data);
@@ -311,6 +344,94 @@ export default function HomeScreen() {
                 <Text style={styles.statLabel}>나의 속도</Text>
               </View>
             </View>
+
+            {/* 경사도 정보 */}
+            {routeInfo.slopeAnalysis && !routeInfo.slopeAnalysis.error && (
+              <View style={styles.slopeInfoCard}>
+                <View style={styles.slopeHeader}>
+                  <MaterialIcons name="terrain" size={20} color="#FF6B6B" />
+                  <Text style={styles.slopeTitle}>경사도 분석</Text>
+                </View>
+
+                <View style={styles.slopeStats}>
+                  <View style={styles.slopeStatItem}>
+                    <Text style={styles.slopeLabel}>평균 경사</Text>
+                    <Text style={styles.slopeValue}>
+                      {routeInfo.slopeAnalysis.walk_legs_analysis.length > 0
+                        ? (
+                          routeInfo.slopeAnalysis.walk_legs_analysis.reduce(
+                            (sum, leg) => sum + Math.abs(leg.avg_slope),
+                            0
+                          ) / routeInfo.slopeAnalysis.walk_legs_analysis.length
+                        ).toFixed(1)
+                        : '0.0'}%
+                    </Text>
+                  </View>
+
+                  <View style={styles.slopeStatItem}>
+                    <Text style={styles.slopeLabel}>보정 시간</Text>
+                    <Text style={[
+                      styles.slopeValue,
+                      routeInfo.slopeAnalysis.total_route_time_adjustment > 0
+                        ? { color: '#FF6B6B' }
+                        : { color: '#4CAF50' }
+                    ]}>
+                      {routeInfo.slopeAnalysis.total_route_time_adjustment > 0 ? '+' : ''}
+                      {formatTimeDifference(routeInfo.slopeAnalysis.total_route_time_adjustment)}
+                    </Text>
+                  </View>
+
+                  <View style={styles.slopeStatItem}>
+                    <Text style={styles.slopeLabel}>실제 예상</Text>
+                    <Text style={styles.slopeValue}>
+                      {Math.round(routeInfo.slopeAnalysis.total_adjusted_walk_time / 60)}분
+                    </Text>
+                  </View>
+                </View>
+
+                {/* 경사도 세부 정보 */}
+                <View style={styles.slopeDetails}>
+                  {routeInfo.slopeAnalysis.walk_legs_analysis.map((leg, index) => {
+                    const getSlopeEmoji = (slope: number) => {
+                      const absSlope = Math.abs(slope);
+                      if (absSlope < 3) return '⚪';
+                      if (absSlope < 5) return '🟢';
+                      if (absSlope < 10) return '🟡';
+                      if (absSlope < 15) return '🟠';
+                      return '🔴';
+                    };
+
+                    const getSlopeDifficulty = (slope: number) => {
+                      const absSlope = Math.abs(slope);
+                      if (absSlope < 3) return '평지';
+                      if (absSlope < 5) return '완만';
+                      if (absSlope < 10) return '보통';
+                      if (absSlope < 15) return '가파름';
+                      return '매우 가파름';
+                    };
+
+                    return (
+                      <View key={index} style={styles.slopeDetailItem}>
+                        <Text style={styles.slopeDetailEmoji}>{getSlopeEmoji(leg.avg_slope)}</Text>
+                        <View style={styles.slopeDetailInfo}>
+                          <Text style={styles.slopeDetailName} numberOfLines={1}>
+                            {leg.start_name} → {leg.end_name}
+                          </Text>
+                          <Text style={styles.slopeDetailStats}>
+                            {leg.distance}m · {getSlopeDifficulty(leg.avg_slope)} ({leg.avg_slope.toFixed(1)}%)
+                            {leg.time_diff !== 0 && (
+                              <Text style={leg.time_diff > 0 ? styles.timeDiffPlus : styles.timeDiffMinus}>
+                                {' '}({leg.time_diff > 0 ? '+' : ''}{Math.round(leg.time_diff / 60)}분)
+                              </Text>
+                            )}
+                          </Text>
+                        </View>
+                      </View>
+                    );
+                  })}
+                </View>
+              </View>
+            )}
 
             <View style={styles.walkingSections}>
               <Text style={styles.sectionTitle}>
@@ -588,5 +709,81 @@ const styles = StyleSheet.create({
     color: SECONDARY_TEXT,
     marginTop: 4,
     opacity: 0.7,
+  },
+  // 경사도 관련 스타일
+  slopeInfoCard: {
+    backgroundColor: '#FFF9F0',
+    borderRadius: 12,
+    padding: 16,
+    marginTop: 16,
+    borderWidth: 1,
+    borderColor: '#FFE5CC',
+  },
+  slopeHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+    gap: 8,
+  },
+  slopeTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#FF6B6B',
+  },
+  slopeStats: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginBottom: 16,
+    paddingVertical: 12,
+    backgroundColor: 'white',
+    borderRadius: 8,
+  },
+  slopeStatItem: {
+    alignItems: 'center',
+    gap: 4,
+  },
+  slopeLabel: {
+    fontSize: 12,
+    color: SECONDARY_TEXT,
+  },
+  slopeValue: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#FF6B6B',
+  },
+  slopeDetails: {
+    gap: 8,
+  },
+  slopeDetailItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'white',
+    padding: 12,
+    borderRadius: 8,
+    gap: 12,
+  },
+  slopeDetailEmoji: {
+    fontSize: 20,
+  },
+  slopeDetailInfo: {
+    flex: 1,
+    gap: 4,
+  },
+  slopeDetailName: {
+    fontSize: 13,
+    fontWeight: '500',
+    color: '#333',
+  },
+  slopeDetailStats: {
+    fontSize: 12,
+    color: SECONDARY_TEXT,
+  },
+  timeDiffPlus: {
+    color: '#FF6B6B',
+    fontWeight: '600',
+  },
+  timeDiffMinus: {
+    color: '#4CAF50',
+    fontWeight: '600',
   },
 });

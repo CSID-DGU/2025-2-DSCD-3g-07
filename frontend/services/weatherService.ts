@@ -1,6 +1,8 @@
-import { OpenMeteoResponse } from '../types/weather';
+import { OpenMeteoResponse, KMAWeatherResponse, KMAWeatherItem, ParsedWeatherData } from '../types/weather';
 
-const OPEN_METEO_BASE_URL = 'https://api.open-meteo.com/v1';
+// 기상청 API 설정
+const KMA_BASE_URL = 'https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0';
+const KMA_API_KEY = 'fd3ec2dea8cbb11a251a2ce60843ea3236811fca06f2a8eb8f63426b208f35da'; // 첨부 이미지의 API 키
 
 export interface WeatherApiOptions {
   latitude: number;
@@ -12,167 +14,372 @@ export interface WeatherApiOptions {
   timezone?: string;
 }
 
+// 위경도를 기상청 격자 좌표로 변환
+const convertToGrid = (lat: number, lon: number): { nx: number; ny: number } => {
+  const RE = 6371.00877; // 지구 반경(km)
+  const GRID = 5.0; // 격자 간격(km)
+  const SLAT1 = 30.0; // 투영 위도1(degree)
+  const SLAT2 = 60.0; // 투영 위도2(degree)
+  const OLON = 126.0; // 기준점 경도(degree)
+  const OLAT = 38.0; // 기준점 위도(degree)
+  const XO = 43; // 기준점 X좌표(GRID)
+  const YO = 136; // 기준점 Y좌표(GRID)
+
+  const DEGRAD = Math.PI / 180.0;
+  const re = RE / GRID;
+  const slat1 = SLAT1 * DEGRAD;
+  const slat2 = SLAT2 * DEGRAD;
+  const olon = OLON * DEGRAD;
+  const olat = OLAT * DEGRAD;
+
+  let sn = Math.tan(Math.PI * 0.25 + slat2 * 0.5) / Math.tan(Math.PI * 0.25 + slat1 * 0.5);
+  sn = Math.log(Math.cos(slat1) / Math.cos(slat2)) / Math.log(sn);
+  let sf = Math.tan(Math.PI * 0.25 + slat1 * 0.5);
+  sf = (Math.pow(sf, sn) * Math.cos(slat1)) / sn;
+  let ro = Math.tan(Math.PI * 0.25 + olat * 0.5);
+  ro = (re * sf) / Math.pow(ro, sn);
+
+  const ra = Math.tan(Math.PI * 0.25 + lat * DEGRAD * 0.5);
+  const theta = lon * DEGRAD - olon;
+  const x = (re * sf) / Math.pow(ra, sn) * Math.sin(theta * sn);
+  const y = ro - (re * sf) / Math.pow(ra, sn) * Math.cos(theta * sn);
+
+  return {
+    nx: Math.floor(x + XO + 0.5),
+    ny: Math.floor(y + YO + 0.5),
+  };
+};
+
+// 기상청 API에서 발표 시각 구하기 (2시간 전 데이터 사용)
+const getBaseTime = (): { baseDate: string; baseTime: string } => {
+  const now = new Date();
+  const koreaTime = new Date(now.getTime() + (9 * 60 * 60 * 1000)); // KST
+  
+  // 기상청 API는 2시간 전 데이터 제공
+  koreaTime.setHours(koreaTime.getHours() - 2);
+  
+  const year = koreaTime.getUTCFullYear();
+  const month = String(koreaTime.getUTCMonth() + 1).padStart(2, '0');
+  const day = String(koreaTime.getUTCDate()).padStart(2, '0');
+  const hour = String(koreaTime.getUTCHours()).padStart(2, '0');
+  
+  return {
+    baseDate: `${year}${month}${day}`,
+    baseTime: `${hour}00`,
+  };
+};
+
+// 기상청 데이터를 OpenMeteo 형식으로 변환
+const convertKMAToOpenMeteo = (
+  kmaData: KMAWeatherItem[],
+  lat: number,
+  lon: number
+): OpenMeteoResponse => {
+  console.log('🔄 [데이터 변환] 시작:', {
+    전체항목수: kmaData.length,
+    카테고리들: [...new Set(kmaData.map(d => d.category))].join(', ')
+  });
+
+  // 현재 시각 기준 데이터 파싱
+  const hourlyData: {
+    time: string[];
+    temperature_2m: number[];
+    relative_humidity_2m: number[];
+    precipitation_probability: number[];
+    precipitation: number[];
+    weather_code: number[];
+    wind_speed_10m: number[];
+    wind_direction_10m: number[];
+  } = {
+    time: [],
+    temperature_2m: [],
+    relative_humidity_2m: [],
+    precipitation_probability: [],
+    precipitation: [],
+    weather_code: [],
+    wind_speed_10m: [],
+    wind_direction_10m: [],
+  };
+
+  // 시간별로 데이터 그룹화
+  const dataByTime: Record<string, Record<string, string>> = {};
+  
+  kmaData.forEach(item => {
+    const datetime = `${item.fcstDate}${item.fcstTime}`;
+    if (!dataByTime[datetime]) {
+      dataByTime[datetime] = {};
+    }
+    dataByTime[datetime][item.category] = item.fcstValue;
+  });
+
+  console.log('📊 [데이터 변환] 시간대별 그룹화 완료:', {
+    시간대수: Object.keys(dataByTime).length,
+    첫번째시간: Object.keys(dataByTime).sort()[0]
+  });
+
+  // 첫 번째 시간대를 현재 날씨로 사용
+  const times = Object.keys(dataByTime).sort();
+  if (times.length > 0 && times[0]) {
+    const firstTime = times[0];
+    const firstData = dataByTime[firstTime];
+    
+    if (firstData) {
+      // 현재 날씨
+      const temp = parseFloat(firstData.TMP || '0');
+      const humidity = parseFloat(firstData.REH || '0');
+      const pop = parseFloat(firstData.POP || '0');
+      const pty = parseInt(firstData.PTY || '0');
+      const sky = parseInt(firstData.SKY || '1');
+      const wsd = parseFloat(firstData.WSD || '0');
+      const vec = parseFloat(firstData.VEC || '0');
+      
+      // weather_code 계산 (강수형태 우선)
+      let weatherCode = 0;
+      if (pty > 0) {
+        weatherCode = pty === 1 ? 61 : pty === 2 ? 71 : pty === 3 ? 71 : 80;
+      } else {
+        weatherCode = sky === 1 ? 0 : sky === 3 ? 2 : 3;
+      }
+
+      const current = {
+        time: `${firstTime.substring(0, 4)}-${firstTime.substring(4, 6)}-${firstTime.substring(6, 8)}T${firstTime.substring(8, 10)}:00`,
+        temperature_2m: temp,
+        relative_humidity_2m: humidity,
+        apparent_temperature: temp - (wsd * 0.5), // 간단한 체감온도 계산
+        precipitation: parseFloat(firstData.PCP?.replace('mm', '') || '0'),
+        rain: pty === 1 ? parseFloat(firstData.PCP?.replace('mm', '') || '0') : 0,
+        weather_code: weatherCode,
+        wind_speed_10m: wsd,
+        wind_direction_10m: vec,
+      };
+
+      console.log('🌡️ [현재 날씨]:', {
+        시각: current.time,
+        기온: `${temp}℃`,
+        습도: `${humidity}%`,
+        강수확률: `${pop}%`,
+        강수형태: pty === 0 ? '없음' : pty === 1 ? '비' : pty === 2 ? '비/눈' : pty === 3 ? '눈' : '소나기',
+        하늘상태: sky === 1 ? '맑음' : sky === 3 ? '구름많음' : '흐림',
+        풍속: `${wsd}m/s`,
+        변환된코드: weatherCode
+      });
+
+      // 시간별 데이터
+      times.forEach(time => {
+        const data = dataByTime[time];
+        if (data) {
+          const datetime = `${time.substring(0, 4)}-${time.substring(4, 6)}-${time.substring(6, 8)}T${time.substring(8, 10)}:00`;
+          
+          const temp = parseFloat(data.TMP || '0');
+          const humidity = parseFloat(data.REH || '0');
+          const pop = parseFloat(data.POP || '0');
+          const pty = parseInt(data.PTY || '0');
+          const sky = parseInt(data.SKY || '1');
+          const wsd = parseFloat(data.WSD || '0');
+          const vec = parseFloat(data.VEC || '0');
+          
+          let weatherCode = 0;
+          if (pty > 0) {
+            weatherCode = pty === 1 ? 61 : pty === 2 ? 71 : pty === 3 ? 71 : 80;
+          } else {
+            weatherCode = sky === 1 ? 0 : sky === 3 ? 2 : 3;
+          }
+
+          hourlyData.time.push(datetime);
+          hourlyData.temperature_2m.push(temp);
+          hourlyData.relative_humidity_2m.push(humidity);
+          hourlyData.precipitation_probability.push(pop);
+          hourlyData.precipitation.push(parseFloat(data.PCP?.replace('mm', '') || '0'));
+          hourlyData.weather_code.push(weatherCode);
+          hourlyData.wind_speed_10m.push(wsd);
+          hourlyData.wind_direction_10m.push(vec);
+        }
+      });
+
+      return {
+        latitude: lat,
+        longitude: lon,
+        timezone: 'Asia/Seoul',
+        current,
+        hourly: hourlyData,
+      };
+    }
+  }
+
+  // 데이터가 없을 경우 기본값
+  return {
+    latitude: lat,
+    longitude: lon,
+    timezone: 'Asia/Seoul',
+    current: {
+      time: new Date().toISOString(),
+      temperature_2m: 0,
+      relative_humidity_2m: 0,
+      apparent_temperature: 0,
+      precipitation: 0,
+      rain: 0,
+      weather_code: 0,
+      wind_speed_10m: 0,
+      wind_direction_10m: 0,
+    },
+  };
+};
+
 // API 응답을 안전하게 파싱하는 헬퍼 함수
-const parseWeatherResponse = async (response: Response): Promise<OpenMeteoResponse> => {
+const parseWeatherResponse = async (response: Response): Promise<KMAWeatherResponse> => {
   if (!response.ok) {
     throw new Error(`날씨 API 호출 실패: ${response.status}`);
   }
-  return response.json() as Promise<OpenMeteoResponse>;
+  return response.json() as Promise<KMAWeatherResponse>;
 };
+
 
 // 현재 날씨 정보만 가져오기
 export const getCurrentWeather = async (lat: number, lon: number): Promise<OpenMeteoResponse> => {
-  const params = new URLSearchParams({
-    latitude: lat.toString(),
-    longitude: lon.toString(),
-    current: [
-      'temperature_2m',
-      'relative_humidity_2m',
-      'apparent_temperature',
-      'is_day',
-      'precipitation',
-      'rain',
-      'showers',
-      'snowfall',
-      'weather_code',
-      'cloud_cover',
-      'pressure_msl',
-      'surface_pressure',
-      'wind_speed_10m',
-      'wind_direction_10m',
-      'wind_gusts_10m'
-    ].join(','),
-    timezone: 'Asia/Seoul',
+  const { nx, ny } = convertToGrid(lat, lon);
+  const { baseDate, baseTime } = getBaseTime();
+
+  console.log('🌍 [기상청 API] 날씨 요청:', {
+    입력위치: { 위도: lat, 경도: lon },
+    격자좌표: { nx, ny },
+    발표일시: { baseDate, baseTime }
   });
 
-  const response = await fetch(`${OPEN_METEO_BASE_URL}/forecast?${params}`);
-  return parseWeatherResponse(response);
+  const params = new URLSearchParams({
+    serviceKey: KMA_API_KEY,
+    numOfRows: '60',
+    pageNo: '1',
+    dataType: 'JSON',
+    base_date: baseDate,
+    base_time: baseTime,
+    nx: nx.toString(),
+    ny: ny.toString(),
+  });
+
+  const response = await fetch(`${KMA_BASE_URL}/getVilageFcst?${params}`);
+  const kmaData = await parseWeatherResponse(response);
+  
+  console.log('📦 [기상청 API] 원본 응답:', {
+    상태: kmaData.response.header,
+    데이터개수: kmaData.response.body.totalCount,
+    샘플: kmaData.response.body.items.item.slice(0, 5)
+  });
+  
+  if (kmaData.response.body.items.item) {
+    const result = convertKMAToOpenMeteo(kmaData.response.body.items.item, lat, lon);
+    
+    console.log('✅ [기상청 API] 변환된 데이터:', {
+      현재날씨: result.current,
+      시간별예보_개수: result.hourly?.time.length || 0,
+      일별예보_개수: result.daily?.time.length || 0
+    });
+    
+    return result;
+  }
+
+  throw new Error('날씨 데이터를 가져올 수 없습니다.');
 };
 
 // 시간별 예보 포함해서 가져오기
 export const getHourlyWeather = async (lat: number, lon: number, hours: number = 24): Promise<OpenMeteoResponse> => {
-  const params = new URLSearchParams({
-    latitude: lat.toString(),
-    longitude: lon.toString(),
-    current: [
-      'temperature_2m',
-      'relative_humidity_2m',
-      'apparent_temperature',
-      'is_day',
-      'precipitation',
-      'rain',
-      'showers',
-      'snowfall',
-      'weather_code',
-      'cloud_cover',
-      'pressure_msl',
-      'surface_pressure',
-      'wind_speed_10m',
-      'wind_direction_10m',
-      'wind_gusts_10m'
-    ].join(','),
-    hourly: [
-      'temperature_2m',
-      'relative_humidity_2m',
-      'apparent_temperature',
-      'precipitation_probability',
-      'precipitation',
-      'rain',
-      'showers',
-      'snowfall',
-      'snow_depth',
-      'weather_code',
-      'pressure_msl',
-      'surface_pressure',
-      'cloud_cover',
-      'visibility',
-      'evapotranspiration',
-      'et0_fao_evapotranspiration',
-      'vapour_pressure_deficit',
-      'wind_speed_10m',
-      'wind_speed_80m',
-      'wind_speed_120m',
-      'wind_speed_180m',
-      'wind_direction_10m',
-      'wind_direction_80m',
-      'wind_direction_120m',
-      'wind_direction_180m',
-      'wind_gusts_10m',
-      'temperature_80m',
-      'temperature_120m',
-      'temperature_180m',
-      'soil_temperature_0cm',
-      'soil_temperature_6cm',
-      'soil_temperature_18cm',
-      'soil_temperature_54cm',
-      'soil_moisture_0_1cm',
-      'soil_moisture_1_3cm',
-      'soil_moisture_3_9cm',
-      'soil_moisture_9_27cm',
-      'soil_moisture_27_81cm'
-    ].join(','),
-    forecast_hours: hours.toString(),
-    timezone: 'Asia/Seoul',
-  });
-
-  const response = await fetch(`${OPEN_METEO_BASE_URL}/forecast?${params}`);
-  return parseWeatherResponse(response);
+  return getCurrentWeather(lat, lon); // 기상청 API는 단기예보에 시간별 데이터 포함
 };
 
 // 일별 예보 포함해서 가져오기
 export const getDailyWeather = async (lat: number, lon: number, days: number = 7): Promise<OpenMeteoResponse> => {
+  const { nx, ny } = convertToGrid(lat, lon);
+  const { baseDate, baseTime } = getBaseTime();
+
   const params = new URLSearchParams({
-    latitude: lat.toString(),
-    longitude: lon.toString(),
-    current: [
-      'temperature_2m',
-      'relative_humidity_2m',
-      'apparent_temperature',
-      'is_day',
-      'precipitation',
-      'rain',
-      'showers',
-      'snowfall',
-      'weather_code',
-      'cloud_cover',
-      'pressure_msl',
-      'surface_pressure',
-      'wind_speed_10m',
-      'wind_direction_10m',
-      'wind_gusts_10m'
-    ].join(','),
-    daily: [
-      'weather_code',
-      'temperature_2m_max',
-      'temperature_2m_min',
-      'apparent_temperature_max',
-      'apparent_temperature_min',
-      'sunrise',
-      'sunset',
-      'daylight_duration',
-      'sunshine_duration',
-      'uv_index_max',
-      'uv_index_clear_sky_max',
-      'precipitation_sum',
-      'rain_sum',
-      'showers_sum',
-      'snowfall_sum',
-      'precipitation_hours',
-      'precipitation_probability_max',
-      'precipitation_probability_min',
-      'precipitation_probability_mean',
-      'wind_speed_10m_max',
-      'wind_gusts_10m_max',
-      'wind_direction_10m_dominant',
-      'shortwave_radiation_sum',
-      'et0_fao_evapotranspiration'
-    ].join(','),
-    forecast_days: days.toString(),
-    timezone: 'Asia/Seoul',
+    serviceKey: KMA_API_KEY,
+    numOfRows: '290', // 더 많은 데이터 가져오기
+    pageNo: '1',
+    dataType: 'JSON',
+    base_date: baseDate,
+    base_time: baseTime,
+    nx: nx.toString(),
+    ny: ny.toString(),
   });
 
-  const response = await fetch(`${OPEN_METEO_BASE_URL}/forecast?${params}`);
-  return parseWeatherResponse(response);
+  const response = await fetch(`${KMA_BASE_URL}/getVilageFcst?${params}`);
+  const kmaData = await parseWeatherResponse(response);
+  
+  if (kmaData.response.body.items.item) {
+    const result = convertKMAToOpenMeteo(kmaData.response.body.items.item, lat, lon);
+    
+    // 일별 데이터 추가 생성
+    if (result.hourly) {
+      const dailyData: {
+        time: string[];
+        weather_code: number[];
+        temperature_2m_max: number[];
+        temperature_2m_min: number[];
+        precipitation_sum: number[];
+        precipitation_probability_max: number[];
+        wind_speed_10m_max: number[];
+      } = {
+        time: [],
+        weather_code: [],
+        temperature_2m_max: [],
+        temperature_2m_min: [],
+        precipitation_sum: [],
+        precipitation_probability_max: [],
+        wind_speed_10m_max: [],
+      };
+
+      // 날짜별로 데이터 그룹화
+      const byDate: Record<string, {
+        temps: number[];
+        precips: number[];
+        pops: number[];
+        winds: number[];
+        codes: number[];
+      }> = {};
+
+      result.hourly.time.forEach((time, idx) => {
+        const dateMatch = time.split('T');
+        if (dateMatch && dateMatch[0]) {
+          const date = dateMatch[0];
+          if (!byDate[date]) {
+            byDate[date] = { temps: [], precips: [], pops: [], winds: [], codes: [] };
+          }
+          if (result.hourly) {
+            const temp = result.hourly.temperature_2m[idx];
+            const precip = result.hourly.precipitation[idx];
+            const pop = result.hourly.precipitation_probability[idx];
+            const wind = result.hourly.wind_speed_10m[idx];
+            const code = result.hourly.weather_code[idx];
+            
+            if (temp !== undefined) byDate[date].temps.push(temp);
+            if (precip !== undefined) byDate[date].precips.push(precip);
+            if (pop !== undefined) byDate[date].pops.push(pop);
+            if (wind !== undefined) byDate[date].winds.push(wind);
+            if (code !== undefined) byDate[date].codes.push(code);
+          }
+        }
+      });
+
+      // 날짜별 통계 계산
+      Object.keys(byDate).sort().forEach(date => {
+        const data = byDate[date];
+        if (data) {
+          dailyData.time.push(date);
+          dailyData.temperature_2m_max.push(Math.max(...data.temps));
+          dailyData.temperature_2m_min.push(Math.min(...data.temps));
+          dailyData.precipitation_sum.push(data.precips.reduce((a, b) => a + b, 0));
+          dailyData.precipitation_probability_max.push(Math.max(...data.pops));
+          dailyData.wind_speed_10m_max.push(Math.max(...data.winds));
+          dailyData.weather_code.push(Math.max(...data.codes)); // 가장 악천후 코드
+        }
+      });
+
+      result.daily = dailyData;
+    }
+
+    return result;
+  }
+
+  throw new Error('날씨 데이터를 가져올 수 없습니다.');
 };
 
 // 모든 정보를 포함한 종합 날씨 정보
@@ -182,99 +389,7 @@ export const getCompleteWeather = async (
   hourlyHours: number = 48, 
   forecastDays: number = 7
 ): Promise<OpenMeteoResponse> => {
-  const params = new URLSearchParams({
-    latitude: lat.toString(),
-    longitude: lon.toString(),
-    current: [
-      'temperature_2m',
-      'relative_humidity_2m',
-      'apparent_temperature',
-      'is_day',
-      'precipitation',
-      'rain',
-      'showers',
-      'snowfall',
-      'weather_code',
-      'cloud_cover',
-      'pressure_msl',
-      'surface_pressure',
-      'wind_speed_10m',
-      'wind_direction_10m',
-      'wind_gusts_10m'
-    ].join(','),
-    hourly: [
-      'temperature_2m',
-      'relative_humidity_2m',
-      'apparent_temperature',
-      'precipitation_probability',
-      'precipitation',
-      'rain',
-      'showers',
-      'snowfall',
-      'snow_depth',
-      'weather_code',
-      'pressure_msl',
-      'surface_pressure',
-      'cloud_cover',
-      'visibility',
-      'evapotranspiration',
-      'et0_fao_evapotranspiration',
-      'vapour_pressure_deficit',
-      'wind_speed_10m',
-      'wind_speed_80m',
-      'wind_speed_120m',
-      'wind_speed_180m',
-      'wind_direction_10m',
-      'wind_direction_80m',
-      'wind_direction_120m',
-      'wind_direction_180m',
-      'wind_gusts_10m',
-      'temperature_80m',
-      'temperature_120m',
-      'temperature_180m',
-      'soil_temperature_0cm',
-      'soil_temperature_6cm',
-      'soil_temperature_18cm',
-      'soil_temperature_54cm',
-      'soil_moisture_0_1cm',
-      'soil_moisture_1_3cm',
-      'soil_moisture_3_9cm',
-      'soil_moisture_9_27cm',
-      'soil_moisture_27_81cm'
-    ].join(','),
-    daily: [
-      'weather_code',
-      'temperature_2m_max',
-      'temperature_2m_min',
-      'apparent_temperature_max',
-      'apparent_temperature_min',
-      'sunrise',
-      'sunset',
-      'daylight_duration',
-      'sunshine_duration',
-      'uv_index_max',
-      'uv_index_clear_sky_max',
-      'precipitation_sum',
-      'rain_sum',
-      'showers_sum',
-      'snowfall_sum',
-      'precipitation_hours',
-      'precipitation_probability_max',
-      'precipitation_probability_min',
-      'precipitation_probability_mean',
-      'wind_speed_10m_max',
-      'wind_gusts_10m_max',
-      'wind_direction_10m_dominant',
-      'shortwave_radiation_sum',
-      'et0_fao_evapotranspiration'
-    ].join(','),
-    forecast_hours: hourlyHours.toString(),
-    forecast_days: forecastDays.toString(),
-    timezone: 'Asia/Seoul',
-  });
-
-  const response = await fetch(`${OPEN_METEO_BASE_URL}/forecast?${params}`);
-  return parseWeatherResponse(response);
+  return getDailyWeather(lat, lon, forecastDays);
 };
 
 // 서울 기본 좌표 (테스트용)

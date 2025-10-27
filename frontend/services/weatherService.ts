@@ -2,7 +2,8 @@ import { OpenMeteoResponse, KMAWeatherResponse, KMAWeatherItem, ParsedWeatherDat
 
 // 기상청 API 설정
 const KMA_BASE_URL = 'https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0';
-const KMA_API_KEY = 'fd3ec2dea8cbb11a251a2ce60843ea3236811fca06f2a8eb8f63426b208f35da'; // 첨부 이미지의 API 키
+// API 키는 인코딩된 상태로 사용 (decodeURIComponent 하지 않음)
+const KMA_API_KEY = 'fd3ec2dea8cbb11a251a2ce60843ea3236811fca06f2a8eb8f63426b208f35da';
 
 export interface WeatherApiOptions {
   latitude: number;
@@ -228,9 +229,25 @@ const convertKMAToOpenMeteo = (
 // API 응답을 안전하게 파싱하는 헬퍼 함수
 const parseWeatherResponse = async (response: Response): Promise<KMAWeatherResponse> => {
   if (!response.ok) {
-    throw new Error(`날씨 API 호출 실패: ${response.status}`);
+    const errorText = await response.text();
+    console.error('❌ [기상청 API] HTTP 오류:', {
+      status: response.status,
+      statusText: response.statusText,
+      body: errorText
+    });
+    throw new Error(`날씨 API 호출 실패: ${response.status} - ${errorText}`);
   }
-  return response.json() as Promise<KMAWeatherResponse>;
+  
+  const data = (await response.json()) as any;
+  console.log('📡 [기상청 API] 원본 JSON:', data);
+  
+  // 에러 응답 체크
+  if (data.response?.header?.resultCode !== '00') {
+    console.error('❌ [기상청 API] 에러 응답:', data.response?.header);
+    throw new Error(`기상청 API 오류: ${data.response?.header?.resultMsg || '알 수 없는 오류'}`);
+  }
+  
+  return data as KMAWeatherResponse;
 };
 
 
@@ -260,13 +277,25 @@ export const getCurrentWeather = async (lat: number, lon: number): Promise<OpenM
   const kmaData = await parseWeatherResponse(response);
   
   console.log('📦 [기상청 API] 원본 응답:', {
-    상태: kmaData.response.header,
-    데이터개수: kmaData.response.body.totalCount,
-    샘플: kmaData.response.body.items.item.slice(0, 5)
+    상태: kmaData.response?.header,
+    전체응답: kmaData
   });
   
-  if (kmaData.response.body.items.item) {
-    const result = convertKMAToOpenMeteo(kmaData.response.body.items.item, lat, lon);
+  // API 응답 구조 안전하게 확인
+  const items = kmaData.response?.body?.items?.item;
+  const totalCount = kmaData.response?.body?.totalCount;
+  
+  console.log('📊 [기상청 API] 데이터 확인:', {
+    totalCount: totalCount,
+    items존재: !!items,
+    items타입: Array.isArray(items) ? 'array' : typeof items,
+    items개수: Array.isArray(items) ? items.length : 0
+  });
+  
+  if (items && Array.isArray(items) && items.length > 0) {
+    console.log('✅ [기상청 API] 데이터 샘플:', items.slice(0, 3));
+    
+    const result = convertKMAToOpenMeteo(items, lat, lon);
     
     console.log('✅ [기상청 API] 변환된 데이터:', {
       현재날씨: result.current,
@@ -277,7 +306,8 @@ export const getCurrentWeather = async (lat: number, lon: number): Promise<OpenM
     return result;
   }
 
-  throw new Error('날씨 데이터를 가져올 수 없습니다.');
+  console.error('❌ [기상청 API] 데이터 없음:', kmaData);
+  throw new Error('날씨 데이터를 가져올 수 없습니다. API 응답: ' + JSON.stringify(kmaData.response?.header || kmaData));
 };
 
 // 시간별 예보 포함해서 가져오기
@@ -304,8 +334,11 @@ export const getDailyWeather = async (lat: number, lon: number, days: number = 7
   const response = await fetch(`${KMA_BASE_URL}/getVilageFcst?${params}`);
   const kmaData = await parseWeatherResponse(response);
   
-  if (kmaData.response.body.items.item) {
-    const result = convertKMAToOpenMeteo(kmaData.response.body.items.item, lat, lon);
+  // API 응답 구조 안전하게 확인
+  const items = kmaData.response?.body?.items?.item;
+  
+  if (items && Array.isArray(items) && items.length > 0) {
+    const result = convertKMAToOpenMeteo(items, lat, lon);
     
     // 일별 데이터 추가 생성
     if (result.hourly) {
@@ -379,7 +412,8 @@ export const getDailyWeather = async (lat: number, lon: number, days: number = 7
     return result;
   }
 
-  throw new Error('날씨 데이터를 가져올 수 없습니다.');
+  console.error('❌ [기상청 API] 일별 데이터 없음:', kmaData);
+  throw new Error('날씨 데이터를 가져올 수 없습니다. API 응답: ' + JSON.stringify(kmaData.response?.header || kmaData));
 };
 
 // 모든 정보를 포함한 종합 날씨 정보

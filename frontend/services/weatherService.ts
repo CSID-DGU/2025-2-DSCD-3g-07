@@ -56,8 +56,9 @@ const convertToGrid = (lat: number, lon: number): { nx: number; ny: number } => 
 const getBaseTime = (): { baseDate: string; baseTime: string } => {
   const now = new Date();
   
-  // 한국 시간으로 변환
-  const koreaTime = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Seoul' }));
+  // Hermes(Android) does not fully support timeZone in toLocaleString, so shift manually to KST (UTC+9).
+  const utcMillis = now.getTime() + now.getTimezoneOffset() * 60000;
+  const koreaTime = new Date(utcMillis + 9 * 60 * 60000);
   
   const year = koreaTime.getFullYear();
   const month = String(koreaTime.getMonth() + 1).padStart(2, '0');

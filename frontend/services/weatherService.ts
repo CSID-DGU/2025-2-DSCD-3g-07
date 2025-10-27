@@ -51,22 +51,49 @@ const convertToGrid = (lat: number, lon: number): { nx: number; ny: number } => 
   };
 };
 
-// 기상청 API에서 발표 시각 구하기 (2시간 전 데이터 사용)
+// 기상청 API에서 발표 시각 구하기
+// 기상청 단기예보는 매일 02:10, 05:10, 08:10, 11:10, 14:10, 17:10, 20:10, 23:10 (8회) 발표
 const getBaseTime = (): { baseDate: string; baseTime: string } => {
   const now = new Date();
-  const koreaTime = new Date(now.getTime() + (9 * 60 * 60 * 1000)); // KST
   
-  // 기상청 API는 2시간 전 데이터 제공
-  koreaTime.setHours(koreaTime.getHours() - 2);
+  // 한국 시간으로 변환
+  const koreaTime = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Seoul' }));
   
-  const year = koreaTime.getUTCFullYear();
-  const month = String(koreaTime.getUTCMonth() + 1).padStart(2, '0');
-  const day = String(koreaTime.getUTCDate()).padStart(2, '0');
-  const hour = String(koreaTime.getUTCHours()).padStart(2, '0');
+  const year = koreaTime.getFullYear();
+  const month = String(koreaTime.getMonth() + 1).padStart(2, '0');
+  const day = String(koreaTime.getDate()).padStart(2, '0');
+  const hour = koreaTime.getHours();
+  const minute = koreaTime.getMinutes();
+  
+  // 발표 시각 목록 (02, 05, 08, 11, 14, 17, 20, 23시)
+  const baseHours = [2, 5, 8, 11, 14, 17, 20, 23];
+  
+  // 현재 시각 이전의 가장 최근 발표 시각 찾기
+  let baseHour = baseHours[0] || 2; // 기본값
+  for (let i = baseHours.length - 1; i >= 0; i--) {
+    const bh = baseHours[i];
+    if (bh !== undefined) {
+      // 발표 시각은 10분 후부터 사용 가능 (예: 02시 발표는 02:10부터)
+      if (hour > bh || (hour === bh && minute >= 10)) {
+        baseHour = bh;
+        break;
+      }
+    }
+  }
+  
+  // 만약 현재 시각이 첫 발표(02:10) 이전이면 전날 마지막 발표(23:00) 사용
+  if (hour < 2 || (hour === 2 && minute < 10)) {
+    const yesterday = new Date(koreaTime);
+    yesterday.setDate(yesterday.getDate() - 1);
+    return {
+      baseDate: `${yesterday.getFullYear()}${String(yesterday.getMonth() + 1).padStart(2, '0')}${String(yesterday.getDate()).padStart(2, '0')}`,
+      baseTime: '2300',
+    };
+  }
   
   return {
     baseDate: `${year}${month}${day}`,
-    baseTime: `${hour}00`,
+    baseTime: `${String(baseHour).padStart(2, '0')}00`,
   };
 };
 
@@ -243,8 +270,21 @@ const parseWeatherResponse = async (response: Response): Promise<KMAWeatherRespo
   
   // 에러 응답 체크
   if (data.response?.header?.resultCode !== '00') {
-    console.error('❌ [기상청 API] 에러 응답:', data.response?.header);
-    throw new Error(`기상청 API 오류: ${data.response?.header?.resultMsg || '알 수 없는 오류'}`);
+    const errorMsg = data.response?.header?.resultMsg || '알 수 없는 오류';
+    const errorCode = data.response?.header?.resultCode || 'UNKNOWN';
+    
+    console.error('❌ [기상청 API] 에러 응답:', {
+      코드: errorCode,
+      메시지: errorMsg,
+      전체헤더: data.response?.header
+    });
+    
+    // NO_DATA 에러에 대한 상세 설명
+    if (errorCode === '03' || errorMsg.includes('NO_DATA')) {
+      throw new Error(`기상청 API 데이터 없음: 요청한 시간대에 데이터가 없습니다. 발표 시각을 확인해주세요. (에러코드: ${errorCode})`);
+    }
+    
+    throw new Error(`기상청 API 오류: ${errorMsg} (에러코드: ${errorCode})`);
   }
   
   return data as KMAWeatherResponse;
@@ -259,7 +299,8 @@ export const getCurrentWeather = async (lat: number, lon: number): Promise<OpenM
   console.log('🌍 [기상청 API] 날씨 요청:', {
     입력위치: { 위도: lat, 경도: lon },
     격자좌표: { nx, ny },
-    발표일시: { baseDate, baseTime }
+    발표일시: { 날짜: baseDate, 시각: baseTime },
+    현재시각: new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' })
   });
 
   const params = new URLSearchParams({
@@ -273,7 +314,10 @@ export const getCurrentWeather = async (lat: number, lon: number): Promise<OpenM
     ny: ny.toString(),
   });
 
-  const response = await fetch(`${KMA_BASE_URL}/getVilageFcst?${params}`);
+  const apiUrl = `${KMA_BASE_URL}/getVilageFcst?${params}`;
+  console.log('🔗 [기상청 API] 요청 URL:', apiUrl);
+
+  const response = await fetch(apiUrl);
   const kmaData = await parseWeatherResponse(response);
   
   console.log('📦 [기상청 API] 원본 응답:', {

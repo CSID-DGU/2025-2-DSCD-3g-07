@@ -160,6 +160,12 @@ export default function WeatherTestScreen() {
     const weather = getWeatherDescriptionFromCode(current.weather_code);
     const windDir = getWindDirection(current.wind_direction_10m);
 
+    console.log('🎨 [UI 렌더링] 현재 날씨:', {
+      원본코드: current.weather_code,
+      변환결과: weather,
+      기온: current.temperature_2m
+    });
+
     return (
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>🌡️ 현재 날씨</Text>

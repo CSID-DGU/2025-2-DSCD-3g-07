@@ -170,6 +170,12 @@ const convertKMAToOpenMeteo = (
         weatherCode = sky === 1 ? 0 : sky === 3 ? 2 : 3;
       }
 
+      console.log('🔍 [날씨 코드 변환]:', {
+        원본값: { PTY: pty, SKY: sky },
+        변환결과: weatherCode,
+        설명: weatherCode === 0 ? '맑음' : weatherCode === 2 ? '부분 흐림' : weatherCode === 3 ? '흐림' : weatherCode === 61 ? '가벼운 비' : weatherCode === 71 ? '가벼운 눈' : '소나기'
+      });
+
       const current = {
         time: `${firstTime.substring(0, 4)}-${firstTime.substring(4, 6)}-${firstTime.substring(6, 8)}T${firstTime.substring(8, 10)}:00`,
         temperature_2m: temp,

@@ -68,16 +68,16 @@ export interface WeatherApiOptions {
   timezone?: string;
 }
 
-// ?꾧꼍?꾨? 湲곗긽泥?寃⑹옄 醫뚰몴濡?蹂??
+// 위경도 -> 기상청 격자 좌표 변환
 const convertToGrid = (lat: number, lon: number): { nx: number; ny: number } => {
-  const RE = 6371.00877; // 吏援?諛섍꼍(km)
-  const GRID = 5.0; // 寃⑹옄 媛꾧꺽(km)
-  const SLAT1 = 30.0; // ?ъ쁺 ?꾨룄1(degree)
-  const SLAT2 = 60.0; // ?ъ쁺 ?꾨룄2(degree)
-  const OLON = 126.0; // 湲곗???寃쎈룄(degree)
-  const OLAT = 38.0; // 湲곗????꾨룄(degree)
-  const XO = 43; // 湲곗???X醫뚰몴(GRID)
-  const YO = 136; // 湲곗???Y醫뚰몴(GRID)
+  const RE = 6371.00877; // 지구 반경(km)
+  const GRID = 5.0; // 격자 간격(km)
+  const SLAT1 = 30.0; // 표준 위도1(degree)
+  const SLAT2 = 60.0; // 표준 위도2(degree)
+  const OLON = 126.0; // 기준 경도(degree)
+  const OLAT = 38.0; // 기준 위도(degree)
+  const XO = 43; // 기준점 X좌표(GRID)
+  const YO = 136; // 기준점 Y좌표(GRID)
 
   const DEGRAD = Math.PI / 180.0;
   const re = RE / GRID;
@@ -104,8 +104,8 @@ const convertToGrid = (lat: number, lon: number): { nx: number; ny: number } => 
   };
 };
 
-// 湲곗긽泥?API?먯꽌 諛쒗몴 ?쒓컖 援ы븯湲?
-// 湲곗긽泥??④린?덈낫??留ㅼ씪 02:10, 05:10, 08:10, 11:10, 14:10, 17:10, 20:10, 23:10 (8?? 諛쒗몴
+// 기상청 API 발표 시각 계산
+// 단기예보는 매일 02:10, 05:10, 08:10, 11:10, 14:10, 17:10, 20:10, 23:10 총 8회 발표
 const getBaseTime = (): { baseDate: string; baseTime: string } => {
   const now = new Date();
   
@@ -119,15 +119,15 @@ const getBaseTime = (): { baseDate: string; baseTime: string } => {
   const hour = koreaTime.getHours();
   const minute = koreaTime.getMinutes();
   
-  // 諛쒗몴 ?쒓컖 紐⑸줉 (02, 05, 08, 11, 14, 17, 20, 23??
+  // 발표 시각 목록 (02, 05, 08, 11, 14, 17, 20, 23시)
   const baseHours = [2, 5, 8, 11, 14, 17, 20, 23];
   
-  // ?꾩옱 ?쒓컖 ?댁쟾??媛??理쒓렐 諛쒗몴 ?쒓컖 李얘린
-  let baseHour = baseHours[0] || 2; // 湲곕낯媛?
+  // 현재 시각 기준 가장 최근 발표 시각 선택
+  let baseHour = baseHours[0] || 2; // 기본값
   for (let i = baseHours.length - 1; i >= 0; i--) {
     const bh = baseHours[i];
     if (bh !== undefined) {
-      // 諛쒗몴 ?쒓컖? 10遺??꾨????ъ슜 媛??(?? 02??諛쒗몴??02:10遺??
+      // 발표는 발표 시각 기준 10분 후부터 활용 (예: 02시는 02:10 이후)
       if (hour > bh || (hour === bh && minute >= 10)) {
         baseHour = bh;
         break;
@@ -135,7 +135,7 @@ const getBaseTime = (): { baseDate: string; baseTime: string } => {
     }
   }
   
-  // 留뚯빟 ?꾩옱 ?쒓컖??泥?諛쒗몴(02:10) ?댁쟾?대㈃ ?꾨궇 留덉?留?諛쒗몴(23:00) ?ъ슜
+  // 하루 첫 발표(02:10) 이전이면 전날 23:00 발표 사용
   if (hour < 2 || (hour === 2 && minute < 10)) {
     const yesterday = new Date(koreaTime);
     yesterday.setDate(yesterday.getDate() - 1);
@@ -151,18 +151,18 @@ const getBaseTime = (): { baseDate: string; baseTime: string } => {
   };
 };
 
-// 湲곗긽泥??곗씠?곕? OpenMeteo ?뺤떇?쇰줈 蹂??
+// 기상청 데이터를 OpenMeteo 포맷으로 변환
 const convertKMAToOpenMeteo = (
   kmaData: KMAWeatherItem[],
   lat: number,
   lon: number
 ): OpenMeteoResponse => {
-  console.log('?봽 [?곗씠??蹂?? ?쒖옉:', {
-    ?꾩껜??ぉ?? kmaData.length,
-    移댄뀒怨좊━?? [...new Set(kmaData.map(d => d.category))].join(', ')
+  console.log('DEBUG [KMA->OpenMeteo] 변환 시작:', {
+    totalItems: kmaData.length,
+    categories: [...new Set(kmaData.map(d => d.category))].join(', '),
   });
 
-  // ?꾩옱 ?쒓컖 湲곗? ?곗씠???뚯떛
+  // 현재 시각 기준 기초 데이터 구조 준비
   const hourlyData: {
     time: string[];
     temperature_2m: number[];
@@ -183,7 +183,7 @@ const convertKMAToOpenMeteo = (
     wind_direction_10m: [],
   };
 
-  // ?쒓컙蹂꾨줈 ?곗씠??洹몃９??
+  // 시각별로 데이터 그룹화
   const dataByTime: Record<string, Record<string, string>> = {};
   
   kmaData.forEach(item => {
@@ -194,19 +194,19 @@ const convertKMAToOpenMeteo = (
     dataByTime[datetime][item.category] = item.fcstValue;
   });
 
-  console.log('?뱤 [?곗씠??蹂?? ?쒓컙?蹂?洹몃９???꾨즺:', {
-    ?쒓컙??? Object.keys(dataByTime).length,
-    泥ル쾲吏몄떆媛? Object.keys(dataByTime).sort()[0]
+  console.log('DEBUG [KMA->OpenMeteo] 타임라인 그룹 완료:', {
+    timeSlotCount: Object.keys(dataByTime).length,
+    earliestTimestamp: Object.keys(dataByTime).sort()[0],
   });
 
-  // 泥?踰덉㎏ ?쒓컙?瑜??꾩옱 ?좎뵪濡??ъ슜
+  // 첫 번째 시간대를 현재 날씨로 사용
   const times = Object.keys(dataByTime).sort();
   if (times.length > 0 && times[0]) {
     const firstTime = times[0];
     const firstData = dataByTime[firstTime];
     
     if (firstData) {
-      // ?꾩옱 ?좎뵪
+      // 현재 조건
       const temp = parseFloat(firstData.TMP || '0');
       const humidity = parseFloat(firstData.REH || '0');
       const pop = parseFloat(firstData.POP || '0');
@@ -215,7 +215,7 @@ const convertKMAToOpenMeteo = (
       const wsd = parseFloat(firstData.WSD || '0');
       const vec = parseFloat(firstData.VEC || '0');
       
-      // weather_code 怨꾩궛 (媛뺤닔?뺥깭 ?곗꽑)
+      // weather_code 결정 (강수/하늘 상태 매핑)
       let weatherCode = 0;
       if (pty > 0) {
         weatherCode = pty === 1 ? 61 : pty === 2 ? 71 : pty === 3 ? 71 : 80;
@@ -223,17 +223,32 @@ const convertKMAToOpenMeteo = (
         weatherCode = sky === 1 ? 0 : sky === 3 ? 2 : 3;
       }
 
-      console.log('?뵇 [?좎뵪 肄붾뱶 蹂??:', {
-        ?먮낯媛? { PTY: pty, SKY: sky },
-        蹂?섍껐怨? weatherCode,
-        ?ㅻ챸: weatherCode === 0 ? '留묒쓬' : weatherCode === 2 ? '遺遺??먮┝' : weatherCode === 3 ? '?먮┝' : weatherCode === 61 ? '媛踰쇱슫 鍮? : weatherCode === 71 ? '媛踰쇱슫 ?? : '?뚮굹湲?
+      const weatherLabel =
+        weatherCode === 0 ? '맑음' :
+        weatherCode === 2 ? '부분 흐림' :
+        weatherCode === 3 ? '흐림' :
+        weatherCode === 61 ? '약한 비' :
+        weatherCode === 71 ? '약한 눈' :
+        '강수';
+      const precipitationType =
+        pty === 0 ? '없음' :
+        pty === 1 ? '비' :
+        pty === 2 ? '비/눈' :
+        pty === 3 ? '눈' :
+        '소나기';
+      const skyLabel = sky === 1 ? '맑음' : sky === 3 ? '구름 많음' : '흐림';
+
+      console.log('DEBUG [날씨 코드 매핑]:', {
+        raw: { PTY: pty, SKY: sky },
+        weatherCode,
+        weatherLabel,
       });
 
       const current = {
         time: `${firstTime.substring(0, 4)}-${firstTime.substring(4, 6)}-${firstTime.substring(6, 8)}T${firstTime.substring(8, 10)}:00`,
         temperature_2m: temp,
         relative_humidity_2m: humidity,
-        apparent_temperature: temp - (wsd * 0.5), // 媛꾨떒??泥닿컧?⑤룄 怨꾩궛
+        apparent_temperature: temp - (wsd * 0.5), // 체감온도를 단순 보정
         precipitation: parseKMAPrecipAmount(firstData.PCP),
         rain: pty === 1 ? parseKMAPrecipAmount(firstData.PCP) : 0,
         weather_code: weatherCode,
@@ -241,18 +256,19 @@ const convertKMAToOpenMeteo = (
         wind_direction_10m: vec,
       };
 
-      console.log('?뙜截?[?꾩옱 ?좎뵪]:', {
-        ?쒓컖: current.time,
-        湲곗삩: `${temp}??,
-        ?듬룄: `${humidity}%`,
-        媛뺤닔?뺣쪧: `${pop}%`,
-        媛뺤닔?뺥깭: pty === 0 ? '?놁쓬' : pty === 1 ? '鍮? : pty === 2 ? '鍮??? : pty === 3 ? '?? : '?뚮굹湲?,
-        ?섎뒛?곹깭: sky === 1 ? '留묒쓬' : sky === 3 ? '援щ쫫留롮쓬' : '?먮┝',
-        ?띿냽: `${wsd}m/s`,
-        蹂?섎맂肄붾뱶: weatherCode
+      console.log('DEBUG [현재 날씨 변환 결과]:', {
+        timestamp: current.time,
+        temperature: `${temp}C`,
+        humidity: `${humidity}%`,
+        precipitationProbability: `${pop}%`,
+        precipitationType,
+        sky: skyLabel,
+        windSpeed: `${wsd}m/s`,
+        weatherCode,
+        weatherLabel,
       });
 
-      // ?쒓컙蹂??곗씠??
+      // 시간별 데이터 적재
       times.forEach(time => {
         const data = dataByTime[time];
         if (data) {
@@ -294,7 +310,7 @@ const convertKMAToOpenMeteo = (
     }
   }
 
-  // ?곗씠?곌? ?놁쓣 寃쎌슦 湲곕낯媛?
+  // 데이터가 없을 때는 기본값 반환
   return {
     latitude: lat,
     longitude: lon,
@@ -313,54 +329,54 @@ const convertKMAToOpenMeteo = (
   };
 };
 
-// API ?묐떟???덉쟾?섍쾶 ?뚯떛?섎뒗 ?ы띁 ?⑥닔
+// API 응답을 안전하게 파싱하는 헬퍼
 const parseWeatherResponse = async (response: Response): Promise<KMAWeatherResponse> => {
   if (!response.ok) {
     const errorText = await response.text();
-    console.error('??[湲곗긽泥?API] HTTP ?ㅻ쪟:', {
+    console.error('ERROR [기상청 API] HTTP 오류:', {
       status: response.status,
       statusText: response.statusText,
-      body: errorText
+      body: errorText,
     });
-    throw new Error(`?좎뵪 API ?몄텧 ?ㅽ뙣: ${response.status} - ${errorText}`);
+    throw new Error(`기상청 API 요청 실패: ${response.status} - ${errorText}`);
   }
   
   const data = (await response.json()) as any;
-  console.log('?뱻 [湲곗긽泥?API] ?먮낯 JSON:', data);
+  console.log('DEBUG [기상청 API] 원본 JSON:', data);
   
-  // ?먮윭 ?묐떟 泥댄겕
+  // 오류 응답 검사
   if (data.response?.header?.resultCode !== '00') {
-    const errorMsg = data.response?.header?.resultMsg || '?????녿뒗 ?ㅻ쪟';
+    const errorMsg = data.response?.header?.resultMsg || '알 수 없는 오류';
     const errorCode = data.response?.header?.resultCode || 'UNKNOWN';
     
-    console.error('??[湲곗긽泥?API] ?먮윭 ?묐떟:', {
-      肄붾뱶: errorCode,
-      硫붿떆吏: errorMsg,
-      ?꾩껜?ㅻ뜑: data.response?.header
+    console.error('ERROR [기상청 API] 오류 응답:', {
+      errorCode,
+      errorMsg,
+      header: data.response?.header,
     });
     
-    // NO_DATA ?먮윭??????곸꽭 ?ㅻ챸
+    // NO_DATA 오류는 상세 안내
     if (errorCode === '03' || errorMsg.includes('NO_DATA')) {
-      throw new Error(`湲곗긽泥?API ?곗씠???놁쓬: ?붿껌???쒓컙????곗씠?곌? ?놁뒿?덈떎. 諛쒗몴 ?쒓컖???뺤씤?댁＜?몄슂. (?먮윭肄붾뱶: ${errorCode})`);
+      throw new Error(`기상청 API 데이터 없음: 요청한 기준 시간에 데이터가 존재하지 않습니다. 발표 시각을 다시 확인해주세요. (오류코드: ${errorCode})`);
     }
     
-    throw new Error(`湲곗긽泥?API ?ㅻ쪟: ${errorMsg} (?먮윭肄붾뱶: ${errorCode})`);
+    throw new Error(`기상청 API 오류: ${errorMsg} (오류코드: ${errorCode})`);
   }
   
   return data as KMAWeatherResponse;
 };
 
 
-// ?꾩옱 ?좎뵪 ?뺣낫留?媛?몄삤湲?
+// 현재 날씨 한 번 조회
 export const getCurrentWeather = async (lat: number, lon: number): Promise<OpenMeteoResponse> => {
   const { nx, ny } = convertToGrid(lat, lon);
   const { baseDate, baseTime } = getBaseTime();
 
-  console.log('?뙇 [湲곗긽泥?API] ?좎뵪 ?붿껌:', {
-    ?낅젰?꾩튂: { ?꾨룄: lat, 寃쎈룄: lon },
-    寃⑹옄醫뚰몴: { nx, ny },
-    諛쒗몴?쇱떆: { ?좎쭨: baseDate, ?쒓컖: baseTime },
-    ?꾩옱?쒓컖: new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' })
+  console.log('DEBUG [기상청 API] 요청 파라미터:', {
+    requestedCoords: { latitude: lat, longitude: lon },
+    gridCoords: { nx, ny },
+    baseTime: { date: baseDate, time: baseTime },
+    nowKST: new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' }),
   });
 
   const params = new URLSearchParams({
@@ -375,58 +391,58 @@ export const getCurrentWeather = async (lat: number, lon: number): Promise<OpenM
   });
 
   const apiUrl = `${KMA_BASE_URL}/getVilageFcst?${params}`;
-  console.log('?뵕 [湲곗긽泥?API] ?붿껌 URL:', apiUrl);
+  console.log('DEBUG [기상청 API] 요청 URL:', apiUrl);
 
   const response = await fetch(apiUrl);
   const kmaData = await parseWeatherResponse(response);
   
-  console.log('?벀 [湲곗긽泥?API] ?먮낯 ?묐떟:', {
-    ?곹깭: kmaData.response?.header,
-    ?꾩껜?묐떟: kmaData
+  console.log('DEBUG [기상청 API] 응답 요약:', {
+    header: kmaData.response?.header,
+    raw: kmaData,
   });
   
-  // API ?묐떟 援ъ“ ?덉쟾?섍쾶 ?뺤씤
+  // API 응답 구조 확인
   const items = kmaData.response?.body?.items?.item;
   const totalCount = kmaData.response?.body?.totalCount;
   
-  console.log('?뱤 [湲곗긽泥?API] ?곗씠???뺤씤:', {
+  console.log('DEBUG [기상청 API] 아이템 확인:', {
     totalCount: totalCount,
-    items議댁옱: !!items,
-    items??? Array.isArray(items) ? 'array' : typeof items,
-    items媛쒖닔: Array.isArray(items) ? items.length : 0
+    hasItems: !!items,
+    itemsType: Array.isArray(items) ? 'array' : typeof items,
+    itemCount: Array.isArray(items) ? items.length : 0,
   });
   
   if (items && Array.isArray(items) && items.length > 0) {
-    console.log('??[湲곗긽泥?API] ?곗씠???섑뵆:', items.slice(0, 3));
+    console.log('DEBUG [기상청 API] 원시 데이터 샘플:', items.slice(0, 3));
     
     const result = convertKMAToOpenMeteo(items, lat, lon);
     
-    console.log('??[湲곗긽泥?API] 蹂?섎맂 ?곗씠??', {
-      ?꾩옱?좎뵪: result.current,
-      ?쒓컙蹂꾩삁蹂?媛쒖닔: result.hourly?.time.length || 0,
-      ?쇰퀎?덈낫_媛쒖닔: result.daily?.time.length || 0
+    console.log('DEBUG [기상청 API] 변환 결과:', {
+      current: result.current,
+      hourlyCount: result.hourly?.time.length || 0,
+      dailyCount: result.daily?.time.length || 0,
     });
     
     return result;
   }
 
-  console.error('??[湲곗긽泥?API] ?곗씠???놁쓬:', kmaData);
-  throw new Error('?좎뵪 ?곗씠?곕? 媛?몄삱 ???놁뒿?덈떎. API ?묐떟: ' + JSON.stringify(kmaData.response?.header || kmaData));
+  console.error('ERROR [기상청 API] 데이터 없음:', kmaData);
+  throw new Error('날씨 데이터를 가져올 수 없습니다. API 응답을 확인해주세요: ' + JSON.stringify(kmaData.response?.header || kmaData));
 };
 
-// ?쒓컙蹂??덈낫 ?ы븿?댁꽌 媛?몄삤湲?
+// 시간별 예보 조회 (현재는 단기예보 API 결과 재사용)
 export const getHourlyWeather = async (lat: number, lon: number, hours: number = 24): Promise<OpenMeteoResponse> => {
-  return getCurrentWeather(lat, lon); // 湲곗긽泥?API???④린?덈낫???쒓컙蹂??곗씠???ы븿
+  return getCurrentWeather(lat, lon); // 기상청 API 응답을 시간별 예보로 활용
 };
 
-// ?쇰퀎 ?덈낫 ?ы븿?댁꽌 媛?몄삤湲?
+// 일별 예보 조회
 export const getDailyWeather = async (lat: number, lon: number, days: number = 7): Promise<OpenMeteoResponse> => {
   const { nx, ny } = convertToGrid(lat, lon);
   const { baseDate, baseTime } = getBaseTime();
 
   const params = new URLSearchParams({
     serviceKey: KMA_API_KEY,
-    numOfRows: '290', // ??留롮? ?곗씠??媛?몄삤湲?
+    numOfRows: '290', // 가능한 많은 데이터를 확보하기 위한 충분한 row 수
     pageNo: '1',
     dataType: 'JSON',
     base_date: baseDate,
@@ -438,13 +454,13 @@ export const getDailyWeather = async (lat: number, lon: number, days: number = 7
   const response = await fetch(`${KMA_BASE_URL}/getVilageFcst?${params}`);
   const kmaData = await parseWeatherResponse(response);
   
-  // API ?묐떟 援ъ“ ?덉쟾?섍쾶 ?뺤씤
+  // API 응답 유효성 확인
   const items = kmaData.response?.body?.items?.item;
   
   if (items && Array.isArray(items) && items.length > 0) {
     const result = convertKMAToOpenMeteo(items, lat, lon);
     
-    // ?쇰퀎 ?곗씠??異붽? ?앹꽦
+    // 일별 데이터 구성
     if (result.hourly) {
       const dailyData: {
         time: string[];
@@ -464,7 +480,7 @@ export const getDailyWeather = async (lat: number, lon: number, days: number = 7
         wind_speed_10m_max: [],
       };
 
-      // ?좎쭨蹂꾨줈 ?곗씠??洹몃９??
+      // 날짜별로 데이터 누적
       const byDate: Record<string, {
         temps: number[];
         precips: number[];
@@ -496,7 +512,7 @@ export const getDailyWeather = async (lat: number, lon: number, days: number = 7
         }
       });
 
-      // ?좎쭨蹂??듦퀎 怨꾩궛
+      // 날짜별 요약 계산
       Object.keys(byDate).sort().forEach(date => {
         const data = byDate[date];
         if (data) {
@@ -506,7 +522,7 @@ export const getDailyWeather = async (lat: number, lon: number, days: number = 7
           dailyData.precipitation_sum.push(data.precips.reduce((a, b) => a + b, 0));
           dailyData.precipitation_probability_max.push(Math.max(...data.pops));
           dailyData.wind_speed_10m_max.push(Math.max(...data.winds));
-          dailyData.weather_code.push(Math.max(...data.codes)); // 媛???낆쿇??肄붾뱶
+          dailyData.weather_code.push(Math.max(...data.codes)); // 강수 우선 순서를 고려해 최대값 사용
         }
       });
 
@@ -516,11 +532,11 @@ export const getDailyWeather = async (lat: number, lon: number, days: number = 7
     return result;
   }
 
-  console.error('??[湲곗긽泥?API] ?쇰퀎 ?곗씠???놁쓬:', kmaData);
-  throw new Error('?좎뵪 ?곗씠?곕? 媛?몄삱 ???놁뒿?덈떎. API ?묐떟: ' + JSON.stringify(kmaData.response?.header || kmaData));
+  console.error('ERROR [기상청 API] 일별 데이터 없음:', kmaData);
+  throw new Error('일별 날씨 데이터를 가져올 수 없습니다. API 응답을 확인해주세요: ' + JSON.stringify(kmaData.response?.header || kmaData));
 };
 
-// 紐⑤뱺 ?뺣낫瑜??ы븿??醫낇빀 ?좎뵪 ?뺣낫
+// 전체 날씨 조회
 export const getCompleteWeather = async (
   lat: number, 
   lon: number, 
@@ -530,9 +546,8 @@ export const getCompleteWeather = async (
   return getDailyWeather(lat, lon, forecastDays);
 };
 
-// ?쒖슱 湲곕낯 醫뚰몴 (?뚯뒪?몄슜)
+// 서울 기본 좌표 (테스트용)
 export const SEOUL_COORDS = {
   latitude: 37.5665,
   longitude: 126.9780
 };
-

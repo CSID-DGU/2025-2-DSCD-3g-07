@@ -12,7 +12,7 @@ def call_tmap_transit_api(
     start_y: float,
     end_x: float,
     end_y: float,
-    count: int = 1,
+    count: int = 10,
     lang: int = 0,
     format: str = "json",
 ) -> Optional[dict[str, Any]]:

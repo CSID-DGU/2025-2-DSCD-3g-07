@@ -230,6 +230,21 @@ export default function RoutesScreen() {
     );
   };
 
+  const searchRoute = async () => {
+    // 테스트용 좌표 (서울역 -> 강남역)
+    const startCoords = { x: 126.9706, y: 37.5547 };
+    const endCoords = { x: 127.0276, y: 37.4979 };
+    
+    await getRoute({
+      start_x: startCoords.x,
+      start_y: startCoords.y,
+      end_x: endCoords.x,
+      end_y: endCoords.y,
+    });
+    
+    setShowRouteResult(true);
+  };
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
@@ -395,6 +410,26 @@ export default function RoutesScreen() {
             );
           })}
         </View>
+
+        {/* 경로 검색 결과 표시 */}
+        {showRouteResult && (
+          <View style={styles.routeResultContainer}>
+            <View style={styles.resultHeader}>
+              <Text style={styles.resultTitle}>검색 결과</Text>
+              <TouchableOpacity 
+                onPress={() => setShowRouteResult(false)}
+                style={styles.closeButton}
+              >
+                <MaterialIcons name="close" size={20} color="#667085" />
+              </TouchableOpacity>
+            </View>
+            {routeError ? (
+              <Text style={styles.errorText}>❌ 오류: {routeError}</Text>
+            ) : (
+              <RouteDetailComponent routeData={routeData} />
+            )}
+          </View>
+        )}
 
         <View style={styles.routeList}>
           {routes.map((route) => (

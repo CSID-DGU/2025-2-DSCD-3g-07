@@ -14,9 +14,8 @@ import * as Location from 'expo-location';
 import { getCurrentWeather, getCompleteWeather, SEOUL_COORDS } from '../services/weatherService';
 import { 
   OpenMeteoResponse, 
-  getWeatherDescription, 
-  getWindDirection, 
-  getUVIndexDescription 
+  getWeatherDescriptionFromCode,
+  getWindDirection,
 } from '../types/weather';
 
 interface LocationCoords {
@@ -158,8 +157,14 @@ export default function WeatherTestScreen() {
     if (!weatherData?.current) return null;
 
     const current = weatherData.current;
-    const weather = getWeatherDescription(current.weather_code);
+    const weather = getWeatherDescriptionFromCode(current.weather_code);
     const windDir = getWindDirection(current.wind_direction_10m);
+
+    console.log('🎨 [UI 렌더링] 현재 날씨:', {
+      원본코드: current.weather_code,
+      변환결과: weather,
+      기온: current.temperature_2m
+    });
 
     return (
       <View style={styles.section}>
@@ -184,22 +189,7 @@ export default function WeatherTestScreen() {
           
           <View style={styles.detailRow}>
             <Text style={styles.detailLabel}>풍속:</Text>
-            <Text style={styles.detailValue}>{current.wind_speed_10m} km/h ({windDir})</Text>
-          </View>
-          
-          <View style={styles.detailRow}>
-            <Text style={styles.detailLabel}>강풍:</Text>
-            <Text style={styles.detailValue}>{current.wind_gusts_10m} km/h</Text>
-          </View>
-          
-          <View style={styles.detailRow}>
-            <Text style={styles.detailLabel}>기압:</Text>
-            <Text style={styles.detailValue}>{current.pressure_msl} hPa</Text>
-          </View>
-          
-          <View style={styles.detailRow}>
-            <Text style={styles.detailLabel}>구름:</Text>
-            <Text style={styles.detailValue}>{current.cloud_cover}%</Text>
+            <Text style={styles.detailValue}>{current.wind_speed_10m} m/s ({windDir})</Text>
           </View>
           
           <View style={styles.detailRow}>
@@ -211,13 +201,6 @@ export default function WeatherTestScreen() {
             <View style={styles.detailRow}>
               <Text style={styles.detailLabel}>비:</Text>
               <Text style={styles.detailValue}>{current.rain} mm</Text>
-            </View>
-          )}
-          
-          {current.snowfall > 0 && (
-            <View style={styles.detailRow}>
-              <Text style={styles.detailLabel}>눈:</Text>
-              <Text style={styles.detailValue}>{current.snowfall} cm</Text>
             </View>
           )}
         </View>
@@ -234,23 +217,15 @@ export default function WeatherTestScreen() {
         <View style={styles.weatherDetails}>
           <View style={styles.detailRow}>
             <Text style={styles.detailLabel}>위도:</Text>
-            <Text style={styles.detailValue}>{weatherData.latitude}°</Text>
+            <Text style={styles.detailValue}>{weatherData.latitude.toFixed(4)}°</Text>
           </View>
           <View style={styles.detailRow}>
             <Text style={styles.detailLabel}>경도:</Text>
-            <Text style={styles.detailValue}>{weatherData.longitude}°</Text>
-          </View>
-          <View style={styles.detailRow}>
-            <Text style={styles.detailLabel}>고도:</Text>
-            <Text style={styles.detailValue}>{weatherData.elevation}m</Text>
+            <Text style={styles.detailValue}>{weatherData.longitude.toFixed(4)}°</Text>
           </View>
           <View style={styles.detailRow}>
             <Text style={styles.detailLabel}>시간대:</Text>
             <Text style={styles.detailValue}>{weatherData.timezone}</Text>
-          </View>
-          <View style={styles.detailRow}>
-            <Text style={styles.detailLabel}>응답 시간:</Text>
-            <Text style={styles.detailValue}>{weatherData.generationtime_ms.toFixed(2)}ms</Text>
           </View>
         </View>
       </View>
@@ -271,7 +246,7 @@ export default function WeatherTestScreen() {
             const hour = new Date(time).getHours();
             const temp = Math.round(hourly.temperature_2m[index] || 0);
             const precipitation = hourly.precipitation_probability[index] || 0;
-            const weather = getWeatherDescription(hourly.weather_code[index] || 0);
+            const weather = getWeatherDescriptionFromCode(hourly.weather_code[index] || 0);
             
             return (
               <View key={index} style={styles.hourlyItem}>
@@ -301,10 +276,10 @@ export default function WeatherTestScreen() {
           const dayName = date.toLocaleDateString('ko-KR', { weekday: 'short' });
           const maxTemp = Math.round(daily.temperature_2m_max[index] || 0);
           const minTemp = Math.round(daily.temperature_2m_min[index] || 0);
-          const weather = getWeatherDescription(daily.weather_code[index] || 0);
-          const rainSum = daily.rain_sum?.[index] || 0;
-          const uvIndex = daily.uv_index_max?.[index] || 0;
-          const uvInfo = getUVIndexDescription(uvIndex);
+          const weatherCode = daily.weather_code[index] || 0;
+          const weather = getWeatherDescriptionFromCode(weatherCode);
+          const precip = daily.precipitation_sum[index] || 0;
+          const pop = daily.precipitation_probability_max[index] || 0;
           
           return (
             <View key={index} style={styles.dailyItem}>
@@ -314,13 +289,11 @@ export default function WeatherTestScreen() {
               </View>
               <View style={styles.dailyCenter}>
                 <Text style={styles.dailyDesc}>{weather.description}</Text>
-                {rainSum > 0 && <Text style={styles.dailyRain}>비 {rainSum}mm</Text>}
+                {precip > 0 && <Text style={styles.dailyRain}>강수 {precip.toFixed(1)}mm</Text>}
+                {pop > 0 && <Text style={styles.dailyRain}>확률 {pop}%</Text>}
               </View>
               <View style={styles.dailyRight}>
                 <Text style={styles.dailyTemp}>{maxTemp}° / {minTemp}°</Text>
-                <Text style={[styles.dailyUV, {color: uvInfo.color}]}>
-                  UV {uvIndex} ({uvInfo.level})
-                </Text>
               </View>
             </View>
           );
@@ -335,7 +308,7 @@ export default function WeatherTestScreen() {
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
     >
       <View style={styles.header}>
-        <Text style={styles.title}>🌤️ Open-Meteo 날씨 테스트</Text>
+        <Text style={styles.title}>🌤️ 기상청 날씨 API 테스트</Text>
         <Text style={styles.subtitle}>
           {useCurrentLocation && currentLocation 
             ? currentLocation.locationName || '현재 위치'

@@ -108,12 +108,12 @@ export const getWeatherDescription = (skyCode?: number, ptyCode?: number): { des
   if (ptyCode !== undefined && ptyCode > 0) {
     const ptyDescriptions: Record<number, { description: string; emoji: string }> = {
       1: { description: '비', emoji: '🌧️' },
-      2: { description: '비/눈', emoji: '�️' },
+      2: { description: '비/눈', emoji: '🌨️' },
       3: { description: '눈', emoji: '❄️' },
       4: { description: '소나기', emoji: '⛈️' },
-      5: { description: '빗방울', emoji: '�️' },
-      6: { description: '빗방울/눈날림', emoji: '�️' },
-      7: { description: '눈날림', emoji: '�️' },
+      5: { description: '빗방울', emoji: '🌦️' },
+      6: { description: '빗방울/눈날림', emoji: '🌨️' },
+      7: { description: '눈날림', emoji: '🌨️' },
     };
     return ptyDescriptions[ptyCode] || { description: '알 수 없음', emoji: '❓' };
   }
@@ -133,38 +133,52 @@ export const getWeatherDescription = (skyCode?: number, ptyCode?: number): { des
 
 // Open Meteo 호환 함수 (기존 코드 지원)
 export const getWeatherDescriptionFromCode = (code: number): { description: string; emoji: string } => {
-  // 하늘상태로 간주 (1, 3, 4)
-  if (code <= 4) {
-    return getWeatherDescription(code, 0);
+  if (!Number.isFinite(code)) {
+    return { description: '알 수 없음', emoji: '❓' };
   }
-  
+
+  const normalizedCode = Math.round(code);
+
   const weatherCodes: Record<number, { description: string; emoji: string }> = {
     0: { description: '맑음', emoji: '☀️' },
-    1: { description: '대체로 맑음', emoji: '�️' },
-    2: { description: '부분적으로 흐림', emoji: '⛅' },
+    1: { description: '대체로 맑음', emoji: '🌤️' },
+    2: { description: '부분 흐림', emoji: '⛅' },
     3: { description: '흐림', emoji: '☁️' },
-    45: { description: '안개', emoji: '�️' },
-    48: { description: '서리 안개', emoji: '�️' },
+    45: { description: '안개', emoji: '🌫️' },
+    48: { description: '서리 안개', emoji: '🌫️' },
     51: { description: '가벼운 이슬비', emoji: '🌦️' },
     53: { description: '보통 이슬비', emoji: '🌦️' },
-    55: { description: '강한 이슬비', emoji: '�️' },
-    61: { description: '가벼운 비', emoji: '�️' },
+    55: { description: '강한 이슬비', emoji: '🌧️' },
+    61: { description: '가벼운 비', emoji: '🌧️' },
     63: { description: '보통 비', emoji: '🌧️' },
     65: { description: '강한 비', emoji: '🌧️' },
+    66: { description: '진눈깨비', emoji: '🌨️' },
     71: { description: '가벼운 눈', emoji: '🌨️' },
-    73: { description: '보통 눈', emoji: '❄️' },
+    73: { description: '보통 눈', emoji: '🌨️' },
     75: { description: '강한 눈', emoji: '❄️' },
     80: { description: '가벼운 소나기', emoji: '🌦️' },
-    81: { description: '보통 소나기', emoji: '⛈️' },
+    81: { description: '보통 소나기', emoji: '🌧️' },
     82: { description: '강한 소나기', emoji: '⛈️' },
     95: { description: '뇌우', emoji: '⛈️' },
   };
 
-  return weatherCodes[code] || { description: '알 수 없음', emoji: '❓' };
+  if (weatherCodes[normalizedCode]) {
+    return weatherCodes[normalizedCode];
+  }
+
+  if (normalizedCode >= 1 && normalizedCode <= 7) {
+    return getWeatherDescription(undefined, normalizedCode);
+  }
+
+  return { description: '알 수 없음', emoji: '❓' };
 };
 
 // 풍향을 한국어로 변환
 export const getWindDirection = (degrees: number): string => {
+  if (!Number.isFinite(degrees)) {
+    return '알 수 없음';
+  }
+
   const directions = ['북', '북동', '동', '남동', '남', '남서', '서', '북서'];
   const index = Math.round(degrees / 45) % 8;
   return directions[index] || '북';

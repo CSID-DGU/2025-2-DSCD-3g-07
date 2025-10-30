@@ -169,13 +169,27 @@ export interface RouteElevationAnalysis {
   total_route_time_adjustment: number;
   sampled_coords_count?: number;
   original_coords_count?: number;
+  user_speed_mps?: number;          // 사용자 평균 속도
+  weather_applied?: boolean;         // 날씨 보정 적용 여부
+  factors?: {                        // 통합 계수 정보
+    user_speed_factor: number;
+    slope_factor: number;
+    weather_factor: number;
+    final_factor: number;
+  };
   error?: string;
 }
 
 export interface AnalyzeSlopeRequest {
   itinerary: Itinerary;
   api_key?: string;
-  walking_speed?: number; // m/s - Health Connect Case 1 평균 속도
+  user_speed_mps?: number; // m/s - Health Connect Case 1 평균 속도
+  weather_data?: {         // 날씨 데이터
+    temp_c: number;
+    pty: number;
+    rain_mm_per_h?: number;
+    snow_cm_per_h?: number;
+  };
 }
 
 export interface ElevationData {

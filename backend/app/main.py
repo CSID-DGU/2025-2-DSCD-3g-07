@@ -1,13 +1,13 @@
 import os
 import pathlib
 
-import joblib
+# import joblib  # 제거됨: ml_helpers와 함께 사용하지 않음
 from dotenv import load_dotenv
 from fastapi import FastAPI, Query, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.utils.api_helpers import call_tmap_transit_api
-from app.utils.ml_helpers import predict_adjustment, train_personalization_model
+# from app.utils.ml_helpers import predict_adjustment, train_personalization_model  # 제거됨: 더 이상 사용하지 않음
 from app.schemas import RouteResponse, WalkingSectionResponse
 from app.routers import routes, weather
 
@@ -57,17 +57,16 @@ def calculate_walking_time(distance_meters: float, avg_speed_kmh: float = 4.5) -
     return int(estimated_time_seconds)
 
 
-# 파일 경로 설정
+# 파일 경로 설정 (더 이상 사용하지 않음 - Factors_Affecting_Walking_Speed.py로 대체)
+# base_dir = pathlib.Path(__file__).parent.parent
+# model_path = base_dir / "personalization_model.pkl"
+# sample_data_path = base_dir / "app" / "utils" / "sample_walking_data.csv"
 
-base_dir = pathlib.Path(__file__).parent.parent
-model_path = base_dir / "personalization_model.pkl"
-sample_data_path = base_dir / "app" / "utils" / "sample_walking_data.csv"
-
-try:
-    personalization_model = joblib.load(str(model_path))
-except FileNotFoundError:
-    train_personalization_model(str(sample_data_path))
-    personalization_model = joblib.load(str(model_path))
+# try:
+#     personalization_model = joblib.load(str(model_path))
+# except FileNotFoundError:
+#     train_personalization_model(str(sample_data_path))
+#     personalization_model = joblib.load(str(model_path))
 
 
 @app.get("/")

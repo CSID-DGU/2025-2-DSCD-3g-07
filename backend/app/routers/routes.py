@@ -16,6 +16,8 @@ class AnalyzeSlopeRequest(BaseModel):
     """경사도 분석 요청 모델"""
     itinerary: Dict
     api_key: Optional[str] = None
+    weather_data: Optional[Dict] = None  # 날씨 데이터
+    user_speed_mps: Optional[float] = None  # 사용자 평균 보행속도 (m/s)
     
     class Config:
         json_schema_extra = {
@@ -36,9 +38,24 @@ class AnalyzeSlopeRequest(BaseModel):
                             ]
                         }
                     ]
-                }
+                },
+                "weather_data": {
+                    "temp_c": 18,
+                    "pty": 0,
+                    "rain_mm_per_h": 0.0,
+                    "snow_cm_per_h": 0.0
+                },
+                "user_speed_mps": 1.5
             }
         }
+
+
+class FactorsInfo(BaseModel):
+    """통합 계수 정보"""
+    user_speed_factor: float
+    slope_factor: float
+    weather_factor: float
+    final_factor: float
 
 
 class AnalyzeSlopeResponse(BaseModel):
@@ -47,8 +64,12 @@ class AnalyzeSlopeResponse(BaseModel):
     total_original_walk_time: int
     total_adjusted_walk_time: int
     total_route_time_adjustment: int
+    factors: Optional[FactorsInfo] = None  # 통합 계수 정보
+    user_speed_mps: Optional[float] = None
+    weather_applied: Optional[bool] = None
     sampled_coords_count: Optional[int] = None
     original_coords_count: Optional[int] = None
+    data_quality: Optional[Dict] = None
     error: Optional[str] = None
 
 
@@ -61,8 +82,13 @@ async def analyze_slope(request: AnalyzeSlopeRequest):
     1. Tmap 경로에서 보행 구간(WALK) 추출
     2. 좌표 샘플링 (API 효율성을 위해 20m 간격으로)
     3. Google Elevation API로 고도 데이터 획득
-    4. 경사도 계산 및 속도 계수 적용
-    5. 보정된 보행 시간 반환
+    4. 경사도 계산 및 속도 계수 적용 (Tobler's Function)
+    5. 통합 계산 (Factors_Affecting_Walking_Speed)
+       - Tmap 기준 시간 (1.0)
+       - × 사용자 속도 계수 (Health Connect)
+       - × 경사도 계수 (Tobler's Function)
+       - × 날씨 계수 (WeatherSpeedModel)
+    6. 최종 보정된 보행 시간 반환
     
     **경사도별 속도 계수:**
     - 평지 (0-3%): 1.0배
@@ -71,11 +97,15 @@ async def analyze_slope(request: AnalyzeSlopeRequest):
     - 가파름 (10-15%): 0.6배
     - 매우 가파름 (15%+): 0.4배
     
+    **날씨 보정:**
+    - 기온, 강수량, 적설량을 고려한 속도 보정
+    - weather_data 파라미터를 통해 전달
+    
     Args:
-        request: Tmap itinerary 데이터와 선택적 API 키
+        request: Tmap itinerary 데이터, 선택적 API 키, 선택적 날씨 데이터
     
     Returns:
-        경사도 분석 결과 및 보정된 시간
+        경사도 분석 결과 및 보정된 시간 (날씨 영향 포함)
     
     Raises:
         HTTPException: API 키가 없거나 처리 중 오류 발생 시
@@ -83,10 +113,12 @@ async def analyze_slope(request: AnalyzeSlopeRequest):
     try:
         logger.info("경사도 분석 요청 시작")
         
-        # 경사도 분석 실행
+        # 경사도 분석 실행 (통합 계산)
         result = await analyze_route_elevation(
             request.itinerary,
-            api_key=request.api_key
+            api_key=request.api_key,
+            weather_data=request.weather_data,
+            user_speed_mps=request.user_speed_mps
         )
         
         if 'error' in result and not result.get('walk_legs_analysis'):
@@ -100,6 +132,14 @@ async def analyze_slope(request: AnalyzeSlopeRequest):
             f"보정: {result['total_adjusted_walk_time']}초, "
             f"차이: {result['total_route_time_adjustment']}초"
         )
+        
+        # ✨ factors 확인 로그
+        logger.info(f"🔍 [라우터] factors 포함 여부: {'factors' in result}")
+        if 'factors' in result:
+            logger.info(f"🔍 [라우터] factors 값: {result['factors']}")
+        else:
+            logger.warning(f"⚠️ [라우터] factors가 응답에 없습니다!")
+            logger.info(f"🔍 [라우터] 응답 키 목록: {list(result.keys())}")
         
         return result
         

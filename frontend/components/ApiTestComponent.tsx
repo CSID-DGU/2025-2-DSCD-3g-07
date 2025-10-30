@@ -54,7 +54,6 @@ const ApiTestComponent: React.FC = () => {
       start_y: 37.55826891774226,
       end_x: 127.04098866446125,
       end_y: 37.648520753827064,
-      count: 1, // 1개 경로 요청
     });
   };
 
@@ -105,7 +104,7 @@ const ApiTestComponent: React.FC = () => {
           disabled={routeLoading || slopeLoading}
         >
           <Text style={styles.buttonText}>
-            {routeLoading ? '⏳ 검색 중...' : slopeLoading ? ' 경사도 분석 중...' : '�🗺️ 경로 검색 (동국대 본관→창동축구장)'}
+            {routeLoading ? '⏳ 검색 중...' : slopeLoading ? ' 경사도 분석 중...' : '🗺️ 경로 검색 (동국대 본관→창동축구장)'}
           </Text>
         </TouchableOpacity>
 

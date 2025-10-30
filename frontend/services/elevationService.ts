@@ -9,8 +9,7 @@ import {
     AnalyzeSlopeRequest,
     WalkLegAnalysis
 } from '@/types/api';
-
-const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:8000';
+import Config from '@/config';
 
 /**
  * Tmap 경로 데이터의 보행 구간 경사도를 분석하고 보정된 시간을 반환
@@ -29,23 +28,46 @@ export async function analyzeRouteSlope(
             ...(apiKey && { api_key: apiKey })
         };
 
-        const response = await fetch(`${API_BASE_URL}/api/routes/analyze-slope`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(requestBody),
-        });
+        // Config에서 동적으로 감지된 API URL 사용
+        const apiBaseUrl = Config.API_BASE_URL;
+        console.log(`📍 [경사도 분석] Using API URL: ${apiBaseUrl}`);
+        console.log(`📤 [경사도 분석] Request body:`, JSON.stringify(requestBody).substring(0, 200));
 
-        if (!response.ok) {
-            const errorData = await response.json() as { detail?: string };
-            throw new Error(
-                errorData.detail || `API 오류: ${response.status} ${response.statusText}`
-            );
+        // 타임아웃 설정 (30초)
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 30000);
+
+        try {
+            const response = await fetch(`${apiBaseUrl}/api/routes/analyze-slope`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(requestBody),
+                signal: controller.signal as any,
+            });
+
+            clearTimeout(timeoutId);
+
+            console.log(`📊 [경사도 분석] Response status: ${response.status}`);
+
+            if (!response.ok) {
+                const errorData = await response.json() as { detail?: string };
+                throw new Error(
+                    errorData.detail || `API 오류: ${response.status} ${response.statusText}`
+                );
+            }
+
+            const data = await response.json() as RouteElevationAnalysis;
+            console.log(`✅ [경사도 분석] Success:`, data);
+            return data;
+        } catch (fetchError: any) {
+            clearTimeout(timeoutId);
+            if (fetchError?.name === 'AbortError') {
+                throw new Error('경사도 분석 타임아웃 (30초 초과)');
+            }
+            throw fetchError;
         }
-
-        const data = await response.json() as RouteElevationAnalysis;
-        return data;
     } catch (error) {
         console.error('[경사도 분석 오류]', error);
         throw error;

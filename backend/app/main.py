@@ -9,7 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.utils.api_helpers import call_tmap_transit_api
 from app.utils.ml_helpers import predict_adjustment, train_personalization_model
 from app.schemas import RouteResponse, WalkingSectionResponse
-from app.routers import routes
+from app.routers import routes, weather
 
 load_dotenv()  # .env 로드
 
@@ -38,6 +38,7 @@ app.add_middleware(
 
 # 라우터 등록
 app.include_router(routes.router, prefix="/api")
+app.include_router(weather.router, prefix="/api")
 
 
 def calculate_walking_time(distance_meters: float, avg_speed_kmh: float = 4.5) -> int:

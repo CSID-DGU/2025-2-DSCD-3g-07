@@ -34,7 +34,7 @@ export default function WeatherTestScreen() {
   const [useCurrentLocation, setUseCurrentLocation] = useState(false);
 
   // 현재 위치 가져오기
-  const getCurrentLocation = async () => {
+  const getCurrentLocation = async (): Promise<LocationCoords | null> => {
     try {
       setLocationLoading(true);
       
@@ -48,7 +48,7 @@ export default function WeatherTestScreen() {
           [{ text: '확인' }]
         );
         setLocationLoading(false);
-        return false;
+        return null;
       }
 
       // 현재 위치 가져오기
@@ -85,24 +85,32 @@ export default function WeatherTestScreen() {
       console.log('[weather] 현재 위치:', coords);
       
       setLocationLoading(false);
-      return true;
+      return coords;
     } catch (error) {
       console.error('[weather] 위치 가져오기 실패:', error);
       Alert.alert('오류', '현재 위치를 가져올 수 없습니다.');
       setLocationLoading(false);
-      return false;
+      return null;
     }
   };
 
-  const fetchWeatherData = async (withForecasts: boolean = false) => {
+  const fetchWeatherData = async (
+    withForecasts: boolean = false,
+    coordsOverride?: { latitude: number; longitude: number }
+  ) => {
     try {
       setLoading(true);
       
       // 사용할 좌표 결정
-      let coords = SEOUL_COORDS;
-      if (useCurrentLocation && currentLocation) {
+      let coords = coordsOverride ?? SEOUL_COORDS;
+      if (!coordsOverride && useCurrentLocation && currentLocation) {
         coords = currentLocation;
       }
+      
+      console.log('[weather] 날씨 데이터 요청:', {
+        좌표: coords,
+        예보포함: withForecasts,
+      });
       
       let data: OpenMeteoResponse;
       
@@ -115,10 +123,25 @@ export default function WeatherTestScreen() {
       }
       
       setWeatherData(data);
-      console.log('날씨 데이터 가져오기 성공:', data);
+      console.log('[weather] 날씨 데이터 가져오기 성공:', {
+        온도: data.current?.temperature_2m,
+        날씨코드: data.current?.weather_code,
+      });
     } catch (error) {
-      console.error('날씨 데이터 가져오기 실패:', error);
-      Alert.alert('오류', '날씨 정보를 가져올 수 없습니다.');
+      console.error('[weather] 날씨 데이터 가져오기 실패:', error);
+      
+      let errorMessage = '날씨 정보를 가져올 수 없습니다.';
+      if (error instanceof Error) {
+        if (error.message.includes('504') || error.message.includes('Gateway')) {
+          errorMessage = '서버 응답 시간이 초과되었습니다.\n백엔드 서버가 실행 중인지 확인해주세요.';
+        } else if (error.message.includes('Network')) {
+          errorMessage = '네트워크 연결을 확인해주세요.';
+        } else if (error.message.includes('timeout')) {
+          errorMessage = '요청 시간이 초과되었습니다.\n잠시 후 다시 시도해주세요.';
+        }
+      }
+      
+      Alert.alert('오류', errorMessage);
     } finally {
       setLoading(false);
     }
@@ -131,21 +154,19 @@ export default function WeatherTestScreen() {
   };
 
   const handleLocationToggle = async (enabled: boolean) => {
-    setUseCurrentLocation(enabled);
-    
     if (enabled) {
-      // 현재 위치 사용 활성화
-      if (!currentLocation) {
-        const success = await getCurrentLocation();
-        if (success && currentLocation) {
-          await fetchWeatherData(includeForecasts);
-        }
-      } else {
-        await fetchWeatherData(includeForecasts);
+      setUseCurrentLocation(true);
+
+      const coords = currentLocation || await getCurrentLocation();
+      if (!coords) {
+        setUseCurrentLocation(false);
+        return;
       }
+
+      await fetchWeatherData(includeForecasts, coords);
     } else {
-      // 서울로 되돌리기
-      await fetchWeatherData(includeForecasts);
+      setUseCurrentLocation(false);
+      await fetchWeatherData(includeForecasts, SEOUL_COORDS);
     }
   };
 

@@ -83,18 +83,35 @@ class ApiClient {
       });
     }
 
-    const response = await fetch(url.toString(), {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
+    // 타임아웃 설정 (20초)
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 20000);
 
-    if (!response.ok) {
-      throw new Error(`API 오류: ${response.status} ${response.statusText}`);
+    try {
+      const response = await fetch(url.toString(), {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        signal: controller.signal as any, // React Native와 DOM 타입 충돌 회피
+      });
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`API 오류: ${response.status} ${response.statusText} - ${errorText}`);
+      }
+
+      return response.json() as Promise<T>;
+    } catch (error) {
+      clearTimeout(timeoutId);
+      
+      if (error instanceof Error && error.name === 'AbortError') {
+        throw new Error('요청 시간이 초과되었습니다. (timeout 20초)');
+      }
+      throw error;
     }
-
-    return response.json() as Promise<T>;
   }
 
   /**

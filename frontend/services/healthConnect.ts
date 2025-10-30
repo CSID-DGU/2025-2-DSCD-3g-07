@@ -14,7 +14,9 @@ import HealthConnectModule from './nativeHealthConnect';
 export interface HealthData {
   steps?: number;
   distance?: number;
-  speed?: number; // 평균 속도 (km/h)
+  speed?: number; // 평균 속도 (km/h) - Case 2 (≥ 1.5 km/h)
+  speedCase1?: number; // 평균 속도 Case 1 (≥ 2.5 km/h) - 실제 이동 목적의 보행
+  speedCase2?: number; // 평균 속도 Case 2 (≥ 1.5 km/h) - 느린 산책 포함
   maxSpeed?: number; // 최고 속도 (km/h)
   calories?: number;
   exerciseSessions?: any[];
@@ -669,20 +671,33 @@ export class HealthConnectService {
         return sum + (typeof dist === 'number' ? dist : 0);
       }, 0);
 
-      // 평균 속도와 최고 속도 계산 (km/h) - 개선된 시간 가중 평균 방식
-      let averageSpeed = 0;
+      // 평균 속도와 최고 속도 계산 (km/h) - 두 가지 케이스로 계산
+      let averageSpeedCase1 = 0; // Case 1: ≥ 2.5 km/h (실제 이동 목적의 보행)
+      let averageSpeedCase2 = 0; // Case 2: ≥ 1.5 km/h (느린 산책 포함)
       let maxSpeed = 0;
 
-      // 최소 속도 임계값 설정
-      // PaceTry는 보행(걷기) 중심 앱이며, 산책 데이터도 포함
-      // 느린 산책: 1.5~2.5 km/h, 보통 산책: 2.5~3.5 km/h
-      // 일반 걷기: 3.5~5 km/h, 빠른 걷기: 5~7 km/h
-      // 1.5 km/h 미만은 정지/GPS 오차로 간주하여 제외
-      const MIN_SPEED_THRESHOLD = 1.5; // km/h
+      // Case 1: 실제 이동 목적의 보행만 포함 (≥ 2.5 km/h)
+      // - 쇼핑/구경 등 목적이 다른 활동 제외
+      // - 대중교통 환승 시 도보 구간 예측에 적합
+      // - 2.5~5 km/h: 보통 산책/걷기
+      // - 5~7 km/h: 빠른 걷기
+      const MIN_SPEED_THRESHOLD_CASE1 = 2.5; // km/h
+
+      // Case 2: 느린 산책까지 포함 (≥ 1.5 km/h)
+      // - 1.5~2.0 km/h: 매우 느린 산책 (강아지 산책)
+      // - 2.0~2.5 km/h: 느린 산책 (공원 산책)
+      // - 2.5~5 km/h: 보통 산책/걷기
+      // - 5~7 km/h: 빠른 걷기
+      const MIN_SPEED_THRESHOLD_CASE2 = 1.5; // km/h
 
       if (speed.length > 0) {
-        let totalWeightedSpeed = 0;
-        let totalDurationSeconds = 0;
+        // Case 1용 변수 (≥ 2.5 km/h)
+        let totalWeightedSpeedCase1 = 0;
+        let totalDurationSecondsCase1 = 0;
+
+        // Case 2용 변수 (≥ 1.5 km/h)
+        let totalWeightedSpeedCase2 = 0;
+        let totalDurationSecondsCase2 = 0;
 
         speed.forEach((record, recordIndex) => {
           // 레코드의 지속 시간 계산 (초 단위)
@@ -693,8 +708,10 @@ export class HealthConnectService {
 
           if (record.samples && Array.isArray(record.samples)) {
             // 새로운 SpeedRecord.Sample 구조 - 각 샘플의 시간 가중 평균
-            let recordSpeedSum = 0;
-            let validSamples = 0;
+            let recordSpeedSumCase1 = 0;
+            let validSamplesCase1 = 0;
+            let recordSpeedSumCase2 = 0;
+            let validSamplesCase2 = 0;
 
             record.samples.forEach((sample: any, sampleIndex: number) => {
               if (sample.speed) {
@@ -712,24 +729,37 @@ export class HealthConnectService {
                   kmhValue = sample.speed * 3.6;
                 }
 
-                // 최소 임계값 이상인 속도만 평균 계산에 포함
-                if (kmhValue >= MIN_SPEED_THRESHOLD) {
-                  recordSpeedSum += kmhValue;
-                  validSamples++;
+                // Case 1: ≥ 2.5 km/h (실제 이동 목적의 보행)
+                if (kmhValue >= MIN_SPEED_THRESHOLD_CASE1) {
+                  recordSpeedSumCase1 += kmhValue;
+                  validSamplesCase1++;
+                }
 
-                  // 최고 속도 업데이트
-                  if (kmhValue > maxSpeed) {
-                    maxSpeed = kmhValue;
-                  }
+                // Case 2: ≥ 1.5 km/h (느린 산책 포함)
+                if (kmhValue >= MIN_SPEED_THRESHOLD_CASE2) {
+                  recordSpeedSumCase2 += kmhValue;
+                  validSamplesCase2++;
+                }
+
+                // 최고 속도 업데이트 (Case 2 기준)
+                if (kmhValue >= MIN_SPEED_THRESHOLD_CASE2 && kmhValue > maxSpeed) {
+                  maxSpeed = kmhValue;
                 }
               }
             });
 
-            // 이 레코드의 평균 속도를 시간으로 가중
-            if (validSamples > 0 && recordDurationSeconds > 0) {
-              const recordAverageSpeed = recordSpeedSum / validSamples;
-              totalWeightedSpeed += recordAverageSpeed * recordDurationSeconds;
-              totalDurationSeconds += recordDurationSeconds;
+            // Case 1: 이 레코드의 평균 속도를 시간으로 가중
+            if (validSamplesCase1 > 0 && recordDurationSeconds > 0) {
+              const recordAverageSpeed = recordSpeedSumCase1 / validSamplesCase1;
+              totalWeightedSpeedCase1 += recordAverageSpeed * recordDurationSeconds;
+              totalDurationSecondsCase1 += recordDurationSeconds;
+            }
+
+            // Case 2: 이 레코드의 평균 속도를 시간으로 가중
+            if (validSamplesCase2 > 0 && recordDurationSeconds > 0) {
+              const recordAverageSpeed = recordSpeedSumCase2 / validSamplesCase2;
+              totalWeightedSpeedCase2 += recordAverageSpeed * recordDurationSeconds;
+              totalDurationSecondsCase2 += recordDurationSeconds;
             }
           } else {
             // 레거시 단일 속도 레코드 형태
@@ -737,27 +767,39 @@ export class HealthConnectService {
             if (spd > 0 && recordDurationSeconds > 0) {
               const kmhValue = (typeof spd === 'number' ? spd * 3.6 : 0);
 
-              // 최소 임계값 이상인 속도만 평균 계산에 포함
-              if (kmhValue >= MIN_SPEED_THRESHOLD) {
-                totalWeightedSpeed += kmhValue * recordDurationSeconds;
-                totalDurationSeconds += recordDurationSeconds;
+              // Case 1: ≥ 2.5 km/h
+              if (kmhValue >= MIN_SPEED_THRESHOLD_CASE1) {
+                totalWeightedSpeedCase1 += kmhValue * recordDurationSeconds;
+                totalDurationSecondsCase1 += recordDurationSeconds;
+              }
 
-                // 최고 속도 업데이트
-                if (kmhValue > maxSpeed) {
-                  maxSpeed = kmhValue;
-                }
+              // Case 2: ≥ 1.5 km/h
+              if (kmhValue >= MIN_SPEED_THRESHOLD_CASE2) {
+                totalWeightedSpeedCase2 += kmhValue * recordDurationSeconds;
+                totalDurationSecondsCase2 += recordDurationSeconds;
+              }
+
+              // 최고 속도 업데이트 (Case 2 기준)
+              if (kmhValue >= MIN_SPEED_THRESHOLD_CASE2 && kmhValue > maxSpeed) {
+                maxSpeed = kmhValue;
               }
             }
           }
         });
 
-        if (totalDurationSeconds > 0) {
-          averageSpeed = totalWeightedSpeed / totalDurationSeconds;
+        // Case 1 평균 속도 계산
+        if (totalDurationSecondsCase1 > 0) {
+          averageSpeedCase1 = totalWeightedSpeedCase1 / totalDurationSecondsCase1;
+        }
+
+        // Case 2 평균 속도 계산
+        if (totalDurationSecondsCase2 > 0) {
+          averageSpeedCase2 = totalWeightedSpeedCase2 / totalDurationSecondsCase2;
         }
       }
 
       // 속도 데이터가 없거나 0인 경우 거리와 운동 시간으로 추정
-      if (averageSpeed === 0 && totalDistance > 0) {
+      if ((averageSpeedCase1 === 0 || averageSpeedCase2 === 0) && totalDistance > 0) {
         // 운동 세션 데이터에서 실제 운동 시간 확인
         let totalExerciseTimeHours = 0;
         if (exercise.length > 0) {
@@ -770,27 +812,42 @@ export class HealthConnectService {
           });
         }
 
+        let estimatedSpeed = 0;
         if (totalExerciseTimeHours > 0) {
           // 실제 운동 시간이 있으면 사용
-          averageSpeed = (totalDistance / 1000) / totalExerciseTimeHours;
+          estimatedSpeed = (totalDistance / 1000) / totalExerciseTimeHours;
         } else if (totalSteps > 0) {
           // 걸음수를 기반으로 시간 추정 (평균적으로 분당 100걸음으로 가정)
           const estimatedTimeHours = (totalSteps / 100) / 60; // 시간 단위
-          averageSpeed = estimatedTimeHours > 0 ? (totalDistance / 1000) / estimatedTimeHours : 0;
+          estimatedSpeed = estimatedTimeHours > 0 ? (totalDistance / 1000) / estimatedTimeHours : 0;
+        }
+
+        // 추정 속도로 빈 값 채우기
+        if (averageSpeedCase1 === 0 && estimatedSpeed >= MIN_SPEED_THRESHOLD_CASE1) {
+          averageSpeedCase1 = estimatedSpeed;
+        }
+        if (averageSpeedCase2 === 0 && estimatedSpeed >= MIN_SPEED_THRESHOLD_CASE2) {
+          averageSpeedCase2 = estimatedSpeed;
         }
       }
+
       const totalCalories = calories.reduce((sum, record) => {
         const cal = record.energy?.inCalories || record.energy?.calories || record.energy || 0;
         return sum + (typeof cal === 'number' ? cal : 0);
       }, 0);
 
       // 간단한 결과 요약만 출력
-      console.log(`📊 Health data (${days}일): ${totalSteps} steps, ${(totalDistance / 1000).toFixed(2)} km, avg ${averageSpeed.toFixed(1)} km/h, max ${maxSpeed.toFixed(1)} km/h, ${totalCalories} cal`);
+      console.log(`📊 Health data (${days}일): ${totalSteps} steps, ${(totalDistance / 1000).toFixed(2)} km`);
+      console.log(`   속도 Case 1 (≥2.5km/h): ${averageSpeedCase1.toFixed(1)} km/h`);
+      console.log(`   속도 Case 2 (≥1.5km/h): ${averageSpeedCase2.toFixed(1)} km/h`);
+      console.log(`   최고 속도: ${maxSpeed.toFixed(1)} km/h, 칼로리: ${totalCalories} cal`);
 
       return {
         steps: totalSteps,
         distance: Math.round(totalDistance),
-        speed: Math.round(averageSpeed * 100) / 100, // 평균 속도 (소수점 둘째 자리까지)
+        speed: Math.round(averageSpeedCase2 * 100) / 100, // 평균 속도 (기본값: Case 2)
+        speedCase1: Math.round(averageSpeedCase1 * 100) / 100, // Case 1: ≥ 2.5 km/h
+        speedCase2: Math.round(averageSpeedCase2 * 100) / 100, // Case 2: ≥ 1.5 km/h
         maxSpeed: Math.round(maxSpeed * 100) / 100, // 최고 속도 (소수점 둘째 자리까지)
         calories: Math.round(totalCalories),
         exerciseSessions: exercise,
@@ -945,12 +1002,19 @@ export class HealthConnectService {
         return sum + (typeof dist === 'number' ? dist : 0);
       }, 0);
 
-      // 평균 속도와 최고 속도 계산
-      let averageSpeed = 0;
+      // 평균 속도와 최고 속도 계산 (두 가지 케이스)
+      let averageSpeedCase1 = 0; // Case 1: ≥ 2.5 km/h
+      let averageSpeedCase2 = 0; // Case 2: ≥ 1.5 km/h
       let maxSpeed = 0;
+
+      const MIN_SPEED_THRESHOLD_CASE1 = 2.5; // km/h
+      const MIN_SPEED_THRESHOLD_CASE2 = 1.5; // km/h
+
       if (speed.length > 0) {
-        let totalWeightedSpeed = 0;
-        let totalDurationSeconds = 0;
+        let totalWeightedSpeedCase1 = 0;
+        let totalDurationSecondsCase1 = 0;
+        let totalWeightedSpeedCase2 = 0;
+        let totalDurationSecondsCase2 = 0;
 
         speed.forEach((record, recordIndex) => {
           const startTimeMs = new Date(record.startTime).getTime();
@@ -959,8 +1023,10 @@ export class HealthConnectService {
           const recordDurationSeconds = recordDurationMs / 1000;
 
           if (record.samples && Array.isArray(record.samples)) {
-            let recordSpeedSum = 0;
-            let validSamples = 0;
+            let recordSpeedSumCase1 = 0;
+            let validSamplesCase1 = 0;
+            let recordSpeedSumCase2 = 0;
+            let validSamplesCase2 = 0;
 
             record.samples.forEach((sample: any, sampleIndex: number) => {
               if (sample.speed) {
@@ -976,45 +1042,76 @@ export class HealthConnectService {
                   kmhValue = sample.speed * 3.6;
                 }
 
-                if (kmhValue > 0) {
-                  recordSpeedSum += kmhValue;
-                  validSamples++;
+                // Case 1: ≥ 2.5 km/h
+                if (kmhValue >= MIN_SPEED_THRESHOLD_CASE1) {
+                  recordSpeedSumCase1 += kmhValue;
+                  validSamplesCase1++;
+                }
 
-                  // 최고 속도 업데이트
-                  if (kmhValue > maxSpeed) {
-                    maxSpeed = kmhValue;
-                  }
+                // Case 2: ≥ 1.5 km/h
+                if (kmhValue >= MIN_SPEED_THRESHOLD_CASE2) {
+                  recordSpeedSumCase2 += kmhValue;
+                  validSamplesCase2++;
+                }
+
+                // 최고 속도 업데이트 (Case 2 기준)
+                if (kmhValue >= MIN_SPEED_THRESHOLD_CASE2 && kmhValue > maxSpeed) {
+                  maxSpeed = kmhValue;
                 }
               }
             });
 
-            if (validSamples > 0 && recordDurationSeconds > 0) {
-              const recordAverageSpeed = recordSpeedSum / validSamples;
-              totalWeightedSpeed += recordAverageSpeed * recordDurationSeconds;
-              totalDurationSeconds += recordDurationSeconds;
+            // Case 1
+            if (validSamplesCase1 > 0 && recordDurationSeconds > 0) {
+              const recordAverageSpeed = recordSpeedSumCase1 / validSamplesCase1;
+              totalWeightedSpeedCase1 += recordAverageSpeed * recordDurationSeconds;
+              totalDurationSecondsCase1 += recordDurationSeconds;
+            }
+
+            // Case 2
+            if (validSamplesCase2 > 0 && recordDurationSeconds > 0) {
+              const recordAverageSpeed = recordSpeedSumCase2 / validSamplesCase2;
+              totalWeightedSpeedCase2 += recordAverageSpeed * recordDurationSeconds;
+              totalDurationSecondsCase2 += recordDurationSeconds;
             }
           } else {
             const spd = record.speed?.inMetersPerSecond || record.speed?.metersPerSecond || record.speed || 0;
             if (spd > 0 && recordDurationSeconds > 0) {
               const kmhValue = (typeof spd === 'number' ? spd * 3.6 : 0);
-              totalWeightedSpeed += kmhValue * recordDurationSeconds;
-              totalDurationSeconds += recordDurationSeconds;
 
-              // 최고 속도 업데이트
-              if (kmhValue > maxSpeed) {
+              // Case 1: ≥ 2.5 km/h
+              if (kmhValue >= MIN_SPEED_THRESHOLD_CASE1) {
+                totalWeightedSpeedCase1 += kmhValue * recordDurationSeconds;
+                totalDurationSecondsCase1 += recordDurationSeconds;
+              }
+
+              // Case 2: ≥ 1.5 km/h
+              if (kmhValue >= MIN_SPEED_THRESHOLD_CASE2) {
+                totalWeightedSpeedCase2 += kmhValue * recordDurationSeconds;
+                totalDurationSecondsCase2 += recordDurationSeconds;
+              }
+
+              // 최고 속도 업데이트 (Case 2 기준)
+              if (kmhValue >= MIN_SPEED_THRESHOLD_CASE2 && kmhValue > maxSpeed) {
                 maxSpeed = kmhValue;
               }
             }
           }
         });
 
-        if (totalDurationSeconds > 0) {
-          averageSpeed = totalWeightedSpeed / totalDurationSeconds;
+        // Case 1 평균 속도 계산
+        if (totalDurationSecondsCase1 > 0) {
+          averageSpeedCase1 = totalWeightedSpeedCase1 / totalDurationSecondsCase1;
+        }
+
+        // Case 2 평균 속도 계산
+        if (totalDurationSecondsCase2 > 0) {
+          averageSpeedCase2 = totalWeightedSpeedCase2 / totalDurationSecondsCase2;
         }
       }
 
       // 속도 데이터가 없는 경우 거리와 운동 시간으로 추정
-      if (averageSpeed === 0 && totalDistance > 0) {
+      if ((averageSpeedCase1 === 0 || averageSpeedCase2 === 0) && totalDistance > 0) {
         let totalExerciseTimeHours = 0;
         if (exercise.length > 0) {
           exercise.forEach((session, index) => {
@@ -1026,11 +1123,20 @@ export class HealthConnectService {
           });
         }
 
+        let estimatedSpeed = 0;
         if (totalExerciseTimeHours > 0) {
-          averageSpeed = (totalDistance / 1000) / totalExerciseTimeHours;
+          estimatedSpeed = (totalDistance / 1000) / totalExerciseTimeHours;
         } else if (totalSteps > 0) {
           const estimatedTimeHours = (totalSteps / 100) / 60;
-          averageSpeed = estimatedTimeHours > 0 ? (totalDistance / 1000) / estimatedTimeHours : 0;
+          estimatedSpeed = estimatedTimeHours > 0 ? (totalDistance / 1000) / estimatedTimeHours : 0;
+        }
+
+        // 추정 속도로 빈 값 채우기
+        if (averageSpeedCase1 === 0 && estimatedSpeed >= MIN_SPEED_THRESHOLD_CASE1) {
+          averageSpeedCase1 = estimatedSpeed;
+        }
+        if (averageSpeedCase2 === 0 && estimatedSpeed >= MIN_SPEED_THRESHOLD_CASE2) {
+          averageSpeedCase2 = estimatedSpeed;
         }
       }
 
@@ -1040,12 +1146,17 @@ export class HealthConnectService {
       }, 0);
 
       const durationHours = (endTime.getTime() - startTime.getTime()) / (1000 * 60 * 60);
-      console.log(`📊 Health data (${durationHours.toFixed(1)}h): ${totalSteps} steps, ${(totalDistance / 1000).toFixed(2)} km, avg ${averageSpeed.toFixed(1)} km/h, max ${maxSpeed.toFixed(1)} km/h, ${totalCalories} cal`);
+      console.log(`📊 Health data (${durationHours.toFixed(1)}h): ${totalSteps} steps, ${(totalDistance / 1000).toFixed(2)} km`);
+      console.log(`   속도 Case 1 (≥2.5km/h): ${averageSpeedCase1.toFixed(1)} km/h`);
+      console.log(`   속도 Case 2 (≥1.5km/h): ${averageSpeedCase2.toFixed(1)} km/h`);
+      console.log(`   최고 속도: ${maxSpeed.toFixed(1)} km/h, 칼로리: ${totalCalories} cal`);
 
       return {
         steps: totalSteps,
         distance: Math.round(totalDistance),
-        speed: Math.round(averageSpeed * 100) / 100,
+        speed: Math.round(averageSpeedCase2 * 100) / 100, // 평균 속도 (기본값: Case 2)
+        speedCase1: Math.round(averageSpeedCase1 * 100) / 100, // Case 1: ≥ 2.5 km/h
+        speedCase2: Math.round(averageSpeedCase2 * 100) / 100, // Case 2: ≥ 1.5 km/h
         maxSpeed: Math.round(maxSpeed * 100) / 100,
         calories: Math.round(totalCalories),
         exerciseSessions: exercise,
@@ -1085,6 +1196,217 @@ export class HealthConnectService {
       return {
         available: false,
         source: 'Not Available',
+        error: error instanceof Error ? error.message : 'Unknown error'
+      };
+    }
+  }
+
+  /**
+   * 헬스커넥트의 전체 기간 속도 데이터로 평균 속도 계산 (Case 1, Case 2)
+   * 모든 기록된 속도 데이터를 가져와서 두 가지 케이스로 평균 계산
+   */
+  async getAllTimeAverageSpeeds(): Promise<{
+    speedCase1: number; // ≥ 2.5 km/h
+    speedCase2: number; // ≥ 1.5 km/h
+    maxSpeed: number;
+    totalRecords: number;
+    error?: string;
+  }> {
+    try {
+      console.log('🌐 Fetching ALL speed records from Health Connect...');
+
+      // Health Connect 설치 확인
+      const isInstalled = await this.isHealthConnectInstalled();
+      if (!isInstalled) {
+        return {
+          speedCase1: 0,
+          speedCase2: 0,
+          maxSpeed: 0,
+          totalRecords: 0,
+          error: 'Health Connect not installed or not available'
+        };
+      }
+
+      // 초기화
+      const isInit = await this.initialize();
+      if (!isInit) {
+        return {
+          speedCase1: 0,
+          speedCase2: 0,
+          maxSpeed: 0,
+          totalRecords: 0,
+          error: 'Failed to initialize Health Connect SDK'
+        };
+      }
+
+      // 권한 확인
+      const grantedPermissions = await getGrantedPermissions();
+      if (grantedPermissions.length === 0) {
+        return {
+          speedCase1: 0,
+          speedCase2: 0,
+          maxSpeed: 0,
+          totalRecords: 0,
+          error: 'No Health Connect permissions granted'
+        };
+      }
+
+      // 전체 기간: 과거 10년 ~ 현재
+      const endTime = new Date();
+      const startTime = new Date();
+      startTime.setFullYear(startTime.getFullYear() - 10); // 10년 전부터
+
+      // 모든 속도 데이터 가져오기
+      const speedRecords = await this.readSpeedData(startTime, endTime);
+
+      if (speedRecords.length === 0) {
+        console.log('⚠️ No speed records found');
+        return {
+          speedCase1: 0,
+          speedCase2: 0,
+          maxSpeed: 0,
+          totalRecords: 0,
+          error: 'No speed data available'
+        };
+      }
+
+      console.log(`✅ Analyzing ${speedRecords.length} speed records...`);
+
+      // Case 1, Case 2 평균 속도 계산
+      let averageSpeedCase1 = 0;
+      let averageSpeedCase2 = 0;
+      let maxSpeed = 0;
+
+      const MIN_SPEED_THRESHOLD_CASE1 = 2.5; // km/h
+      const MIN_SPEED_THRESHOLD_CASE2 = 1.5; // km/h
+
+      // 🔄 단순 평균 방식으로 변경 (시간 가중 평균 대신)
+      let totalSpeedCase1 = 0;
+      let countCase1 = 0;
+      let totalSpeedCase2 = 0;
+      let countCase2 = 0;
+
+      // 디버깅: 속도 구간별 카운트
+      let countUnder1_5 = 0;
+      let count1_5to2_5 = 0;
+      let countOver2_5 = 0;
+      let speedSamples: number[] = []; // 샘플링용
+      let sampleRecords = 0;
+      let singleRecords = 0;
+
+      speedRecords.forEach((record) => {
+
+        if (record.samples && Array.isArray(record.samples)) {
+          // SpeedRecord.Sample 구조
+          sampleRecords++;
+          const totalSamples = record.samples.length;
+
+          record.samples.forEach((sample: any) => {
+            if (sample.speed) {
+              const velocity = sample.speed as any;
+              let kmhValue = 0;
+
+              if (velocity.inKilometersPerHour !== undefined) {
+                kmhValue = velocity.inKilometersPerHour;
+              } else if (velocity.inMetersPerSecond !== undefined) {
+                kmhValue = velocity.inMetersPerSecond * 3.6;
+              } else if (typeof sample.speed === 'number') {
+                kmhValue = sample.speed * 3.6;
+              }
+
+              // 디버깅: 속도 구간 카운트 (첫 100개 샘플만 저장)
+              if (speedSamples.length < 100) {
+                speedSamples.push(kmhValue);
+              }
+              if (kmhValue < MIN_SPEED_THRESHOLD_CASE2) {
+                countUnder1_5++;
+              } else if (kmhValue < MIN_SPEED_THRESHOLD_CASE1) {
+                count1_5to2_5++;
+              } else {
+                countOver2_5++;
+              }
+
+              // Case 1: ≥ 2.5 km/h - 단순 평균 (모든 샘플 동등 취급)
+              if (kmhValue >= MIN_SPEED_THRESHOLD_CASE1) {
+                totalSpeedCase1 += kmhValue;
+                countCase1++;
+              }
+
+              // Case 2: ≥ 1.5 km/h - 단순 평균 (모든 샘플 동등 취급)
+              if (kmhValue >= MIN_SPEED_THRESHOLD_CASE2) {
+                totalSpeedCase2 += kmhValue;
+                countCase2++;
+              }
+
+              // 최고 속도
+              if (kmhValue >= MIN_SPEED_THRESHOLD_CASE2 && kmhValue > maxSpeed) {
+                maxSpeed = kmhValue;
+              }
+            }
+          });
+        } else {
+          // 단일 속도 레코드
+          singleRecords++;
+          const spd = record.speed?.inMetersPerSecond || record.speed?.metersPerSecond || record.speed || 0;
+          if (spd > 0) {
+            const kmhValue = typeof spd === 'number' ? spd * 3.6 : 0;
+
+            // 디버깅: 속도 구간 카운트
+            if (speedSamples.length < 100) {
+              speedSamples.push(kmhValue);
+            }
+            if (kmhValue < MIN_SPEED_THRESHOLD_CASE2) {
+              countUnder1_5++;
+            } else if (kmhValue < MIN_SPEED_THRESHOLD_CASE1) {
+              count1_5to2_5++;
+            } else {
+              countOver2_5++;
+            }
+
+            // Case 1: 단순 평균
+            if (kmhValue >= MIN_SPEED_THRESHOLD_CASE1) {
+              totalSpeedCase1 += kmhValue;
+              countCase1++;
+            }
+
+            // Case 2: 단순 평균
+            if (kmhValue >= MIN_SPEED_THRESHOLD_CASE2) {
+              totalSpeedCase2 += kmhValue;
+              countCase2++;
+            }
+
+            // 최고 속도
+            if (kmhValue >= MIN_SPEED_THRESHOLD_CASE2 && kmhValue > maxSpeed) {
+              maxSpeed = kmhValue;
+            }
+          }
+        }
+      });
+
+      // 단순 평균 계산
+      if (countCase1 > 0) {
+        averageSpeedCase1 = totalSpeedCase1 / countCase1;
+      }
+      if (countCase2 > 0) {
+        averageSpeedCase2 = totalSpeedCase2 / countCase2;
+      }
+
+      console.log(`📊 속도 분석 완료: Case1=${averageSpeedCase1.toFixed(2)}km/h (${countCase1}개), Case2=${averageSpeedCase2.toFixed(2)}km/h (${countCase2}개)`);
+
+      return {
+        speedCase1: Math.round(averageSpeedCase1 * 100) / 100,
+        speedCase2: Math.round(averageSpeedCase2 * 100) / 100,
+        maxSpeed: Math.round(maxSpeed * 100) / 100,
+        totalRecords: speedRecords.length
+      };
+
+    } catch (error) {
+      console.error('❌ Failed to get all-time average speeds:', error);
+      return {
+        speedCase1: 0,
+        speedCase2: 0,
+        maxSpeed: 0,
+        totalRecords: 0,
         error: error instanceof Error ? error.message : 'Unknown error'
       };
     }

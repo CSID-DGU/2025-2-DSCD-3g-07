@@ -175,6 +175,7 @@ export interface RouteElevationAnalysis {
 export interface AnalyzeSlopeRequest {
   itinerary: Itinerary;
   api_key?: string;
+  walking_speed?: number; // m/s - Health Connect Case 1 평균 속도
 }
 
 export interface ElevationData {

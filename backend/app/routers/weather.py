@@ -5,7 +5,7 @@
 import json
 import os
 from datetime import datetime, timedelta, timezone
-from typing import Optional
+from typing import Optional, Dict, Tuple
 
 import aiohttp
 from fastapi import APIRouter, HTTPException, Query
@@ -15,6 +15,44 @@ router = APIRouter(prefix="/weather", tags=["weather"])
 KMA_BASE_URL = "https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0"
 KMA_SERVICE_KEY = os.getenv("KMA_SERVICE_KEY") or os.getenv("KMA_API_KEY")
 KST = timezone(timedelta(hours=9))
+
+
+# 간단한 인메모리 캐시
+class WeatherCache:
+    """날씨 데이터 캐싱 (5분 TTL)"""
+    
+    def __init__(self, ttl_seconds: int = 300):
+        self._cache: Dict[str, Tuple[dict, datetime]] = {}
+        self._ttl = timedelta(seconds=ttl_seconds)
+    
+    def get(self, key: str) -> Optional[dict]:
+        """캐시에서 데이터 가져오기"""
+        if key in self._cache:
+            data, timestamp = self._cache[key]
+            if datetime.now(KST) - timestamp < self._ttl:
+                return data
+            else:
+                # 만료된 캐시 삭제
+                del self._cache[key]
+        return None
+    
+    def set(self, key: str, data: dict) -> None:
+        """캐시에 데이터 저장"""
+        self._cache[key] = (data, datetime.now(KST))
+    
+    def clear(self) -> None:
+        """캐시 전체 삭제"""
+        self._cache.clear()
+    
+    def get_cache_key(self, lat: float, lon: float, base_date: str, base_time: str, num_rows: int) -> str:
+        """캐시 키 생성"""
+        # 격자 좌표로 변환 후 키 생성 (같은 격자는 같은 날씨)
+        nx, ny = convert_to_grid(lat, lon)
+        return f"weather:{nx}:{ny}:{base_date}:{base_time}:{num_rows}"
+
+
+# 전역 캐시 인스턴스
+weather_cache = WeatherCache(ttl_seconds=300)  # 5분 캐시
 
 
 def convert_to_grid(lat: float, lon: float) -> tuple[int, int]:
@@ -103,10 +141,15 @@ async def proxy_kma_weather(
     base_date: Optional[str] = Query(None, alias="baseDate"),
     base_time: Optional[str] = Query(None, alias="baseTime"),
     service_key: Optional[str] = Query(None, alias="serviceKey"),
+    use_cache: bool = Query(True, alias="useCache", description="캐시 사용 여부"),
 ) -> dict:
     """
     기상청 단기예보 API 프록시.
     브라우저 환경에서 발생하는 CORS 이슈를 피하기 위해 서버에서 요청 후 결과를 그대로 전달한다.
+    
+    최적화:
+    - 5분 캐싱으로 불필요한 API 호출 최소화
+    - 같은 격자 좌표는 같은 데이터 공유
     """
     api_key = service_key or KMA_SERVICE_KEY
     if not api_key:
@@ -118,6 +161,21 @@ async def proxy_kma_weather(
         computed_date, computed_time = get_base_time()
         base_date = base_date or computed_date
         base_time = base_time or computed_time
+
+    # 캐시 확인
+    cache_key = weather_cache.get_cache_key(lat, lon, base_date, base_time, num_of_rows)
+    
+    if use_cache:
+        cached_data = weather_cache.get(cache_key)
+        if cached_data:
+            print(f"✅ [CACHE HIT] {cache_key}")
+            return {
+                **cached_data,
+                "cached": True,
+                "cacheHit": True,
+            }
+    
+    print(f"🌐 [CACHE MISS] KMA API 호출: {cache_key}")
 
     params = {
         "serviceKey": api_key,
@@ -132,7 +190,8 @@ async def proxy_kma_weather(
 
     url = f"{KMA_BASE_URL}/getVilageFcst"
 
-    timeout = aiohttp.ClientTimeout(total=15)
+    # 타임아웃 10초로 단축 (기존 15초)
+    timeout = aiohttp.ClientTimeout(total=10)
     async with aiohttp.ClientSession(timeout=timeout) as session:
         try:
             async with session.get(url, params=params) as response:
@@ -155,9 +214,25 @@ async def proxy_kma_weather(
                 detail=f"KMA API 요청 실패: {exc}",
             ) from exc
 
-    return {
+    result = {
         "requestedCoords": {"latitude": lat, "longitude": lon},
         "gridCoords": {"nx": nx, "ny": ny},
         "baseTime": {"date": base_date, "time": base_time},
         "raw": data,
+        "cached": False,
+        "cacheHit": False,
     }
+    
+    # 캐시에 저장
+    if use_cache:
+        weather_cache.set(cache_key, result)
+        print(f"💾 [CACHE SAVED] {cache_key}")
+    
+    return result
+
+
+@router.post("/cache/clear")
+async def clear_cache() -> dict:
+    """캐시 전체 삭제 (디버깅/테스트용)"""
+    weather_cache.clear()
+    return {"message": "캐시가 삭제되었습니다.", "success": True}

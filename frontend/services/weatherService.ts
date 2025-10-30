@@ -4,12 +4,10 @@ import apiClient from '../utils/apiClient';
 
 
 
-// 湲곗긽泥?API ?ㅼ젙
-
+// KMA API Configuration
 const KMA_BASE_URL = 'https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0';
 
-// API ?ㅻ뒗 ?몄퐫?⑸맂 ?곹깭瑜??ъ슜 (decodeURIComponent ?섏? ?딆쓬)
-
+// Use encoded API key as-is (no decodeURIComponent)
 const KMA_API_KEY = 'fd3ec2dea8cbb11a251a2ce60843ea3236811fca06f2a8eb8f63426b208f35da';
 
 const IS_WEB = Platform.OS === 'web';
@@ -125,18 +123,18 @@ const fetchKMAData = async (
         gridCoords: proxyPayload.gridCoords || gridCoords,
       };
     } catch (error) {
-      console.error('ERROR [湲곗긽泥?Proxy] ?붿껌 ?ㅽ뙣:', error);
+      console.error('ERROR [KMA Proxy] Request failed:', error);
       const message =
-        '???섍꼍?먯꽌??諛깆뿏???꾨줉???쒕쾭媛 ?ㅽ뻾 以묒씠?댁빞 湲곗긽泥??곗씠?곕? 議고쉶?????덉뒿?덈떎. 諛깆뿏??API瑜??ㅽ뻾?????ㅼ떆 ?쒕룄?댁＜?몄슂.';
+        'Backend server must be running to query KMA weather data. Please run the backend API and try again.';
       if (error instanceof Error) {
-        throw new Error(`${message} (?먯씤: ${error.message})`);
+        throw new Error(`${message} (Reason: ${error.message})`);
       }
       throw new Error(message);
     }
   }
 
   if (!KMA_API_KEY) {
-    throw new Error('湲곗긽泥?API ?ㅺ? ?ㅼ젙?섏뼱 ?덉? ?딆뒿?덈떎.');
+    throw new Error('KMA API key is not configured.');
   }
 
   const params = new URLSearchParams({
@@ -151,12 +149,12 @@ const fetchKMAData = async (
   });
 
   const apiUrl = `${KMA_BASE_URL}/getVilageFcst?${params}`;
-  console.log('DEBUG [湲곗긽泥?API] ?붿껌 ?뚮씪誘명꽣:', {
-    baseDate,
-    baseTime,
-    gridCoords,
-    numOfRows,
-  });
+  // console.log('DEBUG [KMA API] Request params:', {
+  //   baseDate,
+  //   baseTime,
+  //   gridCoords,
+  //   numOfRows,
+  // });
 
   const response = await fetch(apiUrl);
   const kmaData = await parseWeatherResponse(response);
@@ -181,17 +179,12 @@ const parseKMAPrecipAmount = (value?: string): number => {
 
 
 
-  if (normalized === '媛뺤닔?놁쓬' || normalized === '?곸꽕?놁쓬') {
-
+  if (normalized === '강수없음' || normalized === '적설없음') {
     return 0;
-
   }
 
-
-
-  if (normalized.includes('mm 誘몃쭔')) {
-
-    const numeric = parseFloat(normalized.replace('mm 誘몃쭔', '').trim());
+  if (normalized.includes('mm 미만')) {
+    const numeric = parseFloat(normalized.replace('mm 미만', '').trim());
 
     return Number.isFinite(numeric) ? numeric : 0;
 
@@ -227,16 +220,16 @@ export interface WeatherApiOptions {
   timezone?: string;
 }
 
-// ?꾧꼍??-> 湲곗긽泥?寃⑹옄 醫뚰몴 蹂??
+// Convert WGS84 coordinates to KMA grid coordinates
 const convertToGrid = (lat: number, lon: number): { nx: number; ny: number } => {
-  const RE = 6371.00877; // 吏援?諛섍꼍(km)
-  const GRID = 5.0; // 寃⑹옄 媛꾧꺽(km)
-  const SLAT1 = 30.0; // ?쒖? ?꾨룄1(degree)
-  const SLAT2 = 60.0; // ?쒖? ?꾨룄2(degree)
-  const OLON = 126.0; // 湲곗? 寃쎈룄(degree)
-  const OLAT = 38.0; // 湲곗? ?꾨룄(degree)
-  const XO = 43; // 湲곗???X醫뚰몴(GRID)
-  const YO = 136; // 湲곗???Y醫뚰몴(GRID)
+  const RE = 6371.00877; // Earth radius (km)
+  const GRID = 5.0; // Grid spacing (km)
+  const SLAT1 = 30.0; // Standard latitude 1 (degree)
+  const SLAT2 = 60.0; // Standard latitude 2 (degree)
+  const OLON = 126.0; // Base longitude (degree)
+  const OLAT = 38.0; // Base latitude (degree)
+  const XO = 43; // Base X coordinate (GRID)
+  const YO = 136; // Base Y coordinate (GRID)
 
   const DEGRAD = Math.PI / 180.0;
   const re = RE / GRID;
@@ -264,37 +257,38 @@ const convertToGrid = (lat: number, lon: number): { nx: number; ny: number } => 
 };
 
 // 湲곗긽泥?API 諛쒗몴 ?쒓컖 怨꾩궛
-// ?④린?덈낫??留ㅼ씪 02:10, 05:10, 08:10, 11:10, 14:10, 17:10, 20:10, 23:10 珥?8??諛쒗몴
+// Calculate KMA API base time
+// Data is released daily at 02:10, 05:10, 08:10, 11:10, 14:10, 17:10, 20:10, 23:10 (8 times total)
 const getBaseTime = (): { baseDate: string; baseTime: string } => {
   const now = new Date();
-  
+
   // Hermes(Android) does not fully support timeZone in toLocaleString, so shift manually to KST (UTC+9).
   const utcMillis = now.getTime() + now.getTimezoneOffset() * 60000;
   const koreaTime = new Date(utcMillis + 9 * 60 * 60000);
-  
+
   const year = koreaTime.getFullYear();
   const month = String(koreaTime.getMonth() + 1).padStart(2, '0');
   const day = String(koreaTime.getDate()).padStart(2, '0');
   const hour = koreaTime.getHours();
   const minute = koreaTime.getMinutes();
-  
-  // 諛쒗몴 ?쒓컖 紐⑸줉 (02, 05, 08, 11, 14, 17, 20, 23??
+
+  // Base time list (02, 05, 08, 11, 14, 17, 20, 23)
   const baseHours = [2, 5, 8, 11, 14, 17, 20, 23];
-  
-  // ?꾩옱 ?쒓컖 湲곗? 媛??理쒓렐 諛쒗몴 ?쒓컖 ?좏깮
-  let baseHour = baseHours[0] || 2; // 湲곕낯媛?
+
+  // Select the most recent base time based on current time
+  let baseHour = baseHours[0] || 2; // Default
   for (let i = baseHours.length - 1; i >= 0; i--) {
     const bh = baseHours[i];
     if (bh !== undefined) {
-      // 諛쒗몴??諛쒗몴 ?쒓컖 湲곗? 10遺??꾨????쒖슜 (?? 02?쒕뒗 02:10 ?댄썑)
+      // Use data after 10 minutes from base time (e.g., 02:10 onwards for 02:00)
       if (hour > bh || (hour === bh && minute >= 10)) {
         baseHour = bh;
         break;
       }
     }
   }
-  
-  // ?섎（ 泥?諛쒗몴(02:10) ?댁쟾?대㈃ ?꾨궇 23:00 諛쒗몴 ?ъ슜
+
+  // If before first base time (02:10), use yesterday's 23:00 base
   if (hour < 2 || (hour === 2 && minute < 10)) {
     const yesterday = new Date(koreaTime);
     yesterday.setDate(yesterday.getDate() - 1);
@@ -303,25 +297,25 @@ const getBaseTime = (): { baseDate: string; baseTime: string } => {
       baseTime: '2300',
     };
   }
-  
+
   return {
     baseDate: `${year}${month}${day}`,
     baseTime: `${String(baseHour).padStart(2, '0')}00`,
   };
 };
 
-// 湲곗긽泥??곗씠?곕? OpenMeteo ?щ㎎?쇰줈 蹂??
+// Convert KMA data to OpenMeteo schema
 const convertKMAToOpenMeteo = (
   kmaData: KMAWeatherItem[],
   lat: number,
   lon: number
 ): OpenMeteoResponse => {
-  console.log('DEBUG [KMA->OpenMeteo] 蹂???쒖옉:', {
-    totalItems: kmaData.length,
-    categories: [...new Set(kmaData.map(d => d.category))].join(', '),
-  });
+  // console.log('DEBUG [KMA->OpenMeteo] Conversion start:', {
+  //   totalItems: kmaData.length,
+  //   categories: [...new Set(kmaData.map(d => d.category))].join(', '),
+  // });
 
-  // ?꾩옱 ?쒓컖 湲곗? 湲곗큹 ?곗씠??援ъ“ 以鍮?
+  // Prepare hourly data structure based on current time
   const hourlyData: {
     time: string[];
     temperature_2m: number[];
@@ -342,9 +336,9 @@ const convertKMAToOpenMeteo = (
     wind_direction_10m: [],
   };
 
-  // ?쒓컖蹂꾨줈 ?곗씠??洹몃９??
+  // Group data by time
   const dataByTime: Record<string, Record<string, string>> = {};
-  
+
   kmaData.forEach(item => {
     const datetime = `${item.fcstDate}${item.fcstTime}`;
     if (!dataByTime[datetime]) {
@@ -353,19 +347,19 @@ const convertKMAToOpenMeteo = (
     dataByTime[datetime][item.category] = item.fcstValue;
   });
 
-  console.log('DEBUG [KMA->OpenMeteo] ??꾨씪??洹몃９ ?꾨즺:', {
-    timeSlotCount: Object.keys(dataByTime).length,
-    earliestTimestamp: Object.keys(dataByTime).sort()[0],
-  });
+  // console.log('DEBUG [KMA->OpenMeteo] Time-grouped data:', {
+  //   timeSlotCount: Object.keys(dataByTime).length,
+  //   earliestTimestamp: Object.keys(dataByTime).sort()[0],
+  // });
 
-  // 泥?踰덉㎏ ?쒓컙?瑜??꾩옱 ?좎뵪濡??ъ슜
+  // Use first time slot as current weather
   const times = Object.keys(dataByTime).sort();
   if (times.length > 0 && times[0]) {
     const firstTime = times[0];
     const firstData = dataByTime[firstTime];
-    
+
     if (firstData) {
-      // ?꾩옱 議곌굔
+      // Current conditions
       const temp = toKMANumber(firstData.TMP);
       const humidity = toKMANumber(firstData.REH);
       const pop = toKMANumber(firstData.POP);
@@ -373,8 +367,8 @@ const convertKMAToOpenMeteo = (
       const sky = toKMANumber(firstData.SKY, 1);
       const wsd = toKMANumber(firstData.WSD);
       const vec = toKMANumber(firstData.VEC);
-      
-      // weather_code 寃곗젙 (媛뺤닔/?섎뒛 ?곹깭 留ㅽ븨)
+
+      // Determine weather_code (precipitation/sky condition mapping)
       const weatherCode = mapKMAWeatherCode(pty, sky);
 
       const precipitationAmount = parseKMAPrecipAmount(firstData.PCP);
@@ -383,16 +377,16 @@ const convertKMAToOpenMeteo = (
           ? precipitationAmount
           : 0;
 
-      console.log('DEBUG [湲곗긽 肄붾뱶 留ㅽ븨]:', {
-        raw: { PTY: pty, SKY: sky },
-        weatherCode,
-      });
+      // console.log('DEBUG [Weather code mapping]:', {
+      //   raw: { PTY: pty, SKY: sky },
+      //   weatherCode,
+      // });
 
       const current = {
         time: `${firstTime.substring(0, 4)}-${firstTime.substring(4, 6)}-${firstTime.substring(6, 8)}T${firstTime.substring(8, 10)}:00`,
         temperature_2m: temp,
         relative_humidity_2m: humidity,
-        apparent_temperature: temp - (wsd * 0.5), // 泥닿컧?⑤룄瑜??⑥닚 蹂댁젙
+        apparent_temperature: temp - (wsd * 0.5), // Simple feels-like approximation
         precipitation: precipitationAmount,
         rain: rainAmount,
         weather_code: weatherCode,
@@ -400,23 +394,23 @@ const convertKMAToOpenMeteo = (
         wind_direction_10m: vec,
       };
 
-      console.log('DEBUG [?꾩옱 ?좎뵪 蹂??寃곌낵]:', {
-        timestamp: current.time,
-        temperature: `${temp}C`,
-        humidity: `${humidity}%`,
-        precipitationProbability: `${pop}%`,
-        precipitationAmount,
-        rainAmount,
-        windSpeed: `${wsd}m/s`,
-        weatherCode,
-      });
+      // console.log('DEBUG [Current weather result]:', {
+      //   timestamp: current.time,
+      //   temperature: `${temp}C`,
+      //   humidity: `${humidity}%`,
+      //   precipitationProbability: `${pop}%`,
+      //   precipitationAmount,
+      //   rainAmount,
+      //   windSpeed: `${wsd}m/s`,
+      //   weatherCode,
+      // });
 
-      // ?쒓컙蹂??곗씠???곸옱
+      // Add hourly data
       times.forEach(time => {
         const data = dataByTime[time];
         if (data) {
           const datetime = `${time.substring(0, 4)}-${time.substring(4, 6)}-${time.substring(6, 8)}T${time.substring(8, 10)}:00`;
-          
+
           const temp = toKMANumber(data.TMP);
           const humidity = toKMANumber(data.REH);
           const pop = toKMANumber(data.POP);
@@ -424,7 +418,7 @@ const convertKMAToOpenMeteo = (
           const sky = toKMANumber(data.SKY, 1);
           const wsd = toKMANumber(data.WSD);
           const vec = toKMANumber(data.VEC);
-          
+
           const precipitationAmount = parseKMAPrecipAmount(data.PCP);
           const weatherCode = mapKMAWeatherCode(pty, sky);
 
@@ -449,7 +443,7 @@ const convertKMAToOpenMeteo = (
     }
   }
 
-  // ?곗씠?곌? ?놁쓣 ?뚮뒗 湲곕낯媛?諛섑솚
+  // Return default values if no data available
   return {
     latitude: lat,
     longitude: lon,
@@ -468,7 +462,7 @@ const convertKMAToOpenMeteo = (
   };
 };
 
-// API ?묐떟???덉쟾?섍쾶 ?뚯떛?섎뒗 ?ы띁
+// Helper to safely parse API response
 type KMAResponseSource = Response | KMAWeatherResponse | KMAProxyPayload | undefined | null;
 const parseWeatherResponse = async (source: KMAResponseSource): Promise<KMAWeatherResponse> => {
   if (!source) {
@@ -504,7 +498,7 @@ const parseWeatherResponse = async (source: KMAResponseSource): Promise<KMAWeath
   }
 
   const data = payload as KMAWeatherResponse;
-  console.log('DEBUG [KMA API] Parsed JSON:', data);
+  // console.log('DEBUG [KMA API] Parsed JSON:', data);
 
   const header = data.response?.header;
   if (!header) {
@@ -535,37 +529,37 @@ const parseWeatherResponse = async (source: KMAResponseSource): Promise<KMAWeath
 };
 
 
-// ?꾩옱 ?좎뵪 ??踰?議고쉶
+// Get current weather only (single request)
 export const getCurrentWeather = async (lat: number, lon: number): Promise<OpenMeteoResponse> => {
-  // 현재 날씨만 필요하므로 최소한의 데이터만 요청 (60개 -> 12개로 감소)
-  // 기상청 API는 3시간 간격 데이터이므로 12개면 충분 (현재 시간 포함 약 9시간)
-  const { data, baseDate, baseTime, gridCoords } = await fetchKMAData(lat, lon, 12);
+  // Request sufficient data (60 items = 12 categories × 5 time slots)
+  // This ensures we get all weather categories (TMP, PTY, SKY, etc.) for multiple hours
+  const { data, baseDate, baseTime, gridCoords } = await fetchKMAData(lat, lon, 60);
 
-  console.log('DEBUG [KMA API] Request summary:', {
-    requestedCoords: { latitude: lat, longitude: lon },
-    gridCoords,
-    baseTime: { date: baseDate, time: baseTime },
-    mode: 'CURRENT_ONLY',
-  });
+  // console.log('DEBUG [KMA API] Request summary:', {
+  //   requestedCoords: { latitude: lat, longitude: lon },
+  //   gridCoords,
+  //   baseTime: { date: baseDate, time: baseTime },
+  //   mode: 'CURRENT_ONLY',
+  // });
 
   const items = data.response?.body?.items?.item;
   const totalCount = data.response?.body?.totalCount ?? 0;
 
-  console.log('DEBUG [KMA API] Item summary:', {
-    totalCount,
-    hasItems: Array.isArray(items) && items.length > 0,
-    itemCount: Array.isArray(items) ? items.length : 0,
-    itemSample: Array.isArray(items) ? items.slice(0, 3) : undefined,
-  });
+  // console.log('DEBUG [KMA API] Item summary:', {
+  //   totalCount,
+  //   hasItems: Array.isArray(items) && items.length > 0,
+  //   itemCount: Array.isArray(items) ? items.length : 0,
+  //   itemSample: Array.isArray(items) ? items.slice(0, 3) : undefined,
+  // });
 
   if (Array.isArray(items) && items.length > 0) {
     const result = convertKMAToOpenMeteo(items, lat, lon);
 
-    console.log('DEBUG [KMA API] Converted result:', {
-      current: result.current,
-      hourlyCount: result.hourly?.time.length ?? 0,
-      dailyCount: result.daily?.time.length ?? 0,
-    });
+    // console.log('DEBUG [KMA API] Converted result:', {
+    //   current: result.current,
+    //   hourlyCount: result.hourly?.time.length ?? 0,
+    //   dailyCount: result.daily?.time.length ?? 0,
+    // });
 
     return result;
   }
@@ -580,17 +574,17 @@ export const getCurrentWeather = async (lat: number, lon: number): Promise<OpenM
 export const getHourlyWeather = async (lat: number, lon: number, hours: number = 24): Promise<OpenMeteoResponse> => {
   // 시간별 예보: 60개 데이터 요청
   const { data, baseDate, baseTime, gridCoords } = await fetchKMAData(lat, lon, 60);
-  
+
   const items = data.response?.body?.items?.item;
-  
+
   if (!Array.isArray(items) || items.length === 0) {
     throw new Error('KMA API did not return any forecast items.');
   }
-  
+
   return convertKMAToOpenMeteo(items, lat, lon);
 };
 
-// ?쇰퀎 ?덈낫 議고쉶
+// Get daily forecast
 export const getDailyWeather = async (lat: number, lon: number, days: number = 7): Promise<OpenMeteoResponse> => {
   const { data, baseDate, baseTime, gridCoords } = await fetchKMAData(lat, lon, 290);
 
@@ -644,31 +638,35 @@ export const getDailyWeather = async (lat: number, lon: number, days: number = 7
       }
 
       const hourly = result.hourly;
+      if (!hourly) return; // Safety check for hourly data
+
       const temp = hourly.temperature_2m[idx];
       const precip = hourly.precipitation[idx];
       const pop = hourly.precipitation_probability[idx];
       const wind = hourly.wind_speed_10m[idx];
       const code = hourly.weather_code[idx];
 
-      if (Number.isFinite(temp)) {
+      if (Number.isFinite(temp) && temp !== undefined) {
         byDate[date].temps.push(temp);
       }
-      if (Number.isFinite(precip)) {
+      if (Number.isFinite(precip) && precip !== undefined) {
         byDate[date].precips.push(precip);
       }
-      if (Number.isFinite(pop)) {
+      if (Number.isFinite(pop) && pop !== undefined) {
         byDate[date].pops.push(pop);
       }
-      if (Number.isFinite(wind)) {
+      if (Number.isFinite(wind) && wind !== undefined) {
         byDate[date].winds.push(wind);
       }
-      if (Number.isFinite(code)) {
+      if (Number.isFinite(code) && code !== undefined) {
         byDate[date].codes.push(code);
       }
     });
 
     Object.keys(byDate).sort().forEach(date => {
       const bucket = byDate[date];
+      if (!bucket) return; // Safety check
+
       dailyData.time.push(date);
       dailyData.temperature_2m_max.push(bucket.temps.length ? Math.max(...bucket.temps) : 0);
       dailyData.temperature_2m_min.push(bucket.temps.length ? Math.min(...bucket.temps) : 0);
@@ -696,15 +694,15 @@ export const getDailyWeather = async (lat: number, lon: number, days: number = 7
 };
 
 export const getCompleteWeather = async (
-  lat: number, 
-  lon: number, 
-  hourlyHours: number = 48, 
+  lat: number,
+  lon: number,
+  hourlyHours: number = 48,
   forecastDays: number = 7
 ): Promise<OpenMeteoResponse> => {
   return getDailyWeather(lat, lon, forecastDays);
 };
 
-// ?쒖슱 湲곕낯 醫뚰몴 (?뚯뒪?몄슜)
+// Seoul default coordinates (for testing)
 export const SEOUL_COORDS = {
   latitude: 37.5665,
   longitude: 126.9780

@@ -17,24 +17,32 @@ import Config from '@/config';
  * @param itinerary - Tmap API의 itinerary 데이터
  * @param apiKey - Google Elevation API 키 (선택사항, 없으면 서버 환경변수 사용)
  * @param walkingSpeed - 보행 속도 (m/s) (선택사항, Health Connect Case 1 속도)
+ * @param weatherData - 날씨 데이터 (선택사항)
  * @returns 경사도 분석 결과 및 보정된 시간
  */
 export async function analyzeRouteSlope(
     itinerary: Itinerary,
     apiKey?: string,
-    walkingSpeed?: number
+    walkingSpeed?: number,
+    weatherData?: {
+        temp_c: number;
+        pty: number;
+        rain_mm_per_h?: number;
+        snow_cm_per_h?: number;
+    }
 ): Promise<RouteElevationAnalysis> {
     try {
         const requestBody: AnalyzeSlopeRequest = {
             itinerary,
             ...(apiKey && { api_key: apiKey }),
-            ...(walkingSpeed && { walking_speed: walkingSpeed })
+            ...(walkingSpeed && { user_speed_mps: walkingSpeed }),
+            ...(weatherData && { weather_data: weatherData })
         };
 
         // Config에서 동적으로 감지된 API URL 사용
         const apiBaseUrl = Config.API_BASE_URL;
-        console.log(`📍 [경사도 분석] Using API URL: ${apiBaseUrl}`);
-        console.log(`📤 [경사도 분석] Request body:`, JSON.stringify(requestBody).substring(0, 200));
+        // console.log(`📍 [경사도 분석] Using API URL: ${apiBaseUrl}`);
+        // console.log(`📤 [경사도 분석] Request body:`, JSON.stringify(requestBody).substring(0, 200));
 
         // 타임아웃 설정 (30초)
         const controller = new AbortController();
@@ -52,7 +60,7 @@ export async function analyzeRouteSlope(
 
             clearTimeout(timeoutId);
 
-            console.log(`📊 [경사도 분석] Response status: ${response.status}`);
+            // console.log(`📊 [경사도 분석] Response status: ${response.status}`);
 
             if (!response.ok) {
                 const errorData = await response.json() as { detail?: string };
@@ -62,7 +70,12 @@ export async function analyzeRouteSlope(
             }
 
             const data = await response.json() as RouteElevationAnalysis;
-            console.log(`✅ [경사도 분석] Success:`, data);
+
+            // 간소화된 로그: 주요 정보만 표시
+            if (data.factors) {
+                console.log(`✅ [경사도 분석] 계수 - 사용자: ${data.factors.user_speed_factor.toFixed(3)}, 경사도: ${data.factors.slope_factor.toFixed(3)}, 날씨: ${data.factors.weather_factor.toFixed(3)}, 최종: ${data.factors.final_factor.toFixed(3)}`);
+            }
+
             return data;
         } catch (fetchError: any) {
             clearTimeout(timeoutId);

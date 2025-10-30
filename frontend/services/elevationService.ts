@@ -16,16 +16,19 @@ import Config from '@/config';
  * 
  * @param itinerary - Tmap API의 itinerary 데이터
  * @param apiKey - Google Elevation API 키 (선택사항, 없으면 서버 환경변수 사용)
+ * @param walkingSpeed - 보행 속도 (m/s) (선택사항, Health Connect Case 1 속도)
  * @returns 경사도 분석 결과 및 보정된 시간
  */
 export async function analyzeRouteSlope(
     itinerary: Itinerary,
-    apiKey?: string
+    apiKey?: string,
+    walkingSpeed?: number
 ): Promise<RouteElevationAnalysis> {
     try {
         const requestBody: AnalyzeSlopeRequest = {
             itinerary,
-            ...(apiKey && { api_key: apiKey })
+            ...(apiKey && { api_key: apiKey }),
+            ...(walkingSpeed && { walking_speed: walkingSpeed })
         };
 
         // Config에서 동적으로 감지된 API URL 사용

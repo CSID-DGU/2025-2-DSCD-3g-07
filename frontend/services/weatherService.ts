@@ -108,20 +108,20 @@ const convertToGrid = (lat: number, lon: number): { nx: number; ny: number } => 
 // 단기예보는 매일 02:10, 05:10, 08:10, 11:10, 14:10, 17:10, 20:10, 23:10 총 8회 발표
 const getBaseTime = (): { baseDate: string; baseTime: string } => {
   const now = new Date();
-  
+
   // Hermes(Android) does not fully support timeZone in toLocaleString, so shift manually to KST (UTC+9).
   const utcMillis = now.getTime() + now.getTimezoneOffset() * 60000;
   const koreaTime = new Date(utcMillis + 9 * 60 * 60000);
-  
+
   const year = koreaTime.getFullYear();
   const month = String(koreaTime.getMonth() + 1).padStart(2, '0');
   const day = String(koreaTime.getDate()).padStart(2, '0');
   const hour = koreaTime.getHours();
   const minute = koreaTime.getMinutes();
-  
+
   // 발표 시각 목록 (02, 05, 08, 11, 14, 17, 20, 23시)
   const baseHours = [2, 5, 8, 11, 14, 17, 20, 23];
-  
+
   // 현재 시각 기준 가장 최근 발표 시각 선택
   let baseHour = baseHours[0] || 2; // 기본값
   for (let i = baseHours.length - 1; i >= 0; i--) {
@@ -134,7 +134,7 @@ const getBaseTime = (): { baseDate: string; baseTime: string } => {
       }
     }
   }
-  
+
   // 하루 첫 발표(02:10) 이전이면 전날 23:00 발표 사용
   if (hour < 2 || (hour === 2 && minute < 10)) {
     const yesterday = new Date(koreaTime);
@@ -144,7 +144,7 @@ const getBaseTime = (): { baseDate: string; baseTime: string } => {
       baseTime: '2300',
     };
   }
-  
+
   return {
     baseDate: `${year}${month}${day}`,
     baseTime: `${String(baseHour).padStart(2, '0')}00`,
@@ -185,7 +185,7 @@ const convertKMAToOpenMeteo = (
 
   // 시각별로 데이터 그룹화
   const dataByTime: Record<string, Record<string, string>> = {};
-  
+
   kmaData.forEach(item => {
     const datetime = `${item.fcstDate}${item.fcstTime}`;
     if (!dataByTime[datetime]) {
@@ -204,7 +204,7 @@ const convertKMAToOpenMeteo = (
   if (times.length > 0 && times[0]) {
     const firstTime = times[0];
     const firstData = dataByTime[firstTime];
-    
+
     if (firstData) {
       // 현재 조건
       const temp = parseFloat(firstData.TMP || '0');
@@ -214,7 +214,7 @@ const convertKMAToOpenMeteo = (
       const sky = parseInt(firstData.SKY || '1');
       const wsd = parseFloat(firstData.WSD || '0');
       const vec = parseFloat(firstData.VEC || '0');
-      
+
       // weather_code 결정 (강수/하늘 상태 매핑)
       let weatherCode = 0;
       if (pty > 0) {
@@ -225,17 +225,17 @@ const convertKMAToOpenMeteo = (
 
       const weatherLabel =
         weatherCode === 0 ? '맑음' :
-        weatherCode === 2 ? '부분 흐림' :
-        weatherCode === 3 ? '흐림' :
-        weatherCode === 61 ? '약한 비' :
-        weatherCode === 71 ? '약한 눈' :
-        '강수';
+          weatherCode === 2 ? '부분 흐림' :
+            weatherCode === 3 ? '흐림' :
+              weatherCode === 61 ? '약한 비' :
+                weatherCode === 71 ? '약한 눈' :
+                  '강수';
       const precipitationType =
         pty === 0 ? '없음' :
-        pty === 1 ? '비' :
-        pty === 2 ? '비/눈' :
-        pty === 3 ? '눈' :
-        '소나기';
+          pty === 1 ? '비' :
+            pty === 2 ? '비/눈' :
+              pty === 3 ? '눈' :
+                '소나기';
       const skyLabel = sky === 1 ? '맑음' : sky === 3 ? '구름 많음' : '흐림';
 
       console.log('DEBUG [날씨 코드 매핑]:', {
@@ -273,7 +273,7 @@ const convertKMAToOpenMeteo = (
         const data = dataByTime[time];
         if (data) {
           const datetime = `${time.substring(0, 4)}-${time.substring(4, 6)}-${time.substring(6, 8)}T${time.substring(8, 10)}:00`;
-          
+
           const temp = parseFloat(data.TMP || '0');
           const humidity = parseFloat(data.REH || '0');
           const pop = parseFloat(data.POP || '0');
@@ -281,7 +281,7 @@ const convertKMAToOpenMeteo = (
           const sky = parseInt(data.SKY || '1');
           const wsd = parseFloat(data.WSD || '0');
           const vec = parseFloat(data.VEC || '0');
-          
+
           let weatherCode = 0;
           if (pty > 0) {
             weatherCode = pty === 1 ? 61 : pty === 2 ? 71 : pty === 3 ? 71 : 80;
@@ -340,29 +340,29 @@ const parseWeatherResponse = async (response: Response): Promise<KMAWeatherRespo
     });
     throw new Error(`기상청 API 요청 실패: ${response.status} - ${errorText}`);
   }
-  
+
   const data = (await response.json()) as any;
   console.log('DEBUG [기상청 API] 원본 JSON:', data);
-  
+
   // 오류 응답 검사
   if (data.response?.header?.resultCode !== '00') {
     const errorMsg = data.response?.header?.resultMsg || '알 수 없는 오류';
     const errorCode = data.response?.header?.resultCode || 'UNKNOWN';
-    
+
     console.error('ERROR [기상청 API] 오류 응답:', {
       errorCode,
       errorMsg,
       header: data.response?.header,
     });
-    
+
     // NO_DATA 오류는 상세 안내
     if (errorCode === '03' || errorMsg.includes('NO_DATA')) {
       throw new Error(`기상청 API 데이터 없음: 요청한 기준 시간에 데이터가 존재하지 않습니다. 발표 시각을 다시 확인해주세요. (오류코드: ${errorCode})`);
     }
-    
+
     throw new Error(`기상청 API 오류: ${errorMsg} (오류코드: ${errorCode})`);
   }
-  
+
   return data as KMAWeatherResponse;
 };
 
@@ -393,36 +393,44 @@ export const getCurrentWeather = async (lat: number, lon: number): Promise<OpenM
   const apiUrl = `${KMA_BASE_URL}/getVilageFcst?${params}`;
   console.log('DEBUG [기상청 API] 요청 URL:', apiUrl);
 
-  const response = await fetch(apiUrl);
+  // Expo 프록시 우회를 위해 명시적 설정 추가
+  const response = await fetch(apiUrl, {
+    method: 'GET',
+    headers: {
+      'Accept': 'application/json',
+    },
+    // @ts-ignore - Expo specific option
+    reactNative: { textStreaming: true }
+  });
   const kmaData = await parseWeatherResponse(response);
-  
+
   console.log('DEBUG [기상청 API] 응답 요약:', {
     header: kmaData.response?.header,
     raw: kmaData,
   });
-  
+
   // API 응답 구조 확인
   const items = kmaData.response?.body?.items?.item;
   const totalCount = kmaData.response?.body?.totalCount;
-  
+
   console.log('DEBUG [기상청 API] 아이템 확인:', {
     totalCount: totalCount,
     hasItems: !!items,
     itemsType: Array.isArray(items) ? 'array' : typeof items,
     itemCount: Array.isArray(items) ? items.length : 0,
   });
-  
+
   if (items && Array.isArray(items) && items.length > 0) {
     console.log('DEBUG [기상청 API] 원시 데이터 샘플:', items.slice(0, 3));
-    
+
     const result = convertKMAToOpenMeteo(items, lat, lon);
-    
+
     console.log('DEBUG [기상청 API] 변환 결과:', {
       current: result.current,
       hourlyCount: result.hourly?.time.length || 0,
       dailyCount: result.daily?.time.length || 0,
     });
-    
+
     return result;
   }
 
@@ -451,15 +459,22 @@ export const getDailyWeather = async (lat: number, lon: number, days: number = 7
     ny: ny.toString(),
   });
 
-  const response = await fetch(`${KMA_BASE_URL}/getVilageFcst?${params}`);
+  const response = await fetch(`${KMA_BASE_URL}/getVilageFcst?${params}`, {
+    method: 'GET',
+    headers: {
+      'Accept': 'application/json',
+    },
+    // @ts-ignore - Expo specific option
+    reactNative: { textStreaming: true }
+  });
   const kmaData = await parseWeatherResponse(response);
-  
+
   // API 응답 유효성 확인
   const items = kmaData.response?.body?.items?.item;
-  
+
   if (items && Array.isArray(items) && items.length > 0) {
     const result = convertKMAToOpenMeteo(items, lat, lon);
-    
+
     // 일별 데이터 구성
     if (result.hourly) {
       const dailyData: {
@@ -502,7 +517,7 @@ export const getDailyWeather = async (lat: number, lon: number, days: number = 7
             const pop = result.hourly.precipitation_probability[idx];
             const wind = result.hourly.wind_speed_10m[idx];
             const code = result.hourly.weather_code[idx];
-            
+
             if (temp !== undefined) byDate[date].temps.push(temp);
             if (precip !== undefined) byDate[date].precips.push(precip);
             if (pop !== undefined) byDate[date].pops.push(pop);
@@ -538,9 +553,9 @@ export const getDailyWeather = async (lat: number, lon: number, days: number = 7
 
 // 전체 날씨 조회
 export const getCompleteWeather = async (
-  lat: number, 
-  lon: number, 
-  hourlyHours: number = 48, 
+  lat: number,
+  lon: number,
+  hourlyHours: number = 48,
   forecastDays: number = 7
 ): Promise<OpenMeteoResponse> => {
   return getDailyWeather(lat, lon, forecastDays);

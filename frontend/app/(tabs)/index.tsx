@@ -1,6 +1,6 @@
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import * as Location from 'expo-location';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import {
   View,
   Text,
@@ -11,18 +11,33 @@ import {
   ActivityIndicator,
   Alert,
   StatusBar,
+  Dimensions,
+  PanResponder,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import KakaoMap from '@/components/KakaoMap';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withSpring,
+  runOnJS,
+} from 'react-native-reanimated';
+import KakaoMapWithRoute from '@/components/KakaoMapWithRoute';
 import { apiService } from '@/services/api';
-import type { ApiResponse, TransitRouteParams } from '@/services/api';
-import { analyzeRouteSlope, formatTime as formatSlopeTime, formatTimeDifference } from '@/services/elevationService';
-import type { RouteElevationAnalysis } from '@/types/api';
+import type { TransitRouteParams } from '@/services/api';
+import { analyzeRouteSlope } from '@/services/elevationService';
+import type { Itinerary, RouteElevationAnalysis, Leg } from '@/types/api';
+import { searchPlaces, type PlaceSearchResult } from '@/services/placeSearchService';
+import type { RoutePath } from '@/services/routeService';
 
+const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 const PRIMARY_COLOR = '#2C6DE7';
 const SECONDARY_TEXT = '#4A5968';
 const LIGHT_BACKGROUND = '#F2F5FC';
 const BORDER_COLOR = '#E6E9F2';
+
+const SEARCH_BAR_HEIGHT = 240;
+const BOTTOM_SHEET_MIN = 100;
+const BOTTOM_SHEET_MAX = SCREEN_HEIGHT * 0.7;
 
 interface LocationData {
   address: string;
@@ -34,29 +49,231 @@ interface RouteInfo {
   totalTime: number;
   totalWalkTime: number;
   walkRatio: number;
-  walkingSections: any[];
   personalizedWalkTime: number;
   slopeAnalysis?: RouteElevationAnalysis | null;
-  rawItinerary?: any; // Tmap 원본 데이터
+  rawItinerary?: Itinerary | null;
+  totalDistance?: number;
+  legs?: Leg[];
 }
 
+const formatMinutes = (seconds: number): string => {
+  if (seconds < 60) {
+    return `${seconds}초`;
+  }
+  const minutes = Math.floor(seconds / 60);
+  const remainingSeconds = seconds % 60;
+  
+  if (remainingSeconds === 0) {
+    return `${minutes}분`;
+  }
+  return `${minutes}분 ${remainingSeconds}초`;
+};
+
+const extractRoutePath = (itinerary: Itinerary): RoutePath[] => {
+  const coords: RoutePath[] = [];
+
+  const pushCoord = (lat?: number, lng?: number) => {
+    if (typeof lat !== 'number' || typeof lng !== 'number') return;
+    if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
+
+    const last = coords[coords.length - 1];
+    if (!last || last.lat !== lat || last.lng !== lng) {
+      coords.push({ lat, lng });
+    }
+  };
+
+  if (!itinerary?.legs) {
+    console.log('⚠️ No legs in itinerary');
+    return coords;
+  }
+
+  console.log(`🗺️ Extracting route from ${itinerary.legs.length} legs`);
+
+  itinerary.legs.forEach((leg, legIndex) => {
+    console.log(`  Leg ${legIndex}: ${leg.mode}, steps: ${leg.steps?.length || 0}`);
+    
+    if (leg.steps && leg.steps.length > 0) {
+      leg.steps.forEach((step, stepIndex) => {
+        if (!step.linestring) {
+          console.log(`    Step ${stepIndex}: No linestring`);
+          return;
+        }
+
+        const pairs = step.linestring.trim().split(' ');
+        console.log(`    Step ${stepIndex}: ${pairs.length} coordinate pairs`);
+
+        pairs.forEach((pair) => {
+          if (!pair) return;
+          const parts = pair.split(',');
+          if (parts.length !== 2) return;
+          
+          const [lngStr, latStr] = parts;
+          if (!lngStr || !latStr) return;
+          
+          const lat = parseFloat(latStr);
+          const lng = parseFloat(lngStr);
+          pushCoord(lat, lng);
+        });
+      });
+    } else {
+      // steps가 없으면 시작점과 끝점만 추가
+      console.log(`    Using start/end points only`);
+      pushCoord(leg.start?.lat, leg.start?.lon);
+      pushCoord(leg.end?.lat, leg.end?.lon);
+    }
+  });
+
+  console.log(`✅ Extracted ${coords.length} total coordinates`);
+  return coords;
+};
+
+const getModeIcon = (mode: string) => {
+  switch (mode) {
+    case 'WALK':
+      return 'directions-walk';
+    case 'BUS':
+      return 'directions-bus';
+    case 'SUBWAY':
+      return 'subway';
+    case 'TRAIN':
+      return 'train';
+    default:
+      return 'directions';
+  }
+};
+
+const getModeColor = (mode: string) => {
+  switch (mode) {
+    case 'WALK':
+      return '#4CAF50';
+    case 'BUS':
+      return '#FF9800';
+    case 'SUBWAY':
+      return '#2196F3';
+    case 'TRAIN':
+      return '#9C27B0';
+    default:
+      return PRIMARY_COLOR;
+  }
+};
+
+const getModeLabel = (mode: string) => {
+  switch (mode) {
+    case 'WALK':
+      return '도보';
+    case 'BUS':
+      return '버스';
+    case 'SUBWAY':
+      return '지하철';
+    case 'TRAIN':
+      return '기차';
+    default:
+      return '이동';
+  }
+};
+
 export default function HomeScreen() {
+  // 기본 상태
   const [startLocation, setStartLocation] = useState<LocationData | null>(null);
   const [endLocation, setEndLocation] = useState<LocationData | null>(null);
+  const [routePath, setRoutePath] = useState<RoutePath[]>([]);
+  const [routeInfo, setRouteInfo] = useState<RouteInfo | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  // 경로 옵션 관련 상태 (여러 경로)
+  const [routeOptions, setRouteOptions] = useState<Itinerary[]>([]);
+  const [selectedRouteIndex, setSelectedRouteIndex] = useState(0);
+
+  // 검색 관련 상태
   const [startInput, setStartInput] = useState('');
   const [endInput, setEndInput] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [routeInfo, setRouteInfo] = useState<RouteInfo | null>(null);
-  const [searchMode, setSearchMode] = useState<'start' | 'end' | null>(null);
+  const [activeInput, setActiveInput] = useState<'start' | 'end' | null>(null);
+  const [searchResults, setSearchResults] = useState<PlaceSearchResult[]>([]);
+  const [searching, setSearching] = useState(false);
+
+  // UI 상태
+  const [searchBarVisible, setSearchBarVisible] = useState(true);
+  const [showRouteDetails, setShowRouteDetails] = useState(false);
+  const [showRouteList, setShowRouteList] = useState(true); // 경로 목록 표시 여부
+
+  // 애니메이션
+  const searchBarTranslateY = useSharedValue(0);
+  const bottomSheetHeight = useSharedValue(0);
+  const bottomSheetTranslateY = useRef(0);
+
+  // 검색창 Pan Responder
+  const searchPanResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponder: (_, gestureState) => {
+        return Math.abs(gestureState.dy) > 5;
+      },
+      onPanResponderMove: (_, gestureState) => {
+        if (gestureState.dy < 0) {
+          // 위로 드래그 - 숨기기
+          searchBarTranslateY.value = Math.max(gestureState.dy, -SEARCH_BAR_HEIGHT);
+        } else {
+          // 아래로 드래그 - 보이기
+          searchBarTranslateY.value = Math.min(gestureState.dy, 0);
+        }
+      },
+      onPanResponderRelease: (_, gestureState) => {
+        if (gestureState.dy < -50) {
+          // 위로 50px 이상 드래그하면 숨김
+          searchBarTranslateY.value = withSpring(-SEARCH_BAR_HEIGHT, {
+            damping: 20,
+            stiffness: 90,
+          });
+          runOnJS(setSearchBarVisible)(false);
+        } else {
+          // 원위치
+          searchBarTranslateY.value = withSpring(0, {
+            damping: 20,
+            stiffness: 90,
+          });
+          runOnJS(setSearchBarVisible)(true);
+        }
+      },
+    })
+  ).current;
+
+  // 바텀시트 Pan Responder
+  const bottomPanResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponder: (_, gestureState) => {
+        return Math.abs(gestureState.dy) > 5;
+      },
+      onPanResponderMove: (_, gestureState) => {
+        const newHeight = bottomSheetHeight.value - gestureState.dy;
+        if (newHeight >= BOTTOM_SHEET_MIN && newHeight <= BOTTOM_SHEET_MAX) {
+          bottomSheetHeight.value = newHeight;
+        }
+      },
+      onPanResponderRelease: (_, gestureState) => {
+        if (gestureState.dy > 100) {
+          // 아래로 100px 이상 드래그하면 최소화
+          bottomSheetHeight.value = withSpring(BOTTOM_SHEET_MIN, {
+            damping: 20,
+            stiffness: 90,
+          });
+        } else if (gestureState.dy < -100) {
+          // 위로 100px 이상 드래그하면 최대화
+          bottomSheetHeight.value = withSpring(BOTTOM_SHEET_MAX, {
+            damping: 20,
+            stiffness: 90,
+          });
+        }
+      },
+    })
+  ).current;
 
   // 현재 위치 가져오기
-  const getCurrentLocation = async () => {
+  const getCurrentLocation = useCallback(async () => {
     try {
-      setLoading(true);
       const { status } = await Location.requestForegroundPermissionsAsync();
-
       if (status !== 'granted') {
-        Alert.alert('위치 권한 필요', '현재 위치를 사용하려면 위치 권한이 필요합니다.');
+        Alert.alert('권한 필요', '위치 권한이 필요합니다.');
         return;
       }
 
@@ -69,31 +286,98 @@ export default function HomeScreen() {
         longitude: location.coords.longitude,
       });
 
-      const addressText = address ? [
-        address.city,
-        address.district,
-        address.street,
-      ].filter(Boolean).join(' ') : '현재 위치';
-
       const locationData: LocationData = {
-        address: addressText,
+        address: address ? `${address.city || ''} ${address.district || ''}`.trim() || '현재 위치' : '현재 위치',
         latitude: location.coords.latitude,
         longitude: location.coords.longitude,
       };
 
-      setStartLocation(locationData);
-      setStartInput(addressText);
+      if (activeInput === 'start') {
+        setStartLocation(locationData);
+        setStartInput(locationData.address);
+        setSearchResults([]);
+        setActiveInput(null);
+      } else if (activeInput === 'end') {
+        setEndLocation(locationData);
+        setEndInput(locationData.address);
+        setSearchResults([]);
+        setActiveInput(null);
+      }
 
+      Alert.alert('위치 설정 완료', locationData.address);
     } catch (error) {
       console.error('위치 가져오기 실패:', error);
       Alert.alert('오류', '현재 위치를 가져올 수 없습니다.');
-    } finally {
-      setLoading(false);
     }
+  }, [activeInput]);
+
+  // 장소 검색
+  const handleSearch = useCallback(async (query: string, inputType: 'start' | 'end') => {
+    if (!query || query.trim().length < 2) {
+      setSearchResults([]);
+      return;
+    }
+
+    try {
+      setSearching(true);
+      const results = await searchPlaces(query.trim());
+      setSearchResults(results);
+    } catch (error) {
+      console.error('검색 실패:', error);
+      setSearchResults([]);
+    } finally {
+      setSearching(false);
+    }
+  }, []);
+
+  // 검색어 변경 핸들러
+  useEffect(() => {
+    if (activeInput === 'start' && startInput) {
+      const timer = setTimeout(() => {
+        handleSearch(startInput, 'start');
+      }, 300);
+      return () => clearTimeout(timer);
+    } else if (activeInput === 'end' && endInput) {
+      const timer = setTimeout(() => {
+        handleSearch(endInput, 'end');
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+    return undefined;
+  }, [startInput, endInput, activeInput, handleSearch]);
+
+  // 검색 결과 선택
+  const handleSelectPlace = useCallback((place: PlaceSearchResult) => {
+    const locationData: LocationData = {
+      address: place.place_name,
+      latitude: parseFloat(place.y),
+      longitude: parseFloat(place.x),
+    };
+
+    if (activeInput === 'start') {
+      setStartLocation(locationData);
+      setStartInput(place.place_name);
+    } else if (activeInput === 'end') {
+      setEndLocation(locationData);
+      setEndInput(place.place_name);
+    }
+
+    setSearchResults([]);
+    setActiveInput(null);
+  }, [activeInput]);
+
+  // 출발지/도착지 교환
+  const handleSwapLocations = () => {
+    const tempLocation = startLocation;
+    const tempInput = startInput;
+    setStartLocation(endLocation);
+    setStartInput(endInput);
+    setEndLocation(tempLocation);
+    setEndInput(tempInput);
   };
 
   // 경로 검색
-  const searchRoute = async () => {
+  const handleSearchRoute = async () => {
     if (!startLocation || !endLocation) {
       Alert.alert('알림', '출발지와 도착지를 모두 입력해주세요.');
       return;
@@ -101,411 +385,542 @@ export default function HomeScreen() {
 
     try {
       setLoading(true);
+      setSearchResults([]);
+      setActiveInput(null);
 
       const params: TransitRouteParams = {
         start_x: startLocation.longitude,
         start_y: startLocation.latitude,
         end_x: endLocation.longitude,
         end_y: endLocation.latitude,
-        user_id: 'default_user',
-        user_age: 25,
-        fatigue_level: 3,
+        lang: 0,
+        format: 'json',
+        count: 10, // 최대 10개 경로 요청
       };
 
+      console.log('🔍 Transit API Request:', params);
       const response = await apiService.getTransitRoute(params);
+      console.log('📦 Full API Response:', JSON.stringify(response.data, null, 2));
 
-      if (response.data) {
-        let slopeAnalysis: RouteElevationAnalysis | null = null;
-        let tmapItinerary = null;
+      const itineraries = response.data?.metaData?.plan?.itineraries || [];
+      console.log(`🗺️ Received ${itineraries.length} route options`);
 
-        // Backend 응답에서 Tmap 데이터 추출
-        // apiService.getTransitRoute는 Tmap 원본 응답을 반환함
-        try {
-          // response.data가 Tmap 응답 형식인 경우
-          if (response.data.metaData?.plan?.itineraries?.[0]) {
-            tmapItinerary = response.data.metaData.plan.itineraries[0];
-
-            // 경사도 분석 실행
-            console.log('경사도 분석 시작...');
-            slopeAnalysis = await analyzeRouteSlope(tmapItinerary);
-            console.log('경사도 분석 완료:', slopeAnalysis);
-          }
-          // 또는 raw_tmap_data 필드가 있는 경우
-          else if (response.data.raw_tmap_data?.metaData?.plan?.itineraries?.[0]) {
-            tmapItinerary = response.data.raw_tmap_data.metaData.plan.itineraries[0];
-
-            console.log('경사도 분석 시작...');
-            slopeAnalysis = await analyzeRouteSlope(tmapItinerary);
-            console.log('경사도 분석 완료:', slopeAnalysis);
-          }
-        } catch (slopeError) {
-          console.warn('경사도 분석 실패 (경로 정보는 정상 표시):', slopeError);
-        }
-
-        setRouteInfo({
-          totalTime: response.data.total_time_minutes,
-          totalWalkTime: response.data.total_walk_time_minutes,
-          walkRatio: response.data.walk_ratio_percent,
-          walkingSections: response.data.walking_sections,
-          personalizedWalkTime: response.data.total_personalized_walk_time_minutes,
-          slopeAnalysis: slopeAnalysis,
-          rawItinerary: tmapItinerary,
-        });
-
-        console.log('경로 검색 성공:', response.data);
-      } else {
-        Alert.alert('오류', response.error || '경로를 검색할 수 없습니다.');
+      if (itineraries.length === 0) {
+        Alert.alert('경로 없음', '경로를 찾을 수 없습니다.');
+        return;
       }
 
+      // 모든 경로 옵션 저장
+      setRouteOptions(itineraries);
+      setSelectedRouteIndex(0);
+      setShowRouteList(true);
+
+      // 첫 번째 경로 표시
+      const firstItinerary = itineraries[0];
+      console.log('🗺️ First itinerary structure:', JSON.stringify(firstItinerary, null, 2).substring(0, 1000));
+      console.log('🗺️ Processing itinerary with', firstItinerary.legs?.length || 0, 'legs');
+      
+      // 각 leg의 구조 상세 로깅
+      firstItinerary.legs?.forEach((leg: any, idx: number) => {
+        console.log(`  Leg ${idx}:`);
+        console.log(`    - mode: ${leg.mode}`);
+        console.log(`    - steps: ${leg.steps?.length || 0}`);
+        if (leg.steps && leg.steps.length > 0) {
+          leg.steps.forEach((step: any, stepIdx: number) => {
+            console.log(`      Step ${stepIdx}:`);
+            console.log(`        - linestring exists: ${!!step.linestring}`);
+            if (step.linestring) {
+              const coords = step.linestring.trim().split(' ');
+              console.log(`        - coord count: ${coords.length}`);
+              console.log(`        - first coord: ${coords[0]}`);
+              console.log(`        - last coord: ${coords[coords.length - 1]}`);
+            }
+          });
+        }
+      });
+      
+      const path = extractRoutePath(firstItinerary);
+      console.log('✅ Route path extracted:', path.length, 'coordinates');
+      if (path.length > 0) {
+        console.log('  First coord:', path[0]);
+        console.log('  Last coord:', path[path.length - 1]);
+      }
+      setRoutePath(path);
+
+      const totalTimeSec = firstItinerary.totalTime || 0;
+      const totalWalkTimeSec = firstItinerary.totalWalkTime || 0;
+
+      // 경사도 분석 (에러 시 무시)
+      let slopeAnalysis: RouteElevationAnalysis | null = null;
+      try {
+        slopeAnalysis = await analyzeRouteSlope(firstItinerary);
+      } catch (error) {
+        console.warn('⚠️ 경사도 분석 실패 (경로는 정상 표시):', error);
+      }
+
+      setRouteInfo({
+        totalTime: totalTimeSec,
+        totalWalkTime: totalWalkTimeSec,
+        walkRatio: totalTimeSec > 0 ? (totalWalkTimeSec / totalTimeSec) * 100 : 0,
+        personalizedWalkTime: slopeAnalysis?.total_adjusted_walk_time || totalWalkTimeSec,
+        slopeAnalysis,
+        rawItinerary: firstItinerary,
+        totalDistance: firstItinerary.totalDistance || 0,
+        legs: firstItinerary.legs || [],
+      });
+
+      // 검색창 숨기기
+      searchBarTranslateY.value = withSpring(-SEARCH_BAR_HEIGHT, {
+        damping: 20,
+        stiffness: 90,
+      });
+      setSearchBarVisible(false);
+
+      // 바텀시트 올리기
+      bottomSheetHeight.value = withSpring(BOTTOM_SHEET_MAX, {
+        damping: 20,
+        stiffness: 90,
+      });
     } catch (error) {
-      console.error('경로 검색 실패:', error);
-      Alert.alert('오류', '경로를 검색할 수 없습니다.');
+      console.error('❌ 경로 검색 실패:', error);
+      Alert.alert('오류', '경로 검색에 실패했습니다.');
     } finally {
       setLoading(false);
     }
   };
 
-  // 장소 검색 (간단한 더미 데이터)
-  const searchPlace = (query: string, type: 'start' | 'end') => {
-    // 실제로는 카카오 로컬 API 등을 사용
-    const dummyPlaces: { [key: string]: LocationData } = {
-      '강남역': { address: '서울 강남구 강남역', latitude: 37.4979, longitude: 127.0276 },
-      '홍대입구역': { address: '서울 마포구 홍대입구역', latitude: 37.5570, longitude: 126.9229 },
-      '여의도공원': { address: '서울 영등포구 여의도공원', latitude: 37.5289, longitude: 126.9338 },
-      '서울숲': { address: '서울 성동구 서울숲', latitude: 37.5443, longitude: 127.0374 },
-      '한강공원': { address: '서울 용산구 한강공원', latitude: 37.5285, longitude: 126.9332 },
+  // 경로 선택 함수
+  const handleSelectRoute = useCallback((index: number) => {
+    const selected = routeOptions[index];
+    setSelectedRouteIndex(index);
+
+    const path = extractRoutePath(selected);
+    setRoutePath(path);
+
+    const totalTimeSec = selected.totalTime || 0;
+    const totalWalkTimeSec = selected.totalWalkTime || 0;
+
+    setRouteInfo({
+      totalTime: totalTimeSec,
+      totalWalkTime: totalWalkTimeSec,
+      walkRatio: totalTimeSec > 0 ? (totalWalkTimeSec / totalTimeSec) * 100 : 0,
+      personalizedWalkTime: totalWalkTimeSec,
+      slopeAnalysis: null,
+      rawItinerary: selected,
+      totalDistance: selected.totalDistance || 0,
+      legs: selected.legs || [],
+    });
+
+    setShowRouteList(false);
+    setShowRouteDetails(false);
+  }, [routeOptions]);
+
+  const animatedSearchBarStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{ translateY: searchBarTranslateY.value }],
     };
+  });
 
-    const place = dummyPlaces[query];
-    if (place) {
-      if (type === 'start') {
-        setStartLocation(place);
-        setStartInput(place.address);
-      } else {
-        setEndLocation(place);
-        setEndInput(place.address);
-      }
-      setSearchMode(null);
-    }
-  };
-
-  const quickPlaces = ['강남역', '홍대입구역', '여의도공원', '서울숲', '한강공원'];
+  const animatedBottomSheetStyle = useAnimatedStyle(() => {
+    return {
+      height: bottomSheetHeight.value,
+    };
+  });
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor="white" />
-
-      {/* 헤더 */}
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>PaceTry</Text>
-        <Text style={styles.headerSubtitle}>나만의 속도로 가는 길</Text>
-      </View>
-
-      {/* 검색 영역 */}
-      <View style={styles.searchContainer}>
-        {/* 출발지 */}
-        <View style={styles.searchRow}>
-          <View style={styles.searchIconContainer}>
-            <View style={[styles.dot, styles.startDot]} />
-          </View>
-          <TextInput
-            style={styles.searchInput}
-            placeholder="출발지를 입력하세요"
-            value={startInput}
-            onChangeText={setStartInput}
-            onFocus={() => setSearchMode('start')}
-          />
-          <TouchableOpacity
-            style={styles.currentLocationButton}
-            onPress={getCurrentLocation}
-          >
-            <MaterialIcons name="my-location" size={20} color={PRIMARY_COLOR} />
-          </TouchableOpacity>
-        </View>
-
-        {/* 교환 버튼 */}
-        <View style={styles.swapButtonContainer}>
-          <TouchableOpacity
-            style={styles.swapButton}
-            onPress={() => {
-              const temp = startLocation;
-              const tempInput = startInput;
-              setStartLocation(endLocation);
-              setStartInput(endInput);
-              setEndLocation(temp);
-              setEndInput(tempInput);
-            }}
-          >
-            <MaterialIcons name="swap-vert" size={20} color={SECONDARY_TEXT} />
-          </TouchableOpacity>
-        </View>
-
-        {/* 도착지 */}
-        <View style={styles.searchRow}>
-          <View style={styles.searchIconContainer}>
-            <View style={[styles.dot, styles.endDot]} />
-          </View>
-          <TextInput
-            style={styles.searchInput}
-            placeholder="도착지를 입력하세요"
-            value={endInput}
-            onChangeText={setEndInput}
-            onFocus={() => setSearchMode('end')}
-          />
-          {endInput.length > 0 && (
-            <TouchableOpacity
-              style={styles.clearButton}
-              onPress={() => {
-                setEndInput('');
-                setEndLocation(null);
-              }}
-            >
-              <MaterialIcons name="close" size={20} color={SECONDARY_TEXT} />
-            </TouchableOpacity>
-          )}
-        </View>
-
-        {/* 검색 버튼 */}
-        <TouchableOpacity
-          style={[styles.searchButton, (!startLocation || !endLocation) && styles.searchButtonDisabled]}
-          onPress={searchRoute}
-          disabled={!startLocation || !endLocation || loading}
-        >
-          {loading ? (
-            <ActivityIndicator color="white" />
-          ) : (
-            <>
-              <MaterialIcons name="search" size={20} color="white" />
-              <Text style={styles.searchButtonText}>경로 검색</Text>
-            </>
-          )}
-        </TouchableOpacity>
-      </View>
-
-      {/* 빠른 검색 칩 */}
-      {searchMode && (
-        <View style={styles.quickSearchContainer}>
-          <Text style={styles.quickSearchTitle}>빠른 검색</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            {quickPlaces.map((place) => (
-              <TouchableOpacity
-                key={place}
-                style={styles.quickChip}
-                onPress={() => searchPlace(place, searchMode)}
-              >
-                <MaterialIcons name="place" size={16} color={PRIMARY_COLOR} />
-                <Text style={styles.quickChipText}>{place}</Text>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
-        </View>
-      )}
-
-      {/* 지도 영역 */}
+    <View style={styles.container}>
+      <StatusBar barStyle="dark-content" />
+      
+      {/* 지도 (전체 화면) */}
       <View style={styles.mapContainer}>
-        <KakaoMap
+        <KakaoMapWithRoute
           jsKey="d377e8ba6e5edd8176c63a3f97c9e17b"
-          lat={startLocation?.latitude || 37.5665}
-          lng={startLocation?.longitude || 126.9780}
+          startLat={startLocation?.latitude || 37.5665}
+          startLng={startLocation?.longitude || 126.978}
+          endLat={endLocation?.latitude || 37.5665}
+          endLng={endLocation?.longitude || 126.978}
+          paths={routePath}
         />
       </View>
 
-      {/* 경로 정보 */}
-      {routeInfo && (
-        <View style={styles.routeInfoContainer}>
-          <ScrollView>
-            <View style={styles.routeInfoHeader}>
-              <MaterialIcons name="directions-transit" size={24} color={PRIMARY_COLOR} />
-              <Text style={styles.routeInfoTitle}>추천 경로</Text>
+      {/* 검색창 보이기 버튼 (숨겨져 있을 때) */}
+      {!searchBarVisible && (
+        <TouchableOpacity
+          style={styles.showSearchButton}
+          onPress={() => {
+            searchBarTranslateY.value = withSpring(0, {
+              damping: 20,
+              stiffness: 90,
+            });
+            setSearchBarVisible(true);
+          }}
+        >
+          <MaterialIcons name="search" size={24} color="white" />
+        </TouchableOpacity>
+      )}
+
+      {/* 검색창 (드래그 가능) */}
+      <Animated.View
+        style={[styles.searchOverlay, animatedSearchBarStyle]}
+        {...searchPanResponder.panHandlers}
+      >
+        <SafeAreaView edges={['top']}>
+          <View style={styles.dragHandle}>
+            <View style={styles.dragBar} />
+          </View>
+          
+          <View style={styles.searchContainer}>
+            {/* 출발지 */}
+            <View style={styles.searchRow}>
+              <View style={styles.searchIconContainer}>
+                <View style={[styles.dot, styles.startDot]} />
+              </View>
+              <TextInput
+                style={styles.searchInput}
+                placeholder="출발지를 입력하세요"
+                placeholderTextColor="#999"
+                value={startInput}
+                onChangeText={setStartInput}
+                onFocus={() => setActiveInput('start')}
+              />
+              <TouchableOpacity
+                style={styles.currentLocationButton}
+                onPress={getCurrentLocation}
+              >
+                <MaterialIcons name="my-location" size={20} color={PRIMARY_COLOR} />
+              </TouchableOpacity>
             </View>
 
-            <View style={styles.routeStats}>
-              <View style={styles.statItem}>
-                <MaterialIcons name="schedule" size={20} color={SECONDARY_TEXT} />
-                <Text style={styles.statValue}>{Math.round(routeInfo.totalTime)}분</Text>
-                <Text style={styles.statLabel}>총 시간</Text>
-              </View>
-
-              <View style={styles.statDivider} />
-
-              <View style={styles.statItem}>
-                <MaterialIcons name="directions-walk" size={20} color={SECONDARY_TEXT} />
-                <Text style={styles.statValue}>{Math.round(routeInfo.totalWalkTime)}분</Text>
-                <Text style={styles.statLabel}>도보 시간</Text>
-              </View>
-
-              <View style={styles.statDivider} />
-
-              <View style={styles.statItem}>
-                <MaterialIcons name="person" size={20} color={PRIMARY_COLOR} />
-                <Text style={[styles.statValue, { color: PRIMARY_COLOR }]}>
-                  {Math.round(routeInfo.personalizedWalkTime)}분
-                </Text>
-                <Text style={styles.statLabel}>나의 속도</Text>
-              </View>
+            {/* 교환 버튼 */}
+            <View style={styles.swapButtonContainer}>
+              <TouchableOpacity
+                style={styles.swapButton}
+                onPress={handleSwapLocations}
+              >
+                <MaterialIcons name="swap-vert" size={20} color={SECONDARY_TEXT} />
+              </TouchableOpacity>
             </View>
 
-            {/* 경사도 정보 */}
-            {routeInfo.slopeAnalysis && !routeInfo.slopeAnalysis.error && (
-              <View style={styles.slopeInfoCard}>
-                <View style={styles.slopeHeader}>
-                  <MaterialIcons name="terrain" size={20} color="#FF6B6B" />
-                  <Text style={styles.slopeTitle}>경사도 분석</Text>
-                </View>
+            {/* 도착지 */}
+            <View style={styles.searchRow}>
+              <View style={styles.searchIconContainer}>
+                <View style={[styles.dot, styles.endDot]} />
+              </View>
+              <TextInput
+                style={styles.searchInput}
+                placeholder="도착지를 입력하세요"
+                placeholderTextColor="#999"
+                value={endInput}
+                onChangeText={setEndInput}
+                onFocus={() => setActiveInput('end')}
+              />
+              {endInput.length > 0 && (
+                <TouchableOpacity
+                  style={styles.clearButton}
+                  onPress={() => {
+                    setEndInput('');
+                    setEndLocation(null);
+                  }}
+                >
+                  <MaterialIcons name="close" size={20} color={SECONDARY_TEXT} />
+                </TouchableOpacity>
+              )}
+            </View>
 
-                <View style={styles.slopeStats}>
-                  <View style={styles.slopeStatItem}>
-                    <Text style={styles.slopeLabel}>평균 경사</Text>
-                    <Text style={styles.slopeValue}>
-                      {routeInfo.slopeAnalysis.walk_legs_analysis.length > 0
-                        ? (
-                          routeInfo.slopeAnalysis.walk_legs_analysis.reduce(
-                            (sum, leg) => sum + Math.abs(leg.avg_slope),
-                            0
-                          ) / routeInfo.slopeAnalysis.walk_legs_analysis.length
-                        ).toFixed(1)
-                        : '0.0'}%
-                    </Text>
+            {/* 검색 버튼 */}
+            <TouchableOpacity
+              style={[styles.searchButton, (!startLocation || !endLocation) && styles.searchButtonDisabled]}
+              onPress={handleSearchRoute}
+              disabled={!startLocation || !endLocation || loading}
+            >
+              {loading ? (
+                <ActivityIndicator color="white" />
+              ) : (
+                <>
+                  <MaterialIcons name="search" size={22} color="white" />
+                  <Text style={styles.searchButtonText}>경로 검색</Text>
+                </>
+              )}
+            </TouchableOpacity>
+          </View>
+
+          {/* 검색 결과 리스트 */}
+          {activeInput && (startInput || endInput) && searchResults.length > 0 && (
+            <View style={styles.searchResultsContainer}>
+              <ScrollView style={styles.searchResultsList} keyboardShouldPersistTaps="handled">
+                {searching ? (
+                  <View style={styles.searchingIndicator}>
+                    <ActivityIndicator size="small" color={PRIMARY_COLOR} />
+                    <Text style={styles.searchingText}>검색 중...</Text>
                   </View>
-
-                  <View style={styles.slopeStatItem}>
-                    <Text style={styles.slopeLabel}>보정 시간</Text>
-                    <Text style={[
-                      styles.slopeValue,
-                      routeInfo.slopeAnalysis.total_route_time_adjustment > 0
-                        ? { color: '#FF6B6B' }
-                        : { color: '#4CAF50' }
-                    ]}>
-                      {routeInfo.slopeAnalysis.total_route_time_adjustment > 0 ? '+' : ''}
-                      {formatTimeDifference(routeInfo.slopeAnalysis.total_route_time_adjustment)}
-                    </Text>
-                  </View>
-
-                  <View style={styles.slopeStatItem}>
-                    <Text style={styles.slopeLabel}>실제 예상</Text>
-                    <Text style={styles.slopeValue}>
-                      {Math.round(routeInfo.slopeAnalysis.total_adjusted_walk_time / 60)}분
-                    </Text>
-                  </View>
-                </View>
-
-                {/* 경사도 세부 정보 */}
-                <View style={styles.slopeDetails}>
-                  {routeInfo.slopeAnalysis.walk_legs_analysis.map((leg, index) => {
-                    const getSlopeEmoji = (slope: number) => {
-                      const absSlope = Math.abs(slope);
-                      if (absSlope < 3) return '⚪';
-                      if (absSlope < 5) return '🟢';
-                      if (absSlope < 10) return '🟡';
-                      if (absSlope < 15) return '🟠';
-                      return '🔴';
-                    };
-
-                    const getSlopeDifficulty = (slope: number) => {
-                      const absSlope = Math.abs(slope);
-                      if (absSlope < 3) return '평지';
-                      if (absSlope < 5) return '완만';
-                      if (absSlope < 10) return '보통';
-                      if (absSlope < 15) return '가파름';
-                      return '매우 가파름';
-                    };
-
-                    return (
-                      <View key={index} style={styles.slopeDetailItem}>
-                        <Text style={styles.slopeDetailEmoji}>{getSlopeEmoji(leg.avg_slope)}</Text>
-                        <View style={styles.slopeDetailInfo}>
-                          <Text style={styles.slopeDetailName} numberOfLines={1}>
-                            {leg.start_name} → {leg.end_name}
-                          </Text>
-                          <Text style={styles.slopeDetailStats}>
-                            {leg.distance}m · {getSlopeDifficulty(leg.avg_slope)} ({leg.avg_slope.toFixed(1)}%)
-                            {leg.time_diff !== 0 && (
-                              <Text style={leg.time_diff > 0 ? styles.timeDiffPlus : styles.timeDiffMinus}>
-                                {' '}({leg.time_diff > 0 ? '+' : ''}{Math.round(leg.time_diff / 60)}분)
-                              </Text>
-                            )}
-                          </Text>
-                        </View>
+                ) : (
+                  searchResults.map((place) => (
+                    <TouchableOpacity
+                      key={place.id}
+                      style={styles.searchResultItem}
+                      onPress={() => handleSelectPlace(place)}
+                    >
+                      <View style={styles.resultIconContainer}>
+                        <MaterialIcons name="place" size={24} color={PRIMARY_COLOR} />
                       </View>
-                    );
-                  })}
-                </View>
+                      <View style={styles.resultTextContainer}>
+                        <Text style={styles.resultPlaceName}>{place.place_name}</Text>
+                        <Text style={styles.resultAddress}>
+                          {place.road_address_name || place.address_name}
+                        </Text>
+                      </View>
+                    </TouchableOpacity>
+                  ))
+                )}
+              </ScrollView>
+            </View>
+          )}
+        </SafeAreaView>
+      </Animated.View>
+
+      {/* 바텀시트 (경로 정보) - 드래그 가능 */}
+      {routeInfo && (
+        <Animated.View
+          style={[styles.bottomSheet, animatedBottomSheetStyle]}
+        >
+          <View {...bottomPanResponder.panHandlers} style={styles.bottomSheetHandle}>
+            <View style={styles.dragBar} />
+          </View>
+
+          <ScrollView showsVerticalScrollIndicator={false} style={styles.bottomSheetContent}>
+            {/* 경로 목록 (여러 경로 옵션) */}
+            {showRouteList && routeOptions.length > 0 && (
+              <View>
+                <Text style={styles.routeListTitle}>
+                  경로 옵션 ({routeOptions.length}개)
+                </Text>
+                {routeOptions.map((option, index) => (
+                  <TouchableOpacity
+                    key={index}
+                    style={[
+                      styles.routeOptionItem,
+                      selectedRouteIndex === index && styles.routeOptionItemSelected,
+                    ]}
+                    onPress={() => handleSelectRoute(index)}
+                  >
+                    <View style={styles.routeOptionHeader}>
+                      <Text style={styles.routeOptionNumber}>경로 {index + 1}</Text>
+                      {selectedRouteIndex === index && (
+                        <MaterialIcons name="check-circle" size={20} color={PRIMARY_COLOR} />
+                      )}
+                    </View>
+                    <View style={styles.routeOptionStats}>
+                      <View style={styles.routeOptionStat}>
+                        <MaterialIcons name="schedule" size={16} color={SECONDARY_TEXT} />
+                        <Text style={styles.routeOptionStatText}>
+                          {formatMinutes(option.totalTime || 0)}
+                        </Text>
+                      </View>
+                      <View style={styles.routeOptionStat}>
+                        <MaterialIcons name="directions-walk" size={16} color={SECONDARY_TEXT} />
+                        <Text style={styles.routeOptionStatText}>
+                          {formatMinutes(option.totalWalkTime || 0)}
+                        </Text>
+                      </View>
+                      <View style={styles.routeOptionStat}>
+                        <MaterialIcons name="straighten" size={16} color={SECONDARY_TEXT} />
+                        <Text style={styles.routeOptionStatText}>
+                          {((option.totalDistance || 0) / 1000).toFixed(1)}km
+                        </Text>
+                      </View>
+                    </View>
+                    {/* 경로 미리보기 (버스/지하철) */}
+                    <View style={styles.routePreview}>
+                      {option.legs?.map((leg, legIdx) => {
+                        if (leg.mode === 'WALK') return null;
+                        return (
+                          <View key={legIdx} style={styles.routePreviewItem}>
+                            <MaterialIcons
+                              name={getModeIcon(leg.mode) as any}
+                              size={14}
+                              color={getModeColor(leg.mode)}
+                            />
+                            <Text style={styles.routePreviewText}>
+                              {leg.route || getModeLabel(leg.mode)}
+                            </Text>
+                          </View>
+                        );
+                      })}
+                    </View>
+                  </TouchableOpacity>
+                ))}
+                <TouchableOpacity
+                  style={styles.hideRouteListButton}
+                  onPress={() => setShowRouteList(false)}
+                >
+                  <Text style={styles.hideRouteListButtonText}>선택한 경로 보기</Text>
+                </TouchableOpacity>
               </View>
             )}
 
-            <View style={styles.walkingSections}>
-              <Text style={styles.sectionTitle}>
-                도보 구간 ({routeInfo.walkingSections.length}개)
-              </Text>
-              {routeInfo.walkingSections.map((section, index) => (
-                <View key={index} style={styles.sectionItem}>
-                  <View style={styles.sectionIcon}>
-                    <MaterialIcons name="directions-walk" size={16} color={PRIMARY_COLOR} />
+            {/* 요약 정보 */}
+            {!showRouteDetails && !showRouteList && (
+              <TouchableOpacity
+                style={styles.routeSummary}
+                onPress={() => setShowRouteDetails(true)}
+              >
+                <View style={styles.routeInfoHeader}>
+                  <MaterialIcons name="directions" size={24} color={PRIMARY_COLOR} />
+                  <Text style={styles.routeInfoTitle}>추천 경로</Text>
+                  <MaterialIcons name="chevron-right" size={24} color={SECONDARY_TEXT} />
+                </View>
+
+                <View style={styles.routeStats}>
+                  <View style={styles.statItem}>
+                    <MaterialIcons name="straighten" size={20} color={SECONDARY_TEXT} />
+                    <Text style={styles.statValue}>
+                      {((routeInfo.totalDistance || 0) / 1000).toFixed(1)}km
+                    </Text>
+                    <Text style={styles.statLabel}>거리</Text>
                   </View>
-                  <View style={styles.sectionInfo}>
-                    <Text style={styles.sectionName}>
-                      {section.start_name} → {section.end_name}
-                    </Text>
-                    <Text style={styles.sectionDetail}>
-                      {section.distance_meters}m · {Math.round(section.section_time_seconds / 60)}분
-                      {section.personalized_time_seconds && (
-                        <Text style={{ color: PRIMARY_COLOR }}>
-                          {' '}(나: {Math.round(section.personalized_time_seconds / 60)}분)
-                        </Text>
-                      )}
-                    </Text>
+
+                  <View style={styles.statDivider} />
+
+                  <View style={styles.statItem}>
+                    <MaterialIcons name="schedule" size={20} color={SECONDARY_TEXT} />
+                    <Text style={styles.statValue}>{formatMinutes(routeInfo.totalTime)}</Text>
+                    <Text style={styles.statLabel}>총 시간</Text>
+                  </View>
+
+                  <View style={styles.statDivider} />
+
+                  <View style={styles.statItem}>
+                    <MaterialIcons name="directions-walk" size={20} color={SECONDARY_TEXT} />
+                    <Text style={styles.statValue}>{formatMinutes(routeInfo.totalWalkTime)}</Text>
+                    <Text style={styles.statLabel}>도보 시간</Text>
                   </View>
                 </View>
-              ))}
-            </View>
-          </ScrollView>
-        </View>
-      )}
 
-      {/* 경로 정보가 없을 때 안내 */}
-      {!routeInfo && !searchMode && (
-        <View style={styles.emptyState}>
-          <MaterialIcons name="directions" size={48} color={BORDER_COLOR} />
-          <Text style={styles.emptyStateTitle}>출발지와 도착지를 입력하세요</Text>
-          <Text style={styles.emptyStateSubtitle}>
-            나만의 속도에 맞춘 경로를 찾아드립니다
-          </Text>
-        </View>
+                {/* 경로 목록 다시 보기 버튼 */}
+                {routeOptions.length > 1 && (
+                  <TouchableOpacity
+                    style={styles.showRouteListButton}
+                    onPress={() => setShowRouteList(true)}
+                  >
+                    <MaterialIcons name="list" size={20} color={PRIMARY_COLOR} />
+                    <Text style={styles.showRouteListButtonText}>
+                      다른 경로 보기 ({routeOptions.length}개)
+                    </Text>
+                  </TouchableOpacity>
+                )}
+              </TouchableOpacity>
+            )}
+
+            {/* 상세 경로 정보 (카카오맵 스타일) */}
+            {showRouteDetails && routeInfo.legs && (
+              <View>
+                <TouchableOpacity
+                  style={styles.backButton}
+                  onPress={() => setShowRouteDetails(false)}
+                >
+                  <MaterialIcons name="arrow-back" size={24} color={PRIMARY_COLOR} />
+                  <Text style={styles.backButtonText}>돌아가기</Text>
+                </TouchableOpacity>
+
+                <Text style={styles.routeDetailsTitle}>상세 경로</Text>
+
+                {routeInfo.legs.map((leg, index) => (
+                  <View key={index} style={styles.legItem}>
+                    <View style={styles.legHeader}>
+                      <View
+                        style={[
+                          styles.legIconContainer,
+                          { backgroundColor: `${getModeColor(leg.mode)}20` },
+                        ]}
+                      >
+                        <MaterialIcons
+                          name={getModeIcon(leg.mode) as any}
+                          size={24}
+                          color={getModeColor(leg.mode)}
+                        />
+                      </View>
+                      <View style={styles.legInfo}>
+                        <Text style={styles.legMode}>{getModeLabel(leg.mode)}</Text>
+                        <Text style={styles.legRoute}>
+                          {leg.start?.name || '출발'} → {leg.end?.name || '도착'}
+                        </Text>
+                      </View>
+                      <View style={styles.legStats}>
+                        <Text style={styles.legTime}>{formatMinutes(leg.sectionTime || 0)}</Text>
+                        <Text style={styles.legDistance}>
+                          {((leg.distance || 0) / 1000).toFixed(1)}km
+                        </Text>
+                      </View>
+                    </View>
+
+                    {/* 버스/지하철 노선 정보 */}
+                    {(leg.mode === 'BUS' || leg.mode === 'SUBWAY') && leg.route && (
+                      <View style={styles.routeInfo}>
+                        <Text style={styles.routeName}>{leg.route}</Text>
+                      </View>
+                    )}
+                  </View>
+                ))}
+              </View>
+            )}
+          </ScrollView>
+        </Animated.View>
       )}
-    </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: '#F8FAFC',
   },
-  header: {
-    padding: 20,
-    paddingBottom: 16,
+  mapContainer: {
+    ...StyleSheet.absoluteFillObject,
   },
-  headerTitle: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: PRIMARY_COLOR,
-    marginBottom: 4,
+  showSearchButton: {
+    position: 'absolute',
+    top: 60,
+    right: 20,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: PRIMARY_COLOR,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
   },
-  headerSubtitle: {
-    fontSize: 14,
-    color: SECONDARY_TEXT,
+  searchOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+  },
+  dragHandle: {
+    alignItems: 'center',
+    paddingVertical: 8,
+  },
+  dragBar: {
+    width: 40,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: '#DDD',
   },
   searchContainer: {
     padding: 16,
     backgroundColor: 'white',
-    borderRadius: 16,
-    marginHorizontal: 16,
-    marginBottom: 12,
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
+    marginHorizontal: 8,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 8,
   },
   searchRow: {
     flexDirection: 'row',
@@ -533,116 +948,160 @@ const styles = StyleSheet.create({
     height: 44,
     backgroundColor: LIGHT_BACKGROUND,
     borderRadius: 12,
-    paddingHorizontal: 16,
+    paddingHorizontal: 14,
     fontSize: 15,
-    color: '#333',
+    color: '#222',
   },
   currentLocationButton: {
-    marginLeft: 8,
-    padding: 8,
-  },
-  clearButton: {
-    marginLeft: 8,
-    padding: 8,
+    marginLeft: 12,
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    backgroundColor: LIGHT_BACKGROUND,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   swapButtonContainer: {
     alignItems: 'center',
-    marginVertical: -6,
+    marginBottom: 12,
   },
   swapButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: 32,
+    height: 32,
+    borderRadius: 8,
+    backgroundColor: LIGHT_BACKGROUND,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  clearButton: {
+    marginLeft: 12,
+    width: 40,
+    height: 40,
+    borderRadius: 12,
     backgroundColor: LIGHT_BACKGROUND,
     alignItems: 'center',
     justifyContent: 'center',
   },
   searchButton: {
+    marginTop: 8,
+    height: 48,
+    borderRadius: 12,
+    backgroundColor: PRIMARY_COLOR,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: PRIMARY_COLOR,
-    height: 48,
-    borderRadius: 12,
-    marginTop: 8,
     gap: 8,
   },
   searchButtonDisabled: {
-    backgroundColor: BORDER_COLOR,
+    backgroundColor: '#A5B4FC',
   },
   searchButtonText: {
-    color: 'white',
     fontSize: 16,
     fontWeight: '600',
+    color: 'white',
   },
-  quickSearchContainer: {
-    paddingHorizontal: 16,
-    marginBottom: 12,
-  },
-  quickSearchTitle: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: SECONDARY_TEXT,
-    marginBottom: 8,
-  },
-  quickChip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: LIGHT_BACKGROUND,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-    marginRight: 8,
-    gap: 4,
-  },
-  quickChipText: {
-    fontSize: 14,
-    color: '#333',
-  },
-  mapContainer: {
-    flex: 1,
-    backgroundColor: LIGHT_BACKGROUND,
-  },
-  routeInfoContainer: {
-    maxHeight: 300,
+  searchResultsContainer: {
+    maxHeight: 250,
     backgroundColor: 'white',
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    padding: 20,
+    borderRadius: 12,
+    marginHorizontal: 16,
+    marginTop: 8,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: -2 },
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
-    elevation: 8,
+    elevation: 4,
+  },
+  searchResultsList: {
+    maxHeight: 250,
+  },
+  searchingIndicator: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 16,
+    gap: 8,
+  },
+  searchingText: {
+    fontSize: 14,
+    color: SECONDARY_TEXT,
+  },
+  searchResultItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: BORDER_COLOR,
+  },
+  resultIconContainer: {
+    marginRight: 12,
+  },
+  resultTextContainer: {
+    flex: 1,
+    gap: 4,
+  },
+  resultPlaceName: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
+  },
+  resultAddress: {
+    fontSize: 13,
+    color: SECONDARY_TEXT,
+  },
+  bottomSheet: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: 'white',
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 12,
+  },
+  bottomSheetHandle: {
+    alignItems: 'center',
+    paddingVertical: 12,
+  },
+  bottomSheetContent: {
+    paddingHorizontal: 20,
+    paddingBottom: 32,
+  },
+  routeSummary: {
+    gap: 16,
   },
   routeInfoHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 16,
-    gap: 8,
+    gap: 12,
   },
   routeInfoTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
+    flex: 1,
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#1D2A3B',
   },
   routeStats: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: LIGHT_BACKGROUND,
+    justifyContent: 'space-between',
     borderRadius: 12,
+    backgroundColor: LIGHT_BACKGROUND,
     padding: 16,
-    marginBottom: 16,
   },
   statItem: {
     flex: 1,
     alignItems: 'center',
-    gap: 4,
+    gap: 6,
   },
   statValue: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#333',
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#1D2A3B',
   },
   statLabel: {
     fontSize: 12,
@@ -650,140 +1109,168 @@ const styles = StyleSheet.create({
   },
   statDivider: {
     width: 1,
-    height: 40,
+    height: 32,
     backgroundColor: BORDER_COLOR,
   },
-  walkingSections: {
-    marginTop: 8,
-  },
-  sectionTitle: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: SECONDARY_TEXT,
-    marginBottom: 12,
-  },
-  sectionItem: {
-    flexDirection: 'row',
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: LIGHT_BACKGROUND,
-  },
-  sectionIcon: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: LIGHT_BACKGROUND,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 12,
-  },
-  sectionInfo: {
-    flex: 1,
-    gap: 4,
-  },
-  sectionName: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#333',
-  },
-  sectionDetail: {
-    fontSize: 12,
-    color: SECONDARY_TEXT,
-  },
-  emptyState: {
-    position: 'absolute',
-    bottom: 40,
-    left: 0,
-    right: 0,
-    alignItems: 'center',
-    padding: 20,
-  },
-  emptyStateTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: SECONDARY_TEXT,
-    marginTop: 12,
-  },
-  emptyStateSubtitle: {
-    fontSize: 14,
-    color: SECONDARY_TEXT,
-    marginTop: 4,
-    opacity: 0.7,
-  },
-  // 경사도 관련 스타일
-  slopeInfoCard: {
-    backgroundColor: '#FFF9F0',
-    borderRadius: 12,
-    padding: 16,
-    marginTop: 16,
-    borderWidth: 1,
-    borderColor: '#FFE5CC',
-  },
-  slopeHeader: {
+  backButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 12,
     gap: 8,
-  },
-  slopeTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#FF6B6B',
-  },
-  slopeStats: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
     marginBottom: 16,
-    paddingVertical: 12,
-    backgroundColor: 'white',
-    borderRadius: 8,
   },
-  slopeStatItem: {
-    alignItems: 'center',
-    gap: 4,
+  backButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: PRIMARY_COLOR,
   },
-  slopeLabel: {
-    fontSize: 12,
-    color: SECONDARY_TEXT,
-  },
-  slopeValue: {
+  routeDetailsTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
-    color: '#FF6B6B',
+    fontWeight: '700',
+    color: '#1D2A3B',
+    marginBottom: 16,
   },
-  slopeDetails: {
-    gap: 8,
+  legItem: {
+    marginBottom: 16,
+    padding: 16,
+    backgroundColor: LIGHT_BACKGROUND,
+    borderRadius: 12,
   },
-  slopeDetailItem: {
+  legHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'white',
-    padding: 12,
-    borderRadius: 8,
     gap: 12,
   },
-  slopeDetailEmoji: {
-    fontSize: 20,
+  legIconContainer: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  slopeDetailInfo: {
+  legInfo: {
     flex: 1,
     gap: 4,
   },
-  slopeDetailName: {
-    fontSize: 13,
-    fontWeight: '500',
-    color: '#333',
+  legMode: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#1D2A3B',
   },
-  slopeDetailStats: {
+  legRoute: {
+    fontSize: 13,
+    color: SECONDARY_TEXT,
+  },
+  legStats: {
+    alignItems: 'flex-end',
+    gap: 4,
+  },
+  legTime: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: PRIMARY_COLOR,
+  },
+  legDistance: {
     fontSize: 12,
     color: SECONDARY_TEXT,
   },
-  timeDiffPlus: {
-    color: '#FF6B6B',
-    fontWeight: '600',
+  routeInfo: {
+    marginTop: 12,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: BORDER_COLOR,
   },
-  timeDiffMinus: {
-    color: '#4CAF50',
+  routeName: {
+    fontSize: 14,
     fontWeight: '600',
+    color: PRIMARY_COLOR,
+  },
+  // 경로 목록 스타일
+  routeListTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#1D2A3B',
+    marginBottom: 16,
+  },
+  routeOptionItem: {
+    padding: 16,
+    backgroundColor: LIGHT_BACKGROUND,
+    borderRadius: 12,
+    marginBottom: 12,
+    borderWidth: 2,
+    borderColor: 'transparent',
+  },
+  routeOptionItemSelected: {
+    borderColor: PRIMARY_COLOR,
+    backgroundColor: `${PRIMARY_COLOR}10`,
+  },
+  routeOptionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  routeOptionNumber: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#1D2A3B',
+  },
+  routeOptionStats: {
+    flexDirection: 'row',
+    gap: 16,
+    marginBottom: 8,
+  },
+  routeOptionStat: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  routeOptionStatText: {
+    fontSize: 14,
+    color: SECONDARY_TEXT,
+  },
+  routePreview: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  routePreviewItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+    backgroundColor: 'white',
+    borderRadius: 8,
+  },
+  routePreviewText: {
+    fontSize: 12,
+    color: SECONDARY_TEXT,
+  },
+  hideRouteListButton: {
+    marginTop: 8,
+    padding: 16,
+    backgroundColor: PRIMARY_COLOR,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  hideRouteListButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: 'white',
+  },
+  showRouteListButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    marginTop: 12,
+    padding: 12,
+    backgroundColor: LIGHT_BACKGROUND,
+    borderRadius: 12,
+  },
+  showRouteListButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: PRIMARY_COLOR,
   },
 });

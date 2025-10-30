@@ -1,7 +1,11 @@
-﻿import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { useMemo, useState } from 'react';
 import {
+  ActivityIndicator,
+  Alert,
+  FlatList,
   Image,
+  Modal,
   ScrollView,
   StatusBar,
   StyleSheet,
@@ -11,6 +15,17 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import KakaoMapWithRoute from '../../components/KakaoMapWithRoute';
+import { searchPedestrianRoute, RouteResponse } from '../../services/routeService';
+import { 
+  searchPlaces, 
+  PlaceSearchResult, 
+  placeToCoordinates,
+  formatPlaceDisplay 
+} from '../../services/placeSearchService';
+
+// 카카오맵 JS 키 (환경변수로 관리 권장)
+const KAKAO_JS_KEY = '9a91bb579fe8e58cc9e5e25d6a073869';
 
 const TABS = [
   { id: 'recommended', label: '추천', helper: '맞춤 추천' },
@@ -93,15 +108,141 @@ const ROUTES = {
 export default function RoutesScreen() {
   const [activeTab, setActiveTab] = useState('recommended');
   const [start, setStart] = useState('현재 위치');
-  const [destination, setDestination] = useState('도착지를 입력하세요');
+  const [destination, setDestination] = useState('');
   const [filters, setFilters] = useState<string[]>(['강변 뷰']);
+  
+  // 경로 검색 상태
+  const [searching, setSearching] = useState(false);
+  const [routeResult, setRouteResult] = useState<RouteResponse | null>(null);
+  const [showMap, setShowMap] = useState(false);
+
+  // 장소 검색 상태
+  const [startSearchResults, setStartSearchResults] = useState<PlaceSearchResult[]>([]);
+  const [destSearchResults, setDestSearchResults] = useState<PlaceSearchResult[]>([]);
+  const [showStartResults, setShowStartResults] = useState(false);
+  const [showDestResults, setShowDestResults] = useState(false);
+  const [selectedStartCoords, setSelectedStartCoords] = useState({ lat: 37.5665, lng: 126.9780 }); // 서울시청
+  const [selectedDestCoords, setSelectedDestCoords] = useState<{ lat: number; lng: number } | null>(null);
 
   const routes = useMemo(() => ROUTES[activeTab as keyof typeof ROUTES], [activeTab]);
+
+  // 출발지 검색
+  const handleStartSearch = async (text: string) => {
+    setStart(text);
+    
+    if (text.trim().length >= 2) {
+      try {
+        const results = await searchPlaces(text, selectedStartCoords.lng, selectedStartCoords.lat);
+        setStartSearchResults(results);
+        setShowStartResults(results.length > 0);
+      } catch (error) {
+        console.error('출발지 검색 실패:', error);
+        setStartSearchResults([]);
+        setShowStartResults(false);
+      }
+    } else {
+      setStartSearchResults([]);
+      setShowStartResults(false);
+    }
+  };
+
+  // 도착지 검색
+  const handleDestSearch = async (text: string) => {
+    setDestination(text);
+    
+    if (text.trim().length >= 2) {
+      try {
+        const results = await searchPlaces(text, selectedStartCoords.lng, selectedStartCoords.lat);
+        setDestSearchResults(results);
+        setShowDestResults(results.length > 0);
+      } catch (error) {
+        console.error('도착지 검색 실패:', error);
+        setDestSearchResults([]);
+        setShowDestResults(false);
+      }
+    } else {
+      setDestSearchResults([]);
+      setShowDestResults(false);
+    }
+  };
+
+  // 출발지 선택
+  const handleSelectStart = (place: PlaceSearchResult) => {
+    setStart(formatPlaceDisplay(place));
+    const coords = placeToCoordinates(place);
+    setSelectedStartCoords(coords);
+    setShowStartResults(false);
+    setStartSearchResults([]);
+    console.log('✅ 출발지 선택:', { name: place.place_name, coords });
+  };
+
+  // 도착지 선택
+  const handleSelectDest = (place: PlaceSearchResult) => {
+    setDestination(formatPlaceDisplay(place));
+    const coords = placeToCoordinates(place);
+    setSelectedDestCoords(coords);
+    setShowDestResults(false);
+    setDestSearchResults([]);
+    console.log('✅ 도착지 선택:', { name: place.place_name, coords });
+  };
+
+  // 경로 검색 함수
+  const handleSearchRoute = async () => {
+    if (!destination.trim()) {
+      Alert.alert('알림', '도착지를 입력해주세요');
+      return;
+    }
+
+    if (!selectedDestCoords) {
+      Alert.alert('알림', '도착지 목록에서 선택해주세요');
+      return;
+    }
+
+    try {
+      setSearching(true);
+      console.log('🔍 경로 검색 시작:', { start, destination });
+
+      // 티맵 API로 경로 검색
+      const result = await searchPedestrianRoute({
+        startX: selectedStartCoords.lng,
+        startY: selectedStartCoords.lat,
+        endX: selectedDestCoords.lng,
+        endY: selectedDestCoords.lat,
+        startName: start,
+        endName: destination,
+      });
+
+      setRouteResult(result);
+      setShowMap(true);
+
+      console.log('✅ 경로 검색 완료:', result);
+    } catch (error) {
+      console.error('❌ 경로 검색 실패:', error);
+      Alert.alert('오류', '경로를 찾을 수 없습니다');
+    } finally {
+      setSearching(false);
+    }
+  };
 
   const toggleFilter = (item: string) => {
     setFilters((prev) =>
       prev.includes(item) ? prev.filter((value) => value !== item) : [...prev, item]
     );
+  };
+
+  const searchRoute = async () => {
+    // 테스트용 좌표 (서울역 -> 강남역)
+    const startCoords = { x: 126.9706, y: 37.5547 };
+    const endCoords = { x: 127.0276, y: 37.4979 };
+    
+    await getRoute({
+      start_x: startCoords.x,
+      start_y: startCoords.y,
+      end_x: endCoords.x,
+      end_y: endCoords.y,
+    });
+    
+    setShowRouteResult(true);
   };
 
   return (
@@ -128,29 +269,114 @@ export default function RoutesScreen() {
             <Text style={styles.inputLabel}>출발지</Text>
             <View style={styles.inputRow}>
               <MaterialIcons name="my-location" size={18} color="#304FFE" />
-              <TextInput value={start} onChangeText={setStart} style={styles.inputField} />
-              <MaterialIcons name="refresh" size={18} color="#9AA3B0" />
+              <TextInput 
+                value={start} 
+                onChangeText={handleStartSearch}
+                onFocus={() => setShowStartResults(startSearchResults.length > 0)}
+                placeholder="출발지를 입력하세요"
+                style={styles.inputField} 
+              />
+              {start.length > 0 && (
+                <TouchableOpacity onPress={() => {
+                  setStart('');
+                  setStartSearchResults([]);
+                  setShowStartResults(false);
+                }}>
+                  <MaterialIcons name="clear" size={18} color="#9AA3B0" />
+                </TouchableOpacity>
+              )}
             </View>
+            {/* 출발지 검색 결과 */}
+            {showStartResults && (
+              <View style={styles.searchResults}>
+                <FlatList
+                  data={startSearchResults}
+                  keyExtractor={(item) => item.id}
+                  renderItem={({ item }) => (
+                    <TouchableOpacity
+                      style={styles.searchResultItem}
+                      onPress={() => handleSelectStart(item)}
+                    >
+                      <MaterialIcons name="place" size={20} color="#304FFE" />
+                      <View style={styles.searchResultText}>
+                        <Text style={styles.searchResultName}>{item.place_name}</Text>
+                        <Text style={styles.searchResultAddress}>{item.address_name}</Text>
+                      </View>
+                    </TouchableOpacity>
+                  )}
+                  scrollEnabled={false}
+                  nestedScrollEnabled={true}
+                />
+              </View>
+            )}
           </View>
           <View style={styles.separator} />
           <View style={styles.inputGroup}>
             <Text style={styles.inputLabel}>도착지</Text>
             <View style={styles.inputRow}>
               <MaterialIcons name="flag" size={18} color="#FF7043" />
-              <TextInput value={destination} onChangeText={setDestination} style={styles.inputField} />
-              <MaterialIcons name="bookmark" size={18} color="#9AA3B0" />
+              <TextInput 
+                value={destination} 
+                onChangeText={handleDestSearch}
+                onFocus={() => setShowDestResults(destSearchResults.length > 0)}
+                placeholder="도착지를 입력하세요"
+                style={styles.inputField} 
+              />
+              {destination.length > 0 && (
+                <TouchableOpacity onPress={() => {
+                  setDestination('');
+                  setDestSearchResults([]);
+                  setShowDestResults(false);
+                  setSelectedDestCoords(null);
+                }}>
+                  <MaterialIcons name="clear" size={18} color="#9AA3B0" />
+                </TouchableOpacity>
+              )}
             </View>
+            {/* 도착지 검색 결과 */}
+            {showDestResults && (
+              <View style={styles.searchResults}>
+                <FlatList
+                  data={destSearchResults}
+                  keyExtractor={(item) => item.id}
+                  renderItem={({ item }) => (
+                    <TouchableOpacity
+                      style={styles.searchResultItem}
+                      onPress={() => handleSelectDest(item)}
+                    >
+                      <MaterialIcons name="place" size={20} color="#FF7043" />
+                      <View style={styles.searchResultText}>
+                        <Text style={styles.searchResultName}>{item.place_name}</Text>
+                        <Text style={styles.searchResultAddress}>{item.address_name}</Text>
+                      </View>
+                    </TouchableOpacity>
+                  )}
+                  scrollEnabled={false}
+                  nestedScrollEnabled={true}
+                />
+              </View>
+            )}
           </View>
           <View style={styles.suggestionRow}>
             {SUGGESTIONS.map((value) => (
-              <TouchableOpacity key={value} style={styles.suggestionChip} onPress={() => setDestination(value)}>
+              <TouchableOpacity key={value} style={styles.suggestionChip} onPress={() => handleDestSearch(value)}>
                 <Text style={styles.suggestionText}>{value}</Text>
               </TouchableOpacity>
             ))}
           </View>
-          <TouchableOpacity style={styles.ctaButton}>
-            <MaterialIcons name="directions" size={18} color="#FFFFFF" />
-            <Text style={styles.ctaText}>경로 검색</Text>
+          <TouchableOpacity 
+            style={styles.ctaButton}
+            onPress={handleSearchRoute}
+            disabled={searching}
+          >
+            {searching ? (
+              <ActivityIndicator size="small" color="#FFFFFF" />
+            ) : (
+              <>
+                <MaterialIcons name="directions" size={18} color="#FFFFFF" />
+                <Text style={styles.ctaText}>경로 검색</Text>
+              </>
+            )}
           </TouchableOpacity>
         </View>
 
@@ -184,6 +410,26 @@ export default function RoutesScreen() {
             );
           })}
         </View>
+
+        {/* 경로 검색 결과 표시 */}
+        {showRouteResult && (
+          <View style={styles.routeResultContainer}>
+            <View style={styles.resultHeader}>
+              <Text style={styles.resultTitle}>검색 결과</Text>
+              <TouchableOpacity 
+                onPress={() => setShowRouteResult(false)}
+                style={styles.closeButton}
+              >
+                <MaterialIcons name="close" size={20} color="#667085" />
+              </TouchableOpacity>
+            </View>
+            {routeError ? (
+              <Text style={styles.errorText}>❌ 오류: {routeError}</Text>
+            ) : (
+              <RouteDetailComponent routeData={routeData} />
+            )}
+          </View>
+        )}
 
         <View style={styles.routeList}>
           {routes.map((route) => (
@@ -223,6 +469,43 @@ export default function RoutesScreen() {
 
         <View style={{ height: 40 }} />
       </ScrollView>
+
+      {/* 경로 결과 지도 모달 */}
+      <Modal
+        visible={showMap}
+        animationType="slide"
+        onRequestClose={() => setShowMap(false)}
+      >
+        <SafeAreaView style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
+          <View style={styles.mapHeader}>
+            <TouchableOpacity onPress={() => setShowMap(false)} style={styles.mapCloseButton}>
+              <MaterialIcons name="close" size={24} color="#1A1F2E" />
+            </TouchableOpacity>
+            <View style={styles.mapHeaderInfo}>
+              <Text style={styles.mapHeaderTitle}>경로 안내</Text>
+              {routeResult && (
+                <Text style={styles.mapHeaderSubtitle}>
+                  {(routeResult.totalDistance / 1000).toFixed(2)}km · {Math.round(routeResult.totalTime / 60)}분
+                </Text>
+              )}
+            </View>
+            <TouchableOpacity style={styles.mapStartButton}>
+              <Text style={styles.mapStartText}>시작</Text>
+            </TouchableOpacity>
+          </View>
+          
+          {routeResult && (
+            <KakaoMapWithRoute
+              jsKey={KAKAO_JS_KEY}
+              startLat={37.5665}
+              startLng={126.9780}
+              endLat={37.5511}
+              endLng={126.9882}
+              paths={routeResult.paths}
+            />
+          )}
+        </SafeAreaView>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -296,6 +579,40 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 15,
     color: '#1C1E21',
+  },
+  searchResults: {
+    marginTop: 8,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    overflow: 'hidden',
+    maxHeight: 250,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+  },
+  searchResultItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F0F0F0',
+  },
+  searchResultText: {
+    flex: 1,
+    gap: 4,
+  },
+  searchResultName: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#1C1E21',
+  },
+  searchResultAddress: {
+    fontSize: 12,
+    color: '#667085',
   },
   separator: {
     height: 1,
@@ -462,5 +779,43 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     color: '#FFFFFF',
+  },
+  // 지도 모달 스타일
+  mapHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E7EB',
+  },
+  mapCloseButton: {
+    padding: 8,
+  },
+  mapHeaderInfo: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  mapHeaderTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#1A1F2E',
+  },
+  mapHeaderSubtitle: {
+    fontSize: 14,
+    color: '#667085',
+    marginTop: 2,
+  },
+  mapStartButton: {
+    backgroundColor: '#304FFE',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 12,
+  },
+  mapStartText: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '600',
   },
 });

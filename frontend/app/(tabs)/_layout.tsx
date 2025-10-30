@@ -1,4 +1,4 @@
-﻿import { Tabs } from 'expo-router';
+import { Tabs } from 'expo-router';
 import React from 'react';
 
 import { HapticTab } from '@/components/haptic-tab';
@@ -12,7 +12,13 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
+        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tabIconSelected,
+        tabBarInactiveTintColor: Colors[colorScheme ?? 'light'].tabIconDefault,
+        tabBarStyle: {
+          backgroundColor: Colors[colorScheme ?? 'light'].background,
+          borderTopColor: Colors[colorScheme ?? 'light'].tabIconDefault,
+          borderTopWidth: 0.5,
+        },
         headerShown: false,
         tabBarButton: HapticTab,
         tabBarLabelStyle: { fontSize: 12, fontWeight: '600' },
@@ -44,6 +50,20 @@ export default function TabLayout() {
         options={{
           title: 'API',
           tabBarIcon: ({ color }) => <MaterialIcons size={26} name="api" color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="weather"
+        options={{
+          title: '날씨',
+          tabBarIcon: ({ color }) => <MaterialIcons size={26} name="wb-sunny" color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="health-connect"
+        options={{
+          title: 'Health',
+          tabBarIcon: ({ color }) => <MaterialIcons size={26} name="favorite" color={color} />,
         }}
       />
     </Tabs>

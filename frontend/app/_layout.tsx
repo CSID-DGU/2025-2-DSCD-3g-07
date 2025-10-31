@@ -6,6 +6,7 @@ import React, { useEffect } from 'react';
 import 'react-native-reanimated';
 
 import { Config } from '../config';
+import { WeatherProvider } from '../contexts/WeatherContext';
 
 export const unstable_settings = {
   anchor: '(tabs)',
@@ -26,17 +27,19 @@ export default function RootLayout() {
         // 실패해도 앱은 계속 실행
       }
     };
-    
+
     initializeApi().catch(console.error);
   }, []);
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
-      </Stack>
-      <StatusBar style="auto" />
-    </GestureHandlerRootView>
+    <WeatherProvider>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <Stack>
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
+        </Stack>
+        <StatusBar style="auto" />
+      </GestureHandlerRootView>
+    </WeatherProvider>
   );
 }

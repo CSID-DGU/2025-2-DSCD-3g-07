@@ -167,6 +167,11 @@ export interface RouteElevationAnalysis {
   total_original_walk_time: number;
   total_adjusted_walk_time: number;
   total_route_time_adjustment: number;
+  // 횡단보도 정보
+  crosswalk_count?: number;
+  crosswalk_wait_time?: number;
+  total_time_with_crosswalk?: number;
+  // 기타 정보
   sampled_coords_count?: number;
   original_coords_count?: number;
   user_speed_mps?: number;          // 사용자 평균 속도

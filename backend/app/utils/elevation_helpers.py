@@ -35,6 +35,50 @@ GOOGLE_ELEVATION_API_URL = "https://maps.googleapis.com/maps/api/elevation/json"
 MAX_COORDINATES_PER_REQUEST = 512  # Google API 제한
 
 
+def count_crosswalks(itinerary: Dict) -> int:
+    """
+    Tmap API 응답에서 횡단보도 개수를 카운팅
+    
+    Args:
+        itinerary: Tmap API의 itinerary 데이터 (전체 경로)
+    
+    Returns:
+        경로 상의 총 횡단보도 개수
+        
+    예시:
+        >>> itinerary = {
+        ...     "legs": [
+        ...         {
+        ...             "mode": "WALK",
+        ...             "steps": [
+        ...                 {"description": "망원역 2번출구에서 좌측 횡단보도 후 17m 이동"},
+        ...                 {"description": "횡단보도 후 26m 이동"}
+        ...             ]
+        ...         }
+        ...     ]
+        ... }
+        >>> count_crosswalks(itinerary)
+        2
+    """
+    total_count = 0
+    
+    # 모든 leg 순회
+    legs = itinerary.get('legs', [])
+    for leg in legs:
+        # WALK 모드만 검사
+        if leg.get('mode') != 'WALK':
+            continue
+        
+        # steps의 description에서 "횡단보도" 키워드 검색
+        steps = leg.get('steps', [])
+        for step in steps:
+            description = step.get('description', '')
+            # 한 description에 여러 개의 횡단보도가 있을 수 있음
+            total_count += description.count('횡단보도')
+    
+    return total_count
+
+
 def count_total_coordinates(walk_legs: List[Dict]) -> int:
     """
     전체 보행 구간의 좌표 수를 계산
@@ -469,7 +513,8 @@ async def analyze_route_elevation(
     itinerary: Dict, 
     api_key: Optional[str] = None,
     weather_data: Optional[Dict] = None,
-    user_speed_mps: Optional[float] = None
+    user_speed_mps: Optional[float] = None,
+    crosswalk_count: int = 0
 ) -> Dict:
     """
     전체 경로의 경사도를 분석하고 시간을 보정 (통합 계산)
@@ -483,6 +528,7 @@ async def analyze_route_elevation(
             - rain_mm_per_h: 시간당 강수량 (mm/h)
             - snow_cm_per_h: 시간당 신적설 (cm/h)
         user_speed_mps: 사용자 평균 보행속도 (m/s, Health Connect)
+        crosswalk_count: 경로 상 횡단보도 개수 (기본값: 0)
     
     Returns:
         경사도 분석 결과 및 보정된 시간 정보 (모든 요인 통합)
@@ -495,6 +541,7 @@ async def analyze_route_elevation(
            - × 사용자 속도 계수 (Health Connect)
            - × 경사도 계수 (Tobler's Function)
            - × 날씨 계수 (WeatherSpeedModel)
+        4. 횡단보도 대기 시간 추가 (개당 116초, 중앙값 기준)
     """
     if api_key is None:
         api_key = os.getenv('GOOGLE_ELEVATION_API_KEY')
@@ -505,8 +552,27 @@ async def analyze_route_elevation(
     # 통합 계산기 초기화
     integrator = get_integrator()
     
-    # WALK 모드인 leg만 추출
-    walk_legs = [leg for leg in itinerary.get('legs', []) if leg.get('mode') == 'WALK']
+    # 모든 leg 가져오기
+    all_legs = itinerary.get('legs', [])
+    
+    # WALK 모드인 leg만 추출하되, 지하철 환승 구간은 제외
+    walk_legs = []
+    for i, leg in enumerate(all_legs):
+        if leg.get('mode') == 'WALK':
+            # 이전 leg과 다음 leg 확인
+            prev_leg = all_legs[i - 1] if i > 0 else None
+            next_leg = all_legs[i + 1] if i < len(all_legs) - 1 else None
+            
+            # 지하철 환승 구간 판단: 앞뒤가 모두 지하철이면 제외
+            is_subway_transfer = (
+                prev_leg and prev_leg.get('mode') == 'SUBWAY' and
+                next_leg and next_leg.get('mode') == 'SUBWAY'
+            )
+            
+            if not is_subway_transfer:
+                walk_legs.append(leg)
+            else:
+                print(f"[경사도 분석] 지하철 환승 구간 제외: {leg.get('start', {}).get('name', '')} → {leg.get('end', {}).get('name', '')} (거리: {leg.get('distance', 0)}m)")
     
     if not walk_legs:
         return {
@@ -653,6 +719,9 @@ async def analyze_route_elevation(
     
     original_walk_time = sum(leg.get('sectionTime', 0) for leg in walk_legs)
     
+    # 횡단보도 대기 시간 계산 (중앙값 기준: 116초/개)
+    crosswalk_wait_time = crosswalk_count * 116
+    
     # 전체 평균 계수 계산
     if analysis:
         avg_user_factor = sum(a['user_speed_factor'] for a in analysis) / len(analysis)
@@ -672,6 +741,8 @@ async def analyze_route_elevation(
     print(f"\n[📊 최종 결과]")
     print(f"  Tmap 기준 시간: {original_walk_time}초")
     print(f"  최종 보정 시간: {total_adjusted_time}초")
+    print(f"  횡단보도 대기 시간: {crosswalk_wait_time}초 ({crosswalk_count}개 × 116초)")
+    print(f"  전체 시간: {total_adjusted_time + crosswalk_wait_time}초")
     print(f"  시간 차이: {total_adjusted_time - original_walk_time:+}초")
     print(f"  평균 계수:")
     print(f"    - 사용자 속도: {avg_user_factor:.3f}")
@@ -684,6 +755,10 @@ async def analyze_route_elevation(
         'total_original_walk_time': original_walk_time,
         'total_adjusted_walk_time': total_adjusted_time,
         'total_route_time_adjustment': total_adjusted_time - original_walk_time,
+        # 횡단보도 정보
+        'crosswalk_count': crosswalk_count,
+        'crosswalk_wait_time': crosswalk_wait_time,
+        'total_time_with_crosswalk': total_adjusted_time + crosswalk_wait_time,
         # 통합 계수 정보
         'factors': {
             'user_speed_factor': avg_user_factor,

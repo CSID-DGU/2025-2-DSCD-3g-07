@@ -28,6 +28,8 @@ import { analyzeRouteSlope } from '@/services/elevationService';
 import type { Itinerary, RouteElevationAnalysis, Leg } from '@/types/api';
 import { searchPlaces, type PlaceSearchResult } from '@/services/placeSearchService';
 import type { RoutePath } from '@/services/routeService';
+import { useWeatherContext } from '@/contexts/WeatherContext';
+import { healthConnectService } from '@/services/healthConnect';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 const PRIMARY_COLOR = '#2C6DE7';
@@ -62,7 +64,7 @@ const formatMinutes = (seconds: number): string => {
   }
   const minutes = Math.floor(seconds / 60);
   const remainingSeconds = seconds % 60;
-  
+
   if (remainingSeconds === 0) {
     return `${minutes}분`;
   }
@@ -91,7 +93,7 @@ const extractRoutePath = (itinerary: Itinerary): RoutePath[] => {
 
   itinerary.legs.forEach((leg, legIndex) => {
     console.log(`  Leg ${legIndex}: ${leg.mode}, steps: ${leg.steps?.length || 0}`);
-    
+
     if (leg.steps && leg.steps.length > 0) {
       leg.steps.forEach((step, stepIndex) => {
         if (!step.linestring) {
@@ -106,10 +108,10 @@ const extractRoutePath = (itinerary: Itinerary): RoutePath[] => {
           if (!pair) return;
           const parts = pair.split(',');
           if (parts.length !== 2) return;
-          
+
           const [lngStr, latStr] = parts;
           if (!lngStr || !latStr) return;
-          
+
           const lat = parseFloat(latStr);
           const lng = parseFloat(lngStr);
           pushCoord(lat, lng);
@@ -173,12 +175,16 @@ const getModeLabel = (mode: string) => {
 };
 
 export default function HomeScreen() {
+  // 날씨 Context 사용
+  const { weatherData } = useWeatherContext();
+
   // 기본 상태
   const [startLocation, setStartLocation] = useState<LocationData | null>(null);
   const [endLocation, setEndLocation] = useState<LocationData | null>(null);
   const [routePath, setRoutePath] = useState<RoutePath[]>([]);
   const [routeInfo, setRouteInfo] = useState<RouteInfo | null>(null);
   const [loading, setLoading] = useState(false);
+  const [walkingSpeedCase1, setWalkingSpeedCase1] = useState<number | null>(null);
 
   // 경로 옵션 관련 상태 (여러 경로)
   const [routeOptions, setRouteOptions] = useState<Itinerary[]>([]);
@@ -267,6 +273,26 @@ export default function HomeScreen() {
       },
     })
   ).current;
+
+  // Health Connect에서 보행 속도 가져오기
+  useEffect(() => {
+    const fetchWalkingSpeed = async () => {
+      try {
+        // 전체 기간 평균 속도 사용 (더 안정적)
+        const allTimeSpeed = await healthConnectService.getAllTimeAverageSpeeds();
+        if (allTimeSpeed.speedCase1 && allTimeSpeed.speedCase1 > 0) {
+          // km/h를 m/s로 변환
+          const speedMs = allTimeSpeed.speedCase1 / 3.6;
+          setWalkingSpeedCase1(speedMs);
+          console.log(`✅ 보행 속도 로드: ${allTimeSpeed.speedCase1.toFixed(2)} km/h (${speedMs.toFixed(3)} m/s)`);
+        }
+      } catch (error) {
+        console.warn('⚠️ 보행 속도 데이터 로드 실패:', error);
+      }
+    };
+
+    fetchWalkingSpeed();
+  }, []);
 
   // 현재 위치 가져오기
   const getCurrentLocation = useCallback(async () => {
@@ -419,7 +445,7 @@ export default function HomeScreen() {
       const firstItinerary = itineraries[0];
       console.log('🗺️ First itinerary structure:', JSON.stringify(firstItinerary, null, 2).substring(0, 1000));
       console.log('🗺️ Processing itinerary with', firstItinerary.legs?.length || 0, 'legs');
-      
+
       // 각 leg의 구조 상세 로깅
       firstItinerary.legs?.forEach((leg: any, idx: number) => {
         console.log(`  Leg ${idx}:`);
@@ -438,7 +464,7 @@ export default function HomeScreen() {
           });
         }
       });
-      
+
       const path = extractRoutePath(firstItinerary);
       console.log('✅ Route path extracted:', path.length, 'coordinates');
       if (path.length > 0) {
@@ -453,7 +479,22 @@ export default function HomeScreen() {
       // 경사도 분석 (에러 시 무시)
       let slopeAnalysis: RouteElevationAnalysis | null = null;
       try {
-        slopeAnalysis = await analyzeRouteSlope(firstItinerary);
+        // 사용자 속도와 날씨 데이터를 함께 전달
+        slopeAnalysis = await analyzeRouteSlope(
+          firstItinerary,
+          undefined,                    // apiKey
+          walkingSpeedCase1 || undefined, // walkingSpeed (m/s) - Health Connect Case 1
+          weatherData || undefined      // 날씨 데이터
+        );
+
+        const logParts = ['✅ 경사도 분석 완료'];
+        if (walkingSpeedCase1) {
+          logParts.push(`사용자 속도: ${(walkingSpeedCase1 * 3.6).toFixed(2)} km/h`);
+        }
+        if (weatherData) {
+          logParts.push(`날씨 포함`);
+        }
+        console.log(logParts.join(' - '));
       } catch (error) {
         console.warn('⚠️ 경사도 분석 실패 (경로는 정상 표시):', error);
       }
@@ -490,8 +531,10 @@ export default function HomeScreen() {
   };
 
   // 경로 선택 함수
-  const handleSelectRoute = useCallback((index: number) => {
+  const handleSelectRoute = useCallback(async (index: number) => {
     const selected = routeOptions[index];
+    if (!selected) return;
+
     setSelectedRouteIndex(index);
 
     const path = extractRoutePath(selected);
@@ -500,12 +543,26 @@ export default function HomeScreen() {
     const totalTimeSec = selected.totalTime || 0;
     const totalWalkTimeSec = selected.totalWalkTime || 0;
 
+    // 선택한 경로에 대해서도 경사도 분석 수행
+    let slopeAnalysis: RouteElevationAnalysis | null = null;
+    try {
+      slopeAnalysis = await analyzeRouteSlope(
+        selected,
+        undefined, // apiKey
+        walkingSpeedCase1 || undefined,
+        weatherData || undefined
+      );
+      console.log('✅ 선택한 경로 경사도 분석 완료:', slopeAnalysis);
+    } catch (error) {
+      console.error('❌ 경사도 분석 실패:', error);
+    }
+
     setRouteInfo({
       totalTime: totalTimeSec,
       totalWalkTime: totalWalkTimeSec,
       walkRatio: totalTimeSec > 0 ? (totalWalkTimeSec / totalTimeSec) * 100 : 0,
-      personalizedWalkTime: totalWalkTimeSec,
-      slopeAnalysis: null,
+      personalizedWalkTime: slopeAnalysis?.total_adjusted_walk_time || totalWalkTimeSec,
+      slopeAnalysis,
       rawItinerary: selected,
       totalDistance: selected.totalDistance || 0,
       legs: selected.legs || [],
@@ -513,7 +570,7 @@ export default function HomeScreen() {
 
     setShowRouteList(false);
     setShowRouteDetails(false);
-  }, [routeOptions]);
+  }, [routeOptions, weatherData, walkingSpeedCase1]);
 
   const animatedSearchBarStyle = useAnimatedStyle(() => {
     return {
@@ -530,7 +587,7 @@ export default function HomeScreen() {
   return (
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" />
-      
+
       {/* 지도 (전체 화면) */}
       <View style={styles.mapContainer}>
         <KakaoMapWithRoute
@@ -568,7 +625,7 @@ export default function HomeScreen() {
           <View style={styles.dragHandle}>
             <View style={styles.dragBar} />
           </View>
-          
+
           <View style={styles.searchContainer}>
             {/* 출발지 */}
             <View style={styles.searchRow}>
@@ -795,6 +852,224 @@ export default function HomeScreen() {
                     <Text style={styles.statLabel}>도보 시간</Text>
                   </View>
                 </View>
+
+                {/* 사용자 속도 및 날씨 정보 */}
+                {(walkingSpeedCase1 || weatherData) && (
+                  <View style={styles.additionalInfoContainer}>
+                    {walkingSpeedCase1 && (
+                      <View style={styles.infoItem}>
+                        <Text style={styles.infoIcon}>🚶</Text>
+                        <View style={styles.infoTextContainer}>
+                          <Text style={styles.infoText}>
+                            사용자 속도: {(walkingSpeedCase1 * 3.6).toFixed(2)} km/h
+                          </Text>
+                          {routeInfo.slopeAnalysis?.factors?.user_speed_factor && (
+                            <Text style={[
+                              styles.infoImpact,
+                              routeInfo.slopeAnalysis.factors.user_speed_factor > 1
+                                ? styles.infoImpactIncrease
+                                : styles.infoImpactDecrease
+                            ]}>
+                              {(() => {
+                                const factor = routeInfo.slopeAnalysis.factors.user_speed_factor;
+                                // 원본 도보 시간에 사용자 속도 계수만 적용한 시간 계산
+                                const originalTime = routeInfo.slopeAnalysis.total_original_walk_time;
+                                const timeWithUserSpeed = originalTime * factor;
+                                const impact = Math.round(timeWithUserSpeed - originalTime);
+                                const sign = impact > 0 ? '+' : impact < 0 ? '-' : '';
+                                return `${sign}${Math.floor(Math.abs(impact) / 60)}분 ${Math.abs(impact) % 60}초`;
+                              })()}
+                            </Text>
+                          )}
+                        </View>
+                      </View>
+                    )}
+                    {weatherData && (
+                      <View style={styles.infoItem}>
+                        <Text style={styles.infoIcon}>🌤️</Text>
+                        <View style={styles.infoTextContainer}>
+                          <Text style={styles.infoText}>
+                            날씨: {weatherData.temp_c}°C
+                          </Text>
+                          {routeInfo.slopeAnalysis?.factors?.weather_factor && (
+                            <Text style={[
+                              styles.infoImpact,
+                              routeInfo.slopeAnalysis.factors.weather_factor > 1
+                                ? styles.infoImpactIncrease
+                                : styles.infoImpactDecrease
+                            ]}>
+                              {(() => {
+                                const factor = routeInfo.slopeAnalysis.factors.weather_factor;
+                                // 원본 도보 시간에 날씨 계수만 적용한 시간 계산
+                                const originalTime = routeInfo.slopeAnalysis.total_original_walk_time;
+                                const timeWithWeather = originalTime * factor;
+                                const impact = Math.round(timeWithWeather - originalTime);
+                                const sign = impact > 0 ? '+' : impact < 0 ? '-' : '';
+                                return `${sign}${Math.floor(Math.abs(impact) / 60)}분 ${Math.abs(impact) % 60}초`;
+                              })()}
+                            </Text>
+                          )}
+                        </View>
+                      </View>
+                    )}
+                  </View>
+                )}
+
+                {/* 경사도 분석 정보 */}
+                {(() => {
+                  const hasSlope = routeInfo.slopeAnalysis &&
+                    !routeInfo.slopeAnalysis.error &&
+                    routeInfo.slopeAnalysis.walk_legs_analysis &&
+                    routeInfo.slopeAnalysis.walk_legs_analysis.length > 0;
+
+                  console.log('🔍 [경사도 표시 조건]', {
+                    'slopeAnalysis 존재': !!routeInfo.slopeAnalysis,
+                    'error 없음': !routeInfo.slopeAnalysis?.error,
+                    'walk_legs_analysis 존재': !!routeInfo.slopeAnalysis?.walk_legs_analysis,
+                    'walk_legs_analysis 길이': routeInfo.slopeAnalysis?.walk_legs_analysis?.length,
+                    '최종 표시 여부': hasSlope
+                  });
+
+                  return null;
+                })()}
+                {routeInfo.slopeAnalysis &&
+                  !routeInfo.slopeAnalysis.error &&
+                  routeInfo.slopeAnalysis.walk_legs_analysis &&
+                  routeInfo.slopeAnalysis.walk_legs_analysis.length > 0 && (
+                    <View style={styles.slopeAnalysisContainer}>
+                      <View style={styles.slopeAnalysisHeader}>
+                        <MaterialIcons name="terrain" size={18} color="#FF6B6B" />
+                        <Text style={styles.slopeAnalysisTitle}>경사도 분석</Text>
+                      </View>
+
+                      <View style={styles.slopeStatsRow}>
+                        <View style={styles.slopeStatItem}>
+                          <Text style={styles.slopeStatLabel}>평균 경사</Text>
+                          <Text style={styles.slopeStatValue}>
+                            {(() => {
+                              const totalDistance = routeInfo.slopeAnalysis.walk_legs_analysis.reduce(
+                                (sum, leg) => sum + leg.distance,
+                                0
+                              );
+                              const weightedSum = routeInfo.slopeAnalysis.walk_legs_analysis.reduce(
+                                (sum, leg) => sum + (leg.avg_slope * leg.distance),
+                                0
+                              );
+                              return (weightedSum / totalDistance).toFixed(1);
+                            })()}%
+                          </Text>
+                        </View>
+
+                        <View style={styles.slopeStatItem}>
+                          <Text style={styles.slopeStatLabel}>보정 시간</Text>
+                          <Text style={[
+                            styles.slopeStatValue,
+                            routeInfo.slopeAnalysis.factors?.slope_factor &&
+                              routeInfo.slopeAnalysis.factors.slope_factor < 1
+                              ? styles.slopeStatValueIncrease
+                              : styles.slopeStatValueDecrease
+                          ]}>
+                            {(() => {
+                              if (!routeInfo.slopeAnalysis.factors?.slope_factor) {
+                                return '0분 0초';
+                              }
+                              const factor = routeInfo.slopeAnalysis.factors.slope_factor;
+                              const originalTime = routeInfo.slopeAnalysis.total_original_walk_time;
+                              const timeWithSlope = originalTime * factor;
+                              const impact = Math.round(timeWithSlope - originalTime);
+                              const sign = impact > 0 ? '+' : impact < 0 ? '-' : '';
+                              return `${sign}${Math.floor(Math.abs(impact) / 60)}분 ${Math.abs(impact) % 60}초`;
+                            })()}
+                          </Text>
+                        </View>
+
+                        <View style={styles.slopeStatItem}>
+                          <Text style={styles.slopeStatLabel}>실제 예상</Text>
+                          <Text style={styles.slopeStatValue}>
+                            {Math.floor(routeInfo.slopeAnalysis.total_adjusted_walk_time / 60)}분
+                          </Text>
+                        </View>
+                      </View>
+
+                      {/* 경사도 경고 */}
+                      {(() => {
+                        const totalDistance = routeInfo.slopeAnalysis.walk_legs_analysis.reduce(
+                          (sum, leg) => sum + leg.distance,
+                          0
+                        );
+                        const weightedSum = routeInfo.slopeAnalysis.walk_legs_analysis.reduce(
+                          (sum, leg) => sum + (leg.avg_slope * leg.distance),
+                          0
+                        );
+                        const avgSlope = weightedSum / totalDistance;
+                        const timeAdjustment = routeInfo.slopeAnalysis.total_route_time_adjustment;
+
+                        // 모든 구간의 경사도 중 절대값 40% 이상인 경우 체크
+                        const hasExtremeSteepSlope = routeInfo.slopeAnalysis.walk_legs_analysis.some(leg =>
+                          leg.segments?.some(segment => Math.abs(segment.slope) >= 40) ||
+                          Math.abs(leg.max_slope) >= 40 ||
+                          Math.abs(leg.min_slope) >= 40
+                        );
+
+                        // 내리막인데 시간이 증가한 경우
+                        const hasDownhillTimeIncrease = avgSlope < -1 && timeAdjustment > 30;
+
+                        const warnings = [];
+
+                        // 엘리베이터 필요 (40% 이상 극단 경사)
+                        if (hasExtremeSteepSlope) {
+                          warnings.push(
+                            <View key="extreme" style={styles.slopeWarning}>
+                              <MaterialIcons name="warning" size={16} color="#F44336" />
+                              <Text style={styles.slopeWarningText}>
+                                일부 구간에 경사도가 40% 이상인 급경사가 있습니다. 엘리베이터나 에스컬레이터 이용을 권장합니다.
+                              </Text>
+                            </View>
+                          );
+                        }
+
+                        // 평균 경사가 음수(내리막)인데 시간이 증가한 경우
+                        if (hasDownhillTimeIncrease) {
+                          warnings.push(
+                            <View key="downhill" style={styles.slopeWarning}>
+                              <MaterialIcons name="info-outline" size={16} color="#FF9800" />
+                              <Text style={styles.slopeWarningText}>
+                                일부 구간에 급경사가 있어 안전한 보행을 고려해 시간이 증가했습니다.
+                                계단이나 승강기 이용을 권장드립니다.
+                              </Text>
+                            </View>
+                          );
+                        }
+
+                        return warnings.length > 0 ? <>{warnings}</> : null;
+                      })()}
+                    </View>
+                  )}
+
+                {/* 횡단보도 정보 */}
+                {routeInfo.slopeAnalysis?.crosswalk_count !== undefined &&
+                  routeInfo.slopeAnalysis.crosswalk_count > 0 && (
+                    <View style={styles.crosswalkInfoContainer}>
+                      <View style={styles.crosswalkHeader}>
+                        <Text style={styles.crosswalkIcon}>🚦</Text>
+                        <Text style={styles.crosswalkTitle}>
+                          횡단보도: {routeInfo.slopeAnalysis.crosswalk_count}개
+                        </Text>
+                        {routeInfo.slopeAnalysis.crosswalk_wait_time && (
+                          <Text style={styles.crosswalkWaitTime}>
+                            (+{Math.floor(routeInfo.slopeAnalysis.crosswalk_wait_time / 60)}분{' '}
+                            {routeInfo.slopeAnalysis.crosswalk_wait_time % 60}초 대기)
+                          </Text>
+                        )}
+                      </View>
+                      {routeInfo.slopeAnalysis.total_time_with_crosswalk && (
+                        <Text style={styles.crosswalkTotalTime}>
+                          횡단보도 포함 총 시간: {Math.floor(routeInfo.slopeAnalysis.total_time_with_crosswalk / 60)}분{' '}
+                          {routeInfo.slopeAnalysis.total_time_with_crosswalk % 60}초
+                        </Text>
+                      )}
+                    </View>
+                  )}
 
                 {/* 경로 목록 다시 보기 버튼 */}
                 {routeOptions.length > 1 && (
@@ -1272,5 +1547,132 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     color: PRIMARY_COLOR,
+  },
+  additionalInfoContainer: {
+    marginTop: 12,
+    padding: 12,
+    backgroundColor: LIGHT_BACKGROUND,
+    borderRadius: 12,
+    gap: 8,
+  },
+  infoItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  infoIcon: {
+    fontSize: 16,
+  },
+  infoTextContainer: {
+    flex: 1,
+  },
+  infoText: {
+    fontSize: 13,
+    color: SECONDARY_TEXT,
+  },
+  infoImpact: {
+    fontSize: 12,
+    fontWeight: '600',
+    marginTop: 2,
+  },
+  infoImpactIncrease: {
+    color: '#F44336',
+  },
+  infoImpactDecrease: {
+    color: '#4CAF50',
+  },
+  // 경사도 분석 스타일
+  slopeAnalysisContainer: {
+    marginTop: 12,
+    padding: 16,
+    backgroundColor: 'white',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#FFE0E0',
+  },
+  slopeAnalysisHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 12,
+  },
+  slopeAnalysisTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#FF6B6B',
+  },
+  slopeStatsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: 8,
+  },
+  slopeStatItem: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  slopeStatLabel: {
+    fontSize: 12,
+    color: '#8E8E93',
+    marginBottom: 4,
+  },
+  slopeStatValue: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1C1E21',
+  },
+  slopeStatValueIncrease: {
+    color: '#F44336',
+  },
+  slopeStatValueDecrease: {
+    color: '#4CAF50',
+  },
+  slopeWarning: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFF3E0',
+    padding: 10,
+    borderRadius: 8,
+    marginTop: 8,
+    gap: 8,
+  },
+  slopeWarningText: {
+    flex: 1,
+    fontSize: 12,
+    color: '#E65100',
+    lineHeight: 18,
+  },
+  // 횡단보도 정보 스타일
+  crosswalkInfoContainer: {
+    marginTop: 12,
+    padding: 16,
+    backgroundColor: '#FFF3E0',
+    borderRadius: 12,
+    borderLeftWidth: 4,
+    borderLeftColor: '#FF9800',
+  },
+  crosswalkHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  crosswalkIcon: {
+    fontSize: 20,
+  },
+  crosswalkTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#E65100',
+  },
+  crosswalkWaitTime: {
+    fontSize: 14,
+    color: '#F57C00',
+    fontWeight: '600',
+  },
+  crosswalkTotalTime: {
+    fontSize: 14,
+    color: '#5D4037',
+    marginTop: 8,
+    paddingLeft: 28,
   },
 });

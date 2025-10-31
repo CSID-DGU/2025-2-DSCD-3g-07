@@ -58,21 +58,22 @@ class WalkingSpeedIntegrator:
     def calculate_user_speed_factor(
         self, 
         user_speed_mps: Optional[float],
-        tmap_base_speed_mps: float = 1.4
+        tmap_base_speed_mps: float = 1.111  # 시속 4km = 1.111 m/s (백엔드 재계산 기준)
     ) -> float:
         """
         사용자 보행속도 계수 계산
         
         Args:
             user_speed_mps: Health Connect에서 측정한 사용자 평균 속도 (m/s)
-            tmap_base_speed_mps: Tmap API의 기준 보행속도 (기본값: 1.4 m/s)
+            tmap_base_speed_mps: 시속 4km 재계산 후 기준 속도 (기본값: 1.111 m/s = 4km/h)
         
         Returns:
             사용자 속도 계수 (사용자가 빠르면 < 1.0, 느리면 > 1.0)
             
         설명:
-            - 사용자가 평균보다 빠르면: 시간이 덜 걸림 (계수 < 1.0)
-            - 사용자가 평균보다 느리면: 시간이 더 걸림 (계수 > 1.0)
+            - 백엔드에서 시속 4km(1.111 m/s) 기준으로 재계산한 시간이 기준값(1.0)
+            - 사용자가 4km/h보다 빠르면: 시간이 덜 걸림 (계수 < 1.0)
+            - 사용자가 4km/h보다 느리면: 시간이 더 걸림 (계수 > 1.0)
             - Health Connect 데이터가 없으면: 1.0 (기준값 사용)
         """
         if user_speed_mps is None or user_speed_mps <= 0:
@@ -81,16 +82,17 @@ class WalkingSpeedIntegrator:
         
         # 시간 = 거리 / 속도
         # 계수 = 기준 속도 / 사용자 속도
-        # 예: 사용자가 1.4m/s, 기준이 1.4m/s → 1.4/1.4 = 1.0
-        # 예: 사용자가 2.0m/s, 기준이 1.4m/s → 1.4/2.0 = 0.7 (30% 빠름)
-        # 예: 사용자가 1.0m/s, 기준이 1.4m/s → 1.4/1.0 = 1.4 (40% 느림)
+        # 예: 사용자가 1.252m/s (4.51km/h), 기준이 1.111m/s (4km/h) → 1.111/1.252 = 0.887 (약 11% 빠름)
+        # 예: 사용자가 1.111m/s (4km/h), 기준이 1.111m/s (4km/h) → 1.111/1.111 = 1.0
+        # 예: 사용자가 1.0m/s (3.6km/h), 기준이 1.111m/s (4km/h) → 1.111/1.0 = 1.111 (약 11% 느림)
         factor = tmap_base_speed_mps / user_speed_mps
         
         # 안전 범위: 0.5 ~ 2.0 (기준 대비 ±100%)
         factor = max(0.5, min(2.0, factor))
         
         logger.debug(
-            f"[사용자 속도] {user_speed_mps:.2f} m/s "
+            f"[사용자 속도] {user_speed_mps:.3f} m/s ({user_speed_mps*3.6:.2f} km/h) "
+            f"vs 기준 {tmap_base_speed_mps:.3f} m/s (4 km/h) "
             f"→ 계수: {factor:.3f} "
             f"(기준 대비 {(1-factor)*100:+.1f}%)"
         )

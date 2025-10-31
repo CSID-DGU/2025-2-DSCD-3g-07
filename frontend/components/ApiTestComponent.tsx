@@ -6,7 +6,7 @@ import Config from '../config';
 import { analyzeRouteSlope } from '../services/elevationService';
 import { RouteElevationAnalysis } from '../types/api';
 import { healthConnectService } from '../services/healthConnect';
-import { getCurrentWeather } from '../services/weatherService';
+import { useWeatherContext } from '../contexts/WeatherContext';
 
 const ApiTestComponent: React.FC = () => {
   const { data: healthData, loading: healthLoading, error: healthError, checkHealth } = useHealthCheck();
@@ -14,8 +14,9 @@ const ApiTestComponent: React.FC = () => {
   const [slopeAnalysis, setSlopeAnalysis] = useState<RouteElevationAnalysis | null>(null);
   const [slopeLoading, setSlopeLoading] = useState(false);
   const [walkingSpeedCase1, setWalkingSpeedCase1] = useState<number | null>(null);
-  const [currentWeather, setCurrentWeather] = useState<any>(null);
-  const [weatherLoading, setWeatherLoading] = useState(false);
+
+  // 날씨 Context 사용
+  const { weatherData } = useWeatherContext();
 
   // 컴포넌트 마운트 시 Health Connect에서 Case 1 평균 속도 가져오기
   useEffect(() => {
@@ -48,49 +49,15 @@ const ApiTestComponent: React.FC = () => {
         try {
           const itinerary = itineraries[0]; // 첫 번째 경로만 분석
 
-          // 날씨 데이터 가져오기 (경로 시작점 좌표 사용)
-          let weatherData = null;
-          if (itinerary && itinerary.legs && itinerary.legs.length > 0) {
-            const firstLeg = itinerary.legs[0];
-            const startCoords = firstLeg?.start;
-
-            if (startCoords) {
-              setWeatherLoading(true);
-              try {
-                console.log('🌤️ 날씨 데이터 가져오는 중...', {
-                  lat: startCoords.lat,
-                  lon: startCoords.lon
-                });
-
-                const weather = await getCurrentWeather(startCoords.lat, startCoords.lon);
-
-                if (weather?.current) {
-                  // KMA 데이터 형식으로 변환
-                  weatherData = {
-                    temp_c: weather.current.temperature_2m,
-                    pty: mapWeatherCodeToPTY(weather.current.weather_code),
-                    rain_mm_per_h: weather.current.rain || weather.current.precipitation || 0,
-                    snow_cm_per_h: 0  // KMA 데이터에서 눈 정보가 있으면 추가
-                  };
-
-                  setCurrentWeather(weather.current);
-                  console.log('✅ 날씨 데이터 획득:', weatherData);
-                }
-              } catch (weatherError) {
-                console.warn('⚠️ 날씨 데이터 로드 실패:', weatherError);
-              } finally {
-                setWeatherLoading(false);
-              }
-            }
-          }
-
-          // Health Connect Case 1 속도와 날씨 데이터를 함께 전달
+          // Health Connect Case 1 속도와 날씨 Context 데이터를 함께 전달
           if (itinerary) {
+            console.log('🌤️ 날씨 데이터 사용:', weatherData);
+
             const analysis = await analyzeRouteSlope(
               itinerary,
               undefined, // apiKey
               walkingSpeedCase1 || undefined, // walking speed (m/s)
-              weatherData || undefined // 날씨 데이터 추가 (null이 아닌 undefined로)
+              weatherData || undefined // 날씨 데이터 (Context에서 가져옴)
             );
 
             setSlopeAnalysis(analysis);
@@ -119,21 +86,6 @@ const ApiTestComponent: React.FC = () => {
     analyzeSlopeData();
   }, [routeData, routeError, walkingSpeedCase1]);
 
-  // 날씨 코드를 KMA PTY로 변환하는 헬퍼 함수
-  const mapWeatherCodeToPTY = (weatherCode: number): number => {
-    if (weatherCode === 0) return 0; // 맑음
-    if ((weatherCode >= 51 && weatherCode <= 67) || (weatherCode >= 80 && weatherCode <= 82)) {
-      return 1; // 비
-    }
-    if ((weatherCode >= 71 && weatherCode <= 77) || (weatherCode >= 85 && weatherCode <= 86)) {
-      return 3; // 눈
-    }
-    if (weatherCode >= 68 && weatherCode <= 69) {
-      return 2; // 진눈깨비
-    }
-    return 0;
-  };
-
   const testHealthCheck = async () => {
     console.log('🔍 Testing Health Check...');
     await checkHealth();
@@ -143,12 +95,12 @@ const ApiTestComponent: React.FC = () => {
     console.log('🔍 Testing Transit Route...');
     setSlopeAnalysis(null); // 이전 결과 초기화
 
-    // 동국대 -> 창동축구장 테스트 좌표
+    // 망원시장 -> 동대입구역 테스트 좌표
     await getRoute({
-      start_x: 127.00020089028668,
-      start_y: 37.55826891774226,
-      end_x: 127.04098866446125,
-      end_y: 37.648520753827064,
+      start_x: 126.90626362296295,
+      start_y: 37.555889116421376,
+      end_x: 127.00531091525905,
+      end_y: 37.559045908511976,
     });
   };
 
@@ -199,7 +151,7 @@ const ApiTestComponent: React.FC = () => {
           disabled={routeLoading || slopeLoading}
         >
           <Text style={styles.buttonText}>
-            {routeLoading ? '⏳ 검색 중...' : slopeLoading ? ' 경사도 분석 중...' : '🗺️ 경로 검색 (동국대 본관→창동축구장)'}
+            {routeLoading ? '⏳ 검색 중...' : slopeLoading ? '📊 경사도 분석 중...' : '🗺️ 경로 검색 (망원시장→동대입구역)'}
           </Text>
         </TouchableOpacity>
 
@@ -218,14 +170,14 @@ const ApiTestComponent: React.FC = () => {
                 🚶 사용된 보행 속도: {(walkingSpeedCase1 * 3.6).toFixed(2)} km/h (Case 1)
               </Text>
             )}
-            {currentWeather && (
+            {weatherData && (
               <Text style={styles.infoText}>
-                🌤️ 날씨: {currentWeather.temperature_2m}°C (코드: {currentWeather.weather_code})
+                🌤️ 날씨: {weatherData.temp_c}°C (PTY: {weatherData.pty})
               </Text>
             )}
             {slopeLoading && (
               <Text style={styles.infoText}>
-                📊 경사도 분석 중{weatherLoading ? ' (날씨 포함)' : ''}...
+                📊 경사도 분석 중 (날씨 포함)...
               </Text>
             )}
             {slopeAnalysis && !slopeAnalysis.error && (

@@ -6,7 +6,7 @@ from pydantic import BaseModel
 from typing import Dict, List, Optional
 import logging
 
-from ..utils.elevation_helpers import analyze_route_elevation
+from ..utils.elevation_helpers import analyze_route_elevation, count_crosswalks
 
 router = APIRouter(prefix="/routes", tags=["routes"])
 logger = logging.getLogger(__name__)
@@ -64,7 +64,12 @@ class AnalyzeSlopeResponse(BaseModel):
     total_original_walk_time: int
     total_adjusted_walk_time: int
     total_route_time_adjustment: int
-    factors: Optional[FactorsInfo] = None  # 통합 계수 정보
+    # 횡단보도 정보
+    crosswalk_count: Optional[int] = None
+    crosswalk_wait_time: Optional[int] = None
+    total_time_with_crosswalk: Optional[int] = None
+    # 통합 계수 정보
+    factors: Optional[FactorsInfo] = None
     user_speed_mps: Optional[float] = None
     weather_applied: Optional[bool] = None
     sampled_coords_count: Optional[int] = None
@@ -113,12 +118,17 @@ async def analyze_slope(request: AnalyzeSlopeRequest):
     try:
         logger.info("경사도 분석 요청 시작")
         
+        # 횡단보도 개수 카운팅
+        crosswalk_count = count_crosswalks(request.itinerary)
+        logger.info(f"🚦 횡단보도 개수: {crosswalk_count}개")
+        
         # 경사도 분석 실행 (통합 계산)
         result = await analyze_route_elevation(
             request.itinerary,
             api_key=request.api_key,
             weather_data=request.weather_data,
-            user_speed_mps=request.user_speed_mps
+            user_speed_mps=request.user_speed_mps,
+            crosswalk_count=crosswalk_count
         )
         
         if 'error' in result and not result.get('walk_legs_analysis'):

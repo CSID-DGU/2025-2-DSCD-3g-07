@@ -154,6 +154,28 @@ const RouteDetailComponent: React.FC<RouteDetailComponentProps> = ({ routeData, 
               </View>
             </View>
 
+            {/* 횡단보도 정보 */}
+            {slopeAnalysis.crosswalk_count !== undefined && slopeAnalysis.crosswalk_count > 0 && (
+              <View style={styles.crosswalkSection}>
+                <View style={styles.crosswalkRow}>
+                  <Text style={styles.crosswalkEmoji}>🚦</Text>
+                  <Text style={styles.crosswalkText}>
+                    횡단보도: {slopeAnalysis.crosswalk_count}개
+                  </Text>
+                  {slopeAnalysis.crosswalk_wait_time && (
+                    <Text style={styles.crosswalkTime}>
+                      (+{Math.floor(slopeAnalysis.crosswalk_wait_time / 60)}분 {slopeAnalysis.crosswalk_wait_time % 60}초 대기)
+                    </Text>
+                  )}
+                </View>
+                {slopeAnalysis.total_time_with_crosswalk && (
+                  <Text style={styles.crosswalkTotalTime}>
+                    횡단보도 포함 총 시간: {Math.floor(slopeAnalysis.total_time_with_crosswalk / 60)}분 {slopeAnalysis.total_time_with_crosswalk % 60}초
+                  </Text>
+                )}
+              </View>
+            )}
+
             {/* 경사도 이상 현상 설명 */}
             {(() => {
               const totalDistance = slopeAnalysis.walk_legs_analysis.reduce(
@@ -601,6 +623,38 @@ const styles = StyleSheet.create({
     color: '#999',
     fontWeight: '500',
     paddingVertical: 6,
+  },
+  // 횡단보도 스타일
+  crosswalkSection: {
+    marginTop: 12,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: '#E0E0E0',
+  },
+  crosswalkRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 6,
+  },
+  crosswalkEmoji: {
+    fontSize: 16,
+    marginRight: 8,
+  },
+  crosswalkText: {
+    fontSize: 14,
+    color: '#1C1E21',
+    fontWeight: '600',
+  },
+  crosswalkTime: {
+    fontSize: 12,
+    color: '#FF9800',
+    marginLeft: 8,
+  },
+  crosswalkTotalTime: {
+    fontSize: 13,
+    color: '#667085',
+    marginTop: 4,
+    marginLeft: 24,
   },
 });
 

@@ -1,17 +1,21 @@
 """
 고도 및 경사도 분석을 위한 헬퍼 함수들
-Google Elevation API를 사용하여 경로의 경사도를 계산하고 보행 시간을 보정합니다.
+Google Elevation API를 사용하여 경로의 경사도를 계산합니다.
 
 보행 속도 모델: Tobler's Hiking Function (1993)
 - 출처: Tobler, W. (1993). "Three presentations on geographical analysis and modeling"
 - 공식: W = 6 * exp(-3.5 * |S + 0.05|) km/h
 - 실증 데이터 기반의 과학적 모델로 오르막/내리막을 모두 고려
+
+통합 계산: Factors_Affecting_Walking_Speed.py 사용
+- Tmap 기준값(1.0)에 사용자 속도, 경사도, 날씨 계수를 모두 적용
 """
 import os
 import math
 import aiohttp
 from typing import Dict, List, Tuple, Optional
 from .geo_helpers import parse_linestring, haversine, coords_to_latlng_string
+from .Factors_Affecting_Walking_Speed import get_integrator
 
 
 # 경사도별 속도 계수 (참고용 - 실제로는 Tobler's Function 사용)
@@ -29,6 +33,50 @@ SLOPE_SPEED_FACTORS_REFERENCE = {
 # Google Elevation API 설정
 GOOGLE_ELEVATION_API_URL = "https://maps.googleapis.com/maps/api/elevation/json"
 MAX_COORDINATES_PER_REQUEST = 512  # Google API 제한
+
+
+def count_crosswalks(itinerary: Dict) -> int:
+    """
+    Tmap API 응답에서 횡단보도 개수를 카운팅
+    
+    Args:
+        itinerary: Tmap API의 itinerary 데이터 (전체 경로)
+    
+    Returns:
+        경로 상의 총 횡단보도 개수
+        
+    예시:
+        >>> itinerary = {
+        ...     "legs": [
+        ...         {
+        ...             "mode": "WALK",
+        ...             "steps": [
+        ...                 {"description": "망원역 2번출구에서 좌측 횡단보도 후 17m 이동"},
+        ...                 {"description": "횡단보도 후 26m 이동"}
+        ...             ]
+        ...         }
+        ...     ]
+        ... }
+        >>> count_crosswalks(itinerary)
+        2
+    """
+    total_count = 0
+    
+    # 모든 leg 순회
+    legs = itinerary.get('legs', [])
+    for leg in legs:
+        # WALK 모드만 검사
+        if leg.get('mode') != 'WALK':
+            continue
+        
+        # steps의 description에서 "횡단보도" 키워드 검색
+        steps = leg.get('steps', [])
+        for step in steps:
+            description = step.get('description', '')
+            # 한 description에 여러 개의 횡단보도가 있을 수 있음
+            total_count += description.count('횡단보도')
+    
+    return total_count
 
 
 def count_total_coordinates(walk_legs: List[Dict]) -> int:
@@ -463,17 +511,37 @@ def adjust_walking_time(
 
 async def analyze_route_elevation(
     itinerary: Dict, 
-    api_key: Optional[str] = None
+    api_key: Optional[str] = None,
+    weather_data: Optional[Dict] = None,
+    user_speed_mps: Optional[float] = None,
+    crosswalk_count: int = 0
 ) -> Dict:
     """
-    전체 경로의 경사도를 분석하고 시간을 보정
+    전체 경로의 경사도를 분석하고 시간을 보정 (통합 계산)
     
     Args:
         itinerary: Tmap API의 itinerary 데이터
         api_key: Google Elevation API 키 (None이면 환경변수에서 가져옴)
+        weather_data: 날씨 데이터 (선택사항)
+            - temp_c: 기온 (°C)
+            - pty: 강수형태 (0:없음, 1:비, 2:진눈깨비, 3:눈)
+            - rain_mm_per_h: 시간당 강수량 (mm/h)
+            - snow_cm_per_h: 시간당 신적설 (cm/h)
+        user_speed_mps: 사용자 평균 보행속도 (m/s, Health Connect)
+        crosswalk_count: 경로 상 횡단보도 개수 (기본값: 0)
     
     Returns:
-        경사도 분석 결과 및 보정된 시간 정보
+        경사도 분석 결과 및 보정된 시간 정보 (모든 요인 통합)
+        
+    처리 흐름:
+        1. Google Elevation API로 고도 데이터 획득
+        2. 경사도 계산
+        3. Factors_Affecting_Walking_Speed로 통합 계산
+           - Tmap 기준 시간 (1.0)
+           - × 사용자 속도 계수 (Health Connect)
+           - × 경사도 계수 (Tobler's Function)
+           - × 날씨 계수 (WeatherSpeedModel)
+        4. 횡단보도 대기 시간 추가 (개당 116초, 중앙값 기준)
     """
     if api_key is None:
         api_key = os.getenv('GOOGLE_ELEVATION_API_KEY')
@@ -481,8 +549,30 @@ async def analyze_route_elevation(
     if not api_key:
         raise ValueError("Google Elevation API 키가 설정되지 않았습니다.")
     
-    # WALK 모드인 leg만 추출
-    walk_legs = [leg for leg in itinerary.get('legs', []) if leg.get('mode') == 'WALK']
+    # 통합 계산기 초기화
+    integrator = get_integrator()
+    
+    # 모든 leg 가져오기
+    all_legs = itinerary.get('legs', [])
+    
+    # WALK 모드인 leg만 추출하되, 지하철 환승 구간은 제외
+    walk_legs = []
+    for i, leg in enumerate(all_legs):
+        if leg.get('mode') == 'WALK':
+            # 이전 leg과 다음 leg 확인
+            prev_leg = all_legs[i - 1] if i > 0 else None
+            next_leg = all_legs[i + 1] if i < len(all_legs) - 1 else None
+            
+            # 지하철 환승 구간 판단: 앞뒤가 모두 지하철이면 제외
+            is_subway_transfer = (
+                prev_leg and prev_leg.get('mode') == 'SUBWAY' and
+                next_leg and next_leg.get('mode') == 'SUBWAY'
+            )
+            
+            if not is_subway_transfer:
+                walk_legs.append(leg)
+            else:
+                print(f"[경사도 분석] 지하철 환승 구간 제외: {leg.get('start', {}).get('name', '')} → {leg.get('end', {}).get('name', '')} (거리: {leg.get('distance', 0)}m)")
     
     if not walk_legs:
         return {
@@ -490,7 +580,15 @@ async def analyze_route_elevation(
             'walk_legs_analysis': [],
             'total_original_walk_time': 0,
             'total_adjusted_walk_time': 0,
-            'total_route_time_adjustment': 0
+            'total_route_time_adjustment': 0,
+            'user_speed_mps': user_speed_mps,
+            'weather_applied': weather_data is not None,
+            'factors': {
+                'user_speed_factor': 1.0,
+                'slope_factor': 1.0,
+                'weather_factor': 1.0,
+                'final_factor': 1.0
+            }
         }
     
     # 좌표 최적화
@@ -525,7 +623,15 @@ async def analyze_route_elevation(
             'walk_legs_analysis': [],
             'total_original_walk_time': sum(leg.get('sectionTime', 0) for leg in walk_legs),
             'total_adjusted_walk_time': sum(leg.get('sectionTime', 0) for leg in walk_legs),
-            'total_route_time_adjustment': 0
+            'total_route_time_adjustment': 0,
+            'user_speed_mps': user_speed_mps,
+            'weather_applied': weather_data is not None,
+            'factors': {
+                'user_speed_factor': 1.0,
+                'slope_factor': 1.0,
+                'weather_factor': 1.0,
+                'final_factor': 1.0
+            }
         }
     
     # 각 leg별 분석
@@ -541,27 +647,25 @@ async def analyze_route_elevation(
         leg_elevation_count = sum(len(s['coords']) for s in steps_coords)
         leg_elevations = elevations[elevation_offset:elevation_offset + leg_elevation_count]
         
-        # 시간 보정
+        # 원본 Tmap 시간
         original_time = leg.get('sectionTime', 0)
-        adjusted_time, segment_analysis = adjust_walking_time(
+        
+        # 경사도 기반 시간 계산 (Tobler's Function만 적용)
+        slope_based_time, segment_analysis = adjust_walking_time(
             leg,
             leg_elevations,
             steps_coords
         )
         
-        total_adjusted_time += adjusted_time
-        
-        # 거리 가중 평균 경사도 계산 (더 정확함)
+        # 거리 가중 평균 경사도 계산
         if segment_analysis:
             total_distance = sum(seg['distance'] for seg in segment_analysis)
             if total_distance > 0:
-                # 거리 가중 평균
                 weighted_slope_sum = sum(seg['slope'] * seg['distance'] for seg in segment_analysis)
                 avg_slope = weighted_slope_sum / total_distance
             else:
-                # fallback: 단순 평균
                 slopes = [seg['slope'] for seg in segment_analysis]
-                avg_slope = sum(slopes) / len(slopes)
+                avg_slope = sum(slopes) / len(slopes) if slopes else 0
             
             slopes = [seg['slope'] for seg in segment_analysis]
             max_slope = max(slopes, default=0)
@@ -571,6 +675,17 @@ async def analyze_route_elevation(
             max_slope = 0
             min_slope = 0
         
+        # === 통합 계산: Tmap 기준 × 사용자 속도 × 경사도 × 날씨 ===
+        speed_factors = integrator.calculate_integrated_time(
+            tmap_base_time=original_time,
+            user_speed_mps=user_speed_mps,
+            average_slope_percent=avg_slope,
+            weather_data=weather_data
+        )
+        
+        final_adjusted_time = int(speed_factors.adjusted_time)
+        total_adjusted_time += final_adjusted_time
+        
         # 데이터 품질 검증
         validation = validate_slope_data(segment_analysis)
         
@@ -579,9 +694,16 @@ async def analyze_route_elevation(
             'start_name': leg.get('start', {}).get('name', ''),
             'end_name': leg.get('end', {}).get('name', ''),
             'distance': leg.get('distance', 0),
-            'original_time': original_time,
-            'adjusted_time': adjusted_time,
-            'time_diff': adjusted_time - original_time,
+            'original_time': original_time,  # Tmap 기준
+            'slope_only_time': slope_based_time,  # 경사도만 적용
+            'adjusted_time': final_adjusted_time,  # 모든 요인 적용
+            'time_diff': final_adjusted_time - original_time,
+            # 개별 계수들
+            'user_speed_factor': speed_factors.user_speed_factor,
+            'slope_factor': speed_factors.slope_factor,
+            'weather_factor': speed_factors.weather_factor,
+            'final_factor': speed_factors.final_factor,
+            # 경사도 정보
             'avg_slope': round(avg_slope, 2),
             'max_slope': round(max_slope, 2),
             'min_slope': round(min_slope, 2),
@@ -597,6 +719,18 @@ async def analyze_route_elevation(
     
     original_walk_time = sum(leg.get('sectionTime', 0) for leg in walk_legs)
     
+    # 횡단보도 대기 시간 계산 (중앙값 기준: 116초/개)
+    crosswalk_wait_time = crosswalk_count * 116
+    
+    # 전체 평균 계수 계산
+    if analysis:
+        avg_user_factor = sum(a['user_speed_factor'] for a in analysis) / len(analysis)
+        avg_slope_factor = sum(a['slope_factor'] for a in analysis) / len(analysis)
+        avg_weather_factor = sum(a['weather_factor'] for a in analysis) / len(analysis)
+        avg_final_factor = sum(a['final_factor'] for a in analysis) / len(analysis)
+    else:
+        avg_user_factor = avg_slope_factor = avg_weather_factor = avg_final_factor = 1.0
+    
     # 전체 데이터 품질 검증
     all_segments = []
     for leg_analysis in analysis:
@@ -604,11 +738,36 @@ async def analyze_route_elevation(
     
     overall_validation = validate_slope_data(all_segments)
     
-    return {
+    print(f"\n[📊 최종 결과]")
+    print(f"  Tmap 기준 시간: {original_walk_time}초")
+    print(f"  최종 보정 시간: {total_adjusted_time}초")
+    print(f"  횡단보도 대기 시간: {crosswalk_wait_time}초 ({crosswalk_count}개 × 116초)")
+    print(f"  전체 시간: {total_adjusted_time + crosswalk_wait_time}초")
+    print(f"  시간 차이: {total_adjusted_time - original_walk_time:+}초")
+    print(f"  평균 계수:")
+    print(f"    - 사용자 속도: {avg_user_factor:.3f}")
+    print(f"    - 경사도: {avg_slope_factor:.3f}")
+    print(f"    - 날씨: {avg_weather_factor:.3f}")
+    print(f"    - 최종: {avg_final_factor:.3f}")
+    
+    result = {
         'walk_legs_analysis': analysis,
         'total_original_walk_time': original_walk_time,
         'total_adjusted_walk_time': total_adjusted_time,
         'total_route_time_adjustment': total_adjusted_time - original_walk_time,
+        # 횡단보도 정보
+        'crosswalk_count': crosswalk_count,
+        'crosswalk_wait_time': crosswalk_wait_time,
+        'total_time_with_crosswalk': total_adjusted_time + crosswalk_wait_time,
+        # 통합 계수 정보
+        'factors': {
+            'user_speed_factor': avg_user_factor,
+            'slope_factor': avg_slope_factor,
+            'weather_factor': avg_weather_factor,
+            'final_factor': avg_final_factor
+        },
+        'user_speed_mps': user_speed_mps,
+        'weather_applied': weather_data is not None,
         'sampled_coords_count': optimized['total_sampled_coords'],
         'original_coords_count': optimized['original_coords'],
         'data_quality': {
@@ -618,3 +777,9 @@ async def analyze_route_elevation(
             'warnings': overall_validation['warnings'][:5]  # 처음 5개 경고만
         }
     }
+    
+    print(f"\n[🔍 반환 데이터 확인]")
+    print(f"  factors 포함 여부: {'factors' in result}")
+    print(f"  factors 값: {result.get('factors', 'NOT FOUND')}")
+    
+    return result

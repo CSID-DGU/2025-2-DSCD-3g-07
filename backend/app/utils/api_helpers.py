@@ -1,5 +1,6 @@
 import os
 from typing import Any, Optional
+from datetime import datetime
 
 import requests
 from dotenv import load_dotenv
@@ -84,6 +85,10 @@ def call_tmap_transit_api(
         "appKey": tmap_key,
         "content-type": "application/json",
     }
+    
+    # 현재 시간을 yyyymmddhhmm 형식으로 변환
+    current_time = datetime.now().strftime("%Y%m%d%H%M")
+    
     body = {
         "startX": start_x,
         "startY": start_y,
@@ -92,6 +97,10 @@ def call_tmap_transit_api(
         "count": count,
         "lang": lang,
         "format": format,
+        "searchDttm": current_time,  # 현재 시간 추가
     }
+    
+    print(f"🕐 [TMAP API] 검색 시간: {current_time}")
+    
     response = requests.post(url, headers=headers, json=body)
     return response

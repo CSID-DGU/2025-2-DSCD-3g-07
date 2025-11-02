@@ -9,6 +9,11 @@ venv/
 env/
 .Python
 
+# Virtualenv
+fastapi-env/
+.venv/
+ENV/
+
 # Node.js
 node_modules/
 npm-debug.log*
@@ -106,10 +111,23 @@ frontend/crash.txt
 secrets/
 .secrets
 
+# API keys and configurations
+**/config/*.secrets.json
+**/config/production.json
+api-keys.txt
+.api-keys
+
 # Database files
 *.db
 *.sqlite
 *.sqlite3
+*.sql.backup
+dump.sql
+*.dump
+
+# AWS
+aws-credentials/
+rds-config.json
 
 # Backup files
 *.bak

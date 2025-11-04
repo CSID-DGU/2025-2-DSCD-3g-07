@@ -40,38 +40,47 @@ def count_crosswalks(itinerary: Dict) -> int:
     Tmap API 응답에서 횡단보도 개수를 카운팅
     
     Args:
-        itinerary: Tmap API의 itinerary 데이터 (전체 경로)
+        itinerary: Tmap API의 itinerary 데이터 또는 GeoJSON features
     
     Returns:
         경로 상의 총 횡단보도 개수
         
-    예시:
-        >>> itinerary = {
-        ...     "legs": [
-        ...         {
-        ...             "mode": "WALK",
-        ...             "steps": [
-        ...                 {"description": "망원역 2번출구에서 좌측 횡단보도 후 17m 이동"},
-        ...                 {"description": "횡단보도 후 26m 이동"}
-        ...             ]
-        ...         }
-        ...     ]
-        ... }
-        >>> count_crosswalks(itinerary)
-        2
+    참고:
+        Tmap Pedestrian API의 turnType:
+        - 211: 횡단보도
+        - 214: 8시 방향 횡단보도
+        - 215: 10시 방향 횡단보도
+        - 216: 2시 방향 횡단보도
+        - 217: 4시 방향 횡단보도
     """
     total_count = 0
     
-    # 모든 leg 순회
+    # GeoJSON features가 직접 전달된 경우
+    if isinstance(itinerary, list):
+        features = itinerary
+        for feature in features:
+            if feature.get("type") == "Feature" and feature.get("geometry", {}).get("type") == "Point":
+                turn_type = feature.get("properties", {}).get("turnType")
+                # 횡단보도 관련 turnType 체크
+                if turn_type in [211, 214, 215, 216, 217]:
+                    total_count += 1
+        return total_count
+    
+    # 기존 itinerary 구조 처리
     legs = itinerary.get('legs', [])
     for leg in legs:
         # WALK 모드만 검사
         if leg.get('mode') != 'WALK':
             continue
         
-        # steps의 description에서 "횡단보도" 키워드 검색
+        # steps에서 turnType 확인
         steps = leg.get('steps', [])
         for step in steps:
+            turn_type = step.get('turnType')
+            if turn_type in [211, 214, 215, 216, 217]:
+                total_count += 1
+            
+            # 하위 호환성: description에서도 검사
             description = step.get('description', '')
             # 한 description에 여러 개의 횡단보도가 있을 수 있음
             total_count += description.count('횡단보도')
@@ -107,9 +116,7 @@ def smart_sample_coordinates(
     distance: float
 ) -> List[Dict[str, float]]:
     """
-    거리 기반 적응형 샘플링
-    - 짧은 구간: 더 많은 샘플 (정밀도 유지)
-    - 긴 구간: 적은 샘플 (효율성)
+    목표 개수 기반 적응형 샘플링
     
     Args:
         linestring: 좌표 문자열
@@ -124,32 +131,35 @@ def smart_sample_coordinates(
     if not coords:
         return []
     
-    # 거리에 따른 샘플링 전략
-    if distance < 50:  # 50m 미만: 모든 좌표 사용
+    # 좌표가 목표보다 적으면 그대로 반환
+    if len(coords) <= target_points:
         return coords
-    elif distance < 200:  # 200m 미만: 10m당 1개
-        sample_interval = max(1, len(coords) // max(1, distance // 10))
-    else:  # 200m 이상: 20m당 1개
-        sample_interval = max(1, len(coords) // max(1, distance // 20))
     
-    # 샘플링 (시작점과 끝점은 항상 포함)
-    if len(coords) <= 2:
-        return coords
+    # 최소 2개는 보장 (시작, 끝)
+    target_points = max(2, target_points)
+    
+    # 균등 간격으로 샘플링
+    # 시작점과 끝점은 항상 포함
+    if target_points == 2:
+        return [coords[0], coords[-1]]
     
     sampled = [coords[0]]
-    for i in range(sample_interval, len(coords) - 1, sample_interval):
-        sampled.append(coords[i])
     
-    # 마지막 좌표가 포함되지 않았다면 추가
-    if sampled[-1] != coords[-1]:
-        sampled.append(coords[-1])
+    # 중간 포인트들 계산
+    step = (len(coords) - 1) / (target_points - 1)
+    for i in range(1, target_points - 1):
+        index = int(i * step)
+        sampled.append(coords[index])
+    
+    # 끝점 추가
+    sampled.append(coords[-1])
     
     return sampled
 
 
 def optimize_all_coordinates(
     walk_legs: List[Dict], 
-    max_total: int = 500
+    max_total: int = 300  # URL 길이 제한을 고려해 300개로 축소
 ) -> Dict:
     """
     전체 보행 구간을 512개 이하로 최적화
@@ -191,10 +201,39 @@ def optimize_all_coordinates(
         total_distance += leg_distance
         total_coords += leg_coords
     
+    print(f"[샘플링] 원본 좌표: {total_coords}개, 목표: {max_total}개")
+    
     if total_distance == 0:
         return {'legs': [], 'total_sampled_coords': 0}
     
-    # 2단계: 거리 비율에 따라 좌표 할당
+    # 좌표가 max_total 이하면 샘플링 불필요
+    if total_coords <= max_total:
+        result = {
+            'legs': [],
+            'total_sampled_coords': 0,
+            'original_coords': total_coords
+        }
+        for info in leg_info:
+            step_coords = []
+            for i, step in enumerate(info['steps']):
+                coords = parse_linestring(step['linestring'])
+                step_coords.append({
+                    'step_index': i,
+                    'coords': coords,
+                    'distance': step.get('distance', 0)
+                })
+            result['legs'].append({
+                'leg_data': info['leg'],
+                'steps_coords': step_coords,
+                'total_coords': sum(len(s['coords']) for s in step_coords)
+            })
+            result['total_sampled_coords'] += sum(len(s['coords']) for s in step_coords)
+        return result
+    
+    # 2단계: 거리 비율에 따라 좌표 할당 (적극적 샘플링)
+    sampling_ratio = max_total / total_coords
+    print(f"[샘플링] 샘플링 비율: {sampling_ratio:.3f}")
+    
     result = {
         'legs': [],
         'total_sampled_coords': 0,
@@ -202,14 +241,13 @@ def optimize_all_coordinates(
     }
     
     for info in leg_info:
-        # 거리 비율로 좌표 개수 배분
-        distance_ratio = info['distance'] / total_distance
-        allocated_coords = int(max_total * distance_ratio)
-        allocated_coords = max(10, allocated_coords)  # 최소 10개는 보장
+        # 이 leg에 할당할 좌표 개수 (최소값 보장 제거)
+        leg_target = int(info['original_coords'] * sampling_ratio)
+        leg_target = max(2, leg_target)  # 최소 2개 (시작, 끝)
         
         # 각 step별로 배분
         step_coords = []
-        remaining = allocated_coords
+        remaining = leg_target
         
         for i, step in enumerate(info['steps']):
             is_last = (i == len(info['steps']) - 1)
@@ -217,10 +255,11 @@ def optimize_all_coordinates(
             
             # 마지막 step은 남은 좌표 모두 사용
             if is_last:
-                step_target = remaining
+                step_target = max(2, remaining)  # 최소 2개
             else:
                 step_ratio = step_distance / info['distance'] if info['distance'] > 0 else 0
-                step_target = max(3, int(allocated_coords * step_ratio))
+                step_target = int(leg_target * step_ratio)
+                step_target = max(2, step_target)  # 최소 2개
                 remaining -= step_target
             
             sampled = smart_sample_coordinates(
@@ -242,6 +281,7 @@ def optimize_all_coordinates(
         })
         result['total_sampled_coords'] += sum(len(s['coords']) for s in step_coords)
     
+    print(f"[샘플링] 최종 좌표: {result['total_sampled_coords']}개")
     return result
 
 
@@ -250,7 +290,7 @@ async def call_google_elevation_api(
     api_key: str
 ) -> List[float]:
     """
-    Google Elevation API를 호출하여 고도 데이터를 가져옴
+    Google Elevation API를 호출하여 고도 데이터를 가져옴 (GET 방식)
     
     Args:
         coords: [{'lon': float, 'lat': float}, ...] 형식의 좌표 리스트
@@ -555,24 +595,51 @@ async def analyze_route_elevation(
     # 모든 leg 가져오기
     all_legs = itinerary.get('legs', [])
     
-    # WALK 모드인 leg만 추출하되, 지하철 환승 구간은 제외
-    walk_legs = []
+    # ===== 중요: 모든 WALK leg의 sectionTime을 4km/h 기준으로 재계산 =====
+    # Tmap API가 반환한 시간이 아닌, 거리를 4km/h로 나눈 기준 시간 사용
+    # 이후 사용자 속도, 경사도, 날씨로 보정
+    tmap_base_speed_mps = 1.111  # 4 km/h = 1.111 m/s (Tmap 기준)
+    
+    print(f"\n[🔄 4km/h 기준 재계산]")
+    for leg in all_legs:
+        if leg.get('mode') == 'WALK':
+            original_time = leg.get('sectionTime', 0)
+            distance = leg.get('distance', 0)
+            
+            # 4km/h 기준으로 재계산
+            recalculated_time = int(distance / tmap_base_speed_mps) if tmap_base_speed_mps > 0 and distance > 0 else original_time
+            
+            # leg의 sectionTime을 재계산된 값으로 업데이트
+            leg['sectionTime'] = recalculated_time
+            
+            print(f"  {leg.get('start', {}).get('name', '')} → {leg.get('end', {}).get('name', '')}")
+            print(f"    거리: {distance}m")
+            print(f"    API 원본: {original_time}초 ({original_time//60}분 {original_time%60}초)")
+            print(f"    4km/h 재계산: {recalculated_time}초 ({recalculated_time//60}분 {recalculated_time%60}초)")
+    
+    # WALK 모드인 leg 분류: 실외 보행 vs 환승(실내) 보행
+    outdoor_walk_legs = []  # 경사도 + 날씨 적용
+    transfer_walk_legs = []  # 사용자 속도만 적용
+    
     for i, leg in enumerate(all_legs):
         if leg.get('mode') == 'WALK':
             # 이전 leg과 다음 leg 확인
             prev_leg = all_legs[i - 1] if i > 0 else None
             next_leg = all_legs[i + 1] if i < len(all_legs) - 1 else None
             
-            # 지하철 환승 구간 판단: 앞뒤가 모두 지하철이면 제외
-            is_subway_transfer = (
-                prev_leg and prev_leg.get('mode') == 'SUBWAY' and
-                next_leg and next_leg.get('mode') == 'SUBWAY'
+            # 환승 구간 판단: 앞뒤가 모두 대중교통(지하철, 버스)이면 환승(실내)으로 간주
+            is_transfer = (
+                prev_leg and prev_leg.get('mode') in ['SUBWAY', 'BUS', 'TRAIN'] and
+                next_leg and next_leg.get('mode') in ['SUBWAY', 'BUS', 'TRAIN']
             )
             
-            if not is_subway_transfer:
-                walk_legs.append(leg)
+            if is_transfer:
+                transfer_walk_legs.append(leg)
+                print(f"[경사도 분석] 환승(실내) 구간: {leg.get('start', {}).get('name', '')} → {leg.get('end', {}).get('name', '')} (거리: {leg.get('distance', 0)}m, 재계산 시간: {leg.get('sectionTime', 0)}초) - 사용자 속도만 적용")
             else:
-                print(f"[경사도 분석] 지하철 환승 구간 제외: {leg.get('start', {}).get('name', '')} → {leg.get('end', {}).get('name', '')} (거리: {leg.get('distance', 0)}m)")
+                outdoor_walk_legs.append(leg)
+    
+    walk_legs = outdoor_walk_legs  # 경사도 분석 대상
     
     if not walk_legs:
         return {
@@ -591,8 +658,8 @@ async def analyze_route_elevation(
             }
         }
     
-    # 좌표 최적화
-    optimized = optimize_all_coordinates(walk_legs, max_total=500)
+    # 좌표 최적화 (URL 길이 제한으로 250개로 축소)
+    optimized = optimize_all_coordinates(walk_legs, max_total=250)
     
     print(f"[경사도 분석] 원본 좌표: {optimized['original_coords']}개")
     print(f"[경사도 분석] 샘플링 후: {optimized['total_sampled_coords']}개")
@@ -717,17 +784,66 @@ async def analyze_route_elevation(
         
         elevation_offset += leg_elevation_count
     
+    # === 환승(실내) 구간 처리: 사용자 속도만 적용 ===
+    transfer_adjusted_time = 0
+    transfer_analysis = []
+    
+    if transfer_walk_legs:
+        print(f"\n[🚇 환승(실내) 구간 처리]")
+        for idx, leg in enumerate(transfer_walk_legs):
+            original_time = leg.get('sectionTime', 0)
+            
+            # 사용자 속도 계수만 적용 (경사도=1.0, 날씨=1.0)
+            speed_factors = integrator.calculate_integrated_time(
+                tmap_base_time=original_time,
+                user_speed_mps=user_speed_mps,
+                average_slope_percent=0.0,  # 실내이므로 경사도 무시
+                weather_data=None  # 실내이므로 날씨 무시
+            )
+            
+            adjusted_time = int(speed_factors.adjusted_time)
+            transfer_adjusted_time += adjusted_time
+            
+            print(f"  환승 {idx}: {leg.get('start', {}).get('name', '')} → {leg.get('end', {}).get('name', '')}")
+            print(f"    원본: {original_time}초, 보정: {adjusted_time}초 (사용자 속도: {speed_factors.user_speed_factor:.3f})")
+            
+            transfer_analysis.append({
+                'leg_index': len(analysis) + idx,
+                'start_name': leg.get('start', {}).get('name', ''),
+                'end_name': leg.get('end', {}).get('name', ''),
+                'distance': leg.get('distance', 0),
+                'original_time': original_time,
+                'adjusted_time': adjusted_time,
+                'time_diff': adjusted_time - original_time,
+                'is_transfer': True,
+                'user_speed_factor': speed_factors.user_speed_factor,
+                'slope_factor': 1.0,
+                'weather_factor': 1.0,
+                'final_factor': speed_factors.user_speed_factor
+            })
+    
+    # 전체 도보 시간 계산 (실외 + 환승)
     original_walk_time = sum(leg.get('sectionTime', 0) for leg in walk_legs)
+    original_transfer_time = sum(leg.get('sectionTime', 0) for leg in transfer_walk_legs)
+    total_original_walk_time = original_walk_time + original_transfer_time
+    
+    total_adjusted_walk_time = total_adjusted_time + transfer_adjusted_time
+    
+    print(f"\n[🔍 도보 시간 계산 검증]")
+    print(f"  실외 보행 구간: {len(walk_legs)}개, 원본: {original_walk_time}초, 보정: {total_adjusted_time}초")
+    print(f"  환승(실내) 구간: {len(transfer_walk_legs)}개, 원본: {original_transfer_time}초, 보정: {transfer_adjusted_time}초")
+    print(f"  전체 합계: 원본 {total_original_walk_time}초 ({total_original_walk_time // 60}분 {total_original_walk_time % 60}초), 보정: {total_adjusted_walk_time}초 ({total_adjusted_walk_time // 60}분 {total_adjusted_walk_time % 60}초)")
     
     # 횡단보도 대기 시간 계산 (중앙값 기준: 116초/개)
     crosswalk_wait_time = crosswalk_count * 116
     
-    # 전체 평균 계수 계산
-    if analysis:
-        avg_user_factor = sum(a['user_speed_factor'] for a in analysis) / len(analysis)
-        avg_slope_factor = sum(a['slope_factor'] for a in analysis) / len(analysis)
-        avg_weather_factor = sum(a['weather_factor'] for a in analysis) / len(analysis)
-        avg_final_factor = sum(a['final_factor'] for a in analysis) / len(analysis)
+    # 전체 평균 계수 계산 (실외 + 환승)
+    all_analysis = analysis + transfer_analysis
+    if all_analysis:
+        avg_user_factor = sum(a['user_speed_factor'] for a in all_analysis) / len(all_analysis)
+        avg_slope_factor = sum(a['slope_factor'] for a in all_analysis) / len(all_analysis)
+        avg_weather_factor = sum(a['weather_factor'] for a in all_analysis) / len(all_analysis)
+        avg_final_factor = sum(a['final_factor'] for a in all_analysis) / len(all_analysis)
     else:
         avg_user_factor = avg_slope_factor = avg_weather_factor = avg_final_factor = 1.0
     
@@ -739,11 +855,11 @@ async def analyze_route_elevation(
     overall_validation = validate_slope_data(all_segments)
     
     print(f"\n[📊 최종 결과]")
-    print(f"  Tmap 기준 시간: {original_walk_time}초")
-    print(f"  최종 보정 시간: {total_adjusted_time}초")
+    print(f"  Tmap 기준 시간: {total_original_walk_time}초")
+    print(f"  최종 보정 시간: {total_adjusted_walk_time}초")
     print(f"  횡단보도 대기 시간: {crosswalk_wait_time}초 ({crosswalk_count}개 × 116초)")
-    print(f"  전체 시간: {total_adjusted_time + crosswalk_wait_time}초")
-    print(f"  시간 차이: {total_adjusted_time - original_walk_time:+}초")
+    print(f"  전체 시간: {total_adjusted_walk_time + crosswalk_wait_time}초")
+    print(f"  시간 차이: {total_adjusted_walk_time - total_original_walk_time:+}초")
     print(f"  평균 계수:")
     print(f"    - 사용자 속도: {avg_user_factor:.3f}")
     print(f"    - 경사도: {avg_slope_factor:.3f}")
@@ -751,14 +867,14 @@ async def analyze_route_elevation(
     print(f"    - 최종: {avg_final_factor:.3f}")
     
     result = {
-        'walk_legs_analysis': analysis,
-        'total_original_walk_time': original_walk_time,
-        'total_adjusted_walk_time': total_adjusted_time,
-        'total_route_time_adjustment': total_adjusted_time - original_walk_time,
+        'walk_legs_analysis': all_analysis,  # 실외 + 환승 모두 포함
+        'total_original_walk_time': total_original_walk_time,
+        'total_adjusted_walk_time': total_adjusted_walk_time,
+        'total_route_time_adjustment': total_adjusted_walk_time - total_original_walk_time,
         # 횡단보도 정보
         'crosswalk_count': crosswalk_count,
         'crosswalk_wait_time': crosswalk_wait_time,
-        'total_time_with_crosswalk': total_adjusted_time + crosswalk_wait_time,
+        'total_time_with_crosswalk': total_adjusted_walk_time + crosswalk_wait_time,
         # 통합 계수 정보
         'factors': {
             'user_speed_factor': avg_user_factor,

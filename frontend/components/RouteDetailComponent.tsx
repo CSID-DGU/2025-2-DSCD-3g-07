@@ -232,6 +232,23 @@ const RouteDetailComponent: React.FC<RouteDetailComponentProps> = ({ routeData, 
             {/* 구간별 경사도 미리보기 */}
             <View style={styles.slopePreview}>
               {slopeAnalysis.walk_legs_analysis.slice(0, 3).map((leg, index) => {
+                // 환승 구간 체크
+                if (leg.is_transfer) {
+                  return (
+                    <View key={index} style={styles.slopePreviewItem}>
+                      <Text style={styles.slopeEmoji}>🚇</Text>
+                      <View style={styles.slopePreviewTextContainer}>
+                        <Text style={styles.slopePreviewText}>
+                          환승 구간: {leg.start_name} → {leg.end_name}
+                        </Text>
+                        <Text style={[styles.slopePreviewText, { color: '#6B7280' }]}>
+                          실내 이동 (경사도/날씨 영향 없음)
+                        </Text>
+                      </View>
+                    </View>
+                  );
+                }
+
                 const getSlopeEmoji = (slope: number) => {
                   const absSlope = Math.abs(slope);
                   if (absSlope < 3) return '⚪';
@@ -329,11 +346,18 @@ const RouteDetailComponent: React.FC<RouteDetailComponentProps> = ({ routeData, 
 
               {leg.mode === 'WALK' && leg.steps && (
                 <View style={styles.walkSteps}>
-                  {leg.steps.map((step, stepIndex) => (
-                    <Text key={stepIndex} style={styles.stepText}>
-                      • {step.description}
-                    </Text>
-                  ))}
+                  {(() => {
+                    console.log('🔍 [RouteDetail] Walk steps:', {
+                      legIndex: index,
+                      stepsCount: leg.steps.length,
+                      firstStep: leg.steps[0],
+                    });
+                    return leg.steps.map((step, stepIndex) => (
+                      <Text key={stepIndex} style={styles.stepText}>
+                        • {step.description}
+                      </Text>
+                    ));
+                  })()}
                 </View>
               )}
 

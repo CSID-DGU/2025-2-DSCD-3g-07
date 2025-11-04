@@ -9,6 +9,7 @@ from app.utils.api_helpers import call_tmap_transit_api
 # from app.utils.ml_helpers import predict_adjustment, train_personalization_model  # 제거됨: 더 이상 사용하지 않음
 from app.schemas import RouteResponse, WalkingSectionResponse
 from app.routers import routes, weather
+from app.utils import walking_only
 
 load_dotenv()  # .env 로드
 
@@ -38,6 +39,7 @@ app.add_middleware(
 # 라우터 등록
 app.include_router(routes.router, prefix="/api")
 app.include_router(weather.router, prefix="/api")
+app.include_router(walking_only.router, prefix="/api")
 
 
 def calculate_walking_time(distance_meters: float, avg_speed_kmh: float = 4.5) -> int:
@@ -103,8 +105,8 @@ async def get_transit_route(
 ):
     """
     T맵 대중교통 경로를 검색합니다.
-
-    보행 구간의 소요시간을 시속 4km 기준으로 재계산합니다.
+    
+    ✨ 보행 시간 재계산 및 보정은 /api/routes/analyze-slope에서 수행됩니다.
     """
     response = call_tmap_transit_api(
         start_x, start_y, end_x, end_y, count, lang, format
@@ -112,41 +114,7 @@ async def get_transit_route(
 
     if response.status_code == 200:
         data = response.json()
-        
-        # 보행 구간 소요시간 재계산 (시속 4km 기준)
-        WALK_SPEED_KM_PER_HOUR = 4.0
-        WALK_SPEED_M_PER_SEC = WALK_SPEED_KM_PER_HOUR * 1000 / 3600  # 약 1.111 m/s
-        
-        itineraries = data.get("metaData", {}).get("plan", {}).get("itineraries", [])
-        
-        for itinerary in itineraries:
-            total_walk_time_original = itinerary.get("totalWalkTime", 0)
-            total_walk_time_recalculated = 0
-            
-            legs = itinerary.get("legs", [])
-            for leg in legs:
-                if leg.get("mode") == "WALK":
-                    distance = leg.get("distance", 0)  # 미터 단위
-                    # 시속 4km 기준으로 재계산 (초 단위)
-                    recalculated_time = int(distance / WALK_SPEED_M_PER_SEC)
-                    original_time = leg.get("sectionTime", 0)
-                    
-                    # leg의 소요시간 업데이트
-                    leg["sectionTime"] = recalculated_time
-                    total_walk_time_recalculated += recalculated_time
-                    
-                    print(f"🚶 보행 구간 재계산: {distance}m, 원래 {original_time}초 → 재계산 {recalculated_time}초")
-            
-            # 전체 도보 시간 업데이트
-            time_diff = total_walk_time_recalculated - total_walk_time_original
-            itinerary["totalWalkTime"] = total_walk_time_recalculated
-            
-            # 전체 소요시간도 조정
-            original_total_time = itinerary.get("totalTime", 0)
-            itinerary["totalTime"] = original_total_time + time_diff
-            
-            print(f"📊 경로 총 시간: {original_total_time}초 → {itinerary['totalTime']}초 (도보: {total_walk_time_original}초 → {total_walk_time_recalculated}초)")
-        
+        print(f"✅ 대중교통 경로 검색 성공 - {len(data.get('metaData', {}).get('plan', {}).get('itineraries', []))}개 경로")
         return data
     else:
         # 에러 처리

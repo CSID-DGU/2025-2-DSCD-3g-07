@@ -201,6 +201,7 @@ export default function HomeScreen() {
   const [searchBarVisible, setSearchBarVisible] = useState(true);
   const [showRouteDetails, setShowRouteDetails] = useState(false);
   const [showRouteList, setShowRouteList] = useState(true); // 경로 목록 표시 여부
+  const [routeMode, setRouteMode] = useState<'transit' | 'walking'>('transit'); // 경로 모드 (대중교통 / 도보)
 
   // 애니메이션
   const searchBarTranslateY = useSharedValue(0);
@@ -413,6 +414,7 @@ export default function HomeScreen() {
       setLoading(true);
       setSearchResults([]);
       setActiveInput(null);
+      setRouteMode('transit'); // 대중교통 모드 설정
 
       const params: TransitRouteParams = {
         start_x: startLocation.longitude,
@@ -476,6 +478,18 @@ export default function HomeScreen() {
       const totalTimeSec = firstItinerary.totalTime || 0;
       const totalWalkTimeSec = firstItinerary.totalWalkTime || 0;
 
+      // 🔍 디버깅: leg별 sectionTime 확인
+      const legWalkTimes = firstItinerary.legs
+        ?.filter((leg: any) => leg.mode === 'WALK')
+        .map((leg: any) => leg.sectionTime || 0) || [];
+      const sumOfLegWalkTimes = legWalkTimes.reduce((a: number, b: number) => a + b, 0);
+
+      console.log('🔍 [도보 시간 디버깅]');
+      console.log(`  - totalWalkTime (API): ${totalWalkTimeSec}초 (${Math.floor(totalWalkTimeSec / 60)}분 ${totalWalkTimeSec % 60}초)`);
+      console.log(`  - leg별 sectionTime 합계: ${sumOfLegWalkTimes}초 (${Math.floor(sumOfLegWalkTimes / 60)}분 ${sumOfLegWalkTimes % 60}초)`);
+      console.log(`  - 차이: ${totalWalkTimeSec - sumOfLegWalkTimes}초`);
+      console.log(`  - 개별 leg 시간:`, legWalkTimes);
+
       // 경사도 분석 (에러 시 무시)
       let slopeAnalysis: RouteElevationAnalysis | null = null;
       try {
@@ -525,6 +539,142 @@ export default function HomeScreen() {
     } catch (error) {
       console.error('❌ 경로 검색 실패:', error);
       Alert.alert('오류', '경로 검색에 실패했습니다.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 보행자 전용 경로 검색
+  const handleSearchWalkingRoute = async () => {
+    if (!startLocation || !endLocation) {
+      Alert.alert('알림', '출발지와 도착지를 모두 입력해주세요.');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setSearchResults([]);
+      setActiveInput(null);
+      setRouteMode('walking'); // 도보 모드 설정
+
+      const params = {
+        start_x: startLocation.longitude,
+        start_y: startLocation.latitude,
+        end_x: endLocation.longitude,
+        end_y: endLocation.latitude,
+        start_name: startLocation.address,
+        end_name: endLocation.address,
+        user_speed_mps: walkingSpeedCase1 || undefined,  // 사용자 보행속도 전달
+        weather_data: weatherData || undefined,  // 날씨 데이터 전달
+      };
+
+      console.log('🚶 Walking API Request:', params);
+      const response = await apiService.getWalkingRoute(params);
+
+      if (!response.data || response.data.type !== 'FeatureCollection') {
+        Alert.alert('오류', '보행자 경로를 찾을 수 없습니다.');
+        return;
+      }
+
+      // GeoJSON features에서 경로 데이터 추출
+      const features = response.data.features || [];
+      const totalDistance = response.data.properties?.totalDistance || 0;
+      const totalTime = response.data.properties?.totalTime || 0;
+
+      // 경로 좌표 추출 (LineString features만)
+      const coords: RoutePath[] = [];
+      features.forEach((feature: any) => {
+        if (feature.geometry?.type === 'LineString' && feature.geometry?.coordinates) {
+          feature.geometry.coordinates.forEach(([lng, lat]: [number, number]) => {
+            if (Number.isFinite(lat) && Number.isFinite(lng)) {
+              coords.push({ lat, lng });
+            }
+          });
+        }
+      });
+
+      console.log(`🗺️ Extracted ${coords.length} coordinates from walking route`);
+
+      if (coords.length === 0) {
+        Alert.alert('오류', '경로 좌표를 추출할 수 없습니다.');
+        return;
+      }
+
+      setRoutePath(coords);
+
+      // 백엔드 데이터 확인
+      console.log('🔍 도보 경로 데이터:', {
+        metaData: !!response.data?.metaData,
+        itinerary: !!response.data?.metaData?.plan?.itineraries?.[0],
+        steps: response.data?.metaData?.plan?.itineraries?.[0]?.legs?.[0]?.steps?.length,
+        crosswalk_count: response.data?.elevation_analysis?.crosswalk_count,
+      });
+
+      // 첫 3개 steps 확인
+      const firstSteps = response.data?.metaData?.plan?.itineraries?.[0]?.legs?.[0]?.steps?.slice(0, 3);
+      console.log('🔍 첫 3개 steps:', firstSteps);
+
+      // 백엔드에서 제공한 itinerary 사용 (이미 완전한 구조)
+      const walkingItinerary: Itinerary = response.data?.metaData?.plan?.itineraries?.[0] || {
+        legs: [{
+          mode: 'WALK',
+          sectionTime: totalTime,
+          distance: totalDistance,
+          start: {
+            lat: startLocation.latitude,
+            lon: startLocation.longitude,
+            name: startLocation.address,
+          },
+          end: {
+            lat: endLocation.latitude,
+            lon: endLocation.longitude,
+            name: endLocation.address,
+          },
+          steps: [],
+        }],
+        totalTime,
+        totalWalkTime: totalTime,
+        totalDistance: totalDistance,
+        totalWalkDistance: totalDistance,
+        fare: { regular: { totalFare: 0, currency: { symbol: '₩', currency: 'KRW', currencyCode: 'KRW' } } },
+      };
+
+      // 백엔드에서 받은 경사도 분석 결과 사용
+      const slopeAnalysis = response.data?.elevation_analysis || null;
+
+      setRouteInfo({
+        totalTime: totalTime,
+        totalWalkTime: totalTime,
+        walkRatio: 100, // 100% 도보
+        personalizedWalkTime: slopeAnalysis?.total_adjusted_walk_time || totalTime,
+        slopeAnalysis,
+        rawItinerary: walkingItinerary,
+        totalDistance: totalDistance,
+        legs: walkingItinerary.legs,
+      });
+
+      // 경로 옵션 초기화 (보행자 경로는 1개만)
+      setRouteOptions([walkingItinerary]);
+      setSelectedRouteIndex(0);
+      setShowRouteList(false);
+      setRouteMode('walking');
+
+      // 검색창 숨기기
+      searchBarTranslateY.value = withSpring(-SEARCH_BAR_HEIGHT, {
+        damping: 20,
+        stiffness: 90,
+      });
+      setSearchBarVisible(false);
+
+      // 바텀시트 올리기
+      bottomSheetHeight.value = withSpring(BOTTOM_SHEET_MAX, {
+        damping: 20,
+        stiffness: 90,
+      });
+
+    } catch (error) {
+      console.error('❌ 보행자 경로 검색 실패:', error);
+      Alert.alert('오류', '보행자 경로 검색에 실패했습니다.');
     } finally {
       setLoading(false);
     }
@@ -597,6 +747,7 @@ export default function HomeScreen() {
           endLat={endLocation?.latitude || 37.5665}
           endLng={endLocation?.longitude || 126.978}
           paths={routePath}
+          routeMode={routeMode}
         />
       </View>
 
@@ -685,20 +836,45 @@ export default function HomeScreen() {
             </View>
 
             {/* 검색 버튼 */}
-            <TouchableOpacity
-              style={[styles.searchButton, (!startLocation || !endLocation) && styles.searchButtonDisabled]}
-              onPress={handleSearchRoute}
-              disabled={!startLocation || !endLocation || loading}
-            >
-              {loading ? (
-                <ActivityIndicator color="white" />
-              ) : (
-                <>
-                  <MaterialIcons name="search" size={22} color="white" />
-                  <Text style={styles.searchButtonText}>경로 검색</Text>
-                </>
-              )}
-            </TouchableOpacity>
+            <View style={styles.searchButtonsContainer}>
+              <TouchableOpacity
+                style={[
+                  styles.searchButton,
+                  styles.transitButton,
+                  (!startLocation || !endLocation) && styles.searchButtonDisabled
+                ]}
+                onPress={handleSearchRoute}
+                disabled={!startLocation || !endLocation || loading}
+              >
+                {loading && routeMode === 'transit' ? (
+                  <ActivityIndicator color="white" />
+                ) : (
+                  <>
+                    <MaterialIcons name="directions-bus" size={22} color="white" />
+                    <Text style={styles.searchButtonText}>대중교통</Text>
+                  </>
+                )}
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[
+                  styles.searchButton,
+                  styles.walkingButton,
+                  (!startLocation || !endLocation) && styles.searchButtonDisabled
+                ]}
+                onPress={handleSearchWalkingRoute}
+                disabled={!startLocation || !endLocation || loading}
+              >
+                {loading && routeMode === 'walking' ? (
+                  <ActivityIndicator color="white" />
+                ) : (
+                  <>
+                    <MaterialIcons name="directions-walk" size={22} color="white" />
+                    <Text style={styles.searchButtonText}>도보</Text>
+                  </>
+                )}
+              </TouchableOpacity>
+            </View>
           </View>
 
           {/* 검색 결과 리스트 */}
@@ -848,8 +1024,12 @@ export default function HomeScreen() {
 
                   <View style={styles.statItem}>
                     <MaterialIcons name="directions-walk" size={20} color={SECONDARY_TEXT} />
-                    <Text style={styles.statValue}>{formatMinutes(routeInfo.totalWalkTime)}</Text>
-                    <Text style={styles.statLabel}>도보 시간</Text>
+                    <Text style={styles.statValue}>
+                      {routeInfo.slopeAnalysis?.total_original_walk_time
+                        ? formatMinutes(routeInfo.slopeAnalysis.total_original_walk_time)
+                        : formatMinutes(routeInfo.totalWalkTime)}
+                    </Text>
+                    <Text style={styles.statLabel}>도보 시간 (기준)</Text>
                   </View>
                 </View>
 
@@ -947,12 +1127,19 @@ export default function HomeScreen() {
                           <Text style={styles.slopeStatLabel}>평균 경사</Text>
                           <Text style={styles.slopeStatValue}>
                             {(() => {
-                              const totalDistance = routeInfo.slopeAnalysis.walk_legs_analysis.reduce(
-                                (sum, leg) => sum + leg.distance,
+                              const legs = routeInfo.slopeAnalysis.walk_legs_analysis;
+                              if (!legs || legs.length === 0) {
+                                return '0.0';
+                              }
+                              const totalDistance = legs.reduce(
+                                (sum, leg) => sum + (leg.distance || 0),
                                 0
                               );
-                              const weightedSum = routeInfo.slopeAnalysis.walk_legs_analysis.reduce(
-                                (sum, leg) => sum + (leg.avg_slope * leg.distance),
+                              if (totalDistance === 0) {
+                                return '0.0';
+                              }
+                              const weightedSum = legs.reduce(
+                                (sum, leg) => sum + ((leg.avg_slope || 0) * (leg.distance || 0)),
                                 0
                               );
                               return (weightedSum / totalDistance).toFixed(1);
@@ -984,11 +1171,24 @@ export default function HomeScreen() {
                         </View>
 
                         <View style={styles.slopeStatItem}>
-                          <Text style={styles.slopeStatLabel}>실제 예상</Text>
+                          <Text style={styles.slopeStatLabel}>보정 후</Text>
                           <Text style={styles.slopeStatValue}>
                             {Math.floor(routeInfo.slopeAnalysis.total_adjusted_walk_time / 60)}분
                           </Text>
                         </View>
+                      </View>
+
+                      {/* 계산 설명 */}
+                      <View style={{ marginTop: 12, paddingTop: 12, borderTopWidth: 1, borderTopColor: '#E6E9F2' }}>
+                        <Text style={{ fontSize: 11, color: '#6B7280', lineHeight: 16 }}>
+                          💡 기준 시간({Math.floor(routeInfo.slopeAnalysis.total_original_walk_time / 60)}분)에
+                          사용자 속도, 경사도, 날씨를 반영한 예상 시간입니다.
+                        </Text>
+                        {routeInfo.slopeAnalysis.walk_legs_analysis.some(leg => leg.is_transfer) && (
+                          <Text style={{ fontSize: 10, color: '#9CA3AF', lineHeight: 14, marginTop: 4 }}>
+                            ℹ️ 환승(실내) 구간은 경사도와 날씨 영향 없이 개인 속도만 반영됩니다.
+                          </Text>
+                        )}
                       </View>
 
                       {/* 경사도 경고 */}
@@ -1134,6 +1334,19 @@ export default function HomeScreen() {
                         <Text style={styles.routeName}>{leg.route}</Text>
                       </View>
                     )}
+
+                    {/* 도보 상세 경로 */}
+                    {leg.mode === 'WALK' && leg.steps && leg.steps.length > 0 && (
+                      <View style={styles.walkStepsContainer}>
+                        {leg.steps.map((step, stepIndex) => (
+                          step.description ? (
+                            <Text key={stepIndex} style={styles.walkStepText}>
+                              • {step.description}
+                            </Text>
+                          ) : null
+                        ))}
+                      </View>
+                    )}
                   </View>
                 ))}
               </View>
@@ -1257,15 +1470,25 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  searchButton: {
+  searchButtonsContainer: {
+    flexDirection: 'row',
+    gap: 8,
     marginTop: 8,
+  },
+  searchButton: {
+    flex: 1,
     height: 48,
     borderRadius: 12,
-    backgroundColor: PRIMARY_COLOR,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
+  },
+  transitButton: {
+    backgroundColor: PRIMARY_COLOR,
+  },
+  walkingButton: {
+    backgroundColor: '#10B981', // 초록색 (도보)
   },
   searchButtonDisabled: {
     backgroundColor: '#A5B4FC',
@@ -1458,6 +1681,18 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     color: PRIMARY_COLOR,
+  },
+  walkStepsContainer: {
+    marginTop: 12,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: BORDER_COLOR,
+    gap: 8,
+  },
+  walkStepText: {
+    fontSize: 14,
+    color: '#4B5563',
+    lineHeight: 20,
   },
   // 경로 목록 스타일
   routeListTitle: {

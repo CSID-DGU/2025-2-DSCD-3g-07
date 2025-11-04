@@ -160,6 +160,11 @@ export interface WalkLegAnalysis {
   max_slope: number;
   min_slope: number;
   segments: SlopeSegment[];
+  is_transfer?: boolean;  // 환승(실내) 구간 여부
+  user_speed_factor?: number;
+  slope_factor?: number;
+  weather_factor?: number;
+  final_factor?: number;
 }
 
 export interface RouteElevationAnalysis {

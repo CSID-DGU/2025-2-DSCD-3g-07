@@ -9,6 +9,7 @@ interface KakaoMapWithRouteProps {
   endLat: number;
   endLng: number;
   paths?: RoutePath[]; // 경로 좌표들
+  routeMode?: 'transit' | 'walking'; // 경로 모드 (대중교통 / 도보)
 }
 
 const html = (
@@ -17,7 +18,8 @@ const html = (
   startLng: number,
   endLat: number,
   endLng: number,
-  paths?: RoutePath[]
+  paths?: RoutePath[],
+  routeMode?: 'transit' | 'walking'
 ) => `
 <!doctype html><html><head>
   <meta name="viewport" content="initial-scale=1, width=device-width" />
@@ -63,12 +65,18 @@ const html = (
       const pathCoords = ${JSON.stringify(paths)};
       const linePath = pathCoords.map(p => new kakao.maps.LatLng(p.lat, p.lng));
       
+      // 경로 모드에 따른 색상 및 스타일
+      const isWalking = ${routeMode === 'walking'};
+      const strokeColor = isWalking ? '#34C759' : '#4285F4'; // 도보: 초록색, 대중교통: 파란색
+      const strokeWeight = isWalking ? 6 : 5; // 도보: 더 굵게
+      const strokeStyle = isWalking ? 'solid' : 'solid';
+      
       const polyline = new kakao.maps.Polyline({
         path: linePath,
-        strokeWeight: 5,
-        strokeColor: '#4285F4',
+        strokeWeight: strokeWeight,
+        strokeColor: strokeColor,
         strokeOpacity: 0.8,
-        strokeStyle: 'solid'
+        strokeStyle: strokeStyle
       });
       
       polyline.setMap(map);
@@ -100,6 +108,7 @@ export default function KakaoMapWithRoute({
   endLat,
   endLng,
   paths,
+  routeMode = 'transit', // 기본값: 대중교통
 }: KakaoMapWithRouteProps) {
   return (
     <View style={{ flex: 1 }}>
@@ -110,7 +119,7 @@ export default function KakaoMapWithRoute({
         onMessage={(e) => {
           console.log("WebView:", e.nativeEvent.data);
         }}
-        source={{ html: html(jsKey, startLat, startLng, endLat, endLng, paths) }}
+        source={{ html: html(jsKey, startLat, startLng, endLat, endLng, paths, routeMode) }}
       />
     </View>
   );

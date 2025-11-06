@@ -24,9 +24,9 @@ from app.database import Base
 try:
     from sqlalchemy.dialects.postgresql import JSONB
 
-    JSONType: type[TypeEngine] = JSONB  # type: ignore[assignment]
+    JSONType: type[TypeEngine] = JSONB  # type: ignore
 except ImportError:
-    JSONType = JSON  # type: ignore[assignment]
+    JSONType = JSON  # type: ignore
 
 
 # 1) users

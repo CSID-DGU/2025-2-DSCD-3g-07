@@ -11,6 +11,11 @@ flake8==6.1.0
 isort==6.1.0
 mypy==1.6.1
 
+# 타입 스텁
+types-python-jose==3.3.4.8
+types-passlib==1.7.7.13
+types-requests==2.31.0.10
+
 # 보안 검사
 bandit==1.7.5
 

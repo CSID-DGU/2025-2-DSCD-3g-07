@@ -16,14 +16,17 @@ from sqlalchemy import (
     func,
 )
 from sqlalchemy.orm import relationship
+from sqlalchemy.types import TypeEngine
 
 from app.database import Base
 
 # PostgreSQL에서는 JSONB, SQLite에서는 JSON 사용
 try:
-    from sqlalchemy.dialects.postgresql import JSONB as JSONType
+    from sqlalchemy.dialects.postgresql import JSONB
+
+    JSONType: type[TypeEngine] = JSONB  # type: ignore[assignment]
 except ImportError:
-    JSONType = JSON
+    JSONType = JSON  # type: ignore[assignment]
 
 
 # 1) users

@@ -1,17 +1,17 @@
 import { Platform } from 'react-native';
 import {
-    SdkAvailabilityStatus,
-    aggregateRecord,
-    getGrantedPermissions,
-    getSdkStatus,
-    initialize,
-    openHealthConnectSettings as openNativeHealthConnectSettings,
-    readRecords,
-    requestPermission,
-    type BackgroundAccessPermission,
-    type Permission,
-    type ReadHealthDataHistoryPermission,
-    type WriteExerciseRoutePermission,
+  SdkAvailabilityStatus,
+  aggregateRecord,
+  getGrantedPermissions,
+  getSdkStatus,
+  initialize,
+  openHealthConnectSettings as openNativeHealthConnectSettings,
+  readRecords,
+  requestPermission,
+  type BackgroundAccessPermission,
+  type Permission,
+  type ReadHealthDataHistoryPermission,
+  type WriteExerciseRoutePermission,
 } from 'react-native-health-connect';
 
 export interface HealthResult {
@@ -86,15 +86,15 @@ async function readFromHealthConnect(): Promise<HealthResult | null> {
   }
 
   try {
-    let grantedPermissions = await getGrantedPermissions();
-    let grantedKeys = createGrantedKeySet(grantedPermissions);
+    let grantedPermissions = await getGrantedPermissions() as Permission[];
+    let grantedKeys = createGrantedKeySet(grantedPermissions as AnyGrantedPermission[]);
 
-    let hasRequired = hasAllRequiredPermissions(grantedPermissions);
+    let hasRequired = hasAllRequiredPermissions(grantedPermissions as AnyGrantedPermission[]);
     if (!hasRequired) {
       await requestPermission(ALL_PERMISSIONS);
-      grantedPermissions = await getGrantedPermissions();
-      grantedKeys = createGrantedKeySet(grantedPermissions);
-      hasRequired = hasAllRequiredPermissions(grantedPermissions);
+      grantedPermissions = await getGrantedPermissions() as Permission[];
+      grantedKeys = createGrantedKeySet(grantedPermissions as AnyGrantedPermission[]);
+      hasRequired = hasAllRequiredPermissions(grantedPermissions as AnyGrantedPermission[]);
     }
 
     if (!hasRequired) {
@@ -123,8 +123,11 @@ async function readFromHealthConnect(): Promise<HealthResult | null> {
     const stepsAggregate = await aggregateRecord({ recordType: 'Steps', timeRangeFilter });
     const distanceAggregate = await aggregateRecord({ recordType: 'Distance', timeRangeFilter });
 
-    const totalSteps = Math.max(0, Math.round(stepsAggregate?.COUNT_TOTAL ?? 0));
-    const totalMeters = Math.max(0, Math.round(distanceAggregate?.DISTANCE?.inMeters ?? 0));
+    const totalSteps = Math.max(0, Math.round(Number(stepsAggregate?.COUNT_TOTAL ?? 0)));
+    const distanceValue = distanceAggregate?.DISTANCE as any;
+    const totalMeters = Math.max(0, Math.round(
+      distanceValue?.inMeters ? Number(distanceValue.inMeters) : 0
+    ));
 
     let averageSpeedMps = 0;
     let averageSpeedKmh = 0;
@@ -201,13 +204,30 @@ export async function requestHealthConnectPermissions(): Promise<{ success: bool
 
   try {
     await requestPermission(ALL_PERMISSIONS);
-    const granted = await getGrantedPermissions();
-    if (hasAllRequiredPermissions(granted)) {
+    const granted = await getGrantedPermissions() as Permission[];
+    if (hasAllRequiredPermissions(granted as AnyGrantedPermission[])) {
       return { success: true };
     }
     return { success: false, error: 'Required permissions were not granted' };
   } catch (error: any) {
     return { success: false, error: error?.message ?? String(error) };
+  }
+}
+
+export async function checkHealthConnectAvailability(): Promise<{ available: boolean; error?: string }> {
+  if (Platform.OS !== 'android') {
+    return { available: false, error: 'Health Connect is only available on Android' };
+  }
+
+  try {
+    const status = await getSdkStatus();
+    const available = status === SdkAvailabilityStatus.SDK_AVAILABLE;
+    return {
+      available,
+      error: available ? undefined : `SDK not available: ${status}`
+    };
+  } catch (error: any) {
+    return { available: false, error: error?.message ?? String(error) };
   }
 }
 

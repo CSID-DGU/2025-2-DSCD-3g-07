@@ -17,11 +17,11 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import KakaoMapWithRoute from '../../components/KakaoMapWithRoute';
 import { searchPedestrianRoute, RouteResponse } from '../../services/routeService';
-import { 
-  searchPlaces, 
-  PlaceSearchResult, 
+import {
+  searchPlaces,
+  PlaceSearchResult,
   placeToCoordinates,
-  formatPlaceDisplay 
+  formatPlaceDisplay
 } from '../../services/placeSearchService';
 
 // 카카오맵 JS 키 (환경변수로 관리 권장)
@@ -110,7 +110,7 @@ export default function RoutesScreen() {
   const [start, setStart] = useState('현재 위치');
   const [destination, setDestination] = useState('');
   const [filters, setFilters] = useState<string[]>(['강변 뷰']);
-  
+
   // 경로 검색 상태
   const [searching, setSearching] = useState(false);
   const [routeResult, setRouteResult] = useState<RouteResponse | null>(null);
@@ -129,7 +129,7 @@ export default function RoutesScreen() {
   // 출발지 검색
   const handleStartSearch = async (text: string) => {
     setStart(text);
-    
+
     if (text.trim().length >= 2) {
       try {
         const results = await searchPlaces(text, selectedStartCoords.lng, selectedStartCoords.lat);
@@ -149,7 +149,7 @@ export default function RoutesScreen() {
   // 도착지 검색
   const handleDestSearch = async (text: string) => {
     setDestination(text);
-    
+
     if (text.trim().length >= 2) {
       try {
         const results = await searchPlaces(text, selectedStartCoords.lng, selectedStartCoords.lat);
@@ -170,7 +170,7 @@ export default function RoutesScreen() {
   const handleSelectStart = (place: PlaceSearchResult) => {
     setStart(formatPlaceDisplay(place));
     const coords = placeToCoordinates(place);
-    setSelectedStartCoords(coords);
+    setSelectedStartCoords({ lat: coords.latitude, lng: coords.longitude });
     setShowStartResults(false);
     setStartSearchResults([]);
     console.log('✅ 출발지 선택:', { name: place.place_name, coords });
@@ -180,7 +180,7 @@ export default function RoutesScreen() {
   const handleSelectDest = (place: PlaceSearchResult) => {
     setDestination(formatPlaceDisplay(place));
     const coords = placeToCoordinates(place);
-    setSelectedDestCoords(coords);
+    setSelectedDestCoords({ lat: coords.latitude, lng: coords.longitude });
     setShowDestResults(false);
     setDestSearchResults([]);
     console.log('✅ 도착지 선택:', { name: place.place_name, coords });
@@ -230,21 +230,6 @@ export default function RoutesScreen() {
     );
   };
 
-  const searchRoute = async () => {
-    // 테스트용 좌표 (서울역 -> 강남역)
-    const startCoords = { x: 126.9706, y: 37.5547 };
-    const endCoords = { x: 127.0276, y: 37.4979 };
-    
-    await getRoute({
-      start_x: startCoords.x,
-      start_y: startCoords.y,
-      end_x: endCoords.x,
-      end_y: endCoords.y,
-    });
-    
-    setShowRouteResult(true);
-  };
-
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
@@ -269,12 +254,12 @@ export default function RoutesScreen() {
             <Text style={styles.inputLabel}>출발지</Text>
             <View style={styles.inputRow}>
               <MaterialIcons name="my-location" size={18} color="#304FFE" />
-              <TextInput 
-                value={start} 
+              <TextInput
+                value={start}
                 onChangeText={handleStartSearch}
                 onFocus={() => setShowStartResults(startSearchResults.length > 0)}
                 placeholder="출발지를 입력하세요"
-                style={styles.inputField} 
+                style={styles.inputField}
               />
               {start.length > 0 && (
                 <TouchableOpacity onPress={() => {
@@ -315,12 +300,12 @@ export default function RoutesScreen() {
             <Text style={styles.inputLabel}>도착지</Text>
             <View style={styles.inputRow}>
               <MaterialIcons name="flag" size={18} color="#FF7043" />
-              <TextInput 
-                value={destination} 
+              <TextInput
+                value={destination}
                 onChangeText={handleDestSearch}
                 onFocus={() => setShowDestResults(destSearchResults.length > 0)}
                 placeholder="도착지를 입력하세요"
-                style={styles.inputField} 
+                style={styles.inputField}
               />
               {destination.length > 0 && (
                 <TouchableOpacity onPress={() => {
@@ -364,7 +349,7 @@ export default function RoutesScreen() {
               </TouchableOpacity>
             ))}
           </View>
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.ctaButton}
             onPress={handleSearchRoute}
             disabled={searching}
@@ -410,26 +395,6 @@ export default function RoutesScreen() {
             );
           })}
         </View>
-
-        {/* 경로 검색 결과 표시 */}
-        {showRouteResult && (
-          <View style={styles.routeResultContainer}>
-            <View style={styles.resultHeader}>
-              <Text style={styles.resultTitle}>검색 결과</Text>
-              <TouchableOpacity 
-                onPress={() => setShowRouteResult(false)}
-                style={styles.closeButton}
-              >
-                <MaterialIcons name="close" size={20} color="#667085" />
-              </TouchableOpacity>
-            </View>
-            {routeError ? (
-              <Text style={styles.errorText}>❌ 오류: {routeError}</Text>
-            ) : (
-              <RouteDetailComponent routeData={routeData} />
-            )}
-          </View>
-        )}
 
         <View style={styles.routeList}>
           {routes.map((route) => (
@@ -493,7 +458,7 @@ export default function RoutesScreen() {
               <Text style={styles.mapStartText}>시작</Text>
             </TouchableOpacity>
           </View>
-          
+
           {routeResult && (
             <KakaoMapWithRoute
               jsKey={KAKAO_JS_KEY}

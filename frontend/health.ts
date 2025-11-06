@@ -40,7 +40,10 @@ const OPTIONAL_PERMISSIONS: Permission[] = [
   { accessType: 'read', recordType: 'Speed' },
 ];
 
-const ALL_PERMISSIONS: Permission[] = [...REQUIRED_PERMISSIONS, ...OPTIONAL_PERMISSIONS];
+const ALL_PERMISSIONS: Permission[] = [
+  ...REQUIRED_PERMISSIONS,
+  ...OPTIONAL_PERMISSIONS,
+];
 
 const REQUIRED_PERMISSION_KEYS = REQUIRED_PERMISSIONS.map(permissionKey);
 const OPTIONAL_PERMISSION_KEYS = OPTIONAL_PERMISSIONS.map(permissionKey);
@@ -49,7 +52,10 @@ const SPEED_PERMISSION_KEY = OPTIONAL_PERMISSION_KEYS[0];
 
 const nowISO = () => new Date().toISOString();
 
-function permissionKey(permission: { accessType: string; recordType: string }): string {
+function permissionKey(permission: {
+  accessType: string;
+  recordType: string;
+}): string {
   return `${permission.accessType}:${permission.recordType}`;
 }
 
@@ -59,7 +65,7 @@ function createGrantedKeySet(granted: AnyGrantedPermission[]): Set<string> {
 
 function hasAllRequiredPermissions(granted: AnyGrantedPermission[]): boolean {
   const grantedKeys = createGrantedKeySet(granted);
-  return REQUIRED_PERMISSION_KEYS.every((key) => grantedKeys.has(key));
+  return REQUIRED_PERMISSION_KEYS.every(key => grantedKeys.has(key));
 }
 
 async function ensureHealthConnectReady(): Promise<boolean> {
@@ -86,15 +92,23 @@ async function readFromHealthConnect(): Promise<HealthResult | null> {
   }
 
   try {
-    let grantedPermissions = await getGrantedPermissions() as Permission[];
-    let grantedKeys = createGrantedKeySet(grantedPermissions as AnyGrantedPermission[]);
+    let grantedPermissions = (await getGrantedPermissions()) as Permission[];
+    let grantedKeys = createGrantedKeySet(
+      grantedPermissions as AnyGrantedPermission[]
+    );
 
-    let hasRequired = hasAllRequiredPermissions(grantedPermissions as AnyGrantedPermission[]);
+    let hasRequired = hasAllRequiredPermissions(
+      grantedPermissions as AnyGrantedPermission[]
+    );
     if (!hasRequired) {
       await requestPermission(ALL_PERMISSIONS);
-      grantedPermissions = await getGrantedPermissions() as Permission[];
-      grantedKeys = createGrantedKeySet(grantedPermissions as AnyGrantedPermission[]);
-      hasRequired = hasAllRequiredPermissions(grantedPermissions as AnyGrantedPermission[]);
+      grantedPermissions = (await getGrantedPermissions()) as Permission[];
+      grantedKeys = createGrantedKeySet(
+        grantedPermissions as AnyGrantedPermission[]
+      );
+      hasRequired = hasAllRequiredPermissions(
+        grantedPermissions as AnyGrantedPermission[]
+      );
     }
 
     if (!hasRequired) {
@@ -120,14 +134,24 @@ async function readFromHealthConnect(): Promise<HealthResult | null> {
       endTime: end.toISOString(),
     };
 
-    const stepsAggregate = await aggregateRecord({ recordType: 'Steps', timeRangeFilter });
-    const distanceAggregate = await aggregateRecord({ recordType: 'Distance', timeRangeFilter });
+    const stepsAggregate = await aggregateRecord({
+      recordType: 'Steps',
+      timeRangeFilter,
+    });
+    const distanceAggregate = await aggregateRecord({
+      recordType: 'Distance',
+      timeRangeFilter,
+    });
 
-    const totalSteps = Math.max(0, Math.round(Number(stepsAggregate?.COUNT_TOTAL ?? 0)));
+    const totalSteps = Math.max(
+      0,
+      Math.round(Number(stepsAggregate?.COUNT_TOTAL ?? 0))
+    );
     const distanceValue = distanceAggregate?.DISTANCE as any;
-    const totalMeters = Math.max(0, Math.round(
-      distanceValue?.inMeters ? Number(distanceValue.inMeters) : 0
-    ));
+    const totalMeters = Math.max(
+      0,
+      Math.round(distanceValue?.inMeters ? Number(distanceValue.inMeters) : 0)
+    );
 
     let averageSpeedMps = 0;
     let averageSpeedKmh = 0;
@@ -139,10 +163,10 @@ async function readFromHealthConnect(): Promise<HealthResult | null> {
         });
 
         const samples = speedResponse?.records
-          ?.map((record) => record.samples ?? [])
+          ?.map(record => record.samples ?? [])
           .flat()
-          .map((sample) => sample.speed?.inMetersPerSecond ?? 0)
-          .filter((value) => value > 0);
+          .map(sample => sample.speed?.inMetersPerSecond ?? 0)
+          .filter(value => value > 0);
 
         if (samples && samples.length > 0) {
           const total = samples.reduce((sum, value) => sum + value, 0);
@@ -197,14 +221,17 @@ export async function readTodayStepsAndDistance(): Promise<HealthResult> {
   return demoFallback();
 }
 
-export async function requestHealthConnectPermissions(): Promise<{ success: boolean; error?: string }> {
+export async function requestHealthConnectPermissions(): Promise<{
+  success: boolean;
+  error?: string;
+}> {
   if (!(await ensureHealthConnectReady())) {
     return { success: false, error: 'Health Connect is not available' };
   }
 
   try {
     await requestPermission(ALL_PERMISSIONS);
-    const granted = await getGrantedPermissions() as Permission[];
+    const granted = (await getGrantedPermissions()) as Permission[];
     if (hasAllRequiredPermissions(granted as AnyGrantedPermission[])) {
       return { success: true };
     }
@@ -214,9 +241,15 @@ export async function requestHealthConnectPermissions(): Promise<{ success: bool
   }
 }
 
-export async function checkHealthConnectAvailability(): Promise<{ available: boolean; error?: string }> {
+export async function checkHealthConnectAvailability(): Promise<{
+  available: boolean;
+  error?: string;
+}> {
   if (Platform.OS !== 'android') {
-    return { available: false, error: 'Health Connect is only available on Android' };
+    return {
+      available: false,
+      error: 'Health Connect is only available on Android',
+    };
   }
 
   try {
@@ -224,16 +257,22 @@ export async function checkHealthConnectAvailability(): Promise<{ available: boo
     const available = status === SdkAvailabilityStatus.SDK_AVAILABLE;
     return {
       available,
-      error: available ? undefined : `SDK not available: ${status}`
+      error: available ? undefined : `SDK not available: ${status}`,
     };
   } catch (error: any) {
     return { available: false, error: error?.message ?? String(error) };
   }
 }
 
-export async function openHealthConnectSettings(): Promise<{ success: boolean; error?: string }> {
+export async function openHealthConnectSettings(): Promise<{
+  success: boolean;
+  error?: string;
+}> {
   if (Platform.OS !== 'android') {
-    return { success: false, error: 'Health Connect settings unavailable on this platform' };
+    return {
+      success: false,
+      error: 'Health Connect settings unavailable on this platform',
+    };
   }
 
   try {

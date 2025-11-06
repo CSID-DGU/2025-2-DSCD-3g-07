@@ -1,6 +1,6 @@
-import { View } from "react-native";
-import { WebView } from "react-native-webview";
-import { RoutePath } from "../services/routeService";
+import { View } from 'react-native';
+import { WebView } from 'react-native-webview';
+import { RoutePath } from '../services/routeService';
 
 interface KakaoMapWithRouteProps {
   jsKey: string;
@@ -60,7 +60,9 @@ const html = (
         )
       });
 
-      ${paths && paths.length > 0 ? `
+      ${
+        paths && paths.length > 0
+          ? `
       // 경로 그리기
       const pathCoords = ${JSON.stringify(paths)};
       const linePath = pathCoords.map(p => new kakao.maps.LatLng(p.lat, p.lng));
@@ -85,13 +87,15 @@ const html = (
       const bounds = new kakao.maps.LatLngBounds();
       linePath.forEach(point => bounds.extend(point));
       map.setBounds(bounds);
-      ` : `
+      `
+          : `
       // 경로가 없으면 출발지와 도착지만 보이도록
       const bounds = new kakao.maps.LatLngBounds();
       bounds.extend(new kakao.maps.LatLng(${startLat}, ${startLng}));
       bounds.extend(new kakao.maps.LatLng(${endLat}, ${endLng}));
       map.setBounds(bounds);
-      `}
+      `
+      }
 
       if (window.ReactNativeWebView) {
         window.ReactNativeWebView.postMessage("KAKAO_MAP_WITH_ROUTE_READY");
@@ -113,13 +117,23 @@ export default function KakaoMapWithRoute({
   return (
     <View style={{ flex: 1 }}>
       <WebView
-        originWhitelist={["*"]}
+        originWhitelist={['*']}
         javaScriptEnabled
         domStorageEnabled
-        onMessage={(e) => {
-          console.log("WebView:", e.nativeEvent.data);
+        onMessage={e => {
+          console.log('WebView:', e.nativeEvent.data);
         }}
-        source={{ html: html(jsKey, startLat, startLng, endLat, endLng, paths, routeMode) }}
+        source={{
+          html: html(
+            jsKey,
+            startLat,
+            startLng,
+            endLat,
+            endLng,
+            paths,
+            routeMode
+          ),
+        }}
       />
     </View>
   );

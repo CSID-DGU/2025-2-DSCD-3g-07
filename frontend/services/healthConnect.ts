@@ -6,7 +6,7 @@ import {
   revokeAllPermissions,
   getGrantedPermissions,
   readRecords,
-  Permission
+  Permission,
 } from 'react-native-health-connect';
 import { Platform } from 'react-native';
 import HealthConnectModule from './nativeHealthConnect';
@@ -99,8 +99,13 @@ export class HealthConnectService {
         console.log('✅ Health Connect is available and ready');
       } else if (status === SdkAvailabilityStatus.SDK_UNAVAILABLE) {
         console.log('❌ Health Connect is not installed');
-      } else if (status === SdkAvailabilityStatus.SDK_UNAVAILABLE_PROVIDER_UPDATE_REQUIRED) {
-        console.log('⚠️ Health Connect update required OR device not compatible');
+      } else if (
+        status ===
+        SdkAvailabilityStatus.SDK_UNAVAILABLE_PROVIDER_UPDATE_REQUIRED
+      ) {
+        console.log(
+          '⚠️ Health Connect update required OR device not compatible'
+        );
       }
 
       return status;
@@ -132,8 +137,10 @@ export class HealthConnectService {
 
       // SDK 가용성 확인
       const sdkStatus = await this.checkAvailability();
-      const sdkAvailable = sdkStatus === SdkAvailabilityStatus.SDK_AVAILABLE ||
-        sdkStatus === SdkAvailabilityStatus.SDK_UNAVAILABLE_PROVIDER_UPDATE_REQUIRED;
+      const sdkAvailable =
+        sdkStatus === SdkAvailabilityStatus.SDK_AVAILABLE ||
+        sdkStatus ===
+          SdkAvailabilityStatus.SDK_UNAVAILABLE_PROVIDER_UPDATE_REQUIRED;
 
       // 부여된 권한 확인
       let grantedCount = 0;
@@ -144,12 +151,14 @@ export class HealthConnectService {
           // 먼저 초기화 확인
           const isInit = await this.initialize();
           if (!isInit) {
-            console.warn('⚠️ Health Connect not initialized, skipping permission check');
+            console.warn(
+              '⚠️ Health Connect not initialized, skipping permission check'
+            );
             return {
               sdkAvailable: false,
               permissionsGranted: false,
               grantedCount: 0,
-              totalCount: 10
+              totalCount: 10,
             };
           }
 
@@ -157,11 +166,16 @@ export class HealthConnectService {
 
           // 우리가 요청한 권한 목록
           const requestedPermissions = [
-            'Steps-read', 'Steps-write',
-            'Distance-read', 'Distance-write',
-            'Speed-read', 'Speed-write',
-            'ActiveCaloriesBurned-read', 'ActiveCaloriesBurned-write',
-            'ExerciseSession-read', 'ExerciseSession-write'
+            'Steps-read',
+            'Steps-write',
+            'Distance-read',
+            'Distance-write',
+            'Speed-read',
+            'Speed-write',
+            'ActiveCaloriesBurned-read',
+            'ActiveCaloriesBurned-write',
+            'ExerciseSession-read',
+            'ExerciseSession-write',
           ];
 
           // 실제 부여된 권한 중 우리가 요청한 권한만 카운트
@@ -174,11 +188,16 @@ export class HealthConnectService {
           });
 
           permissionsGranted = grantedCount > 0;
-          console.log(`✅ Our requested permissions granted: ${grantedCount}/10`);
+          console.log(
+            `✅ Our requested permissions granted: ${grantedCount}/10`
+          );
           console.log(`📊 Total permissions in system: ${allGranted.length}`);
         } catch (error) {
           console.warn('⚠️ Could not check granted permissions:', error);
-          console.warn('⚠️ Error details:', error instanceof Error ? error.message : String(error));
+          console.warn(
+            '⚠️ Error details:',
+            error instanceof Error ? error.message : String(error)
+          );
         }
       }
 
@@ -187,7 +206,7 @@ export class HealthConnectService {
         permissionsGranted,
         grantedCount,
         totalCount: 10,
-        sdkStatus
+        sdkStatus,
       };
     } catch (error) {
       console.error('❌ Failed to check permission status:', error);
@@ -195,7 +214,7 @@ export class HealthConnectService {
         sdkAvailable: false,
         permissionsGranted: false,
         grantedCount: 0,
-        totalCount: 10
+        totalCount: 10,
       };
     }
   }
@@ -212,13 +231,20 @@ export class HealthConnectService {
       console.log('📊 SDK Status before permission request:', sdkStatus);
 
       if (sdkStatus === SdkAvailabilityStatus.SDK_UNAVAILABLE) {
-        console.error('❌ Health Connect app is not installed. Please install it from Play Store.');
+        console.error(
+          '❌ Health Connect app is not installed. Please install it from Play Store.'
+        );
         return false;
       }
 
-      if (sdkStatus === SdkAvailabilityStatus.SDK_UNAVAILABLE_PROVIDER_UPDATE_REQUIRED) {
+      if (
+        sdkStatus ===
+        SdkAvailabilityStatus.SDK_UNAVAILABLE_PROVIDER_UPDATE_REQUIRED
+      ) {
         console.warn('⚠️ Health Connect Status 3 (UPDATE_REQUIRED)');
-        console.warn('   This is common and we can still try to request permissions.');
+        console.warn(
+          '   This is common and we can still try to request permissions.'
+        );
       }
 
       // 2. 초기화
@@ -232,7 +258,10 @@ export class HealthConnectService {
       // 3. 현재 권한 상태 확인
       try {
         const currentPermissions = await getGrantedPermissions();
-        console.log('📋 Current granted permissions:', currentPermissions.length);
+        console.log(
+          '📋 Current granted permissions:',
+          currentPermissions.length
+        );
       } catch (error) {
         console.warn('⚠️ Could not get current permissions, continuing anyway');
       }
@@ -263,10 +292,20 @@ export class HealthConnectService {
         // 권한 요청 후 다시 확인
         await new Promise(resolve => setTimeout(resolve, 1000));
         const updatedPermissions = await getGrantedPermissions();
-        console.log('📋 Updated granted permissions:', updatedPermissions.length);
+        console.log(
+          '📋 Updated granted permissions:',
+          updatedPermissions.length
+        );
 
-        if (Array.isArray(updatedPermissions) && updatedPermissions.length > 0) {
-          console.log('✅ Permissions successfully granted:', updatedPermissions.length, 'permissions');
+        if (
+          Array.isArray(updatedPermissions) &&
+          updatedPermissions.length > 0
+        ) {
+          console.log(
+            '✅ Permissions successfully granted:',
+            updatedPermissions.length,
+            'permissions'
+          );
           return true;
         } else {
           console.warn('⚠️ No permissions granted yet.');
@@ -278,14 +317,19 @@ export class HealthConnectService {
         console.error('   Error message:', permissionError?.message);
 
         // Activity Result API 에러 감지
-        if (permissionError?.message?.includes('lateinit') ||
-          permissionError?.message?.includes('requestPermission')) {
-          console.error('💡 This is an Activity Result API initialization error.');
+        if (
+          permissionError?.message?.includes('lateinit') ||
+          permissionError?.message?.includes('requestPermission')
+        ) {
+          console.error(
+            '💡 This is an Activity Result API initialization error.'
+          );
           console.error('   Falling back to opening settings manually...');
 
           // Fallback: 설정 화면 직접 열기
           try {
-            const opened = await HealthConnectModule.openHealthConnectSettings();
+            const opened =
+              await HealthConnectModule.openHealthConnectSettings();
             if (opened) {
               console.log('✅ Opened Health Connect settings as fallback');
               await new Promise(resolve => setTimeout(resolve, 5000));
@@ -299,11 +343,13 @@ export class HealthConnectService {
 
         return false;
       }
-
     } catch (error) {
       console.error('❌ Failed to request permissions:', error);
       console.error('Error type:', error?.constructor?.name);
-      console.error('Error message:', error instanceof Error ? error.message : String(error));
+      console.error(
+        'Error message:',
+        error instanceof Error ? error.message : String(error)
+      );
       return false;
     }
   }
@@ -335,7 +381,9 @@ export class HealthConnectService {
   async readStepsData(startTime: Date, endTime: Date): Promise<any[]> {
     try {
       console.log('👟 Reading steps data from', startTime, 'to', endTime);
-      console.log('🎯 Filtering to Samsung Health only: com.sec.android.app.shealth');
+      console.log(
+        '🎯 Filtering to Samsung Health only: com.sec.android.app.shealth'
+      );
 
       const result = await readRecords('Steps', {
         timeRangeFilter: {
@@ -355,14 +403,18 @@ export class HealthConnectService {
         console.log(`📊 Steps: ${recordCount} records loaded`);
 
         // 데이터 출처별로 분석
-        const sourceAnalysis = new Map<string, { count: number, steps: number }>();
+        const sourceAnalysis = new Map<
+          string,
+          { count: number; steps: number }
+        >();
 
         records.forEach(record => {
           // 메타데이터에서 앱 정보 추출 (구조가 다를 수 있음)
           let source = 'unknown';
           try {
             if (record.metadata?.dataOrigin) {
-              source = (record.metadata.dataOrigin as any).packageName ||
+              source =
+                (record.metadata.dataOrigin as any).packageName ||
                 (record.metadata.dataOrigin as any).appName ||
                 JSON.stringify(record.metadata.dataOrigin);
             }
@@ -384,16 +436,23 @@ export class HealthConnectService {
         // 출처별 데이터 로그
         console.log('📊 Steps sources:');
         sourceAnalysis.forEach((data, source) => {
-          console.log(`   ${source}: ${data.count} records, ${data.steps} steps`);
+          console.log(
+            `   ${source}: ${data.count} records, ${data.steps} steps`
+          );
         });
 
         // 총 걸음 수 (중복 제거 전)
-        const totalStepsBeforeDedup = records.reduce((sum, record) => sum + (record.count || 0), 0);
+        const totalStepsBeforeDedup = records.reduce(
+          (sum, record) => sum + (record.count || 0),
+          0
+        );
         console.log(`📊 Total steps before dedup: ${totalStepsBeforeDedup}`);
 
         // 삼성 헬스 우선 정책으로 중복 제거
         const filteredRecords = this.deduplicateStepsData(records);
-        console.log(`📊 After deduplication: ${filteredRecords.length} records`);
+        console.log(
+          `📊 After deduplication: ${filteredRecords.length} records`
+        );
 
         return filteredRecords;
       } else {
@@ -443,7 +502,8 @@ export class HealthConnectService {
 
         const samsungRecords = groupRecords.filter(record => {
           try {
-            const source = (record.metadata?.dataOrigin as any)?.packageName || '';
+            const source =
+              (record.metadata?.dataOrigin as any)?.packageName || '';
             return source.includes('shealth') || source.includes('samsung');
           } catch (e) {
             return false;
@@ -452,7 +512,8 @@ export class HealthConnectService {
 
         const googleRecords = groupRecords.filter(record => {
           try {
-            const source = (record.metadata?.dataOrigin as any)?.packageName || '';
+            const source =
+              (record.metadata?.dataOrigin as any)?.packageName || '';
             return source.includes('fitness') || source.includes('google');
           } catch (e) {
             return false;
@@ -504,8 +565,6 @@ export class HealthConnectService {
     }
   }
 
-
-
   /**
    * 속도 데이터 읽기 (기존 방식)
    */
@@ -532,7 +591,10 @@ export class HealthConnectService {
       return result.records || [];
     } catch (error) {
       console.error('❌ Failed to read speed data:', error);
-      console.error('❌ Speed error details:', error instanceof Error ? error.message : String(error));
+      console.error(
+        '❌ Speed error details:',
+        error instanceof Error ? error.message : String(error)
+      );
       return [];
     }
   }
@@ -606,7 +668,7 @@ export class HealthConnectService {
         return {
           available: false,
           source: 'Not Available',
-          error: 'Health Connect not installed or not available'
+          error: 'Health Connect not installed or not available',
         };
       }
 
@@ -616,7 +678,7 @@ export class HealthConnectService {
         return {
           available: false,
           source: 'Not Available',
-          error: 'Failed to initialize Health Connect SDK'
+          error: 'Failed to initialize Health Connect SDK',
         };
       }
 
@@ -626,35 +688,43 @@ export class HealthConnectService {
         return {
           available: false,
           source: 'Not Available',
-          error: 'No Health Connect permissions granted'
+          error: 'No Health Connect permissions granted',
         };
       }
 
       const endTime = new Date();
-      const startTime = new Date(endTime.getTime() - (days * 24 * 60 * 60 * 1000));
+      const startTime = new Date(
+        endTime.getTime() - days * 24 * 60 * 60 * 1000
+      );
 
       // 병렬로 데이터 요청
-      const [stepsData, distanceData, speedData, caloriesData, exerciseData] = await Promise.allSettled([
-        this.readStepsData(startTime, endTime),
-        this.readDistanceData(startTime, endTime),
-        this.readSpeedData(startTime, endTime),
-        this.readCaloriesData(startTime, endTime),
-        this.readExerciseData(startTime, endTime)
-      ]);
+      const [stepsData, distanceData, speedData, caloriesData, exerciseData] =
+        await Promise.allSettled([
+          this.readStepsData(startTime, endTime),
+          this.readDistanceData(startTime, endTime),
+          this.readSpeedData(startTime, endTime),
+          this.readCaloriesData(startTime, endTime),
+          this.readExerciseData(startTime, endTime),
+        ]);
 
       // 안전하게 데이터 추출
       const steps = stepsData.status === 'fulfilled' ? stepsData.value : [];
-      const distance = distanceData.status === 'fulfilled' ? distanceData.value : [];
+      const distance =
+        distanceData.status === 'fulfilled' ? distanceData.value : [];
       const speed = speedData.status === 'fulfilled' ? speedData.value : [];
-      const calories = caloriesData.status === 'fulfilled' ? caloriesData.value : [];
-      const exercise = exerciseData.status === 'fulfilled' ? exerciseData.value : [];
+      const calories =
+        caloriesData.status === 'fulfilled' ? caloriesData.value : [];
+      const exercise =
+        exerciseData.status === 'fulfilled' ? exerciseData.value : [];
 
       // 데이터 집계
-      const totalSteps = steps.reduce((sum, record) => sum + (record.count || 0), 0);
+      const totalSteps = steps.reduce(
+        (sum, record) => sum + (record.count || 0),
+        0
+      );
 
       // 거리 데이터 집계
       const totalDistance = distance.reduce((sum, record, index) => {
-
         let dist = 0;
         if (record.distance) {
           // Distance 객체에서 올바른 값 추출 (공식 문서 기준)
@@ -742,7 +812,10 @@ export class HealthConnectService {
                 }
 
                 // 최고 속도 업데이트 (Case 2 기준)
-                if (kmhValue >= MIN_SPEED_THRESHOLD_CASE2 && kmhValue > maxSpeed) {
+                if (
+                  kmhValue >= MIN_SPEED_THRESHOLD_CASE2 &&
+                  kmhValue > maxSpeed
+                ) {
                   maxSpeed = kmhValue;
                 }
               }
@@ -750,22 +823,30 @@ export class HealthConnectService {
 
             // Case 1: 이 레코드의 평균 속도를 시간으로 가중
             if (validSamplesCase1 > 0 && recordDurationSeconds > 0) {
-              const recordAverageSpeed = recordSpeedSumCase1 / validSamplesCase1;
-              totalWeightedSpeedCase1 += recordAverageSpeed * recordDurationSeconds;
+              const recordAverageSpeed =
+                recordSpeedSumCase1 / validSamplesCase1;
+              totalWeightedSpeedCase1 +=
+                recordAverageSpeed * recordDurationSeconds;
               totalDurationSecondsCase1 += recordDurationSeconds;
             }
 
             // Case 2: 이 레코드의 평균 속도를 시간으로 가중
             if (validSamplesCase2 > 0 && recordDurationSeconds > 0) {
-              const recordAverageSpeed = recordSpeedSumCase2 / validSamplesCase2;
-              totalWeightedSpeedCase2 += recordAverageSpeed * recordDurationSeconds;
+              const recordAverageSpeed =
+                recordSpeedSumCase2 / validSamplesCase2;
+              totalWeightedSpeedCase2 +=
+                recordAverageSpeed * recordDurationSeconds;
               totalDurationSecondsCase2 += recordDurationSeconds;
             }
           } else {
             // 레거시 단일 속도 레코드 형태
-            const spd = record.speed?.inMetersPerSecond || record.speed?.metersPerSecond || record.speed || 0;
+            const spd =
+              record.speed?.inMetersPerSecond ||
+              record.speed?.metersPerSecond ||
+              record.speed ||
+              0;
             if (spd > 0 && recordDurationSeconds > 0) {
-              const kmhValue = (typeof spd === 'number' ? spd * 3.6 : 0);
+              const kmhValue = typeof spd === 'number' ? spd * 3.6 : 0;
 
               // Case 1: ≥ 2.5 km/h
               if (kmhValue >= MIN_SPEED_THRESHOLD_CASE1) {
@@ -780,7 +861,10 @@ export class HealthConnectService {
               }
 
               // 최고 속도 업데이트 (Case 2 기준)
-              if (kmhValue >= MIN_SPEED_THRESHOLD_CASE2 && kmhValue > maxSpeed) {
+              if (
+                kmhValue >= MIN_SPEED_THRESHOLD_CASE2 &&
+                kmhValue > maxSpeed
+              ) {
                 maxSpeed = kmhValue;
               }
             }
@@ -789,17 +873,22 @@ export class HealthConnectService {
 
         // Case 1 평균 속도 계산
         if (totalDurationSecondsCase1 > 0) {
-          averageSpeedCase1 = totalWeightedSpeedCase1 / totalDurationSecondsCase1;
+          averageSpeedCase1 =
+            totalWeightedSpeedCase1 / totalDurationSecondsCase1;
         }
 
         // Case 2 평균 속도 계산
         if (totalDurationSecondsCase2 > 0) {
-          averageSpeedCase2 = totalWeightedSpeedCase2 / totalDurationSecondsCase2;
+          averageSpeedCase2 =
+            totalWeightedSpeedCase2 / totalDurationSecondsCase2;
         }
       }
 
       // 속도 데이터가 없거나 0인 경우 거리와 운동 시간으로 추정
-      if ((averageSpeedCase1 === 0 || averageSpeedCase2 === 0) && totalDistance > 0) {
+      if (
+        (averageSpeedCase1 === 0 || averageSpeedCase2 === 0) &&
+        totalDistance > 0
+      ) {
         // 운동 세션 데이터에서 실제 운동 시간 확인
         let totalExerciseTimeHours = 0;
         if (exercise.length > 0) {
@@ -815,32 +904,53 @@ export class HealthConnectService {
         let estimatedSpeed = 0;
         if (totalExerciseTimeHours > 0) {
           // 실제 운동 시간이 있으면 사용
-          estimatedSpeed = (totalDistance / 1000) / totalExerciseTimeHours;
+          estimatedSpeed = totalDistance / 1000 / totalExerciseTimeHours;
         } else if (totalSteps > 0) {
           // 걸음수를 기반으로 시간 추정 (평균적으로 분당 100걸음으로 가정)
-          const estimatedTimeHours = (totalSteps / 100) / 60; // 시간 단위
-          estimatedSpeed = estimatedTimeHours > 0 ? (totalDistance / 1000) / estimatedTimeHours : 0;
+          const estimatedTimeHours = totalSteps / 100 / 60; // 시간 단위
+          estimatedSpeed =
+            estimatedTimeHours > 0
+              ? totalDistance / 1000 / estimatedTimeHours
+              : 0;
         }
 
         // 추정 속도로 빈 값 채우기
-        if (averageSpeedCase1 === 0 && estimatedSpeed >= MIN_SPEED_THRESHOLD_CASE1) {
+        if (
+          averageSpeedCase1 === 0 &&
+          estimatedSpeed >= MIN_SPEED_THRESHOLD_CASE1
+        ) {
           averageSpeedCase1 = estimatedSpeed;
         }
-        if (averageSpeedCase2 === 0 && estimatedSpeed >= MIN_SPEED_THRESHOLD_CASE2) {
+        if (
+          averageSpeedCase2 === 0 &&
+          estimatedSpeed >= MIN_SPEED_THRESHOLD_CASE2
+        ) {
           averageSpeedCase2 = estimatedSpeed;
         }
       }
 
       const totalCalories = calories.reduce((sum, record) => {
-        const cal = record.energy?.inCalories || record.energy?.calories || record.energy || 0;
+        const cal =
+          record.energy?.inCalories ||
+          record.energy?.calories ||
+          record.energy ||
+          0;
         return sum + (typeof cal === 'number' ? cal : 0);
       }, 0);
 
       // 간단한 결과 요약만 출력
-      console.log(`📊 Health data (${days}일): ${totalSteps} steps, ${(totalDistance / 1000).toFixed(2)} km`);
-      console.log(`   속도 Case 1 (≥2.5km/h): ${averageSpeedCase1.toFixed(1)} km/h`);
-      console.log(`   속도 Case 2 (≥1.5km/h): ${averageSpeedCase2.toFixed(1)} km/h`);
-      console.log(`   최고 속도: ${maxSpeed.toFixed(1)} km/h, 칼로리: ${totalCalories} cal`);
+      console.log(
+        `📊 Health data (${days}일): ${totalSteps} steps, ${(totalDistance / 1000).toFixed(2)} km`
+      );
+      console.log(
+        `   속도 Case 1 (≥2.5km/h): ${averageSpeedCase1.toFixed(1)} km/h`
+      );
+      console.log(
+        `   속도 Case 2 (≥1.5km/h): ${averageSpeedCase2.toFixed(1)} km/h`
+      );
+      console.log(
+        `   최고 속도: ${maxSpeed.toFixed(1)} km/h, 칼로리: ${totalCalories} cal`
+      );
 
       return {
         steps: totalSteps,
@@ -852,9 +962,8 @@ export class HealthConnectService {
         calories: Math.round(totalCalories),
         exerciseSessions: exercise,
         available: true,
-        source: 'Health Connect'
+        source: 'Health Connect',
       };
-
     } catch (error) {
       console.error('❌ Failed to get health data:', error);
       let errorMessage = 'Unknown error occurred';
@@ -864,7 +973,7 @@ export class HealthConnectService {
       return {
         available: false,
         source: 'Not Available',
-        error: errorMessage
+        error: errorMessage,
       };
     }
   }
@@ -877,7 +986,8 @@ export class HealthConnectService {
       console.log('🔄 Checking Health Connect sync status...');
 
       const sdkStatus = await this.checkAvailability();
-      const isHealthConnectAvailable = sdkStatus === SdkAvailabilityStatus.SDK_AVAILABLE;
+      const isHealthConnectAvailable =
+        sdkStatus === SdkAvailabilityStatus.SDK_AVAILABLE;
 
       const grantedPermissions = await this.getGrantedPermissions();
       const permissionsGranted = grantedPermissions.length > 0;
@@ -888,23 +998,30 @@ export class HealthConnectService {
       const availableDataTypes: string[] = [];
       if (permissionsGranted) {
         grantedPermissions.forEach(permission => {
-          availableDataTypes.push(`${permission.recordType} (${permission.accessType})`);
+          availableDataTypes.push(
+            `${permission.recordType} (${permission.accessType})`
+          );
         });
       }
 
       const recommendedActions: string[] = [];
       if (!isHealthConnectAvailable) {
-        recommendedActions.push('Health Connect 앱을 설치하거나 업데이트하세요');
+        recommendedActions.push(
+          'Health Connect 앱을 설치하거나 업데이트하세요'
+        );
       }
       if (!permissionsGranted) {
         recommendedActions.push('건강 데이터 접근 권한을 허용하세요');
       }
       if (!dataAccessible) {
-        recommendedActions.push('Samsung Health 또는 다른 건강 앱에서 데이터를 동기화하세요');
+        recommendedActions.push(
+          'Samsung Health 또는 다른 건강 앱에서 데이터를 동기화하세요'
+        );
       }
 
       return {
-        isConnected: isHealthConnectAvailable && permissionsGranted && dataAccessible,
+        isConnected:
+          isHealthConnectAvailable && permissionsGranted && dataAccessible,
         lastSync: new Date(),
         availableData: availableDataTypes,
         connectionDetails: {
@@ -912,10 +1029,9 @@ export class HealthConnectService {
           healthConnectAvailable: isHealthConnectAvailable,
           permissionsGranted,
           dataAccessible,
-          recommendedActions
-        }
+          recommendedActions,
+        },
       };
-
     } catch (error) {
       console.error('❌ Failed to check sync status:', error);
       return {
@@ -926,8 +1042,8 @@ export class HealthConnectService {
           healthConnectAvailable: false,
           permissionsGranted: false,
           dataAccessible: false,
-          recommendedActions: ['Health Connect를 확인할 수 없습니다']
-        }
+          recommendedActions: ['Health Connect를 확인할 수 없습니다'],
+        },
       };
     }
   }
@@ -935,7 +1051,10 @@ export class HealthConnectService {
   /**
    * 지정된 날짜 범위의 건강 데이터 가져오기
    */
-  async getHealthDataByDateRange(startTime: Date, endTime: Date): Promise<HealthData> {
+  async getHealthDataByDateRange(
+    startTime: Date,
+    endTime: Date
+  ): Promise<HealthData> {
     try {
       // Health Connect 설치 확인
       const isInstalled = await this.isHealthConnectInstalled();
@@ -943,7 +1062,7 @@ export class HealthConnectService {
         return {
           available: false,
           source: 'Not Available',
-          error: 'Health Connect not installed or not available'
+          error: 'Health Connect not installed or not available',
         };
       }
 
@@ -953,7 +1072,7 @@ export class HealthConnectService {
         return {
           available: false,
           source: 'Not Available',
-          error: 'Failed to initialize Health Connect SDK'
+          error: 'Failed to initialize Health Connect SDK',
         };
       }
 
@@ -963,28 +1082,35 @@ export class HealthConnectService {
         return {
           available: false,
           source: 'Not Available',
-          error: 'No Health Connect permissions granted'
+          error: 'No Health Connect permissions granted',
         };
       }
 
       // 병렬로 데이터 요청
-      const [stepsData, distanceData, speedData, caloriesData, exerciseData] = await Promise.allSettled([
-        this.readStepsData(startTime, endTime),
-        this.readDistanceData(startTime, endTime),
-        this.readSpeedData(startTime, endTime),
-        this.readCaloriesData(startTime, endTime),
-        this.readExerciseData(startTime, endTime)
-      ]);
+      const [stepsData, distanceData, speedData, caloriesData, exerciseData] =
+        await Promise.allSettled([
+          this.readStepsData(startTime, endTime),
+          this.readDistanceData(startTime, endTime),
+          this.readSpeedData(startTime, endTime),
+          this.readCaloriesData(startTime, endTime),
+          this.readExerciseData(startTime, endTime),
+        ]);
 
       // 안전하게 데이터 추출
       const steps = stepsData.status === 'fulfilled' ? stepsData.value : [];
-      const distance = distanceData.status === 'fulfilled' ? distanceData.value : [];
+      const distance =
+        distanceData.status === 'fulfilled' ? distanceData.value : [];
       const speed = speedData.status === 'fulfilled' ? speedData.value : [];
-      const calories = caloriesData.status === 'fulfilled' ? caloriesData.value : [];
-      const exercise = exerciseData.status === 'fulfilled' ? exerciseData.value : [];
+      const calories =
+        caloriesData.status === 'fulfilled' ? caloriesData.value : [];
+      const exercise =
+        exerciseData.status === 'fulfilled' ? exerciseData.value : [];
 
       // 데이터 집계 (기존 getHealthData와 동일한 로직)
-      const totalSteps = steps.reduce((sum, record) => sum + (record.count || 0), 0);
+      const totalSteps = steps.reduce(
+        (sum, record) => sum + (record.count || 0),
+        0
+      );
 
       // 거리 데이터 집계
       const totalDistance = distance.reduce((sum, record, index) => {
@@ -1055,7 +1181,10 @@ export class HealthConnectService {
                 }
 
                 // 최고 속도 업데이트 (Case 2 기준)
-                if (kmhValue >= MIN_SPEED_THRESHOLD_CASE2 && kmhValue > maxSpeed) {
+                if (
+                  kmhValue >= MIN_SPEED_THRESHOLD_CASE2 &&
+                  kmhValue > maxSpeed
+                ) {
                   maxSpeed = kmhValue;
                 }
               }
@@ -1063,21 +1192,29 @@ export class HealthConnectService {
 
             // Case 1
             if (validSamplesCase1 > 0 && recordDurationSeconds > 0) {
-              const recordAverageSpeed = recordSpeedSumCase1 / validSamplesCase1;
-              totalWeightedSpeedCase1 += recordAverageSpeed * recordDurationSeconds;
+              const recordAverageSpeed =
+                recordSpeedSumCase1 / validSamplesCase1;
+              totalWeightedSpeedCase1 +=
+                recordAverageSpeed * recordDurationSeconds;
               totalDurationSecondsCase1 += recordDurationSeconds;
             }
 
             // Case 2
             if (validSamplesCase2 > 0 && recordDurationSeconds > 0) {
-              const recordAverageSpeed = recordSpeedSumCase2 / validSamplesCase2;
-              totalWeightedSpeedCase2 += recordAverageSpeed * recordDurationSeconds;
+              const recordAverageSpeed =
+                recordSpeedSumCase2 / validSamplesCase2;
+              totalWeightedSpeedCase2 +=
+                recordAverageSpeed * recordDurationSeconds;
               totalDurationSecondsCase2 += recordDurationSeconds;
             }
           } else {
-            const spd = record.speed?.inMetersPerSecond || record.speed?.metersPerSecond || record.speed || 0;
+            const spd =
+              record.speed?.inMetersPerSecond ||
+              record.speed?.metersPerSecond ||
+              record.speed ||
+              0;
             if (spd > 0 && recordDurationSeconds > 0) {
-              const kmhValue = (typeof spd === 'number' ? spd * 3.6 : 0);
+              const kmhValue = typeof spd === 'number' ? spd * 3.6 : 0;
 
               // Case 1: ≥ 2.5 km/h
               if (kmhValue >= MIN_SPEED_THRESHOLD_CASE1) {
@@ -1092,7 +1229,10 @@ export class HealthConnectService {
               }
 
               // 최고 속도 업데이트 (Case 2 기준)
-              if (kmhValue >= MIN_SPEED_THRESHOLD_CASE2 && kmhValue > maxSpeed) {
+              if (
+                kmhValue >= MIN_SPEED_THRESHOLD_CASE2 &&
+                kmhValue > maxSpeed
+              ) {
                 maxSpeed = kmhValue;
               }
             }
@@ -1101,17 +1241,22 @@ export class HealthConnectService {
 
         // Case 1 평균 속도 계산
         if (totalDurationSecondsCase1 > 0) {
-          averageSpeedCase1 = totalWeightedSpeedCase1 / totalDurationSecondsCase1;
+          averageSpeedCase1 =
+            totalWeightedSpeedCase1 / totalDurationSecondsCase1;
         }
 
         // Case 2 평균 속도 계산
         if (totalDurationSecondsCase2 > 0) {
-          averageSpeedCase2 = totalWeightedSpeedCase2 / totalDurationSecondsCase2;
+          averageSpeedCase2 =
+            totalWeightedSpeedCase2 / totalDurationSecondsCase2;
         }
       }
 
       // 속도 데이터가 없는 경우 거리와 운동 시간으로 추정
-      if ((averageSpeedCase1 === 0 || averageSpeedCase2 === 0) && totalDistance > 0) {
+      if (
+        (averageSpeedCase1 === 0 || averageSpeedCase2 === 0) &&
+        totalDistance > 0
+      ) {
         let totalExerciseTimeHours = 0;
         if (exercise.length > 0) {
           exercise.forEach((session, index) => {
@@ -1125,31 +1270,53 @@ export class HealthConnectService {
 
         let estimatedSpeed = 0;
         if (totalExerciseTimeHours > 0) {
-          estimatedSpeed = (totalDistance / 1000) / totalExerciseTimeHours;
+          estimatedSpeed = totalDistance / 1000 / totalExerciseTimeHours;
         } else if (totalSteps > 0) {
-          const estimatedTimeHours = (totalSteps / 100) / 60;
-          estimatedSpeed = estimatedTimeHours > 0 ? (totalDistance / 1000) / estimatedTimeHours : 0;
+          const estimatedTimeHours = totalSteps / 100 / 60;
+          estimatedSpeed =
+            estimatedTimeHours > 0
+              ? totalDistance / 1000 / estimatedTimeHours
+              : 0;
         }
 
         // 추정 속도로 빈 값 채우기
-        if (averageSpeedCase1 === 0 && estimatedSpeed >= MIN_SPEED_THRESHOLD_CASE1) {
+        if (
+          averageSpeedCase1 === 0 &&
+          estimatedSpeed >= MIN_SPEED_THRESHOLD_CASE1
+        ) {
           averageSpeedCase1 = estimatedSpeed;
         }
-        if (averageSpeedCase2 === 0 && estimatedSpeed >= MIN_SPEED_THRESHOLD_CASE2) {
+        if (
+          averageSpeedCase2 === 0 &&
+          estimatedSpeed >= MIN_SPEED_THRESHOLD_CASE2
+        ) {
           averageSpeedCase2 = estimatedSpeed;
         }
       }
 
       const totalCalories = calories.reduce((sum, record) => {
-        const cal = record.energy?.inCalories || record.energy?.calories || record.energy || 0;
+        const cal =
+          record.energy?.inCalories ||
+          record.energy?.calories ||
+          record.energy ||
+          0;
         return sum + (typeof cal === 'number' ? cal : 0);
       }, 0);
 
-      const durationHours = (endTime.getTime() - startTime.getTime()) / (1000 * 60 * 60);
-      console.log(`📊 Health data (${durationHours.toFixed(1)}h): ${totalSteps} steps, ${(totalDistance / 1000).toFixed(2)} km`);
-      console.log(`   속도 Case 1 (≥2.5km/h): ${averageSpeedCase1.toFixed(1)} km/h`);
-      console.log(`   속도 Case 2 (≥1.5km/h): ${averageSpeedCase2.toFixed(1)} km/h`);
-      console.log(`   최고 속도: ${maxSpeed.toFixed(1)} km/h, 칼로리: ${totalCalories} cal`);
+      const durationHours =
+        (endTime.getTime() - startTime.getTime()) / (1000 * 60 * 60);
+      console.log(
+        `📊 Health data (${durationHours.toFixed(1)}h): ${totalSteps} steps, ${(totalDistance / 1000).toFixed(2)} km`
+      );
+      console.log(
+        `   속도 Case 1 (≥2.5km/h): ${averageSpeedCase1.toFixed(1)} km/h`
+      );
+      console.log(
+        `   속도 Case 2 (≥1.5km/h): ${averageSpeedCase2.toFixed(1)} km/h`
+      );
+      console.log(
+        `   최고 속도: ${maxSpeed.toFixed(1)} km/h, 칼로리: ${totalCalories} cal`
+      );
 
       return {
         steps: totalSteps,
@@ -1161,9 +1328,8 @@ export class HealthConnectService {
         calories: Math.round(totalCalories),
         exerciseSessions: exercise,
         available: true,
-        source: 'Health Connect'
+        source: 'Health Connect',
       };
-
     } catch (error) {
       console.error('❌ Failed to get health data by date range:', error);
       let errorMessage = 'Unknown error occurred';
@@ -1173,7 +1339,7 @@ export class HealthConnectService {
       return {
         available: false,
         source: 'Not Available',
-        error: errorMessage
+        error: errorMessage,
       };
     }
   }
@@ -1185,18 +1351,28 @@ export class HealthConnectService {
     try {
       // 오늘 자정 시간 계산
       const now = new Date();
-      const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
+      const startOfToday = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate(),
+        0,
+        0,
+        0,
+        0
+      );
       const endTime = now;
 
-      console.log(`📅 Today's data range: ${startOfToday.toISOString()} to ${endTime.toISOString()}`);
+      console.log(
+        `📅 Today's data range: ${startOfToday.toISOString()} to ${endTime.toISOString()}`
+      );
 
       return await this.getHealthDataByDateRange(startOfToday, endTime);
     } catch (error) {
-      console.error('❌ Failed to get today\'s summary:', error);
+      console.error("❌ Failed to get today's summary:", error);
       return {
         available: false,
         source: 'Not Available',
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       };
     }
   }
@@ -1223,7 +1399,7 @@ export class HealthConnectService {
           speedCase2: 0,
           maxSpeed: 0,
           totalRecords: 0,
-          error: 'Health Connect not installed or not available'
+          error: 'Health Connect not installed or not available',
         };
       }
 
@@ -1235,7 +1411,7 @@ export class HealthConnectService {
           speedCase2: 0,
           maxSpeed: 0,
           totalRecords: 0,
-          error: 'Failed to initialize Health Connect SDK'
+          error: 'Failed to initialize Health Connect SDK',
         };
       }
 
@@ -1247,7 +1423,7 @@ export class HealthConnectService {
           speedCase2: 0,
           maxSpeed: 0,
           totalRecords: 0,
-          error: 'No Health Connect permissions granted'
+          error: 'No Health Connect permissions granted',
         };
       }
 
@@ -1266,7 +1442,7 @@ export class HealthConnectService {
           speedCase2: 0,
           maxSpeed: 0,
           totalRecords: 0,
-          error: 'No speed data available'
+          error: 'No speed data available',
         };
       }
 
@@ -1294,8 +1470,7 @@ export class HealthConnectService {
       let sampleRecords = 0;
       let singleRecords = 0;
 
-      speedRecords.forEach((record) => {
-
+      speedRecords.forEach(record => {
         if (record.samples && Array.isArray(record.samples)) {
           // SpeedRecord.Sample 구조
           sampleRecords++;
@@ -1339,7 +1514,10 @@ export class HealthConnectService {
               }
 
               // 최고 속도
-              if (kmhValue >= MIN_SPEED_THRESHOLD_CASE2 && kmhValue > maxSpeed) {
+              if (
+                kmhValue >= MIN_SPEED_THRESHOLD_CASE2 &&
+                kmhValue > maxSpeed
+              ) {
                 maxSpeed = kmhValue;
               }
             }
@@ -1347,7 +1525,11 @@ export class HealthConnectService {
         } else {
           // 단일 속도 레코드
           singleRecords++;
-          const spd = record.speed?.inMetersPerSecond || record.speed?.metersPerSecond || record.speed || 0;
+          const spd =
+            record.speed?.inMetersPerSecond ||
+            record.speed?.metersPerSecond ||
+            record.speed ||
+            0;
           if (spd > 0) {
             const kmhValue = typeof spd === 'number' ? spd * 3.6 : 0;
 
@@ -1391,15 +1573,16 @@ export class HealthConnectService {
         averageSpeedCase2 = totalSpeedCase2 / countCase2;
       }
 
-      console.log(`📊 속도 분석 완료: Case1=${averageSpeedCase1.toFixed(2)}km/h (${countCase1}개), Case2=${averageSpeedCase2.toFixed(2)}km/h (${countCase2}개)`);
+      console.log(
+        `📊 속도 분석 완료: Case1=${averageSpeedCase1.toFixed(2)}km/h (${countCase1}개), Case2=${averageSpeedCase2.toFixed(2)}km/h (${countCase2}개)`
+      );
 
       return {
         speedCase1: Math.round(averageSpeedCase1 * 100) / 100,
         speedCase2: Math.round(averageSpeedCase2 * 100) / 100,
         maxSpeed: Math.round(maxSpeed * 100) / 100,
-        totalRecords: speedRecords.length
+        totalRecords: speedRecords.length,
       };
-
     } catch (error) {
       console.error('❌ Failed to get all-time average speeds:', error);
       return {
@@ -1407,7 +1590,7 @@ export class HealthConnectService {
         speedCase2: 0,
         maxSpeed: 0,
         totalRecords: 0,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       };
     }
   }

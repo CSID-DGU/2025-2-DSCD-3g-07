@@ -24,15 +24,15 @@ class ApiClient {
    */
   private async initialize() {
     if (this.initialized) return;
-    
+
     console.log('🚀 Initializing API Client with dynamic IP detection...');
-    
+
     // Config의 동적 감지 시스템 실행
     this.baseUrl = await Config.initializeApiUrl();
     this.initialized = true;
-    
+
     console.log('📡 API Client initialized with URL:', this.baseUrl);
-    
+
     // 연결 테스트
     this.checkConnection();
   }
@@ -42,10 +42,10 @@ class ApiClient {
    */
   private async checkConnection() {
     this.isConnected = await testApiConnection(this.baseUrl);
-    
+
     if (!this.isConnected && __DEV__) {
       console.warn('⚠️ 기본 URL 연결 실패, 대체 URL 탐색 중...');
-      
+
       // 여러 가능한 URL 시도
       const possibleUrls: string[] = [
         this.baseUrl,
@@ -76,7 +76,7 @@ class ApiClient {
     console.log(`🔍 Making GET request to: ${this.baseUrl}${endpoint}`);
 
     const url = new URL(endpoint, this.baseUrl);
-    
+
     if (params) {
       Object.entries(params).forEach(([key, value]) => {
         url.searchParams.append(key, String(value));
@@ -100,13 +100,15 @@ class ApiClient {
 
       if (!response.ok) {
         const errorText = await response.text();
-        throw new Error(`API 오류: ${response.status} ${response.statusText} - ${errorText}`);
+        throw new Error(
+          `API 오류: ${response.status} ${response.statusText} - ${errorText}`
+        );
       }
 
       return response.json() as Promise<T>;
     } catch (error) {
       clearTimeout(timeoutId);
-      
+
       if (error instanceof Error && error.name === 'AbortError') {
         throw new Error('요청 시간이 초과되었습니다. (timeout 20초)');
       }

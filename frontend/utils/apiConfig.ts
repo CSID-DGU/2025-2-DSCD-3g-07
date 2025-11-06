@@ -34,7 +34,7 @@ const getDevServerIp = (): string | null => {
  */
 const getApiBaseUrl = () => {
   const isDev = __DEV__;
-  
+
   // 1순위: 환경 변수에서 확인
   if (process.env.EXPO_PUBLIC_API_URL) {
     console.log('📌 환경변수 사용:', process.env.EXPO_PUBLIC_API_URL);
@@ -73,22 +73,22 @@ export const API_CONFIG = {
   BASE_URL: getApiBaseUrl(),
   TIMEOUT: 30000,
   RETRY_ATTEMPTS: 3,
-  
+
   // 엔드포인트
   ENDPOINTS: {
     HEALTH: '/health',
     TRANSIT_ROUTE: '/transit/route',
     PERSONALIZATION: '/personalization',
   },
-  
+
   // 개발자별 수동 설정 (자동 감지 실패 시 사용)
   DEVELOPER_URLS: {
-    default: 'http://10.0.2.2:8000',      // Android 에뮬레이터
-    localhost: 'http://localhost:8000',   // 웹/iOS 시뮬레이터
+    default: 'http://10.0.2.2:8000', // Android 에뮬레이터
+    localhost: 'http://localhost:8000', // 웹/iOS 시뮬레이터
     // 팀원별 IP 주소 (필요시 추가)
     // member1: 'http://192.168.1.100:8000',
     // member2: 'http://172.30.1.50:8000',
-  }
+  },
 };
 
 // 디버그 정보 출력

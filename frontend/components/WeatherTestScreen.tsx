@@ -11,9 +11,13 @@ import {
   Platform,
 } from 'react-native';
 import * as Location from 'expo-location';
-import { getCurrentWeather, getCompleteWeather, SEOUL_COORDS } from '../services/weatherService';
-import { 
-  OpenMeteoResponse, 
+import {
+  getCurrentWeather,
+  getCompleteWeather,
+  SEOUL_COORDS,
+} from '../services/weatherService';
+import {
+  OpenMeteoResponse,
   getWeatherDescriptionFromCode,
   getWindDirection,
 } from '../types/weather';
@@ -25,11 +29,15 @@ interface LocationCoords {
 }
 
 export default function WeatherTestScreen() {
-  const [weatherData, setWeatherData] = useState<OpenMeteoResponse | null>(null);
+  const [weatherData, setWeatherData] = useState<OpenMeteoResponse | null>(
+    null
+  );
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [includeForecasts, setIncludeForecasts] = useState(false);
-  const [currentLocation, setCurrentLocation] = useState<LocationCoords | null>(null);
+  const [currentLocation, setCurrentLocation] = useState<LocationCoords | null>(
+    null
+  );
   const [locationLoading, setLocationLoading] = useState(false);
   const [useCurrentLocation, setUseCurrentLocation] = useState(false);
 
@@ -37,10 +45,10 @@ export default function WeatherTestScreen() {
   const getCurrentLocation = async (): Promise<LocationCoords | null> => {
     try {
       setLocationLoading(true);
-      
+
       // 위치 권한 요청
       const { status } = await Location.requestForegroundPermissionsAsync();
-      
+
       if (status !== 'granted') {
         Alert.alert(
           '위치 권한 필요',
@@ -63,13 +71,12 @@ export default function WeatherTestScreen() {
           latitude: location.coords.latitude,
           longitude: location.coords.longitude,
         });
-        
+
         if (address) {
-          locationName = [
-            address.city,
-            address.district,
-            address.street,
-          ].filter(Boolean).join(' ') || '현재 위치';
+          locationName =
+            [address.city, address.district, address.street]
+              .filter(Boolean)
+              .join(' ') || '현재 위치';
         }
       } catch (error) {
         console.warn('[weather] reverse geocoding failed', error);
@@ -83,7 +90,7 @@ export default function WeatherTestScreen() {
 
       setCurrentLocation(coords);
       console.log('[weather] 현재 위치:', coords);
-      
+
       setLocationLoading(false);
       return coords;
     } catch (error) {
@@ -100,28 +107,33 @@ export default function WeatherTestScreen() {
   ) => {
     try {
       setLoading(true);
-      
+
       // 사용할 좌표 결정
       let coords = coordsOverride ?? SEOUL_COORDS;
       if (!coordsOverride && useCurrentLocation && currentLocation) {
         coords = currentLocation;
       }
-      
+
       console.log('[weather] 날씨 데이터 요청:', {
         좌표: coords,
         예보포함: withForecasts,
       });
-      
+
       let data: OpenMeteoResponse;
-      
+
       if (withForecasts) {
         // 모든 정보 포함 (48시간 예보 + 7일 예보)
-        data = await getCompleteWeather(coords.latitude, coords.longitude, 48, 7);
+        data = await getCompleteWeather(
+          coords.latitude,
+          coords.longitude,
+          48,
+          7
+        );
       } else {
         // 현재 날씨만
         data = await getCurrentWeather(coords.latitude, coords.longitude);
       }
-      
+
       setWeatherData(data);
       console.log('[weather] 날씨 데이터 가져오기 성공:', {
         온도: data.current?.temperature_2m,
@@ -129,18 +141,23 @@ export default function WeatherTestScreen() {
       });
     } catch (error) {
       console.error('[weather] 날씨 데이터 가져오기 실패:', error);
-      
+
       let errorMessage = '날씨 정보를 가져올 수 없습니다.';
       if (error instanceof Error) {
-        if (error.message.includes('504') || error.message.includes('Gateway')) {
-          errorMessage = '서버 응답 시간이 초과되었습니다.\n백엔드 서버가 실행 중인지 확인해주세요.';
+        if (
+          error.message.includes('504') ||
+          error.message.includes('Gateway')
+        ) {
+          errorMessage =
+            '서버 응답 시간이 초과되었습니다.\n백엔드 서버가 실행 중인지 확인해주세요.';
         } else if (error.message.includes('Network')) {
           errorMessage = '네트워크 연결을 확인해주세요.';
         } else if (error.message.includes('timeout')) {
-          errorMessage = '요청 시간이 초과되었습니다.\n잠시 후 다시 시도해주세요.';
+          errorMessage =
+            '요청 시간이 초과되었습니다.\n잠시 후 다시 시도해주세요.';
         }
       }
-      
+
       Alert.alert('오류', errorMessage);
     } finally {
       setLoading(false);
@@ -157,7 +174,7 @@ export default function WeatherTestScreen() {
     if (enabled) {
       setUseCurrentLocation(true);
 
-      const coords = currentLocation || await getCurrentLocation();
+      const coords = currentLocation || (await getCurrentLocation());
       if (!coords) {
         setUseCurrentLocation(false);
         return;
@@ -184,40 +201,48 @@ export default function WeatherTestScreen() {
     console.log('🎨 [UI 렌더링] 현재 날씨:', {
       원본코드: current.weather_code,
       변환결과: weather,
-      기온: current.temperature_2m
+      기온: current.temperature_2m,
     });
 
     return (
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>🌡️ 현재 날씨</Text>
-        
+
         <View style={styles.weatherMain}>
           <Text style={styles.emoji}>{weather.emoji}</Text>
-          <Text style={styles.temperature}>{Math.round(current.temperature_2m)}°C</Text>
+          <Text style={styles.temperature}>
+            {Math.round(current.temperature_2m)}°C
+          </Text>
           <Text style={styles.weatherDesc}>{weather.description}</Text>
         </View>
 
         <View style={styles.weatherDetails}>
           <View style={styles.detailRow}>
             <Text style={styles.detailLabel}>체감온도:</Text>
-            <Text style={styles.detailValue}>{Math.round(current.apparent_temperature)}°C</Text>
+            <Text style={styles.detailValue}>
+              {Math.round(current.apparent_temperature)}°C
+            </Text>
           </View>
-          
+
           <View style={styles.detailRow}>
             <Text style={styles.detailLabel}>습도:</Text>
-            <Text style={styles.detailValue}>{current.relative_humidity_2m}%</Text>
+            <Text style={styles.detailValue}>
+              {current.relative_humidity_2m}%
+            </Text>
           </View>
-          
+
           <View style={styles.detailRow}>
             <Text style={styles.detailLabel}>풍속:</Text>
-            <Text style={styles.detailValue}>{current.wind_speed_10m} m/s ({windDir})</Text>
+            <Text style={styles.detailValue}>
+              {current.wind_speed_10m} m/s ({windDir})
+            </Text>
           </View>
-          
+
           <View style={styles.detailRow}>
             <Text style={styles.detailLabel}>강수량:</Text>
             <Text style={styles.detailValue}>{current.precipitation} mm</Text>
           </View>
-          
+
           {current.rain > 0 && (
             <View style={styles.detailRow}>
               <Text style={styles.detailLabel}>비:</Text>
@@ -238,11 +263,15 @@ export default function WeatherTestScreen() {
         <View style={styles.weatherDetails}>
           <View style={styles.detailRow}>
             <Text style={styles.detailLabel}>위도:</Text>
-            <Text style={styles.detailValue}>{weatherData.latitude.toFixed(4)}°</Text>
+            <Text style={styles.detailValue}>
+              {weatherData.latitude.toFixed(4)}°
+            </Text>
           </View>
           <View style={styles.detailRow}>
             <Text style={styles.detailLabel}>경도:</Text>
-            <Text style={styles.detailValue}>{weatherData.longitude.toFixed(4)}°</Text>
+            <Text style={styles.detailValue}>
+              {weatherData.longitude.toFixed(4)}°
+            </Text>
           </View>
           <View style={styles.detailRow}>
             <Text style={styles.detailLabel}>시간대:</Text>
@@ -267,8 +296,10 @@ export default function WeatherTestScreen() {
             const hour = new Date(time).getHours();
             const temp = Math.round(hourly.temperature_2m[index] || 0);
             const precipitation = hourly.precipitation_probability[index] || 0;
-            const weather = getWeatherDescriptionFromCode(hourly.weather_code[index] || 0);
-            
+            const weather = getWeatherDescriptionFromCode(
+              hourly.weather_code[index] || 0
+            );
+
             return (
               <View key={index} style={styles.hourlyItem}>
                 <Text style={styles.hourlyTime}>{hour}시</Text>
@@ -294,14 +325,16 @@ export default function WeatherTestScreen() {
         <Text style={styles.sectionTitle}>📅 일별 예보 (5일)</Text>
         {next5Days.map((dateStr, index) => {
           const date = new Date(dateStr);
-          const dayName = date.toLocaleDateString('ko-KR', { weekday: 'short' });
+          const dayName = date.toLocaleDateString('ko-KR', {
+            weekday: 'short',
+          });
           const maxTemp = Math.round(daily.temperature_2m_max[index] || 0);
           const minTemp = Math.round(daily.temperature_2m_min[index] || 0);
           const weatherCode = daily.weather_code[index] || 0;
           const weather = getWeatherDescriptionFromCode(weatherCode);
           const precip = daily.precipitation_sum[index] || 0;
           const pop = daily.precipitation_probability_max[index] || 0;
-          
+
           return (
             <View key={index} style={styles.dailyItem}>
               <View style={styles.dailyLeft}>
@@ -310,11 +343,17 @@ export default function WeatherTestScreen() {
               </View>
               <View style={styles.dailyCenter}>
                 <Text style={styles.dailyDesc}>{weather.description}</Text>
-                {precip > 0 && <Text style={styles.dailyRain}>강수 {precip.toFixed(1)}mm</Text>}
+                {precip > 0 && (
+                  <Text style={styles.dailyRain}>
+                    강수 {precip.toFixed(1)}mm
+                  </Text>
+                )}
                 {pop > 0 && <Text style={styles.dailyRain}>확률 {pop}%</Text>}
               </View>
               <View style={styles.dailyRight}>
-                <Text style={styles.dailyTemp}>{maxTemp}° / {minTemp}°</Text>
+                <Text style={styles.dailyTemp}>
+                  {maxTemp}° / {minTemp}°
+                </Text>
               </View>
             </View>
           );
@@ -324,14 +363,16 @@ export default function WeatherTestScreen() {
   };
 
   return (
-    <ScrollView 
+    <ScrollView
       style={styles.container}
-      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
     >
       <View style={styles.header}>
         <Text style={styles.title}>🌤️ 기상청 날씨 API 테스트</Text>
         <Text style={styles.subtitle}>
-          {useCurrentLocation && currentLocation 
+          {useCurrentLocation && currentLocation
             ? currentLocation.locationName || '현재 위치'
             : '서울 지역'}
         </Text>
@@ -341,20 +382,33 @@ export default function WeatherTestScreen() {
         <View style={styles.locationToggle}>
           <Text style={styles.locationLabel}>📍 현재 위치 사용</Text>
           <TouchableOpacity
-            style={[styles.toggleButton, useCurrentLocation && styles.toggleButtonActive]}
+            style={[
+              styles.toggleButton,
+              useCurrentLocation && styles.toggleButtonActive,
+            ]}
             onPress={() => handleLocationToggle(!useCurrentLocation)}
             disabled={locationLoading}
           >
-            <Text style={[styles.toggleText, useCurrentLocation && styles.toggleTextActive]}>
-              {locationLoading ? '위치 가져오는 중...' : (useCurrentLocation ? 'ON' : 'OFF')}
+            <Text
+              style={[
+                styles.toggleText,
+                useCurrentLocation && styles.toggleTextActive,
+              ]}
+            >
+              {locationLoading
+                ? '위치 가져오는 중...'
+                : useCurrentLocation
+                  ? 'ON'
+                  : 'OFF'}
             </Text>
           </TouchableOpacity>
         </View>
-        
+
         {useCurrentLocation && currentLocation && (
           <View style={styles.coordsDisplay}>
             <Text style={styles.coordsText}>
-              위도: {currentLocation.latitude.toFixed(4)}° / 경도: {currentLocation.longitude.toFixed(4)}°
+              위도: {currentLocation.latitude.toFixed(4)}° / 경도:{' '}
+              {currentLocation.longitude.toFixed(4)}°
             </Text>
           </View>
         )}
@@ -370,7 +424,7 @@ export default function WeatherTestScreen() {
         >
           <Text style={styles.buttonText}>현재 날씨만</Text>
         </TouchableOpacity>
-        
+
         <TouchableOpacity
           style={[styles.button, includeForecasts && styles.buttonActive]}
           onPress={() => {

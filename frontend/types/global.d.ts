@@ -117,8 +117,12 @@ declare module 'react-native-health-connect' {
   export interface HealthConnectClient {
     initialize(): Promise<void>;
     requestPermission(permissions: HealthConnectPermission[]): Promise<boolean>;
-    checkPermissions(permissions: HealthConnectPermission[]): Promise<boolean[]>;
-    readRecords<T>(request: ReadRecordsRequest): Promise<ReadRecordsResponse<T>>;
+    checkPermissions(
+      permissions: HealthConnectPermission[]
+    ): Promise<boolean[]>;
+    readRecords<T>(
+      request: ReadRecordsRequest
+    ): Promise<ReadRecordsResponse<T>>;
     aggregate(request: AggregateRequest): Promise<AggregateResult>;
     insertRecords(records: any[]): Promise<string[]>;
     deleteRecords(recordIds: string[]): Promise<void>;
@@ -137,13 +141,23 @@ declare module 'react-native-health-connect' {
   // Main exports
   export function initialize(): Promise<boolean>;
   export function getSdkStatus(): Promise<number>;
-  export function requestPermission(permissions: HealthConnectPermission[]): Promise<boolean>;
+  export function requestPermission(
+    permissions: HealthConnectPermission[]
+  ): Promise<boolean>;
   export function getGrantedPermissions(): Promise<HealthConnectPermission[]>;
-  export function readRecords<T>(request: ReadRecordsRequest): Promise<ReadRecordsResponse<T>>;
-  export function aggregateRecord(request: AggregateRequest): Promise<AggregateResult>;
+  export function readRecords<T>(
+    request: ReadRecordsRequest
+  ): Promise<ReadRecordsResponse<T>>;
+  export function aggregateRecord(
+    request: AggregateRequest
+  ): Promise<AggregateResult>;
   export function insertRecords(records: any[]): Promise<string[]>;
-  export function deleteRecords(recordType: string, recordIdsList: string[], clientRecordIdsList: string[]): Promise<boolean>;
-  
+  export function deleteRecords(
+    recordType: string,
+    recordIdsList: string[],
+    clientRecordIdsList: string[]
+  ): Promise<boolean>;
+
   // Constants
   export const SdkAvailabilityStatus: {
     SDK_UNAVAILABLE: number;

@@ -160,7 +160,7 @@ export interface WalkLegAnalysis {
   max_slope: number;
   min_slope: number;
   segments: SlopeSegment[];
-  is_transfer?: boolean;  // 환승(실내) 구간 여부
+  is_transfer?: boolean; // 환승(실내) 구간 여부
   user_speed_factor?: number;
   slope_factor?: number;
   weather_factor?: number;
@@ -179,9 +179,10 @@ export interface RouteElevationAnalysis {
   // 기타 정보
   sampled_coords_count?: number;
   original_coords_count?: number;
-  user_speed_mps?: number;          // 사용자 평균 속도
-  weather_applied?: boolean;         // 날씨 보정 적용 여부
-  factors?: {                        // 통합 계수 정보
+  user_speed_mps?: number; // 사용자 평균 속도
+  weather_applied?: boolean; // 날씨 보정 적용 여부
+  factors?: {
+    // 통합 계수 정보
     user_speed_factor: number;
     slope_factor: number;
     weather_factor: number;
@@ -194,7 +195,8 @@ export interface AnalyzeSlopeRequest {
   itinerary: Itinerary;
   api_key?: string;
   user_speed_mps?: number; // m/s - Health Connect Case 1 평균 속도
-  weather_data?: {         // 날씨 데이터
+  weather_data?: {
+    // 날씨 데이터
     temp_c: number;
     pty: number;
     rain_mm_per_h?: number;
@@ -217,7 +219,7 @@ export interface SlopeCategory {
 
 /**
  * 경사도 카테고리 정의 (UI 표시용)
- * 
+ *
  * 주의: speedFactor는 참고용입니다.
  * 실제 보행 시간 계산은 백엔드의 Tobler's Hiking Function을 사용하여
  * 연속적이고 더 정확한 속도 계수를 적용합니다.
@@ -228,36 +230,36 @@ export const SLOPE_CATEGORIES: Record<string, SlopeCategory> = {
     label: '평지',
     range: '0-3%',
     speedFactor: 1.0,
-    color: '#4CAF50'
+    color: '#4CAF50',
   },
   gentle: {
     type: 'gentle',
     label: '완만한 오르막',
     range: '3-5%',
     speedFactor: 0.84, // Tobler's Function 근사값
-    color: '#8BC34A'
+    color: '#8BC34A',
   },
   moderate: {
     type: 'moderate',
     label: '보통 오르막',
     range: '5-10%',
     speedFactor: 0.65, // Tobler's Function 근사값
-    color: '#FFC107'
+    color: '#FFC107',
   },
   steep: {
     type: 'steep',
     label: '가파른 오르막',
     range: '10-15%',
     speedFactor: 0.42, // Tobler's Function 근사값
-    color: '#FF9800'
+    color: '#FF9800',
   },
   very_steep: {
     type: 'very_steep',
     label: '매우 가파름',
     range: '15%+',
     speedFactor: 0.25, // Tobler's Function 근사값
-    color: '#F44336'
-  }
+    color: '#F44336',
+  },
 };
 
 // ============================================

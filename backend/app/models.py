@@ -1,11 +1,24 @@
 # app/models.py
 from sqlalchemy import (
-    Column, Integer, String, Date, DateTime, Numeric, Boolean, Text,
-    ForeignKey, UniqueConstraint, CheckConstraint, Index, func
+    Boolean,
+    CheckConstraint,
+    Column,
+    Date,
+    DateTime,
+    ForeignKey,
+    Index,
+    Integer,
+    Numeric,
+    String,
+    Text,
+    UniqueConstraint,
+    func,
 )
-from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.orm import relationship
+
 from app.database import Base
+
 
 # 1) users
 class Users(Base):
@@ -15,17 +28,35 @@ class Users(Base):
     username = Column(String(50), unique=True, nullable=False, index=True)
     email = Column(String(100), unique=True, nullable=False, index=True)
     password_hash = Column(String(255), nullable=False)
-    auth_provider = Column(String(20))  # CHECK는 DB에 존재, 애플리케이션에서 값 제한 권장
+    auth_provider = Column(
+        String(20)
+    )  # CHECK는 DB에 존재, 애플리케이션에서 값 제한 권장
     created_at = Column(DateTime, server_default=func.current_timestamp())
     last_login = Column(DateTime)
 
     # relationships
-    health_data = relationship("HealthData", back_populates="user", cascade="all, delete-orphan")
-    speed_profiles = relationship("ActivitySpeedProfile", back_populates="user", cascade="all, delete-orphan")
-    preferences = relationship("UserPreferences", uselist=False, back_populates="user", cascade="all, delete-orphan")
-    route_search_history = relationship("RouteSearchHistory", back_populates="user", cascade="all, delete-orphan")
-    favorite_routes = relationship("FavoriteRoutes", back_populates="user", cascade="all, delete-orphan")
-    route_ratings = relationship("RouteRatings", back_populates="user", cascade="all, delete-orphan")
+    health_data = relationship(
+        "HealthData", back_populates="user", cascade="all, delete-orphan"
+    )
+    speed_profiles = relationship(
+        "ActivitySpeedProfile", back_populates="user", cascade="all, delete-orphan"
+    )
+    preferences = relationship(
+        "UserPreferences",
+        uselist=False,
+        back_populates="user",
+        cascade="all, delete-orphan",
+    )
+    route_search_history = relationship(
+        "RouteSearchHistory", back_populates="user", cascade="all, delete-orphan"
+    )
+    favorite_routes = relationship(
+        "FavoriteRoutes", back_populates="user", cascade="all, delete-orphan"
+    )
+    route_ratings = relationship(
+        "RouteRatings", back_populates="user", cascade="all, delete-orphan"
+    )
+
 
 # 2) weather_cache
 class WeatherCache(Base):
@@ -50,12 +81,18 @@ class WeatherCache(Base):
         Index("idx_weather_cached_at", "cached_at"),
     )
 
+
 # 3) health_data
 class HealthData(Base):
     __tablename__ = "health_data"
 
     health_data_id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey("users.user_id", ondelete="CASCADE"), nullable=False, index=True)
+    user_id = Column(
+        Integer,
+        ForeignKey("users.user_id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
     record_date = Column(Date, nullable=False, index=True)
     daily_steps = Column(Integer)
     daily_distance_km = Column(Numeric(6, 2))
@@ -65,7 +102,9 @@ class HealthData(Base):
     elevation_gain_m = Column(Numeric(7, 2), server_default="0")
     elevation_loss_m = Column(Numeric(7, 2), server_default="0")
     data_source = Column(String(20))
-    weather_id = Column(Integer, ForeignKey("weather_cache.weather_id", ondelete="SET NULL"))
+    weather_id = Column(
+        Integer, ForeignKey("weather_cache.weather_id", ondelete="SET NULL")
+    )
     created_at = Column(DateTime, server_default=func.current_timestamp())
 
     __table_args__ = (
@@ -77,12 +116,18 @@ class HealthData(Base):
     user = relationship("Users", back_populates="health_data")
     weather = relationship("WeatherCache")
 
+
 # 4) activity_speed_profile
 class ActivitySpeedProfile(Base):
     __tablename__ = "activity_speed_profile"
 
     profile_id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey("users.user_id", ondelete="CASCADE"), nullable=False, index=True)
+    user_id = Column(
+        Integer,
+        ForeignKey("users.user_id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
     activity_type = Column(String(20), nullable=False)  # walking/running/cycling
     avg_speed_flat_kmh = Column(Numeric(4, 2))
     avg_speed_uphill_kmh = Column(Numeric(4, 2))
@@ -92,7 +137,11 @@ class ActivitySpeedProfile(Base):
     speed_variance = Column(Numeric(4, 2))
     confidence_score = Column(Numeric(3, 2))
     data_points_count = Column(Integer, server_default="0")
-    last_updated = Column(DateTime, server_default=func.current_timestamp(), onupdate=func.current_timestamp())
+    last_updated = Column(
+        DateTime,
+        server_default=func.current_timestamp(),
+        onupdate=func.current_timestamp(),
+    )
     created_at = Column(DateTime, server_default=func.current_timestamp())
 
     __table_args__ = (
@@ -102,12 +151,19 @@ class ActivitySpeedProfile(Base):
 
     user = relationship("Users", back_populates="speed_profiles")
 
+
 # 5) user_preferences
 class UserPreferences(Base):
     __tablename__ = "user_preferences"
 
     preference_id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey("users.user_id", ondelete="CASCADE"), nullable=False, unique=True, index=True)
+    user_id = Column(
+        Integer,
+        ForeignKey("users.user_id", ondelete="CASCADE"),
+        nullable=False,
+        unique=True,
+        index=True,
+    )
     preferred_distance_km = Column(Numeric(5, 2))
     preferred_duration_minutes = Column(Integer)
     preferred_terrain = Column(String(20))
@@ -116,9 +172,14 @@ class UserPreferences(Base):
     prefer_scenic_routes = Column(Boolean, server_default="false")
     preferred_areas = Column(JSONB)
     weather_preferences = Column(JSONB)
-    updated_at = Column(DateTime, server_default=func.current_timestamp(), onupdate=func.current_timestamp())
+    updated_at = Column(
+        DateTime,
+        server_default=func.current_timestamp(),
+        onupdate=func.current_timestamp(),
+    )
 
     user = relationship("Users", back_populates="preferences")
+
 
 # 6) routes
 class Routes(Base):
@@ -141,7 +202,11 @@ class Routes(Base):
     rating_count = Column(Integer, server_default="0")
     tags = Column(JSONB)
     created_at = Column(DateTime, server_default=func.current_timestamp())
-    updated_at = Column(DateTime, server_default=func.current_timestamp(), onupdate=func.current_timestamp())
+    updated_at = Column(
+        DateTime,
+        server_default=func.current_timestamp(),
+        onupdate=func.current_timestamp(),
+    )
 
     __table_args__ = (
         Index("idx_routes_type", "route_type"),
@@ -150,16 +215,28 @@ class Routes(Base):
         Index("idx_routes_source", "source", "external_id"),
     )
 
-    segments = relationship("RouteSegments", back_populates="route", cascade="all, delete-orphan")
-    favorites = relationship("FavoriteRoutes", back_populates="route", cascade="all, delete-orphan")
-    ratings = relationship("RouteRatings", back_populates="route", cascade="all, delete-orphan")
+    segments = relationship(
+        "RouteSegments", back_populates="route", cascade="all, delete-orphan"
+    )
+    favorites = relationship(
+        "FavoriteRoutes", back_populates="route", cascade="all, delete-orphan"
+    )
+    ratings = relationship(
+        "RouteRatings", back_populates="route", cascade="all, delete-orphan"
+    )
+
 
 # 7) route_segments
 class RouteSegments(Base):
     __tablename__ = "route_segments"
 
     segment_id = Column(Integer, primary_key=True)
-    route_id = Column(Integer, ForeignKey("routes.route_id", ondelete="CASCADE"), nullable=False, index=True)
+    route_id = Column(
+        Integer,
+        ForeignKey("routes.route_id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
     segment_order = Column(Integer, nullable=False)
     start_lat = Column(Numeric(9, 6), nullable=False)
     start_lon = Column(Numeric(9, 6), nullable=False)
@@ -180,12 +257,18 @@ class RouteSegments(Base):
 
     route = relationship("Routes", back_populates="segments")
 
+
 # 8) route_search_history
 class RouteSearchHistory(Base):
     __tablename__ = "route_search_history"
 
     search_id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey("users.user_id", ondelete="CASCADE"), nullable=False, index=True)
+    user_id = Column(
+        Integer,
+        ForeignKey("users.user_id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
     start_location = Column(String(200))
     end_location = Column(String(200))
     start_lat = Column(Numeric(9, 6), nullable=False)
@@ -198,7 +281,9 @@ class RouteSearchHistory(Base):
     total_elevation_gain_m = Column(Numeric(7, 2))
     total_elevation_loss_m = Column(Numeric(7, 2))
     route_type = Column(String(20))
-    weather_id = Column(Integer, ForeignKey("weather_cache.weather_id", ondelete="SET NULL"))
+    weather_id = Column(
+        Integer, ForeignKey("weather_cache.weather_id", ondelete="SET NULL")
+    )
     searched_at = Column(DateTime, server_default=func.current_timestamp())
 
     __table_args__ = (
@@ -208,16 +293,26 @@ class RouteSearchHistory(Base):
 
     user = relationship("Users", back_populates="route_search_history")
     weather = relationship("WeatherCache")
-    segments = relationship("SearchRouteSegments", back_populates="search", cascade="all, delete-orphan")
+    segments = relationship(
+        "SearchRouteSegments", back_populates="search", cascade="all, delete-orphan"
+    )
+
 
 # 9) search_route_segments
 class SearchRouteSegments(Base):
     __tablename__ = "search_route_segments"
 
     search_segment_id = Column(Integer, primary_key=True)
-    search_id = Column(Integer, ForeignKey("route_search_history.search_id", ondelete="CASCADE"), nullable=False, index=True)
+    search_id = Column(
+        Integer,
+        ForeignKey("route_search_history.search_id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
     segment_order = Column(Integer, nullable=False)
-    route_segment_id = Column(Integer, ForeignKey("route_segments.segment_id", ondelete="SET NULL"))
+    route_segment_id = Column(
+        Integer, ForeignKey("route_segments.segment_id", ondelete="SET NULL")
+    )
     segment_distance_m = Column(Numeric(7, 2), nullable=False)
     segment_grade_percent = Column(Numeric(5, 2))
     segment_elevation_change_m = Column(Numeric(6, 2))
@@ -232,13 +327,24 @@ class SearchRouteSegments(Base):
     search = relationship("RouteSearchHistory", back_populates="segments")
     route_segment = relationship("RouteSegments")
 
+
 # 10) favorite_routes
 class FavoriteRoutes(Base):
     __tablename__ = "favorite_routes"
 
     favorite_id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey("users.user_id", ondelete="CASCADE"), nullable=False, index=True)
-    route_id = Column(Integer, ForeignKey("routes.route_id", ondelete="CASCADE"), nullable=False, index=True)
+    user_id = Column(
+        Integer,
+        ForeignKey("users.user_id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    route_id = Column(
+        Integer,
+        ForeignKey("routes.route_id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
     saved_at = Column(DateTime, server_default=func.current_timestamp())
     notes = Column(Text)
 
@@ -250,13 +356,24 @@ class FavoriteRoutes(Base):
     user = relationship("Users", back_populates="favorite_routes")
     route = relationship("Routes", back_populates="favorites")
 
+
 # 11) route_ratings
 class RouteRatings(Base):
     __tablename__ = "route_ratings"
 
     rating_id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey("users.user_id", ondelete="CASCADE"), nullable=False, index=True)
-    route_id = Column(Integer, ForeignKey("routes.route_id", ondelete="CASCADE"), nullable=False, index=True)
+    user_id = Column(
+        Integer,
+        ForeignKey("users.user_id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    route_id = Column(
+        Integer,
+        ForeignKey("routes.route_id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
     rating = Column(Integer, nullable=False)
     review_text = Column(Text)
     rating_factors = Column(JSONB)

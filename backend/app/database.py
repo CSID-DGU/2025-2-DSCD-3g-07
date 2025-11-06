@@ -1,10 +1,11 @@
 # DB 연결 설정
 
+import os
+
+from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-import os
-from dotenv import load_dotenv
 
 # .env 파일에서 환경 변수 로드 (DB 보안 정보 분리)
 load_dotenv()
@@ -24,6 +25,7 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 # Base 클래스 생성 — 모든 모델 클래스가 이걸 상속받음
 Base = declarative_base()
+
 
 # FastAPI 의존성 주입용 함수
 # 요청마다 새로운 DB 세션을 생성하고, 끝나면 자동 종료되게 함

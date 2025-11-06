@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Button, StyleSheet, Alert } from 'react-native';
-import { 
-  readTodayStepsAndDistance, 
-  requestHealthConnectPermissions, 
+import {
+  readTodayStepsAndDistance,
+  requestHealthConnectPermissions,
   checkHealthConnectAvailability,
-  HealthResult 
+  HealthResult,
 } from '../health';
 
 export default function HealthConnectTest() {
@@ -31,7 +31,10 @@ export default function HealthConnectTest() {
       if (result.success) {
         Alert.alert('Success', 'Health Connect permissions granted!');
       } else {
-        Alert.alert('Permission Denied', result.error || 'Failed to get permissions');
+        Alert.alert(
+          'Permission Denied',
+          result.error || 'Failed to get permissions'
+        );
       }
     } catch (error) {
       Alert.alert('Error', 'Failed to request permissions');
@@ -45,9 +48,12 @@ export default function HealthConnectTest() {
     try {
       const data = await readTodayStepsAndDistance();
       setHealthData(data);
-      
+
       if (!data.granted) {
-        Alert.alert('Permission Required', 'Please grant Health Connect permissions first');
+        Alert.alert(
+          'Permission Required',
+          'Please grant Health Connect permissions first'
+        );
       }
     } catch (error) {
       Alert.alert('Error', 'Failed to read health data');
@@ -59,11 +65,12 @@ export default function HealthConnectTest() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Health Connect Test</Text>
-      
+
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Availability</Text>
         <Text style={styles.status}>
-          Health Connect Available: {availability === null ? 'Checking...' : availability ? 'Yes' : 'No'}
+          Health Connect Available:{' '}
+          {availability === null ? 'Checking...' : availability ? 'Yes' : 'No'}
         </Text>
       </View>
 
@@ -85,12 +92,22 @@ export default function HealthConnectTest() {
       {healthData && (
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Health Data</Text>
-          <Text style={styles.dataText}>Permission Granted: {healthData.granted ? 'Yes' : 'No'}</Text>
-          <Text style={styles.dataText}>Steps: {healthData.totalSteps.toLocaleString()}</Text>
-          <Text style={styles.dataText}>Distance: {(healthData.totalMeters / 1000).toFixed(2)} km</Text>
+          <Text style={styles.dataText}>
+            Permission Granted: {healthData.granted ? 'Yes' : 'No'}
+          </Text>
+          <Text style={styles.dataText}>
+            Steps: {healthData.totalSteps.toLocaleString()}
+          </Text>
+          <Text style={styles.dataText}>
+            Distance: {(healthData.totalMeters / 1000).toFixed(2)} km
+          </Text>
           <Text style={styles.dataText}>Source: {healthData.source}</Text>
-          <Text style={styles.dataText}>Demo Data: {healthData.isDemoData ? 'Yes' : 'No'}</Text>
-          <Text style={styles.dataText}>Timestamp: {new Date(healthData.timestamp).toLocaleString()}</Text>
+          <Text style={styles.dataText}>
+            Demo Data: {healthData.isDemoData ? 'Yes' : 'No'}
+          </Text>
+          <Text style={styles.dataText}>
+            Timestamp: {new Date(healthData.timestamp).toLocaleString()}
+          </Text>
         </View>
       )}
 

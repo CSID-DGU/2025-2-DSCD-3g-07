@@ -1,14 +1,6 @@
 module.exports = {
-  extends: [
-    'expo',
-    '@react-native-community',
-    'prettier',
-  ],
-  plugins: [
-    'prettier',
-    '@typescript-eslint',
-    'react-hooks',
-  ],
+  extends: ['expo', '@react-native-community', 'prettier'],
+  plugins: ['prettier', '@typescript-eslint', 'react-hooks'],
   rules: {
     'prettier/prettier': 'error',
     '@typescript-eslint/no-unused-vars': 'error',

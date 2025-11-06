@@ -2,36 +2,49 @@
 # 초안만 일단
 # CRUD는 백엔드 개발 중 언제든지 수정될 수 있음
 
+from datetime import datetime
+
 # app/crud.py
 from sqlalchemy.orm import Session
-from datetime import datetime
+
 from app import models
+
 
 # ================================
 # 1. USERS
 # ================================
-def create_user(db: Session, username: str, email: str, password_hash: str, auth_provider: str = "local"):
+def create_user(
+    db: Session,
+    username: str,
+    email: str,
+    password_hash: str,
+    auth_provider: str = "local",
+):
     new_user = models.Users(
         username=username,
         email=email,
         password_hash=password_hash,
-        auth_provider=auth_provider
+        auth_provider=auth_provider,
     )
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
     return new_user
 
+
 def get_user_by_id(db: Session, user_id: int):
     return db.query(models.Users).filter(models.Users.user_id == user_id).first()
+
 
 def get_user_by_email(db: Session, email: str):
     """이메일로 사용자 조회"""
     return db.query(models.Users).filter(models.Users.email == email).first()
 
+
 def get_user_by_username(db: Session, username: str):
     """사용자명으로 사용자 조회"""
     return db.query(models.Users).filter(models.Users.username == username).first()
+
 
 def update_last_login(db: Session, user_id: int):
     """마지막 로그인 시간 업데이트"""
@@ -42,8 +55,10 @@ def update_last_login(db: Session, user_id: int):
         db.refresh(user)
     return user
 
+
 def get_all_users(db: Session):
     return db.query(models.Users).all()
+
 
 def delete_user(db: Session, user_id: int):
     user = get_user_by_id(db, user_id)
@@ -63,11 +78,18 @@ def create_weather_cache(db: Session, **kwargs):
     db.refresh(weather)
     return weather
 
+
 def get_weather_by_id(db: Session, weather_id: int):
-    return db.query(models.WeatherCache).filter(models.WeatherCache.weather_id == weather_id).first()
+    return (
+        db.query(models.WeatherCache)
+        .filter(models.WeatherCache.weather_id == weather_id)
+        .first()
+    )
+
 
 def get_all_weather_cache(db: Session):
     return db.query(models.WeatherCache).all()
+
 
 def delete_weather_cache(db: Session, weather_id: int):
     w = get_weather_by_id(db, weather_id)
@@ -87,11 +109,20 @@ def create_health_data(db: Session, **kwargs):
     db.refresh(record)
     return record
 
+
 def get_health_data_by_id(db: Session, health_data_id: int):
-    return db.query(models.HealthData).filter(models.HealthData.health_data_id == health_data_id).first()
+    return (
+        db.query(models.HealthData)
+        .filter(models.HealthData.health_data_id == health_data_id)
+        .first()
+    )
+
 
 def get_user_health_data(db: Session, user_id: int):
-    return db.query(models.HealthData).filter(models.HealthData.user_id == user_id).all()
+    return (
+        db.query(models.HealthData).filter(models.HealthData.user_id == user_id).all()
+    )
+
 
 def delete_health_data(db: Session, health_data_id: int):
     record = get_health_data_by_id(db, health_data_id)
@@ -111,11 +142,21 @@ def create_speed_profile(db: Session, **kwargs):
     db.refresh(profile)
     return profile
 
+
 def get_speed_profile_by_user(db: Session, user_id: int):
-    return db.query(models.ActivitySpeedProfile).filter(models.ActivitySpeedProfile.user_id == user_id).all()
+    return (
+        db.query(models.ActivitySpeedProfile)
+        .filter(models.ActivitySpeedProfile.user_id == user_id)
+        .all()
+    )
+
 
 def delete_speed_profile(db: Session, profile_id: int):
-    profile = db.query(models.ActivitySpeedProfile).filter(models.ActivitySpeedProfile.profile_id == profile_id).first()
+    profile = (
+        db.query(models.ActivitySpeedProfile)
+        .filter(models.ActivitySpeedProfile.profile_id == profile_id)
+        .first()
+    )
     if profile:
         db.delete(profile)
         db.commit()
@@ -132,8 +173,14 @@ def create_user_preferences(db: Session, **kwargs):
     db.refresh(pref)
     return pref
 
+
 def get_preferences_by_user(db: Session, user_id: int):
-    return db.query(models.UserPreferences).filter(models.UserPreferences.user_id == user_id).first()
+    return (
+        db.query(models.UserPreferences)
+        .filter(models.UserPreferences.user_id == user_id)
+        .first()
+    )
+
 
 def update_user_preferences(db: Session, user_id: int, **kwargs):
     pref = get_preferences_by_user(db, user_id)
@@ -155,11 +202,14 @@ def create_route(db: Session, **kwargs):
     db.refresh(route)
     return route
 
+
 def get_route_by_id(db: Session, route_id: int):
     return db.query(models.Routes).filter(models.Routes.route_id == route_id).first()
 
+
 def get_all_routes(db: Session):
     return db.query(models.Routes).all()
+
 
 def delete_route(db: Session, route_id: int):
     route = get_route_by_id(db, route_id)
@@ -179,8 +229,13 @@ def create_route_segment(db: Session, **kwargs):
     db.refresh(segment)
     return segment
 
+
 def get_segments_by_route(db: Session, route_id: int):
-    return db.query(models.RouteSegments).filter(models.RouteSegments.route_id == route_id).all()
+    return (
+        db.query(models.RouteSegments)
+        .filter(models.RouteSegments.route_id == route_id)
+        .all()
+    )
 
 
 # ================================
@@ -193,8 +248,13 @@ def create_route_search(db: Session, **kwargs):
     db.refresh(search)
     return search
 
+
 def get_search_by_user(db: Session, user_id: int):
-    return db.query(models.RouteSearchHistory).filter(models.RouteSearchHistory.user_id == user_id).all()
+    return (
+        db.query(models.RouteSearchHistory)
+        .filter(models.RouteSearchHistory.user_id == user_id)
+        .all()
+    )
 
 
 # ================================
@@ -207,8 +267,13 @@ def create_search_segment(db: Session, **kwargs):
     db.refresh(seg)
     return seg
 
+
 def get_segments_by_search(db: Session, search_id: int):
-    return db.query(models.SearchRouteSegments).filter(models.SearchRouteSegments.search_id == search_id).all()
+    return (
+        db.query(models.SearchRouteSegments)
+        .filter(models.SearchRouteSegments.search_id == search_id)
+        .all()
+    )
 
 
 # ================================
@@ -221,14 +286,24 @@ def add_favorite_route(db: Session, **kwargs):
     db.refresh(fav)
     return fav
 
+
 def get_favorites_by_user(db: Session, user_id: int):
-    return db.query(models.FavoriteRoutes).filter(models.FavoriteRoutes.user_id == user_id).all()
+    return (
+        db.query(models.FavoriteRoutes)
+        .filter(models.FavoriteRoutes.user_id == user_id)
+        .all()
+    )
+
 
 def remove_favorite_route(db: Session, user_id: int, route_id: int):
-    fav = db.query(models.FavoriteRoutes).filter(
-        models.FavoriteRoutes.user_id == user_id,
-        models.FavoriteRoutes.route_id == route_id
-    ).first()
+    fav = (
+        db.query(models.FavoriteRoutes)
+        .filter(
+            models.FavoriteRoutes.user_id == user_id,
+            models.FavoriteRoutes.route_id == route_id,
+        )
+        .first()
+    )
     if fav:
         db.delete(fav)
         db.commit()
@@ -245,13 +320,21 @@ def create_route_rating(db: Session, **kwargs):
     db.refresh(rating)
     return rating
 
+
 def get_ratings_by_route(db: Session, route_id: int):
-    return db.query(models.RouteRatings).filter(models.RouteRatings.route_id == route_id).all()
+    return (
+        db.query(models.RouteRatings)
+        .filter(models.RouteRatings.route_id == route_id)
+        .all()
+    )
+
 
 def get_user_rating_for_route(db: Session, user_id: int, route_id: int):
-    return db.query(models.RouteRatings).filter(
-        models.RouteRatings.user_id == user_id,
-        models.RouteRatings.route_id == route_id
-    ).first()
-
-
+    return (
+        db.query(models.RouteRatings)
+        .filter(
+            models.RouteRatings.user_id == user_id,
+            models.RouteRatings.route_id == route_id,
+        )
+        .first()
+    )

@@ -28,49 +28,63 @@ export default function TabLayout() {
         name="index"
         options={{
           title: '홈',
-          tabBarIcon: ({ color }) => <MaterialIcons size={26} name="home" color={color} />,
+          tabBarIcon: ({ color }) => (
+            <MaterialIcons size={26} name="home" color={color} />
+          ),
         }}
       />
       <Tabs.Screen
         name="routes"
         options={{
           title: '코스',
-          tabBarIcon: ({ color }) => <MaterialIcons size={26} name="map" color={color} />,
+          tabBarIcon: ({ color }) => (
+            <MaterialIcons size={26} name="map" color={color} />
+          ),
         }}
       />
       <Tabs.Screen
         name="stats"
         options={{
           title: 'MY',
-          tabBarIcon: ({ color }) => <MaterialIcons size={26} name="person" color={color} />,
+          tabBarIcon: ({ color }) => (
+            <MaterialIcons size={26} name="person" color={color} />
+          ),
         }}
       />
       <Tabs.Screen
         name="api-test"
         options={{
           title: 'API',
-          tabBarIcon: ({ color }) => <MaterialIcons size={26} name="api" color={color} />,
+          tabBarIcon: ({ color }) => (
+            <MaterialIcons size={26} name="api" color={color} />
+          ),
         }}
       />
       <Tabs.Screen
         name="weather"
         options={{
           title: '날씨',
-          tabBarIcon: ({ color }) => <MaterialIcons size={26} name="wb-sunny" color={color} />,
+          tabBarIcon: ({ color }) => (
+            <MaterialIcons size={26} name="wb-sunny" color={color} />
+          ),
         }}
       />
       <Tabs.Screen
         name="health-connect"
         options={{
           title: 'Health',
-          tabBarIcon: ({ color }) => <MaterialIcons size={26} name="favorite" color={color} />,
+          tabBarIcon: ({ color }) => (
+            <MaterialIcons size={26} name="favorite" color={color} />
+          ),
         }}
       />
       <Tabs.Screen
         name="settings"
         options={{
           title: '설정',
-          tabBarIcon: ({ color }) => <MaterialIcons size={26} name="settings" color={color} />,
+          tabBarIcon: ({ color }) => (
+            <MaterialIcons size={26} name="settings" color={color} />
+          ),
         }}
       />
     </Tabs>

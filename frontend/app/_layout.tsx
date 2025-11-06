@@ -1,4 +1,3 @@
-import { useColorScheme } from '@/hooks/use-color-scheme';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -14,8 +13,6 @@ export const unstable_settings = {
 };
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
-
   // 앱 시작시 API URL 자동 감지 및 초기화
   useEffect(() => {
     const initializeApi = async () => {

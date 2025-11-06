@@ -33,7 +33,7 @@ export default function SettingsScreen() {
                 onPress: () => router.replace('/(auth)/login'),
               },
             ]);
-          } catch (error) {
+          } catch {
             Alert.alert('오류', '로그아웃에 실패했습니다');
           }
         },

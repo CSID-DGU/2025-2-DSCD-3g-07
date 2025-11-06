@@ -36,7 +36,7 @@ export default function HealthConnectTest() {
           result.error || 'Failed to get permissions'
         );
       }
-    } catch (error) {
+    } catch {
       Alert.alert('Error', 'Failed to request permissions');
     } finally {
       setIsLoading(false);
@@ -55,7 +55,7 @@ export default function HealthConnectTest() {
           'Please grant Health Connect permissions first'
         );
       }
-    } catch (error) {
+    } catch {
       Alert.alert('Error', 'Failed to read health data');
     } finally {
       setIsLoading(false);

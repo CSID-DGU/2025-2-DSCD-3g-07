@@ -35,6 +35,8 @@ jobs:
     - name: 📦 Install dependencies
       run: |
         npm install
+        cd frontend && npm ci
+        cd ..
         pip install -r backend/requirements.txt
         pip install -r backend/requirements-dev.txt
         
@@ -54,6 +56,8 @@ jobs:
   backend-test:
     runs-on: ubuntu-latest
     name: 🐍 Backend Tests
+    env:
+      DATABASE_URL: sqlite:///./test.db
     
     steps:
     - name: 📥 Checkout code

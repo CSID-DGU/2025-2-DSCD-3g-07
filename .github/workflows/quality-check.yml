@@ -9,6 +9,8 @@ on:
 jobs:
   backend-quality:
     runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: sqlite:///./test.db
     steps:
     - uses: actions/checkout@v3
     

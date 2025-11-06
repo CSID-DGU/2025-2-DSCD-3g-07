@@ -1,7 +1,6 @@
 """
 경로 검색 API 테스트
 """
-import pytest
 from fastapi.testclient import TestClient
 
 

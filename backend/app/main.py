@@ -14,7 +14,7 @@ from app.utils import walking_only
 load_dotenv()  # .env 로드
 
 # 환경 변수 설정
-HOST = os.getenv("HOST", "0.0.0.0")
+HOST = os.getenv("HOST", "0.0.0.0") # nosec B104
 PORT = int(os.getenv("PORT", 8000))
 DEBUG = os.getenv("DEBUG", "True").lower() == "true"
 

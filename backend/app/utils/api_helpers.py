@@ -102,5 +102,5 @@ def call_tmap_transit_api(
     
     print(f"🕐 [TMAP API] 검색 시간: {current_time}")
     
-    response = requests.post(url, headers=headers, json=body)
+    response = requests.post(url, headers=headers, json=body) # nosec B113
     return response

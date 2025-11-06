@@ -12,11 +12,7 @@ import aiohttp
 from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel, Field
 
-from ..utils.weather_helpers import (
-    WeatherSpeedModel,
-    calculate_eta,
-    map_kma_to_weather,
-)
+from ..utils.weather_helpers import WeatherSpeedModel, calculate_eta, map_kma_to_weather
 
 router = APIRouter(prefix="/weather", tags=["weather"])
 

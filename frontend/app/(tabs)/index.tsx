@@ -328,7 +328,7 @@ export default function HomeScreen() {
       const locationData: LocationData = {
         address: address
           ? `${address.city || ''} ${address.district || ''}`.trim() ||
-          '현재 위치'
+            '현재 위치'
           : '현재 위치',
         latitude: location.coords.latitude,
         longitude: location.coords.longitude,
@@ -923,7 +923,7 @@ export default function HomeScreen() {
                   styles.searchButton,
                   styles.transitButton,
                   (!startLocation || !endLocation) &&
-                  styles.searchButtonDisabled,
+                    styles.searchButtonDisabled,
                 ]}
                 onPress={handleSearchRoute}
                 disabled={!startLocation || !endLocation || loading}
@@ -947,7 +947,7 @@ export default function HomeScreen() {
                   styles.searchButton,
                   styles.walkingButton,
                   (!startLocation || !endLocation) &&
-                  styles.searchButtonDisabled,
+                    styles.searchButtonDisabled,
                 ]}
                 onPress={handleSearchWalkingRoute}
                 disabled={!startLocation || !endLocation || loading}
@@ -1039,7 +1039,7 @@ export default function HomeScreen() {
                     style={[
                       styles.routeOptionItem,
                       selectedRouteIndex === index &&
-                      styles.routeOptionItemSelected,
+                        styles.routeOptionItemSelected,
                     ]}
                     onPress={() => handleSelectRoute(index)}
                   >
@@ -1176,8 +1176,8 @@ export default function HomeScreen() {
                     <Text style={styles.statValue}>
                       {routeInfo.slopeAnalysis?.total_original_walk_time
                         ? formatMinutes(
-                          routeInfo.slopeAnalysis.total_original_walk_time
-                        )
+                            routeInfo.slopeAnalysis.total_original_walk_time
+                          )
                         : formatMinutes(routeInfo.totalWalkTime)}
                     </Text>
                     <Text style={styles.statLabel}>도보 시간 (기준)</Text>
@@ -1197,33 +1197,33 @@ export default function HomeScreen() {
                           </Text>
                           {routeInfo.slopeAnalysis?.factors
                             ?.user_speed_factor && (
-                              <Text
-                                style={[
-                                  styles.infoImpact,
+                            <Text
+                              style={[
+                                styles.infoImpact,
+                                routeInfo.slopeAnalysis.factors
+                                  .user_speed_factor > 1
+                                  ? styles.infoImpactIncrease
+                                  : styles.infoImpactDecrease,
+                              ]}
+                            >
+                              {(() => {
+                                const factor =
                                   routeInfo.slopeAnalysis.factors
-                                    .user_speed_factor > 1
-                                    ? styles.infoImpactIncrease
-                                    : styles.infoImpactDecrease,
-                                ]}
-                              >
-                                {(() => {
-                                  const factor =
-                                    routeInfo.slopeAnalysis.factors
-                                      .user_speed_factor;
-                                  // 원본 도보 시간에 사용자 속도 계수만 적용한 시간 계산
-                                  const originalTime =
-                                    routeInfo.slopeAnalysis
-                                      .total_original_walk_time;
-                                  const timeWithUserSpeed = originalTime * factor;
-                                  const impact = Math.round(
-                                    timeWithUserSpeed - originalTime
-                                  );
-                                  const sign =
-                                    impact > 0 ? '+' : impact < 0 ? '-' : '';
-                                  return `${sign}${Math.floor(Math.abs(impact) / 60)}분 ${Math.abs(impact) % 60}초`;
-                                })()}
-                              </Text>
-                            )}
+                                    .user_speed_factor;
+                                // 원본 도보 시간에 사용자 속도 계수만 적용한 시간 계산
+                                const originalTime =
+                                  routeInfo.slopeAnalysis
+                                    .total_original_walk_time;
+                                const timeWithUserSpeed = originalTime * factor;
+                                const impact = Math.round(
+                                  timeWithUserSpeed - originalTime
+                                );
+                                const sign =
+                                  impact > 0 ? '+' : impact < 0 ? '-' : '';
+                                return `${sign}${Math.floor(Math.abs(impact) / 60)}분 ${Math.abs(impact) % 60}초`;
+                              })()}
+                            </Text>
+                          )}
                         </View>
                       </View>
                     )}
@@ -1239,7 +1239,7 @@ export default function HomeScreen() {
                               style={[
                                 styles.infoImpact,
                                 routeInfo.slopeAnalysis.factors.weather_factor >
-                                  1
+                                1
                                   ? styles.infoImpactIncrease
                                   : styles.infoImpactDecrease,
                               ]}
@@ -1339,7 +1339,7 @@ export default function HomeScreen() {
                             style={[
                               styles.slopeStatValue,
                               routeInfo.slopeAnalysis.factors?.slope_factor &&
-                                routeInfo.slopeAnalysis.factors.slope_factor < 1
+                              routeInfo.slopeAnalysis.factors.slope_factor < 1
                                 ? styles.slopeStatValueIncrease
                                 : styles.slopeStatValueDecrease,
                             ]}
@@ -1371,7 +1371,7 @@ export default function HomeScreen() {
                           <Text style={styles.slopeStatValue}>
                             {Math.floor(
                               routeInfo.slopeAnalysis.total_adjusted_walk_time /
-                              60
+                                60
                             )}
                             분
                           </Text>
@@ -1397,7 +1397,7 @@ export default function HomeScreen() {
                           💡 기준 시간(
                           {Math.floor(
                             routeInfo.slopeAnalysis.total_original_walk_time /
-                            60
+                              60
                           )}
                           분)에 사용자 속도, 경사도, 날씨를 반영한 예상
                           시간입니다.
@@ -1405,18 +1405,18 @@ export default function HomeScreen() {
                         {routeInfo.slopeAnalysis.walk_legs_analysis.some(
                           leg => leg.is_transfer
                         ) && (
-                            <Text
-                              style={{
-                                fontSize: 10,
-                                color: '#9CA3AF',
-                                lineHeight: 14,
-                                marginTop: 4,
-                              }}
-                            >
-                              ℹ️ 환승(실내) 구간은 경사도와 날씨 영향 없이 개인
-                              속도만 반영됩니다.
-                            </Text>
-                          )}
+                          <Text
+                            style={{
+                              fontSize: 10,
+                              color: '#9CA3AF',
+                              lineHeight: 14,
+                              marginTop: 4,
+                            }}
+                          >
+                            ℹ️ 환승(실내) 구간은 경사도와 날씨 영향 없이 개인
+                            속도만 반영됩니다.
+                          </Text>
+                        )}
                       </View>
 
                       {/* 경사도 경고 */}
@@ -1519,7 +1519,7 @@ export default function HomeScreen() {
                           횡단보도 포함 총 시간:{' '}
                           {Math.floor(
                             routeInfo.slopeAnalysis.total_time_with_crosswalk /
-                            60
+                              60
                           )}
                           분{' '}
                           {routeInfo.slopeAnalysis.total_time_with_crosswalk %

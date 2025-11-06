@@ -46,11 +46,16 @@ jobs:
     - name: 🔍 Lint Frontend
       run: npm run lint:frontend
       
-    - name: 📝 Format Check
+    - name: 📝 Format Check Backend
       run: |
-        npm run format:backend
-        npm run format:frontend
-        git diff --exit-code
+        cd backend
+        python -m black --check app/ tests/
+        python -m isort --check-only app/ tests/
+        
+    - name: 📝 Format Check Frontend
+      run: |
+        cd frontend
+        npx prettier --check "**/*.{js,jsx,ts,tsx,json}"
         
   # 🧪 백엔드 테스트
   backend-test:

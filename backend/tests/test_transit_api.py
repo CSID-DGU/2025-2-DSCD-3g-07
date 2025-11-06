@@ -1,6 +1,7 @@
 """
 경로 검색 API 테스트
 """
+
 from fastapi.testclient import TestClient
 
 
@@ -45,14 +46,12 @@ def test_transit_route_invalid_coordinates(client: TestClient):
 
 
 def test_transit_route_parameter_types(client: TestClient):
-    """파라미터 타입 검증 테스트"""
+    """잘못된 파라미터 타입 테스트"""
     params = {
-        "start_x": 126.9706,
+        "start_x": "invalid",  # 필수 파라미터에 잘못된 타입
         "start_y": 37.5547,
         "end_x": 127.0276,
         "end_y": 37.4979,
-        "user_age": "invalid_age",  # 잘못된 타입
-        "fatigue_level": 3,
     }
 
     response = client.get("/transit-route", params=params)

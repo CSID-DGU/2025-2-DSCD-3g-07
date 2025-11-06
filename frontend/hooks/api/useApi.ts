@@ -1,5 +1,9 @@
 import { useState, useEffect } from 'react';
-import { apiService, ApiResponse, TransitRouteParams } from '../../services/api';
+import {
+  apiService,
+  ApiResponse,
+  TransitRouteParams,
+} from '../../services/api';
 import { TransitRouteResponse } from '../../types/api';
 
 interface UseApiState<T> {
@@ -9,7 +13,9 @@ interface UseApiState<T> {
 }
 
 export function useHealthCheck() {
-  const [state, setState] = useState<UseApiState<{ status: string; version: string }>>({
+  const [state, setState] = useState<
+    UseApiState<{ status: string; version: string }>
+  >({
     data: null,
     loading: false,
     error: null,
@@ -22,15 +28,23 @@ export function useHealthCheck() {
       const response = await apiService.healthCheck();
 
       if (response.error) {
-        setState(prev => ({ ...prev, loading: false, error: response.error || 'Unknown error' }));
+        setState(prev => ({
+          ...prev,
+          loading: false,
+          error: response.error || 'Unknown error',
+        }));
       } else {
-        setState(prev => ({ ...prev, loading: false, data: response.data || null }));
+        setState(prev => ({
+          ...prev,
+          loading: false,
+          data: response.data || null,
+        }));
       }
     } catch (error) {
       setState(prev => ({
         ...prev,
         loading: false,
-        error: error instanceof Error ? error.message : 'Network error'
+        error: error instanceof Error ? error.message : 'Network error',
       }));
     }
   };
@@ -55,15 +69,23 @@ export function useTransitRoute() {
       const response = await apiService.getTransitRoute(params);
 
       if (response.error) {
-        setState(prev => ({ ...prev, loading: false, error: response.error || 'Unknown error' }));
+        setState(prev => ({
+          ...prev,
+          loading: false,
+          error: response.error || 'Unknown error',
+        }));
       } else {
-        setState(prev => ({ ...prev, loading: false, data: response.data || null }));
+        setState(prev => ({
+          ...prev,
+          loading: false,
+          data: response.data || null,
+        }));
       }
     } catch (error) {
       setState(prev => ({
         ...prev,
         loading: false,
-        error: error instanceof Error ? error.message : 'Network error'
+        error: error instanceof Error ? error.message : 'Network error',
       }));
     }
   };

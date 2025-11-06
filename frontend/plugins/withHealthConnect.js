@@ -4,8 +4,8 @@ const { withMainActivity, AndroidConfig } = require('@expo/config-plugins');
  * Expo Config Plugin for react-native-health-connect
  * Modifies MainActivity to properly register Activity Result Launcher
  */
-const withHealthConnect = (config) => {
-  return withMainActivity(config, async (config) => {
+const withHealthConnect = config => {
+  return withMainActivity(config, async config => {
     const { modResults } = config;
     let contents = modResults.contents;
 
@@ -23,7 +23,7 @@ const withHealthConnect = (config) => {
     const propertyDeclaration = `  private val healthConnectPermissionDelegate by lazy {
     HealthConnectPermissionDelegate(this)
   }`;
-    
+
     if (!contents.includes('healthConnectPermissionDelegate')) {
       // MainActivity 클래스 시작 부분에 추가
       contents = contents.replace(

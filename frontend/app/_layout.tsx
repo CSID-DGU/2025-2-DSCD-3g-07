@@ -1,4 +1,3 @@
-import { useColorScheme } from '@/hooks/use-color-scheme';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -7,14 +6,13 @@ import 'react-native-reanimated';
 
 import { Config } from '../config';
 import { WeatherProvider } from '../contexts/WeatherContext';
+import { AuthProvider } from '../contexts/AuthContext';
 
 export const unstable_settings = {
   anchor: '(tabs)',
 };
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
-
   // 앱 시작시 API URL 자동 감지 및 초기화
   useEffect(() => {
     const initializeApi = async () => {
@@ -32,14 +30,27 @@ export default function RootLayout() {
   }, []);
 
   return (
-    <WeatherProvider>
-      <GestureHandlerRootView style={{ flex: 1 }}>
-        <Stack>
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
-        </Stack>
-        <StatusBar style="auto" />
-      </GestureHandlerRootView>
-    </WeatherProvider>
+    <AuthProvider>
+      <WeatherProvider>
+        <GestureHandlerRootView style={{ flex: 1 }}>
+          <Stack>
+            <Stack.Screen
+              name="(auth)/login"
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="(auth)/register"
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            <Stack.Screen
+              name="modal"
+              options={{ presentation: 'modal', title: 'Modal' }}
+            />
+          </Stack>
+          <StatusBar style="auto" />
+        </GestureHandlerRootView>
+      </WeatherProvider>
+    </AuthProvider>
   );
 }

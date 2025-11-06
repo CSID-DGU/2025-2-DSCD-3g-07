@@ -32,7 +32,7 @@
         "android.permission.health.READ_ACTIVE_CALORIES_BURNED",
         "android.permission.health.READ_EXERCISE",
         "android.permission.health.WRITE_STEPS",
-        "android.permission.health.WRITE_DISTANCE", 
+        "android.permission.health.WRITE_DISTANCE",
         "android.permission.health.WRITE_ACTIVE_CALORIES_BURNED",
         "android.permission.health.WRITE_EXERCISE"
       ]
@@ -83,8 +83,6 @@
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ]
+    "assetBundlePatterns": ["**/*"]
   }
 }

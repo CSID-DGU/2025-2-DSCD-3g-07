@@ -17,8 +17,8 @@ interface WalkingRouteParams {
   end_y: number;
   start_name?: string;
   end_name?: string;
-  user_speed_mps?: number;  // 사용자 보행속도 (m/s)
-  weather_data?: any;  // 날씨 데이터
+  user_speed_mps?: number; // 사용자 보행속도 (m/s)
+  weather_data?: any; // 날씨 데이터
 }
 
 interface ApiResponse<T> {
@@ -32,7 +32,10 @@ class ApiService {
     console.log('🌐 API Service initialized with auto-scanning apiClient');
   }
 
-  private async makeRequest<T>(endpoint: string, options?: RequestInit): Promise<ApiResponse<T>> {
+  private async makeRequest<T>(
+    endpoint: string,
+    options?: RequestInit
+  ): Promise<ApiResponse<T>> {
     try {
       // apiClient를 사용하여 자동 스캔 기능 활용
       if (options?.method === 'GET' || !options?.method) {
@@ -42,7 +45,10 @@ class ApiService {
           data: result,
         };
       } else {
-        const result = await apiClient.post<T>(endpoint, options?.body ? JSON.parse(options.body as string) : undefined);
+        const result = await apiClient.post<T>(
+          endpoint,
+          options?.body ? JSON.parse(options.body as string) : undefined
+        );
         return {
           status: 200,
           data: result,
@@ -52,7 +58,10 @@ class ApiService {
       console.error('❌ API Request failed:', error);
       return {
         status: 0,
-        error: error instanceof Error ? error.message : 'Network error with auto-scanning apiClient',
+        error:
+          error instanceof Error
+            ? error.message
+            : 'Network error with auto-scanning apiClient',
       };
     }
   }
@@ -89,7 +98,9 @@ class ApiService {
     });
   }
 
-  async healthCheck(): Promise<ApiResponse<{ status: string; version: string }>> {
+  async healthCheck(): Promise<
+    ApiResponse<{ status: string; version: string }>
+  > {
     return this.makeRequest('/api-health');
   }
 }

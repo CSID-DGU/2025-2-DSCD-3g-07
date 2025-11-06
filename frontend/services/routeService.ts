@@ -2,8 +2,8 @@
 export interface RouteRequest {
   startX: number; // 출발지 경도
   startY: number; // 출발지 위도
-  endX: number;   // 도착지 경도
-  endY: number;   // 도착지 위도
+  endX: number; // 도착지 경도
+  endY: number; // 도착지 위도
   startName?: string;
   endName?: string;
 }
@@ -11,7 +11,7 @@ export interface RouteRequest {
 export interface RouteResponse {
   type: 'pedestrian' | 'transit' | 'car';
   totalDistance: number; // 총 거리 (m)
-  totalTime: number;     // 총 시간 (초)
+  totalTime: number; // 총 시간 (초)
   totalWalkTime?: number; // 도보 시간 (초)
   paths: RoutePath[];
 }
@@ -32,37 +32,43 @@ export interface RouteSegment {
 }
 
 const TMAP_API_KEY = 'uAD0x6MeRK3WiaTxMW3ck23uBsilTxXA7hLk0Lo4';
-const TMAP_PEDESTRIAN_URL = 'https://apis.openapi.sk.com/tmap/routes/pedestrian';
+const TMAP_PEDESTRIAN_URL =
+  'https://apis.openapi.sk.com/tmap/routes/pedestrian';
 const TMAP_TRANSIT_URL = 'https://apis.openapi.sk.com/transit/routes';
 
 // 도보 경로 검색
-export const searchPedestrianRoute = async (request: RouteRequest): Promise<RouteResponse> => {
+export const searchPedestrianRoute = async (
+  request: RouteRequest
+): Promise<RouteResponse> => {
   console.log('🚶 [티맵 API] 도보 경로 검색:', request);
 
   try {
-    const response = await fetch(`${TMAP_PEDESTRIAN_URL}?version=1&format=json`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'appKey': TMAP_API_KEY,
-      },
-      body: JSON.stringify({
-        startX: request.startX.toString(),
-        startY: request.startY.toString(),
-        endX: request.endX.toString(),
-        endY: request.endY.toString(),
-        reqCoordType: 'WGS84GEO',
-        resCoordType: 'WGS84GEO',
-        startName: request.startName || '출발지',
-        endName: request.endName || '도착지',
-      }),
-    });
+    const response = await fetch(
+      `${TMAP_PEDESTRIAN_URL}?version=1&format=json`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          appKey: TMAP_API_KEY,
+        },
+        body: JSON.stringify({
+          startX: request.startX.toString(),
+          startY: request.startY.toString(),
+          endX: request.endX.toString(),
+          endY: request.endY.toString(),
+          reqCoordType: 'WGS84GEO',
+          resCoordType: 'WGS84GEO',
+          startName: request.startName || '출발지',
+          endName: request.endName || '도착지',
+        }),
+      }
+    );
 
     if (!response.ok) {
       throw new Error(`티맵 API 오류: ${response.status}`);
     }
 
-    const data = await response.json() as any;
+    const data = (await response.json()) as any;
     console.log('📦 [티맵 API] 도보 경로 응답:', data);
 
     // 티맵 응답을 우리 형식으로 변환
@@ -113,7 +119,9 @@ export const searchPedestrianRoute = async (request: RouteRequest): Promise<Rout
 };
 
 // 대중교통 경로 검색
-export const searchTransitRoute = async (request: RouteRequest): Promise<RouteResponse> => {
+export const searchTransitRoute = async (
+  request: RouteRequest
+): Promise<RouteResponse> => {
   console.log('🚌 [티맵 API] 대중교통 경로 검색:', request);
 
   try {
@@ -128,7 +136,7 @@ export const searchTransitRoute = async (request: RouteRequest): Promise<RouteRe
 
     const response = await fetch(`${TMAP_TRANSIT_URL}?${params}`, {
       headers: {
-        'appKey': TMAP_API_KEY,
+        appKey: TMAP_API_KEY,
       },
     });
 
@@ -136,7 +144,7 @@ export const searchTransitRoute = async (request: RouteRequest): Promise<RouteRe
       throw new Error(`티맵 API 오류: ${response.status}`);
     }
 
-    const data = await response.json() as any;
+    const data = (await response.json()) as any;
     console.log('📦 [티맵 API] 대중교통 경로 응답:', data);
 
     // 첫 번째 경로만 사용
@@ -173,14 +181,16 @@ export const searchTransitRoute = async (request: RouteRequest): Promise<RouteRe
 };
 
 // 주소 → 좌표 변환 (카카오 API 사용 가능)
-export const geocodeAddress = async (address: string): Promise<{ lat: number; lng: number } | null> => {
+export const geocodeAddress = async (
+  address: string
+): Promise<{ lat: number; lng: number } | null> => {
   // TODO: 카카오 로컬 API로 주소 검색 구현
   // 지금은 간단히 서울 좌표 반환
   console.log('📍 주소 검색:', address);
-  
+
   // 기본값: 서울시청
   return {
     lat: 37.5665,
-    lng: 126.9780,
+    lng: 126.978,
   };
 };

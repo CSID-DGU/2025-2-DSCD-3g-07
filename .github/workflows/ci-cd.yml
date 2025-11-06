@@ -7,8 +7,8 @@ on:
     branches: [ main ]
 
 env:
-  NODE_VERSION: '18'
-  PYTHON_VERSION: '3.9'
+  NODE_VERSION: '20'
+  PYTHON_VERSION: '3.11'
 
 jobs:
   # 🔍 코드 품질 검사
@@ -35,6 +35,8 @@ jobs:
     - name: 📦 Install dependencies
       run: |
         npm install
+        cd frontend && npm ci
+        cd ..
         pip install -r backend/requirements.txt
         pip install -r backend/requirements-dev.txt
         
@@ -44,16 +46,23 @@ jobs:
     - name: 🔍 Lint Frontend
       run: npm run lint:frontend
       
-    - name: 📝 Format Check
+    - name: 📝 Format Check Backend
       run: |
-        npm run format:backend
-        npm run format:frontend
-        git diff --exit-code
+        cd backend
+        python -m black --check app/ tests/
+        python -m isort --check-only app/ tests/
+        
+    - name: 📝 Format Check Frontend
+      run: |
+        cd frontend
+        npx prettier --check "**/*.{js,jsx,ts,tsx,json}"
         
   # 🧪 백엔드 테스트
   backend-test:
     runs-on: ubuntu-latest
     name: 🐍 Backend Tests
+    env:
+      DATABASE_URL: sqlite:///./test.db
     
     steps:
     - name: 📥 Checkout code
@@ -74,12 +83,14 @@ jobs:
       run: npm run backend:test
       
     - name: 📊 Generate coverage
-      run: npm run backend:coverage
+      run: |
+        cd backend
+        python -m pytest --cov=app --cov-report=xml --cov-report=html
       
     - name: 📤 Upload coverage to Codecov
       uses: codecov/codecov-action@v3
       with:
-        file: backend/htmlcov/coverage.xml
+        file: backend/coverage.xml
         flags: backend
         
   # 📱 프론트엔드 테스트
@@ -122,9 +133,10 @@ jobs:
       uses: actions/setup-python@v4
       with:
         python-version: ${{ env.PYTHON_VERSION }}
+        cache: 'pip'
         
-    - name: 📦 Install bandit
-      run: pip install bandit
+    - name: 📦 Install dependencies
+      run: pip install -r backend/requirements-dev.txt
       
     - name: 🔒 Security scan
       run: npm run security:backend

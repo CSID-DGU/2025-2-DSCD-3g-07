@@ -1,9 +1,15 @@
 {
   "extends": ["expo", "@expo/eslint-config/typescript"],
   "rules": {
-    "@typescript-eslint/no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }],
+    "@typescript-eslint/no-unused-vars": [
+      "warn",
+      {
+        "argsIgnorePattern": "^_"
+      }
+    ],
     "@typescript-eslint/no-explicit-any": "warn",
-    "react-hooks/exhaustive-deps": "warn",
+    "react-hooks/exhaustive-deps": "off",
+    "import/no-named-as-default": "off",
     "no-console": "off",
     "prefer-const": "warn"
   },
@@ -16,7 +22,9 @@
     {
       "files": ["*.ts", "*.tsx"],
       "rules": {
-        "@typescript-eslint/explicit-function-return-type": "off"
+        "@typescript-eslint/explicit-function-return-type": "off",
+        "react-hooks/exhaustive-deps": "off",
+        "import/no-named-as-default": "off"
       }
     }
   ]

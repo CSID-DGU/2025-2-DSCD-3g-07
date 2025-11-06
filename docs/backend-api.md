@@ -284,7 +284,7 @@ VSCode에서 디버깅하려면:
 ### Docker (예정)
 
 ```dockerfile
-FROM python:3.9-slim
+FROM python:3.11-slim
 
 WORKDIR /app
 COPY requirements.txt .

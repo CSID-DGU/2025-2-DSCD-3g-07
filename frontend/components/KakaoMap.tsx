@@ -1,5 +1,5 @@
-import { View } from "react-native";
-import { WebView } from "react-native-webview";
+import { View } from 'react-native';
+import { WebView } from 'react-native-webview';
 
 const html = (jsKey: string, lat: number, lng: number) => `
 <!doctype html><html><head>
@@ -28,17 +28,23 @@ const html = (jsKey: string, lat: number, lng: number) => `
 `;
 
 export default function KakaoMap({
-  jsKey, lat, lng,
-}: { jsKey: string; lat: number; lng: number }) {
+  jsKey,
+  lat,
+  lng,
+}: {
+  jsKey: string;
+  lat: number;
+  lng: number;
+}) {
   return (
     <View style={{ flex: 1 }}>
       <WebView
-        originWhitelist={["*"]}
-        javaScriptEnabled  // 안드로이드 기본 true지만 명시적으로 켜두자
-        domStorageEnabled  // 로컬스토리지 등 사용 허용
-        onMessage={(e) => {
+        originWhitelist={['*']}
+        javaScriptEnabled // 안드로이드 기본 true지만 명시적으로 켜두자
+        domStorageEnabled // 로컬스토리지 등 사용 허용
+        onMessage={e => {
           // "KAKAO_MAP_READY" 수신되면 콘솔에 표시(개발 확인용)
-          console.log("WebView:", e.nativeEvent.data);
+          console.log('WebView:', e.nativeEvent.data);
         }}
         source={{ html: html(jsKey, lat, lng) }}
       />

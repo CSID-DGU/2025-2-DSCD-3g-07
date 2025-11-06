@@ -16,12 +16,15 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import KakaoMapWithRoute from '../../components/KakaoMapWithRoute';
-import { searchPedestrianRoute, RouteResponse } from '../../services/routeService';
-import { 
-  searchPlaces, 
-  PlaceSearchResult, 
+import {
+  searchPedestrianRoute,
+  RouteResponse,
+} from '../../services/routeService';
+import {
+  searchPlaces,
+  PlaceSearchResult,
   placeToCoordinates,
-  formatPlaceDisplay 
+  formatPlaceDisplay,
 } from '../../services/placeSearchService';
 
 // 카카오맵 JS 키 (환경변수로 관리 권장)
@@ -46,7 +49,8 @@ const ROUTES = {
       duration: '48분',
       difficulty: '쉬움',
       highlight: '데크길과 노을 포인트',
-      image: 'https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?auto=format&fit=crop&w=1100&q=60',
+      image:
+        'https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?auto=format&fit=crop&w=1100&q=60',
     },
     {
       id: 'rec-2',
@@ -56,7 +60,8 @@ const ROUTES = {
       duration: '62분',
       difficulty: '보통',
       highlight: '카페 휴식과 포토존',
-      image: 'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=1100&q=60',
+      image:
+        'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=1100&q=60',
     },
   ],
   distance: [
@@ -68,7 +73,8 @@ const ROUTES = {
       duration: '70분',
       difficulty: '보통',
       highlight: '1km마다 알림',
-      image: 'https://images.unsplash.com/photo-1436450412740-6b988f486c6b?auto=format&fit=crop&w=1100&q=60',
+      image:
+        'https://images.unsplash.com/photo-1436450412740-6b988f486c6b?auto=format&fit=crop&w=1100&q=60',
     },
     {
       id: 'dist-2',
@@ -78,7 +84,8 @@ const ROUTES = {
       duration: '30분',
       difficulty: '쉬움',
       highlight: '피니시 라인 먹거리',
-      image: 'https://images.unsplash.com/photo-1512100356356-de1b84283e18?auto=format&fit=crop&w=1100&q=60',
+      image:
+        'https://images.unsplash.com/photo-1512100356356-de1b84283e18?auto=format&fit=crop&w=1100&q=60',
     },
   ],
   time: [
@@ -90,7 +97,8 @@ const ROUTES = {
       duration: '32분',
       difficulty: '쉬움',
       highlight: '그늘과 벤치',
-      image: 'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=1100&q=60',
+      image:
+        'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=1100&q=60',
     },
     {
       id: 'time-2',
@@ -100,7 +108,8 @@ const ROUTES = {
       duration: '63분',
       difficulty: '도전적',
       highlight: '꾸준한 오르막과 전망대',
-      image: 'https://images.unsplash.com/photo-1479705879471-baea15b10f82?auto=format&fit=crop&w=1100&q=60',
+      image:
+        'https://images.unsplash.com/photo-1479705879471-baea15b10f82?auto=format&fit=crop&w=1100&q=60',
     },
   ],
 } as const;
@@ -110,29 +119,46 @@ export default function RoutesScreen() {
   const [start, setStart] = useState('현재 위치');
   const [destination, setDestination] = useState('');
   const [filters, setFilters] = useState<string[]>(['강변 뷰']);
-  
+
   // 경로 검색 상태
   const [searching, setSearching] = useState(false);
   const [routeResult, setRouteResult] = useState<RouteResponse | null>(null);
   const [showMap, setShowMap] = useState(false);
 
   // 장소 검색 상태
-  const [startSearchResults, setStartSearchResults] = useState<PlaceSearchResult[]>([]);
-  const [destSearchResults, setDestSearchResults] = useState<PlaceSearchResult[]>([]);
+  const [startSearchResults, setStartSearchResults] = useState<
+    PlaceSearchResult[]
+  >([]);
+  const [destSearchResults, setDestSearchResults] = useState<
+    PlaceSearchResult[]
+  >([]);
   const [showStartResults, setShowStartResults] = useState(false);
   const [showDestResults, setShowDestResults] = useState(false);
-  const [selectedStartCoords, setSelectedStartCoords] = useState({ lat: 37.5665, lng: 126.9780 }); // 서울시청
-  const [selectedDestCoords, setSelectedDestCoords] = useState<{ lat: number; lng: number } | null>(null);
+  const [selectedStartCoords, setSelectedStartCoords] = useState({
+    lat: 37.5665,
+    lng: 126.978,
+  }); // 서울시청
+  const [selectedDestCoords, setSelectedDestCoords] = useState<{
+    lat: number;
+    lng: number;
+  } | null>(null);
 
-  const routes = useMemo(() => ROUTES[activeTab as keyof typeof ROUTES], [activeTab]);
+  const routes = useMemo(
+    () => ROUTES[activeTab as keyof typeof ROUTES],
+    [activeTab]
+  );
 
   // 출발지 검색
   const handleStartSearch = async (text: string) => {
     setStart(text);
-    
+
     if (text.trim().length >= 2) {
       try {
-        const results = await searchPlaces(text, selectedStartCoords.lng, selectedStartCoords.lat);
+        const results = await searchPlaces(
+          text,
+          selectedStartCoords.lng,
+          selectedStartCoords.lat
+        );
         setStartSearchResults(results);
         setShowStartResults(results.length > 0);
       } catch (error) {
@@ -149,10 +175,14 @@ export default function RoutesScreen() {
   // 도착지 검색
   const handleDestSearch = async (text: string) => {
     setDestination(text);
-    
+
     if (text.trim().length >= 2) {
       try {
-        const results = await searchPlaces(text, selectedStartCoords.lng, selectedStartCoords.lat);
+        const results = await searchPlaces(
+          text,
+          selectedStartCoords.lng,
+          selectedStartCoords.lat
+        );
         setDestSearchResults(results);
         setShowDestResults(results.length > 0);
       } catch (error) {
@@ -170,7 +200,7 @@ export default function RoutesScreen() {
   const handleSelectStart = (place: PlaceSearchResult) => {
     setStart(formatPlaceDisplay(place));
     const coords = placeToCoordinates(place);
-    setSelectedStartCoords(coords);
+    setSelectedStartCoords({ lat: coords.latitude, lng: coords.longitude });
     setShowStartResults(false);
     setStartSearchResults([]);
     console.log('✅ 출발지 선택:', { name: place.place_name, coords });
@@ -180,7 +210,7 @@ export default function RoutesScreen() {
   const handleSelectDest = (place: PlaceSearchResult) => {
     setDestination(formatPlaceDisplay(place));
     const coords = placeToCoordinates(place);
-    setSelectedDestCoords(coords);
+    setSelectedDestCoords({ lat: coords.latitude, lng: coords.longitude });
     setShowDestResults(false);
     setDestSearchResults([]);
     console.log('✅ 도착지 선택:', { name: place.place_name, coords });
@@ -225,24 +255,11 @@ export default function RoutesScreen() {
   };
 
   const toggleFilter = (item: string) => {
-    setFilters((prev) =>
-      prev.includes(item) ? prev.filter((value) => value !== item) : [...prev, item]
+    setFilters(prev =>
+      prev.includes(item)
+        ? prev.filter(value => value !== item)
+        : [...prev, item]
     );
-  };
-
-  const searchRoute = async () => {
-    // 테스트용 좌표 (서울역 -> 강남역)
-    const startCoords = { x: 126.9706, y: 37.5547 };
-    const endCoords = { x: 127.0276, y: 37.4979 };
-    
-    await getRoute({
-      start_x: startCoords.x,
-      start_y: startCoords.y,
-      end_x: endCoords.x,
-      end_y: endCoords.y,
-    });
-    
-    setShowRouteResult(true);
   };
 
   return (
@@ -256,7 +273,9 @@ export default function RoutesScreen() {
         <View style={styles.header}>
           <View>
             <Text style={styles.title}>걸을 코스 선택하기</Text>
-            <Text style={styles.subtitle}>거리, 시간, 풍경을 내 걸음에 맞춰 조정하세요</Text>
+            <Text style={styles.subtitle}>
+              거리, 시간, 풍경을 내 걸음에 맞춰 조정하세요
+            </Text>
           </View>
           <TouchableOpacity style={styles.recentButton}>
             <MaterialIcons name="history" size={20} color="#304FFE" />
@@ -269,19 +288,23 @@ export default function RoutesScreen() {
             <Text style={styles.inputLabel}>출발지</Text>
             <View style={styles.inputRow}>
               <MaterialIcons name="my-location" size={18} color="#304FFE" />
-              <TextInput 
-                value={start} 
+              <TextInput
+                value={start}
                 onChangeText={handleStartSearch}
-                onFocus={() => setShowStartResults(startSearchResults.length > 0)}
+                onFocus={() =>
+                  setShowStartResults(startSearchResults.length > 0)
+                }
                 placeholder="출발지를 입력하세요"
-                style={styles.inputField} 
+                style={styles.inputField}
               />
               {start.length > 0 && (
-                <TouchableOpacity onPress={() => {
-                  setStart('');
-                  setStartSearchResults([]);
-                  setShowStartResults(false);
-                }}>
+                <TouchableOpacity
+                  onPress={() => {
+                    setStart('');
+                    setStartSearchResults([]);
+                    setShowStartResults(false);
+                  }}
+                >
                   <MaterialIcons name="clear" size={18} color="#9AA3B0" />
                 </TouchableOpacity>
               )}
@@ -291,7 +314,7 @@ export default function RoutesScreen() {
               <View style={styles.searchResults}>
                 <FlatList
                   data={startSearchResults}
-                  keyExtractor={(item) => item.id}
+                  keyExtractor={item => item.id}
                   renderItem={({ item }) => (
                     <TouchableOpacity
                       style={styles.searchResultItem}
@@ -299,8 +322,12 @@ export default function RoutesScreen() {
                     >
                       <MaterialIcons name="place" size={20} color="#304FFE" />
                       <View style={styles.searchResultText}>
-                        <Text style={styles.searchResultName}>{item.place_name}</Text>
-                        <Text style={styles.searchResultAddress}>{item.address_name}</Text>
+                        <Text style={styles.searchResultName}>
+                          {item.place_name}
+                        </Text>
+                        <Text style={styles.searchResultAddress}>
+                          {item.address_name}
+                        </Text>
                       </View>
                     </TouchableOpacity>
                   )}
@@ -315,20 +342,22 @@ export default function RoutesScreen() {
             <Text style={styles.inputLabel}>도착지</Text>
             <View style={styles.inputRow}>
               <MaterialIcons name="flag" size={18} color="#FF7043" />
-              <TextInput 
-                value={destination} 
+              <TextInput
+                value={destination}
                 onChangeText={handleDestSearch}
                 onFocus={() => setShowDestResults(destSearchResults.length > 0)}
                 placeholder="도착지를 입력하세요"
-                style={styles.inputField} 
+                style={styles.inputField}
               />
               {destination.length > 0 && (
-                <TouchableOpacity onPress={() => {
-                  setDestination('');
-                  setDestSearchResults([]);
-                  setShowDestResults(false);
-                  setSelectedDestCoords(null);
-                }}>
+                <TouchableOpacity
+                  onPress={() => {
+                    setDestination('');
+                    setDestSearchResults([]);
+                    setShowDestResults(false);
+                    setSelectedDestCoords(null);
+                  }}
+                >
                   <MaterialIcons name="clear" size={18} color="#9AA3B0" />
                 </TouchableOpacity>
               )}
@@ -338,7 +367,7 @@ export default function RoutesScreen() {
               <View style={styles.searchResults}>
                 <FlatList
                   data={destSearchResults}
-                  keyExtractor={(item) => item.id}
+                  keyExtractor={item => item.id}
                   renderItem={({ item }) => (
                     <TouchableOpacity
                       style={styles.searchResultItem}
@@ -346,8 +375,12 @@ export default function RoutesScreen() {
                     >
                       <MaterialIcons name="place" size={20} color="#FF7043" />
                       <View style={styles.searchResultText}>
-                        <Text style={styles.searchResultName}>{item.place_name}</Text>
-                        <Text style={styles.searchResultAddress}>{item.address_name}</Text>
+                        <Text style={styles.searchResultName}>
+                          {item.place_name}
+                        </Text>
+                        <Text style={styles.searchResultAddress}>
+                          {item.address_name}
+                        </Text>
                       </View>
                     </TouchableOpacity>
                   )}
@@ -358,13 +391,17 @@ export default function RoutesScreen() {
             )}
           </View>
           <View style={styles.suggestionRow}>
-            {SUGGESTIONS.map((value) => (
-              <TouchableOpacity key={value} style={styles.suggestionChip} onPress={() => handleDestSearch(value)}>
+            {SUGGESTIONS.map(value => (
+              <TouchableOpacity
+                key={value}
+                style={styles.suggestionChip}
+                onPress={() => handleDestSearch(value)}
+              >
                 <Text style={styles.suggestionText}>{value}</Text>
               </TouchableOpacity>
             ))}
           </View>
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.ctaButton}
             onPress={handleSearchRoute}
             disabled={searching}
@@ -381,7 +418,7 @@ export default function RoutesScreen() {
         </View>
 
         <View style={styles.tabsRow}>
-          {TABS.map((tab) => {
+          {TABS.map(tab => {
             const active = tab.id === activeTab;
             return (
               <TouchableOpacity
@@ -389,15 +426,23 @@ export default function RoutesScreen() {
                 style={[styles.tabButton, active && styles.tabButtonActive]}
                 onPress={() => setActiveTab(tab.id)}
               >
-                <Text style={[styles.tabLabel, active && styles.tabLabelActive]}>{tab.label}</Text>
-                <Text style={[styles.tabHelper, active && styles.tabHelperActive]}>{tab.helper}</Text>
+                <Text
+                  style={[styles.tabLabel, active && styles.tabLabelActive]}
+                >
+                  {tab.label}
+                </Text>
+                <Text
+                  style={[styles.tabHelper, active && styles.tabHelperActive]}
+                >
+                  {tab.helper}
+                </Text>
               </TouchableOpacity>
             );
           })}
         </View>
 
         <View style={styles.filterRow}>
-          {FILTERS.map((item) => {
+          {FILTERS.map(item => {
             const active = filters.includes(item);
             return (
               <TouchableOpacity
@@ -405,48 +450,40 @@ export default function RoutesScreen() {
                 style={[styles.filterChip, active && styles.filterChipActive]}
                 onPress={() => toggleFilter(item)}
               >
-                <Text style={[styles.filterText, active && styles.filterTextActive]}>{item}</Text>
+                <Text
+                  style={[styles.filterText, active && styles.filterTextActive]}
+                >
+                  {item}
+                </Text>
               </TouchableOpacity>
             );
           })}
         </View>
 
-        {/* 경로 검색 결과 표시 */}
-        {showRouteResult && (
-          <View style={styles.routeResultContainer}>
-            <View style={styles.resultHeader}>
-              <Text style={styles.resultTitle}>검색 결과</Text>
-              <TouchableOpacity 
-                onPress={() => setShowRouteResult(false)}
-                style={styles.closeButton}
-              >
-                <MaterialIcons name="close" size={20} color="#667085" />
-              </TouchableOpacity>
-            </View>
-            {routeError ? (
-              <Text style={styles.errorText}>❌ 오류: {routeError}</Text>
-            ) : (
-              <RouteDetailComponent routeData={routeData} />
-            )}
-          </View>
-        )}
-
         <View style={styles.routeList}>
-          {routes.map((route) => (
+          {routes.map(route => (
             <View key={route.id} style={styles.routeCard}>
               <Image source={{ uri: route.image }} style={styles.thumbnail} />
               <View style={styles.routeContent}>
                 <View style={styles.routeHeader}>
                   <Text style={styles.routeTitle}>{route.title}</Text>
                   <View style={styles.badge}>
-                    <MaterialIcons name="emoji-nature" size={16} color="#304FFE" />
+                    <MaterialIcons
+                      name="emoji-nature"
+                      size={16}
+                      color="#304FFE"
+                    />
                     <Text style={styles.badgeText}>{route.difficulty}</Text>
                   </View>
                 </View>
                 <Text style={styles.routeSubtitle}>{route.subtitle}</Text>
                 <View style={styles.metricRow}>
                   <View style={styles.metricItem}>
-                    <MaterialIcons name="straighten" size={16} color="#304FFE" />
+                    <MaterialIcons
+                      name="straighten"
+                      size={16}
+                      color="#304FFE"
+                    />
                     <Text style={styles.metricText}>{route.distance}</Text>
                   </View>
                   <View style={styles.metricItem}>
@@ -460,7 +497,11 @@ export default function RoutesScreen() {
                 </View>
                 <TouchableOpacity style={styles.routeButton}>
                   <Text style={styles.routeButtonText}>View detail</Text>
-                  <MaterialIcons name="chevron-right" size={18} color="#FFFFFF" />
+                  <MaterialIcons
+                    name="chevron-right"
+                    size={18}
+                    color="#FFFFFF"
+                  />
                 </TouchableOpacity>
               </View>
             </View>
@@ -478,14 +519,18 @@ export default function RoutesScreen() {
       >
         <SafeAreaView style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
           <View style={styles.mapHeader}>
-            <TouchableOpacity onPress={() => setShowMap(false)} style={styles.mapCloseButton}>
+            <TouchableOpacity
+              onPress={() => setShowMap(false)}
+              style={styles.mapCloseButton}
+            >
               <MaterialIcons name="close" size={24} color="#1A1F2E" />
             </TouchableOpacity>
             <View style={styles.mapHeaderInfo}>
               <Text style={styles.mapHeaderTitle}>경로 안내</Text>
               {routeResult && (
                 <Text style={styles.mapHeaderSubtitle}>
-                  {(routeResult.totalDistance / 1000).toFixed(2)}km · {Math.round(routeResult.totalTime / 60)}분
+                  {(routeResult.totalDistance / 1000).toFixed(2)}km ·{' '}
+                  {Math.round(routeResult.totalTime / 60)}분
                 </Text>
               )}
             </View>
@@ -493,12 +538,12 @@ export default function RoutesScreen() {
               <Text style={styles.mapStartText}>시작</Text>
             </TouchableOpacity>
           </View>
-          
+
           {routeResult && (
             <KakaoMapWithRoute
               jsKey={KAKAO_JS_KEY}
               startLat={37.5665}
-              startLng={126.9780}
+              startLng={126.978}
               endLat={37.5511}
               endLng={126.9882}
               paths={routeResult.paths}

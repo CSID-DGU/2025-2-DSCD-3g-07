@@ -26,7 +26,10 @@ import { apiService } from '@/services/api';
 import type { TransitRouteParams } from '@/services/api';
 import { analyzeRouteSlope } from '@/services/elevationService';
 import type { Itinerary, RouteElevationAnalysis, Leg } from '@/types/api';
-import { searchPlaces, type PlaceSearchResult } from '@/services/placeSearchService';
+import {
+  searchPlaces,
+  type PlaceSearchResult,
+} from '@/services/placeSearchService';
 import type { RoutePath } from '@/services/routeService';
 import { useWeatherContext } from '@/contexts/WeatherContext';
 import { healthConnectService } from '@/services/healthConnect';
@@ -92,7 +95,9 @@ const extractRoutePath = (itinerary: Itinerary): RoutePath[] => {
   console.log(`🗺️ Extracting route from ${itinerary.legs.length} legs`);
 
   itinerary.legs.forEach((leg, legIndex) => {
-    console.log(`  Leg ${legIndex}: ${leg.mode}, steps: ${leg.steps?.length || 0}`);
+    console.log(
+      `  Leg ${legIndex}: ${leg.mode}, steps: ${leg.steps?.length || 0}`
+    );
 
     if (leg.steps && leg.steps.length > 0) {
       leg.steps.forEach((step, stepIndex) => {
@@ -104,7 +109,7 @@ const extractRoutePath = (itinerary: Itinerary): RoutePath[] => {
         const pairs = step.linestring.trim().split(' ');
         console.log(`    Step ${stepIndex}: ${pairs.length} coordinate pairs`);
 
-        pairs.forEach((pair) => {
+        pairs.forEach(pair => {
           if (!pair) return;
           const parts = pair.split(',');
           if (parts.length !== 2) return;
@@ -184,7 +189,9 @@ export default function HomeScreen() {
   const [routePath, setRoutePath] = useState<RoutePath[]>([]);
   const [routeInfo, setRouteInfo] = useState<RouteInfo | null>(null);
   const [loading, setLoading] = useState(false);
-  const [walkingSpeedCase1, setWalkingSpeedCase1] = useState<number | null>(null);
+  const [walkingSpeedCase1, setWalkingSpeedCase1] = useState<number | null>(
+    null
+  );
 
   // 경로 옵션 관련 상태 (여러 경로)
   const [routeOptions, setRouteOptions] = useState<Itinerary[]>([]);
@@ -206,7 +213,6 @@ export default function HomeScreen() {
   // 애니메이션
   const searchBarTranslateY = useSharedValue(0);
   const bottomSheetHeight = useSharedValue(0);
-  const bottomSheetTranslateY = useRef(0);
 
   // 검색창 Pan Responder
   const searchPanResponder = useRef(
@@ -218,7 +224,10 @@ export default function HomeScreen() {
       onPanResponderMove: (_, gestureState) => {
         if (gestureState.dy < 0) {
           // 위로 드래그 - 숨기기
-          searchBarTranslateY.value = Math.max(gestureState.dy, -SEARCH_BAR_HEIGHT);
+          searchBarTranslateY.value = Math.max(
+            gestureState.dy,
+            -SEARCH_BAR_HEIGHT
+          );
         } else {
           // 아래로 드래그 - 보이기
           searchBarTranslateY.value = Math.min(gestureState.dy, 0);
@@ -280,12 +289,15 @@ export default function HomeScreen() {
     const fetchWalkingSpeed = async () => {
       try {
         // 전체 기간 평균 속도 사용 (더 안정적)
-        const allTimeSpeed = await healthConnectService.getAllTimeAverageSpeeds();
+        const allTimeSpeed =
+          await healthConnectService.getAllTimeAverageSpeeds();
         if (allTimeSpeed.speedCase1 && allTimeSpeed.speedCase1 > 0) {
           // km/h를 m/s로 변환
           const speedMs = allTimeSpeed.speedCase1 / 3.6;
           setWalkingSpeedCase1(speedMs);
-          console.log(`✅ 보행 속도 로드: ${allTimeSpeed.speedCase1.toFixed(2)} km/h (${speedMs.toFixed(3)} m/s)`);
+          console.log(
+            `✅ 보행 속도 로드: ${allTimeSpeed.speedCase1.toFixed(2)} km/h (${speedMs.toFixed(3)} m/s)`
+          );
         }
       } catch (error) {
         console.warn('⚠️ 보행 속도 데이터 로드 실패:', error);
@@ -314,7 +326,10 @@ export default function HomeScreen() {
       });
 
       const locationData: LocationData = {
-        address: address ? `${address.city || ''} ${address.district || ''}`.trim() || '현재 위치' : '현재 위치',
+        address: address
+          ? `${address.city || ''} ${address.district || ''}`.trim() ||
+            '현재 위치'
+          : '현재 위치',
         latitude: location.coords.latitude,
         longitude: location.coords.longitude,
       };
@@ -339,23 +354,26 @@ export default function HomeScreen() {
   }, [activeInput]);
 
   // 장소 검색
-  const handleSearch = useCallback(async (query: string, inputType: 'start' | 'end') => {
-    if (!query || query.trim().length < 2) {
-      setSearchResults([]);
-      return;
-    }
+  const handleSearch = useCallback(
+    async (query: string, inputType: 'start' | 'end') => {
+      if (!query || query.trim().length < 2) {
+        setSearchResults([]);
+        return;
+      }
 
-    try {
-      setSearching(true);
-      const results = await searchPlaces(query.trim());
-      setSearchResults(results);
-    } catch (error) {
-      console.error('검색 실패:', error);
-      setSearchResults([]);
-    } finally {
-      setSearching(false);
-    }
-  }, []);
+      try {
+        setSearching(true);
+        const results = await searchPlaces(query.trim());
+        setSearchResults(results);
+      } catch (error) {
+        console.error('검색 실패:', error);
+        setSearchResults([]);
+      } finally {
+        setSearching(false);
+      }
+    },
+    []
+  );
 
   // 검색어 변경 핸들러
   useEffect(() => {
@@ -374,24 +392,27 @@ export default function HomeScreen() {
   }, [startInput, endInput, activeInput, handleSearch]);
 
   // 검색 결과 선택
-  const handleSelectPlace = useCallback((place: PlaceSearchResult) => {
-    const locationData: LocationData = {
-      address: place.place_name,
-      latitude: parseFloat(place.y),
-      longitude: parseFloat(place.x),
-    };
+  const handleSelectPlace = useCallback(
+    (place: PlaceSearchResult) => {
+      const locationData: LocationData = {
+        address: place.place_name,
+        latitude: parseFloat(place.y),
+        longitude: parseFloat(place.x),
+      };
 
-    if (activeInput === 'start') {
-      setStartLocation(locationData);
-      setStartInput(place.place_name);
-    } else if (activeInput === 'end') {
-      setEndLocation(locationData);
-      setEndInput(place.place_name);
-    }
+      if (activeInput === 'start') {
+        setStartLocation(locationData);
+        setStartInput(place.place_name);
+      } else if (activeInput === 'end') {
+        setEndLocation(locationData);
+        setEndInput(place.place_name);
+      }
 
-    setSearchResults([]);
-    setActiveInput(null);
-  }, [activeInput]);
+      setSearchResults([]);
+      setActiveInput(null);
+    },
+    [activeInput]
+  );
 
   // 출발지/도착지 교환
   const handleSwapLocations = () => {
@@ -428,7 +449,10 @@ export default function HomeScreen() {
 
       console.log('🔍 Transit API Request:', params);
       const response = await apiService.getTransitRoute(params);
-      console.log('📦 Full API Response:', JSON.stringify(response.data, null, 2));
+      console.log(
+        '📦 Full API Response:',
+        JSON.stringify(response.data, null, 2)
+      );
 
       const itineraries = response.data?.metaData?.plan?.itineraries || [];
       console.log(`🗺️ Received ${itineraries.length} route options`);
@@ -445,8 +469,15 @@ export default function HomeScreen() {
 
       // 첫 번째 경로 표시
       const firstItinerary = itineraries[0];
-      console.log('🗺️ First itinerary structure:', JSON.stringify(firstItinerary, null, 2).substring(0, 1000));
-      console.log('🗺️ Processing itinerary with', firstItinerary.legs?.length || 0, 'legs');
+      console.log(
+        '🗺️ First itinerary structure:',
+        JSON.stringify(firstItinerary, null, 2).substring(0, 1000)
+      );
+      console.log(
+        '🗺️ Processing itinerary with',
+        firstItinerary.legs?.length || 0,
+        'legs'
+      );
 
       // 각 leg의 구조 상세 로깅
       firstItinerary.legs?.forEach((leg: any, idx: number) => {
@@ -479,14 +510,22 @@ export default function HomeScreen() {
       const totalWalkTimeSec = firstItinerary.totalWalkTime || 0;
 
       // 🔍 디버깅: leg별 sectionTime 확인
-      const legWalkTimes = firstItinerary.legs
-        ?.filter((leg: any) => leg.mode === 'WALK')
-        .map((leg: any) => leg.sectionTime || 0) || [];
-      const sumOfLegWalkTimes = legWalkTimes.reduce((a: number, b: number) => a + b, 0);
+      const legWalkTimes =
+        firstItinerary.legs
+          ?.filter((leg: any) => leg.mode === 'WALK')
+          .map((leg: any) => leg.sectionTime || 0) || [];
+      const sumOfLegWalkTimes = legWalkTimes.reduce(
+        (a: number, b: number) => a + b,
+        0
+      );
 
       console.log('🔍 [도보 시간 디버깅]');
-      console.log(`  - totalWalkTime (API): ${totalWalkTimeSec}초 (${Math.floor(totalWalkTimeSec / 60)}분 ${totalWalkTimeSec % 60}초)`);
-      console.log(`  - leg별 sectionTime 합계: ${sumOfLegWalkTimes}초 (${Math.floor(sumOfLegWalkTimes / 60)}분 ${sumOfLegWalkTimes % 60}초)`);
+      console.log(
+        `  - totalWalkTime (API): ${totalWalkTimeSec}초 (${Math.floor(totalWalkTimeSec / 60)}분 ${totalWalkTimeSec % 60}초)`
+      );
+      console.log(
+        `  - leg별 sectionTime 합계: ${sumOfLegWalkTimes}초 (${Math.floor(sumOfLegWalkTimes / 60)}분 ${sumOfLegWalkTimes % 60}초)`
+      );
       console.log(`  - 차이: ${totalWalkTimeSec - sumOfLegWalkTimes}초`);
       console.log(`  - 개별 leg 시간:`, legWalkTimes);
 
@@ -496,14 +535,16 @@ export default function HomeScreen() {
         // 사용자 속도와 날씨 데이터를 함께 전달
         slopeAnalysis = await analyzeRouteSlope(
           firstItinerary,
-          undefined,                    // apiKey
+          undefined, // apiKey
           walkingSpeedCase1 || undefined, // walkingSpeed (m/s) - Health Connect Case 1
-          weatherData || undefined      // 날씨 데이터
+          weatherData || undefined // 날씨 데이터
         );
 
         const logParts = ['✅ 경사도 분석 완료'];
         if (walkingSpeedCase1) {
-          logParts.push(`사용자 속도: ${(walkingSpeedCase1 * 3.6).toFixed(2)} km/h`);
+          logParts.push(
+            `사용자 속도: ${(walkingSpeedCase1 * 3.6).toFixed(2)} km/h`
+          );
         }
         if (weatherData) {
           logParts.push(`날씨 포함`);
@@ -516,8 +557,10 @@ export default function HomeScreen() {
       setRouteInfo({
         totalTime: totalTimeSec,
         totalWalkTime: totalWalkTimeSec,
-        walkRatio: totalTimeSec > 0 ? (totalWalkTimeSec / totalTimeSec) * 100 : 0,
-        personalizedWalkTime: slopeAnalysis?.total_adjusted_walk_time || totalWalkTimeSec,
+        walkRatio:
+          totalTimeSec > 0 ? (totalWalkTimeSec / totalTimeSec) * 100 : 0,
+        personalizedWalkTime:
+          slopeAnalysis?.total_adjusted_walk_time || totalWalkTimeSec,
         slopeAnalysis,
         rawItinerary: firstItinerary,
         totalDistance: firstItinerary.totalDistance || 0,
@@ -564,8 +607,8 @@ export default function HomeScreen() {
         end_y: endLocation.latitude,
         start_name: startLocation.address,
         end_name: endLocation.address,
-        user_speed_mps: walkingSpeedCase1 || undefined,  // 사용자 보행속도 전달
-        weather_data: weatherData || undefined,  // 날씨 데이터 전달
+        user_speed_mps: walkingSpeedCase1 || undefined, // 사용자 보행속도 전달
+        weather_data: weatherData || undefined, // 날씨 데이터 전달
       };
 
       console.log('🚶 Walking API Request:', params);
@@ -584,16 +627,23 @@ export default function HomeScreen() {
       // 경로 좌표 추출 (LineString features만)
       const coords: RoutePath[] = [];
       features.forEach((feature: any) => {
-        if (feature.geometry?.type === 'LineString' && feature.geometry?.coordinates) {
-          feature.geometry.coordinates.forEach(([lng, lat]: [number, number]) => {
-            if (Number.isFinite(lat) && Number.isFinite(lng)) {
-              coords.push({ lat, lng });
+        if (
+          feature.geometry?.type === 'LineString' &&
+          feature.geometry?.coordinates
+        ) {
+          feature.geometry.coordinates.forEach(
+            ([lng, lat]: [number, number]) => {
+              if (Number.isFinite(lat) && Number.isFinite(lng)) {
+                coords.push({ lat, lng });
+              }
             }
-          });
+          );
         }
       });
 
-      console.log(`🗺️ Extracted ${coords.length} coordinates from walking route`);
+      console.log(
+        `🗺️ Extracted ${coords.length} coordinates from walking route`
+      );
 
       if (coords.length === 0) {
         Alert.alert('오류', '경로 좌표를 추출할 수 없습니다.');
@@ -606,37 +656,51 @@ export default function HomeScreen() {
       console.log('🔍 도보 경로 데이터:', {
         metaData: !!response.data?.metaData,
         itinerary: !!response.data?.metaData?.plan?.itineraries?.[0],
-        steps: response.data?.metaData?.plan?.itineraries?.[0]?.legs?.[0]?.steps?.length,
+        steps:
+          response.data?.metaData?.plan?.itineraries?.[0]?.legs?.[0]?.steps
+            ?.length,
         crosswalk_count: response.data?.elevation_analysis?.crosswalk_count,
       });
 
       // 첫 3개 steps 확인
-      const firstSteps = response.data?.metaData?.plan?.itineraries?.[0]?.legs?.[0]?.steps?.slice(0, 3);
+      const firstSteps =
+        response.data?.metaData?.plan?.itineraries?.[0]?.legs?.[0]?.steps?.slice(
+          0,
+          3
+        );
       console.log('🔍 첫 3개 steps:', firstSteps);
 
       // 백엔드에서 제공한 itinerary 사용 (이미 완전한 구조)
-      const walkingItinerary: Itinerary = response.data?.metaData?.plan?.itineraries?.[0] || {
-        legs: [{
-          mode: 'WALK',
-          sectionTime: totalTime,
-          distance: totalDistance,
-          start: {
-            lat: startLocation.latitude,
-            lon: startLocation.longitude,
-            name: startLocation.address,
+      const walkingItinerary: Itinerary = response.data?.metaData?.plan
+        ?.itineraries?.[0] || {
+        legs: [
+          {
+            mode: 'WALK',
+            sectionTime: totalTime,
+            distance: totalDistance,
+            start: {
+              lat: startLocation.latitude,
+              lon: startLocation.longitude,
+              name: startLocation.address,
+            },
+            end: {
+              lat: endLocation.latitude,
+              lon: endLocation.longitude,
+              name: endLocation.address,
+            },
+            steps: [],
           },
-          end: {
-            lat: endLocation.latitude,
-            lon: endLocation.longitude,
-            name: endLocation.address,
-          },
-          steps: [],
-        }],
+        ],
         totalTime,
         totalWalkTime: totalTime,
         totalDistance: totalDistance,
         totalWalkDistance: totalDistance,
-        fare: { regular: { totalFare: 0, currency: { symbol: '₩', currency: 'KRW', currencyCode: 'KRW' } } },
+        fare: {
+          regular: {
+            totalFare: 0,
+            currency: { symbol: '₩', currency: 'KRW', currencyCode: 'KRW' },
+          },
+        },
       };
 
       // 백엔드에서 받은 경사도 분석 결과 사용
@@ -646,7 +710,8 @@ export default function HomeScreen() {
         totalTime: totalTime,
         totalWalkTime: totalTime,
         walkRatio: 100, // 100% 도보
-        personalizedWalkTime: slopeAnalysis?.total_adjusted_walk_time || totalTime,
+        personalizedWalkTime:
+          slopeAnalysis?.total_adjusted_walk_time || totalTime,
         slopeAnalysis,
         rawItinerary: walkingItinerary,
         totalDistance: totalDistance,
@@ -671,7 +736,6 @@ export default function HomeScreen() {
         damping: 20,
         stiffness: 90,
       });
-
     } catch (error) {
       console.error('❌ 보행자 경로 검색 실패:', error);
       Alert.alert('오류', '보행자 경로 검색에 실패했습니다.');
@@ -681,46 +745,51 @@ export default function HomeScreen() {
   };
 
   // 경로 선택 함수
-  const handleSelectRoute = useCallback(async (index: number) => {
-    const selected = routeOptions[index];
-    if (!selected) return;
+  const handleSelectRoute = useCallback(
+    async (index: number) => {
+      const selected = routeOptions[index];
+      if (!selected) return;
 
-    setSelectedRouteIndex(index);
+      setSelectedRouteIndex(index);
 
-    const path = extractRoutePath(selected);
-    setRoutePath(path);
+      const path = extractRoutePath(selected);
+      setRoutePath(path);
 
-    const totalTimeSec = selected.totalTime || 0;
-    const totalWalkTimeSec = selected.totalWalkTime || 0;
+      const totalTimeSec = selected.totalTime || 0;
+      const totalWalkTimeSec = selected.totalWalkTime || 0;
 
-    // 선택한 경로에 대해서도 경사도 분석 수행
-    let slopeAnalysis: RouteElevationAnalysis | null = null;
-    try {
-      slopeAnalysis = await analyzeRouteSlope(
-        selected,
-        undefined, // apiKey
-        walkingSpeedCase1 || undefined,
-        weatherData || undefined
-      );
-      console.log('✅ 선택한 경로 경사도 분석 완료:', slopeAnalysis);
-    } catch (error) {
-      console.error('❌ 경사도 분석 실패:', error);
-    }
+      // 선택한 경로에 대해서도 경사도 분석 수행
+      let slopeAnalysis: RouteElevationAnalysis | null = null;
+      try {
+        slopeAnalysis = await analyzeRouteSlope(
+          selected,
+          undefined, // apiKey
+          walkingSpeedCase1 || undefined,
+          weatherData || undefined
+        );
+        console.log('✅ 선택한 경로 경사도 분석 완료:', slopeAnalysis);
+      } catch (error) {
+        console.error('❌ 경사도 분석 실패:', error);
+      }
 
-    setRouteInfo({
-      totalTime: totalTimeSec,
-      totalWalkTime: totalWalkTimeSec,
-      walkRatio: totalTimeSec > 0 ? (totalWalkTimeSec / totalTimeSec) * 100 : 0,
-      personalizedWalkTime: slopeAnalysis?.total_adjusted_walk_time || totalWalkTimeSec,
-      slopeAnalysis,
-      rawItinerary: selected,
-      totalDistance: selected.totalDistance || 0,
-      legs: selected.legs || [],
-    });
+      setRouteInfo({
+        totalTime: totalTimeSec,
+        totalWalkTime: totalWalkTimeSec,
+        walkRatio:
+          totalTimeSec > 0 ? (totalWalkTimeSec / totalTimeSec) * 100 : 0,
+        personalizedWalkTime:
+          slopeAnalysis?.total_adjusted_walk_time || totalWalkTimeSec,
+        slopeAnalysis,
+        rawItinerary: selected,
+        totalDistance: selected.totalDistance || 0,
+        legs: selected.legs || [],
+      });
 
-    setShowRouteList(false);
-    setShowRouteDetails(false);
-  }, [routeOptions, weatherData, walkingSpeedCase1]);
+      setShowRouteList(false);
+      setShowRouteDetails(false);
+    },
+    [routeOptions, weatherData, walkingSpeedCase1]
+  );
 
   const animatedSearchBarStyle = useAnimatedStyle(() => {
     return {
@@ -795,7 +864,11 @@ export default function HomeScreen() {
                 style={styles.currentLocationButton}
                 onPress={getCurrentLocation}
               >
-                <MaterialIcons name="my-location" size={20} color={PRIMARY_COLOR} />
+                <MaterialIcons
+                  name="my-location"
+                  size={20}
+                  color={PRIMARY_COLOR}
+                />
               </TouchableOpacity>
             </View>
 
@@ -805,7 +878,11 @@ export default function HomeScreen() {
                 style={styles.swapButton}
                 onPress={handleSwapLocations}
               >
-                <MaterialIcons name="swap-vert" size={20} color={SECONDARY_TEXT} />
+                <MaterialIcons
+                  name="swap-vert"
+                  size={20}
+                  color={SECONDARY_TEXT}
+                />
               </TouchableOpacity>
             </View>
 
@@ -830,7 +907,11 @@ export default function HomeScreen() {
                     setEndLocation(null);
                   }}
                 >
-                  <MaterialIcons name="close" size={20} color={SECONDARY_TEXT} />
+                  <MaterialIcons
+                    name="close"
+                    size={20}
+                    color={SECONDARY_TEXT}
+                  />
                 </TouchableOpacity>
               )}
             </View>
@@ -841,7 +922,8 @@ export default function HomeScreen() {
                 style={[
                   styles.searchButton,
                   styles.transitButton,
-                  (!startLocation || !endLocation) && styles.searchButtonDisabled
+                  (!startLocation || !endLocation) &&
+                    styles.searchButtonDisabled,
                 ]}
                 onPress={handleSearchRoute}
                 disabled={!startLocation || !endLocation || loading}
@@ -850,7 +932,11 @@ export default function HomeScreen() {
                   <ActivityIndicator color="white" />
                 ) : (
                   <>
-                    <MaterialIcons name="directions-bus" size={22} color="white" />
+                    <MaterialIcons
+                      name="directions-bus"
+                      size={22}
+                      color="white"
+                    />
                     <Text style={styles.searchButtonText}>대중교통</Text>
                   </>
                 )}
@@ -860,7 +946,8 @@ export default function HomeScreen() {
                 style={[
                   styles.searchButton,
                   styles.walkingButton,
-                  (!startLocation || !endLocation) && styles.searchButtonDisabled
+                  (!startLocation || !endLocation) &&
+                    styles.searchButtonDisabled,
                 ]}
                 onPress={handleSearchWalkingRoute}
                 disabled={!startLocation || !endLocation || loading}
@@ -869,7 +956,11 @@ export default function HomeScreen() {
                   <ActivityIndicator color="white" />
                 ) : (
                   <>
-                    <MaterialIcons name="directions-walk" size={22} color="white" />
+                    <MaterialIcons
+                      name="directions-walk"
+                      size={22}
+                      color="white"
+                    />
                     <Text style={styles.searchButtonText}>도보</Text>
                   </>
                 )}
@@ -878,49 +969,64 @@ export default function HomeScreen() {
           </View>
 
           {/* 검색 결과 리스트 */}
-          {activeInput && (startInput || endInput) && searchResults.length > 0 && (
-            <View style={styles.searchResultsContainer}>
-              <ScrollView style={styles.searchResultsList} keyboardShouldPersistTaps="handled">
-                {searching ? (
-                  <View style={styles.searchingIndicator}>
-                    <ActivityIndicator size="small" color={PRIMARY_COLOR} />
-                    <Text style={styles.searchingText}>검색 중...</Text>
-                  </View>
-                ) : (
-                  searchResults.map((place) => (
-                    <TouchableOpacity
-                      key={place.id}
-                      style={styles.searchResultItem}
-                      onPress={() => handleSelectPlace(place)}
-                    >
-                      <View style={styles.resultIconContainer}>
-                        <MaterialIcons name="place" size={24} color={PRIMARY_COLOR} />
-                      </View>
-                      <View style={styles.resultTextContainer}>
-                        <Text style={styles.resultPlaceName}>{place.place_name}</Text>
-                        <Text style={styles.resultAddress}>
-                          {place.road_address_name || place.address_name}
-                        </Text>
-                      </View>
-                    </TouchableOpacity>
-                  ))
-                )}
-              </ScrollView>
-            </View>
-          )}
+          {activeInput &&
+            (startInput || endInput) &&
+            searchResults.length > 0 && (
+              <View style={styles.searchResultsContainer}>
+                <ScrollView
+                  style={styles.searchResultsList}
+                  keyboardShouldPersistTaps="handled"
+                >
+                  {searching ? (
+                    <View style={styles.searchingIndicator}>
+                      <ActivityIndicator size="small" color={PRIMARY_COLOR} />
+                      <Text style={styles.searchingText}>검색 중...</Text>
+                    </View>
+                  ) : (
+                    searchResults.map(place => (
+                      <TouchableOpacity
+                        key={place.id}
+                        style={styles.searchResultItem}
+                        onPress={() => handleSelectPlace(place)}
+                      >
+                        <View style={styles.resultIconContainer}>
+                          <MaterialIcons
+                            name="place"
+                            size={24}
+                            color={PRIMARY_COLOR}
+                          />
+                        </View>
+                        <View style={styles.resultTextContainer}>
+                          <Text style={styles.resultPlaceName}>
+                            {place.place_name}
+                          </Text>
+                          <Text style={styles.resultAddress}>
+                            {place.road_address_name || place.address_name}
+                          </Text>
+                        </View>
+                      </TouchableOpacity>
+                    ))
+                  )}
+                </ScrollView>
+              </View>
+            )}
         </SafeAreaView>
       </Animated.View>
 
       {/* 바텀시트 (경로 정보) - 드래그 가능 */}
       {routeInfo && (
-        <Animated.View
-          style={[styles.bottomSheet, animatedBottomSheetStyle]}
-        >
-          <View {...bottomPanResponder.panHandlers} style={styles.bottomSheetHandle}>
+        <Animated.View style={[styles.bottomSheet, animatedBottomSheetStyle]}>
+          <View
+            {...bottomPanResponder.panHandlers}
+            style={styles.bottomSheetHandle}
+          >
             <View style={styles.dragBar} />
           </View>
 
-          <ScrollView showsVerticalScrollIndicator={false} style={styles.bottomSheetContent}>
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            style={styles.bottomSheetContent}
+          >
             {/* 경로 목록 (여러 경로 옵션) */}
             {showRouteList && routeOptions.length > 0 && (
               <View>
@@ -932,31 +1038,50 @@ export default function HomeScreen() {
                     key={index}
                     style={[
                       styles.routeOptionItem,
-                      selectedRouteIndex === index && styles.routeOptionItemSelected,
+                      selectedRouteIndex === index &&
+                        styles.routeOptionItemSelected,
                     ]}
                     onPress={() => handleSelectRoute(index)}
                   >
                     <View style={styles.routeOptionHeader}>
-                      <Text style={styles.routeOptionNumber}>경로 {index + 1}</Text>
+                      <Text style={styles.routeOptionNumber}>
+                        경로 {index + 1}
+                      </Text>
                       {selectedRouteIndex === index && (
-                        <MaterialIcons name="check-circle" size={20} color={PRIMARY_COLOR} />
+                        <MaterialIcons
+                          name="check-circle"
+                          size={20}
+                          color={PRIMARY_COLOR}
+                        />
                       )}
                     </View>
                     <View style={styles.routeOptionStats}>
                       <View style={styles.routeOptionStat}>
-                        <MaterialIcons name="schedule" size={16} color={SECONDARY_TEXT} />
+                        <MaterialIcons
+                          name="schedule"
+                          size={16}
+                          color={SECONDARY_TEXT}
+                        />
                         <Text style={styles.routeOptionStatText}>
                           {formatMinutes(option.totalTime || 0)}
                         </Text>
                       </View>
                       <View style={styles.routeOptionStat}>
-                        <MaterialIcons name="directions-walk" size={16} color={SECONDARY_TEXT} />
+                        <MaterialIcons
+                          name="directions-walk"
+                          size={16}
+                          color={SECONDARY_TEXT}
+                        />
                         <Text style={styles.routeOptionStatText}>
                           {formatMinutes(option.totalWalkTime || 0)}
                         </Text>
                       </View>
                       <View style={styles.routeOptionStat}>
-                        <MaterialIcons name="straighten" size={16} color={SECONDARY_TEXT} />
+                        <MaterialIcons
+                          name="straighten"
+                          size={16}
+                          color={SECONDARY_TEXT}
+                        />
                         <Text style={styles.routeOptionStatText}>
                           {((option.totalDistance || 0) / 1000).toFixed(1)}km
                         </Text>
@@ -986,7 +1111,9 @@ export default function HomeScreen() {
                   style={styles.hideRouteListButton}
                   onPress={() => setShowRouteList(false)}
                 >
-                  <Text style={styles.hideRouteListButtonText}>선택한 경로 보기</Text>
+                  <Text style={styles.hideRouteListButtonText}>
+                    선택한 경로 보기
+                  </Text>
                 </TouchableOpacity>
               </View>
             )}
@@ -998,14 +1125,26 @@ export default function HomeScreen() {
                 onPress={() => setShowRouteDetails(true)}
               >
                 <View style={styles.routeInfoHeader}>
-                  <MaterialIcons name="directions" size={24} color={PRIMARY_COLOR} />
+                  <MaterialIcons
+                    name="directions"
+                    size={24}
+                    color={PRIMARY_COLOR}
+                  />
                   <Text style={styles.routeInfoTitle}>추천 경로</Text>
-                  <MaterialIcons name="chevron-right" size={24} color={SECONDARY_TEXT} />
+                  <MaterialIcons
+                    name="chevron-right"
+                    size={24}
+                    color={SECONDARY_TEXT}
+                  />
                 </View>
 
                 <View style={styles.routeStats}>
                   <View style={styles.statItem}>
-                    <MaterialIcons name="straighten" size={20} color={SECONDARY_TEXT} />
+                    <MaterialIcons
+                      name="straighten"
+                      size={20}
+                      color={SECONDARY_TEXT}
+                    />
                     <Text style={styles.statValue}>
                       {((routeInfo.totalDistance || 0) / 1000).toFixed(1)}km
                     </Text>
@@ -1015,18 +1154,30 @@ export default function HomeScreen() {
                   <View style={styles.statDivider} />
 
                   <View style={styles.statItem}>
-                    <MaterialIcons name="schedule" size={20} color={SECONDARY_TEXT} />
-                    <Text style={styles.statValue}>{formatMinutes(routeInfo.totalTime)}</Text>
+                    <MaterialIcons
+                      name="schedule"
+                      size={20}
+                      color={SECONDARY_TEXT}
+                    />
+                    <Text style={styles.statValue}>
+                      {formatMinutes(routeInfo.totalTime)}
+                    </Text>
                     <Text style={styles.statLabel}>총 시간</Text>
                   </View>
 
                   <View style={styles.statDivider} />
 
                   <View style={styles.statItem}>
-                    <MaterialIcons name="directions-walk" size={20} color={SECONDARY_TEXT} />
+                    <MaterialIcons
+                      name="directions-walk"
+                      size={20}
+                      color={SECONDARY_TEXT}
+                    />
                     <Text style={styles.statValue}>
                       {routeInfo.slopeAnalysis?.total_original_walk_time
-                        ? formatMinutes(routeInfo.slopeAnalysis.total_original_walk_time)
+                        ? formatMinutes(
+                            routeInfo.slopeAnalysis.total_original_walk_time
+                          )
                         : formatMinutes(routeInfo.totalWalkTime)}
                     </Text>
                     <Text style={styles.statLabel}>도보 시간 (기준)</Text>
@@ -1041,22 +1192,34 @@ export default function HomeScreen() {
                         <Text style={styles.infoIcon}>🚶</Text>
                         <View style={styles.infoTextContainer}>
                           <Text style={styles.infoText}>
-                            사용자 속도: {(walkingSpeedCase1 * 3.6).toFixed(2)} km/h
+                            사용자 속도: {(walkingSpeedCase1 * 3.6).toFixed(2)}{' '}
+                            km/h
                           </Text>
-                          {routeInfo.slopeAnalysis?.factors?.user_speed_factor && (
-                            <Text style={[
-                              styles.infoImpact,
-                              routeInfo.slopeAnalysis.factors.user_speed_factor > 1
-                                ? styles.infoImpactIncrease
-                                : styles.infoImpactDecrease
-                            ]}>
+                          {routeInfo.slopeAnalysis?.factors
+                            ?.user_speed_factor && (
+                            <Text
+                              style={[
+                                styles.infoImpact,
+                                routeInfo.slopeAnalysis.factors
+                                  .user_speed_factor > 1
+                                  ? styles.infoImpactIncrease
+                                  : styles.infoImpactDecrease,
+                              ]}
+                            >
                               {(() => {
-                                const factor = routeInfo.slopeAnalysis.factors.user_speed_factor;
+                                const factor =
+                                  routeInfo.slopeAnalysis.factors
+                                    .user_speed_factor;
                                 // 원본 도보 시간에 사용자 속도 계수만 적용한 시간 계산
-                                const originalTime = routeInfo.slopeAnalysis.total_original_walk_time;
+                                const originalTime =
+                                  routeInfo.slopeAnalysis
+                                    .total_original_walk_time;
                                 const timeWithUserSpeed = originalTime * factor;
-                                const impact = Math.round(timeWithUserSpeed - originalTime);
-                                const sign = impact > 0 ? '+' : impact < 0 ? '-' : '';
+                                const impact = Math.round(
+                                  timeWithUserSpeed - originalTime
+                                );
+                                const sign =
+                                  impact > 0 ? '+' : impact < 0 ? '-' : '';
                                 return `${sign}${Math.floor(Math.abs(impact) / 60)}분 ${Math.abs(impact) % 60}초`;
                               })()}
                             </Text>
@@ -1072,19 +1235,29 @@ export default function HomeScreen() {
                             날씨: {weatherData.temp_c}°C
                           </Text>
                           {routeInfo.slopeAnalysis?.factors?.weather_factor && (
-                            <Text style={[
-                              styles.infoImpact,
-                              routeInfo.slopeAnalysis.factors.weather_factor > 1
-                                ? styles.infoImpactIncrease
-                                : styles.infoImpactDecrease
-                            ]}>
+                            <Text
+                              style={[
+                                styles.infoImpact,
+                                routeInfo.slopeAnalysis.factors.weather_factor >
+                                1
+                                  ? styles.infoImpactIncrease
+                                  : styles.infoImpactDecrease,
+                              ]}
+                            >
                               {(() => {
-                                const factor = routeInfo.slopeAnalysis.factors.weather_factor;
+                                const factor =
+                                  routeInfo.slopeAnalysis.factors
+                                    .weather_factor;
                                 // 원본 도보 시간에 날씨 계수만 적용한 시간 계산
-                                const originalTime = routeInfo.slopeAnalysis.total_original_walk_time;
+                                const originalTime =
+                                  routeInfo.slopeAnalysis
+                                    .total_original_walk_time;
                                 const timeWithWeather = originalTime * factor;
-                                const impact = Math.round(timeWithWeather - originalTime);
-                                const sign = impact > 0 ? '+' : impact < 0 ? '-' : '';
+                                const impact = Math.round(
+                                  timeWithWeather - originalTime
+                                );
+                                const sign =
+                                  impact > 0 ? '+' : impact < 0 ? '-' : '';
                                 return `${sign}${Math.floor(Math.abs(impact) / 60)}분 ${Math.abs(impact) % 60}초`;
                               })()}
                             </Text>
@@ -1097,7 +1270,8 @@ export default function HomeScreen() {
 
                 {/* 경사도 분석 정보 */}
                 {(() => {
-                  const hasSlope = routeInfo.slopeAnalysis &&
+                  const hasSlope =
+                    routeInfo.slopeAnalysis &&
                     !routeInfo.slopeAnalysis.error &&
                     routeInfo.slopeAnalysis.walk_legs_analysis &&
                     routeInfo.slopeAnalysis.walk_legs_analysis.length > 0;
@@ -1105,9 +1279,11 @@ export default function HomeScreen() {
                   console.log('🔍 [경사도 표시 조건]', {
                     'slopeAnalysis 존재': !!routeInfo.slopeAnalysis,
                     'error 없음': !routeInfo.slopeAnalysis?.error,
-                    'walk_legs_analysis 존재': !!routeInfo.slopeAnalysis?.walk_legs_analysis,
-                    'walk_legs_analysis 길이': routeInfo.slopeAnalysis?.walk_legs_analysis?.length,
-                    '최종 표시 여부': hasSlope
+                    'walk_legs_analysis 존재':
+                      !!routeInfo.slopeAnalysis?.walk_legs_analysis,
+                    'walk_legs_analysis 길이':
+                      routeInfo.slopeAnalysis?.walk_legs_analysis?.length,
+                    '최종 표시 여부': hasSlope,
                   });
 
                   return null;
@@ -1118,8 +1294,14 @@ export default function HomeScreen() {
                   routeInfo.slopeAnalysis.walk_legs_analysis.length > 0 && (
                     <View style={styles.slopeAnalysisContainer}>
                       <View style={styles.slopeAnalysisHeader}>
-                        <MaterialIcons name="terrain" size={18} color="#FF6B6B" />
-                        <Text style={styles.slopeAnalysisTitle}>경사도 분석</Text>
+                        <MaterialIcons
+                          name="terrain"
+                          size={18}
+                          color="#FF6B6B"
+                        />
+                        <Text style={styles.slopeAnalysisTitle}>
+                          경사도 분석
+                        </Text>
                       </View>
 
                       <View style={styles.slopeStatsRow}>
@@ -1127,7 +1309,8 @@ export default function HomeScreen() {
                           <Text style={styles.slopeStatLabel}>평균 경사</Text>
                           <Text style={styles.slopeStatValue}>
                             {(() => {
-                              const legs = routeInfo.slopeAnalysis.walk_legs_analysis;
+                              const legs =
+                                routeInfo.slopeAnalysis.walk_legs_analysis;
                               if (!legs || legs.length === 0) {
                                 return '0.0';
                               }
@@ -1139,32 +1322,45 @@ export default function HomeScreen() {
                                 return '0.0';
                               }
                               const weightedSum = legs.reduce(
-                                (sum, leg) => sum + ((leg.avg_slope || 0) * (leg.distance || 0)),
+                                (sum, leg) =>
+                                  sum +
+                                  (leg.avg_slope || 0) * (leg.distance || 0),
                                 0
                               );
                               return (weightedSum / totalDistance).toFixed(1);
-                            })()}%
+                            })()}
+                            %
                           </Text>
                         </View>
 
                         <View style={styles.slopeStatItem}>
                           <Text style={styles.slopeStatLabel}>보정 시간</Text>
-                          <Text style={[
-                            styles.slopeStatValue,
-                            routeInfo.slopeAnalysis.factors?.slope_factor &&
+                          <Text
+                            style={[
+                              styles.slopeStatValue,
+                              routeInfo.slopeAnalysis.factors?.slope_factor &&
                               routeInfo.slopeAnalysis.factors.slope_factor < 1
-                              ? styles.slopeStatValueIncrease
-                              : styles.slopeStatValueDecrease
-                          ]}>
+                                ? styles.slopeStatValueIncrease
+                                : styles.slopeStatValueDecrease,
+                            ]}
+                          >
                             {(() => {
-                              if (!routeInfo.slopeAnalysis.factors?.slope_factor) {
+                              if (
+                                !routeInfo.slopeAnalysis.factors?.slope_factor
+                              ) {
                                 return '0분 0초';
                               }
-                              const factor = routeInfo.slopeAnalysis.factors.slope_factor;
-                              const originalTime = routeInfo.slopeAnalysis.total_original_walk_time;
+                              const factor =
+                                routeInfo.slopeAnalysis.factors.slope_factor;
+                              const originalTime =
+                                routeInfo.slopeAnalysis
+                                  .total_original_walk_time;
                               const timeWithSlope = originalTime * factor;
-                              const impact = Math.round(timeWithSlope - originalTime);
-                              const sign = impact > 0 ? '+' : impact < 0 ? '-' : '';
+                              const impact = Math.round(
+                                timeWithSlope - originalTime
+                              );
+                              const sign =
+                                impact > 0 ? '+' : impact < 0 ? '-' : '';
                               return `${sign}${Math.floor(Math.abs(impact) / 60)}분 ${Math.abs(impact) % 60}초`;
                             })()}
                           </Text>
@@ -1173,46 +1369,86 @@ export default function HomeScreen() {
                         <View style={styles.slopeStatItem}>
                           <Text style={styles.slopeStatLabel}>보정 후</Text>
                           <Text style={styles.slopeStatValue}>
-                            {Math.floor(routeInfo.slopeAnalysis.total_adjusted_walk_time / 60)}분
+                            {Math.floor(
+                              routeInfo.slopeAnalysis.total_adjusted_walk_time /
+                                60
+                            )}
+                            분
                           </Text>
                         </View>
                       </View>
 
                       {/* 계산 설명 */}
-                      <View style={{ marginTop: 12, paddingTop: 12, borderTopWidth: 1, borderTopColor: '#E6E9F2' }}>
-                        <Text style={{ fontSize: 11, color: '#6B7280', lineHeight: 16 }}>
-                          💡 기준 시간({Math.floor(routeInfo.slopeAnalysis.total_original_walk_time / 60)}분)에
-                          사용자 속도, 경사도, 날씨를 반영한 예상 시간입니다.
+                      <View
+                        style={{
+                          marginTop: 12,
+                          paddingTop: 12,
+                          borderTopWidth: 1,
+                          borderTopColor: '#E6E9F2',
+                        }}
+                      >
+                        <Text
+                          style={{
+                            fontSize: 11,
+                            color: '#6B7280',
+                            lineHeight: 16,
+                          }}
+                        >
+                          💡 기준 시간(
+                          {Math.floor(
+                            routeInfo.slopeAnalysis.total_original_walk_time /
+                              60
+                          )}
+                          분)에 사용자 속도, 경사도, 날씨를 반영한 예상
+                          시간입니다.
                         </Text>
-                        {routeInfo.slopeAnalysis.walk_legs_analysis.some(leg => leg.is_transfer) && (
-                          <Text style={{ fontSize: 10, color: '#9CA3AF', lineHeight: 14, marginTop: 4 }}>
-                            ℹ️ 환승(실내) 구간은 경사도와 날씨 영향 없이 개인 속도만 반영됩니다.
+                        {routeInfo.slopeAnalysis.walk_legs_analysis.some(
+                          leg => leg.is_transfer
+                        ) && (
+                          <Text
+                            style={{
+                              fontSize: 10,
+                              color: '#9CA3AF',
+                              lineHeight: 14,
+                              marginTop: 4,
+                            }}
+                          >
+                            ℹ️ 환승(실내) 구간은 경사도와 날씨 영향 없이 개인
+                            속도만 반영됩니다.
                           </Text>
                         )}
                       </View>
 
                       {/* 경사도 경고 */}
                       {(() => {
-                        const totalDistance = routeInfo.slopeAnalysis.walk_legs_analysis.reduce(
-                          (sum, leg) => sum + leg.distance,
-                          0
-                        );
-                        const weightedSum = routeInfo.slopeAnalysis.walk_legs_analysis.reduce(
-                          (sum, leg) => sum + (leg.avg_slope * leg.distance),
-                          0
-                        );
+                        const totalDistance =
+                          routeInfo.slopeAnalysis.walk_legs_analysis.reduce(
+                            (sum, leg) => sum + leg.distance,
+                            0
+                          );
+                        const weightedSum =
+                          routeInfo.slopeAnalysis.walk_legs_analysis.reduce(
+                            (sum, leg) => sum + leg.avg_slope * leg.distance,
+                            0
+                          );
                         const avgSlope = weightedSum / totalDistance;
-                        const timeAdjustment = routeInfo.slopeAnalysis.total_route_time_adjustment;
+                        const timeAdjustment =
+                          routeInfo.slopeAnalysis.total_route_time_adjustment;
 
                         // 모든 구간의 경사도 중 절대값 40% 이상인 경우 체크
-                        const hasExtremeSteepSlope = routeInfo.slopeAnalysis.walk_legs_analysis.some(leg =>
-                          leg.segments?.some(segment => Math.abs(segment.slope) >= 40) ||
-                          Math.abs(leg.max_slope) >= 40 ||
-                          Math.abs(leg.min_slope) >= 40
-                        );
+                        const hasExtremeSteepSlope =
+                          routeInfo.slopeAnalysis.walk_legs_analysis.some(
+                            leg =>
+                              leg.segments?.some(
+                                segment => Math.abs(segment.slope) >= 40
+                              ) ||
+                              Math.abs(leg.max_slope) >= 40 ||
+                              Math.abs(leg.min_slope) >= 40
+                          );
 
                         // 내리막인데 시간이 증가한 경우
-                        const hasDownhillTimeIncrease = avgSlope < -1 && timeAdjustment > 30;
+                        const hasDownhillTimeIncrease =
+                          avgSlope < -1 && timeAdjustment > 30;
 
                         const warnings = [];
 
@@ -1220,9 +1456,15 @@ export default function HomeScreen() {
                         if (hasExtremeSteepSlope) {
                           warnings.push(
                             <View key="extreme" style={styles.slopeWarning}>
-                              <MaterialIcons name="warning" size={16} color="#F44336" />
+                              <MaterialIcons
+                                name="warning"
+                                size={16}
+                                color="#F44336"
+                              />
                               <Text style={styles.slopeWarningText}>
-                                일부 구간에 경사도가 40% 이상인 급경사가 있습니다. 엘리베이터나 에스컬레이터 이용을 권장합니다.
+                                일부 구간에 경사도가 40% 이상인 급경사가
+                                있습니다. 엘리베이터나 에스컬레이터 이용을
+                                권장합니다.
                               </Text>
                             </View>
                           );
@@ -1232,10 +1474,15 @@ export default function HomeScreen() {
                         if (hasDownhillTimeIncrease) {
                           warnings.push(
                             <View key="downhill" style={styles.slopeWarning}>
-                              <MaterialIcons name="info-outline" size={16} color="#FF9800" />
+                              <MaterialIcons
+                                name="info-outline"
+                                size={16}
+                                color="#FF9800"
+                              />
                               <Text style={styles.slopeWarningText}>
-                                일부 구간에 급경사가 있어 안전한 보행을 고려해 시간이 증가했습니다.
-                                계단이나 승강기 이용을 권장드립니다.
+                                일부 구간에 급경사가 있어 안전한 보행을 고려해
+                                시간이 증가했습니다. 계단이나 승강기 이용을
+                                권장드립니다.
                               </Text>
                             </View>
                           );
@@ -1257,15 +1504,27 @@ export default function HomeScreen() {
                         </Text>
                         {routeInfo.slopeAnalysis.crosswalk_wait_time && (
                           <Text style={styles.crosswalkWaitTime}>
-                            (+{Math.floor(routeInfo.slopeAnalysis.crosswalk_wait_time / 60)}분{' '}
-                            {routeInfo.slopeAnalysis.crosswalk_wait_time % 60}초 대기)
+                            (+
+                            {Math.floor(
+                              routeInfo.slopeAnalysis.crosswalk_wait_time / 60
+                            )}
+                            분{' '}
+                            {routeInfo.slopeAnalysis.crosswalk_wait_time % 60}초
+                            대기)
                           </Text>
                         )}
                       </View>
                       {routeInfo.slopeAnalysis.total_time_with_crosswalk && (
                         <Text style={styles.crosswalkTotalTime}>
-                          횡단보도 포함 총 시간: {Math.floor(routeInfo.slopeAnalysis.total_time_with_crosswalk / 60)}분{' '}
-                          {routeInfo.slopeAnalysis.total_time_with_crosswalk % 60}초
+                          횡단보도 포함 총 시간:{' '}
+                          {Math.floor(
+                            routeInfo.slopeAnalysis.total_time_with_crosswalk /
+                              60
+                          )}
+                          분{' '}
+                          {routeInfo.slopeAnalysis.total_time_with_crosswalk %
+                            60}
+                          초
                         </Text>
                       )}
                     </View>
@@ -1277,7 +1536,11 @@ export default function HomeScreen() {
                     style={styles.showRouteListButton}
                     onPress={() => setShowRouteList(true)}
                   >
-                    <MaterialIcons name="list" size={20} color={PRIMARY_COLOR} />
+                    <MaterialIcons
+                      name="list"
+                      size={20}
+                      color={PRIMARY_COLOR}
+                    />
                     <Text style={styles.showRouteListButtonText}>
                       다른 경로 보기 ({routeOptions.length}개)
                     </Text>
@@ -1293,7 +1556,11 @@ export default function HomeScreen() {
                   style={styles.backButton}
                   onPress={() => setShowRouteDetails(false)}
                 >
-                  <MaterialIcons name="arrow-back" size={24} color={PRIMARY_COLOR} />
+                  <MaterialIcons
+                    name="arrow-back"
+                    size={24}
+                    color={PRIMARY_COLOR}
+                  />
                   <Text style={styles.backButtonText}>돌아가기</Text>
                 </TouchableOpacity>
 
@@ -1315,13 +1582,18 @@ export default function HomeScreen() {
                         />
                       </View>
                       <View style={styles.legInfo}>
-                        <Text style={styles.legMode}>{getModeLabel(leg.mode)}</Text>
+                        <Text style={styles.legMode}>
+                          {getModeLabel(leg.mode)}
+                        </Text>
                         <Text style={styles.legRoute}>
-                          {leg.start?.name || '출발'} → {leg.end?.name || '도착'}
+                          {leg.start?.name || '출발'} →{' '}
+                          {leg.end?.name || '도착'}
                         </Text>
                       </View>
                       <View style={styles.legStats}>
-                        <Text style={styles.legTime}>{formatMinutes(leg.sectionTime || 0)}</Text>
+                        <Text style={styles.legTime}>
+                          {formatMinutes(leg.sectionTime || 0)}
+                        </Text>
                         <Text style={styles.legDistance}>
                           {((leg.distance || 0) / 1000).toFixed(1)}km
                         </Text>
@@ -1329,24 +1601,27 @@ export default function HomeScreen() {
                     </View>
 
                     {/* 버스/지하철 노선 정보 */}
-                    {(leg.mode === 'BUS' || leg.mode === 'SUBWAY') && leg.route && (
-                      <View style={styles.routeInfo}>
-                        <Text style={styles.routeName}>{leg.route}</Text>
-                      </View>
-                    )}
+                    {(leg.mode === 'BUS' || leg.mode === 'SUBWAY') &&
+                      leg.route && (
+                        <View style={styles.routeInfo}>
+                          <Text style={styles.routeName}>{leg.route}</Text>
+                        </View>
+                      )}
 
                     {/* 도보 상세 경로 */}
-                    {leg.mode === 'WALK' && leg.steps && leg.steps.length > 0 && (
-                      <View style={styles.walkStepsContainer}>
-                        {leg.steps.map((step, stepIndex) => (
-                          step.description ? (
-                            <Text key={stepIndex} style={styles.walkStepText}>
-                              • {step.description}
-                            </Text>
-                          ) : null
-                        ))}
-                      </View>
-                    )}
+                    {leg.mode === 'WALK' &&
+                      leg.steps &&
+                      leg.steps.length > 0 && (
+                        <View style={styles.walkStepsContainer}>
+                          {leg.steps.map((step, stepIndex) =>
+                            step.description ? (
+                              <Text key={stepIndex} style={styles.walkStepText}>
+                                • {step.description}
+                              </Text>
+                            ) : null
+                          )}
+                        </View>
+                      )}
                   </View>
                 ))}
               </View>

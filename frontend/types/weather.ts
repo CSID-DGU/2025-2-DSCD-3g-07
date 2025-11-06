@@ -18,45 +18,45 @@ export interface KMAWeatherResponse {
 }
 
 export interface KMAWeatherItem {
-  baseDate: string;      // 발표일자
-  baseTime: string;      // 발표시각
-  category: string;      // 자료구분코드
-  fcstDate: string;      // 예보일자
-  fcstTime: string;      // 예보시각
-  fcstValue: string;     // 예보값
-  nx: number;            // 예보지점 X좌표
-  ny: number;            // 예보지점 Y좌표
+  baseDate: string; // 발표일자
+  baseTime: string; // 발표시각
+  category: string; // 자료구분코드
+  fcstDate: string; // 예보일자
+  fcstTime: string; // 예보시각
+  fcstValue: string; // 예보값
+  nx: number; // 예보지점 X좌표
+  ny: number; // 예보지점 Y좌표
 }
 
 // 단기예보 카테고리
-export type KMACategory = 
-  | 'POP'  // 강수확률 (%)
-  | 'PTY'  // 강수형태 (코드값)
-  | 'PCP'  // 1시간 강수량 (mm)
-  | 'REH'  // 습도 (%)
-  | 'SNO'  // 1시간 신적설 (cm)
-  | 'SKY'  // 하늘상태 (코드값)
-  | 'TMP'  // 1시간 기온 (℃)
-  | 'TMN'  // 일 최저기온 (℃)
-  | 'TMX'  // 일 최고기온 (℃)
-  | 'UUU'  // 풍속(동서성분) (m/s)
-  | 'VVV'  // 풍속(남북성분) (m/s)
-  | 'WAV'  // 파고 (M)
-  | 'VEC'  // 풍향 (deg)
+export type KMACategory =
+  | 'POP' // 강수확률 (%)
+  | 'PTY' // 강수형태 (코드값)
+  | 'PCP' // 1시간 강수량 (mm)
+  | 'REH' // 습도 (%)
+  | 'SNO' // 1시간 신적설 (cm)
+  | 'SKY' // 하늘상태 (코드값)
+  | 'TMP' // 1시간 기온 (℃)
+  | 'TMN' // 일 최저기온 (℃)
+  | 'TMX' // 일 최고기온 (℃)
+  | 'UUU' // 풍속(동서성분) (m/s)
+  | 'VVV' // 풍속(남북성분) (m/s)
+  | 'WAV' // 파고 (M)
+  | 'VEC' // 풍향 (deg)
   | 'WSD'; // 풍속 (m/s)
 
 // 파싱된 날씨 데이터
 export interface ParsedWeatherData {
   datetime: string;
-  temperature?: number;        // 기온 (℃)
-  humidity?: number;          // 습도 (%)
+  temperature?: number; // 기온 (℃)
+  humidity?: number; // 습도 (%)
   precipitationProb?: number; // 강수확률 (%)
-  precipitation?: string;     // 강수량
+  precipitation?: string; // 강수량
   precipitationType?: number; // 강수형태 (0:없음, 1:비, 2:비/눈, 3:눈, 4:소나기)
-  skyCondition?: number;      // 하늘상태 (1:맑음, 3:구름많음, 4:흐림)
-  windSpeed?: number;         // 풍속 (m/s)
-  windDirection?: number;     // 풍향 (deg)
-  snowfall?: string;          // 적설량
+  skyCondition?: number; // 하늘상태 (1:맑음, 3:구름많음, 4:흐림)
+  windSpeed?: number; // 풍속 (m/s)
+  windDirection?: number; // 풍향 (deg)
+  snowfall?: string; // 적설량
 }
 
 // 통합 날씨 응답 (기존 코드와 호환성 유지)
@@ -101,12 +101,17 @@ export type OpenMeteoCurrentWeather = OpenMeteoResponse['current'];
 export type OpenMeteoHourlyWeather = NonNullable<OpenMeteoResponse['hourly']>;
 export type OpenMeteoDailyWeather = NonNullable<OpenMeteoResponse['daily']>;
 
-
 // 날씨 코드를 한국어로 변환 (기상청 API 기반)
-export const getWeatherDescription = (skyCode?: number, ptyCode?: number): { description: string; emoji: string } => {
+export const getWeatherDescription = (
+  skyCode?: number,
+  ptyCode?: number
+): { description: string; emoji: string } => {
   // 강수형태 우선 (PTY)
   if (ptyCode !== undefined && ptyCode > 0) {
-    const ptyDescriptions: Record<number, { description: string; emoji: string }> = {
+    const ptyDescriptions: Record<
+      number,
+      { description: string; emoji: string }
+    > = {
       1: { description: '비', emoji: '🌧️' },
       2: { description: '비/눈', emoji: '🌨️' },
       3: { description: '눈', emoji: '❄️' },
@@ -115,24 +120,33 @@ export const getWeatherDescription = (skyCode?: number, ptyCode?: number): { des
       6: { description: '빗방울/눈날림', emoji: '🌨️' },
       7: { description: '눈날림', emoji: '🌨️' },
     };
-    return ptyDescriptions[ptyCode] || { description: '알 수 없음', emoji: '❓' };
+    return (
+      ptyDescriptions[ptyCode] || { description: '알 수 없음', emoji: '❓' }
+    );
   }
 
   // 하늘상태 (SKY)
   if (skyCode !== undefined) {
-    const skyDescriptions: Record<number, { description: string; emoji: string }> = {
+    const skyDescriptions: Record<
+      number,
+      { description: string; emoji: string }
+    > = {
       1: { description: '맑음', emoji: '☀️' },
       3: { description: '구름많음', emoji: '⛅' },
       4: { description: '흐림', emoji: '☁️' },
     };
-    return skyDescriptions[skyCode] || { description: '알 수 없음', emoji: '❓' };
+    return (
+      skyDescriptions[skyCode] || { description: '알 수 없음', emoji: '❓' }
+    );
   }
 
   return { description: '정보없음', emoji: '❓' };
 };
 
 // Open Meteo 호환 함수 (기존 코드 지원)
-export const getWeatherDescriptionFromCode = (code: number): { description: string; emoji: string } => {
+export const getWeatherDescriptionFromCode = (
+  code: number
+): { description: string; emoji: string } => {
   if (!Number.isFinite(code)) {
     return { description: '알 수 없음', emoji: '❓' };
   }
@@ -185,7 +199,9 @@ export const getWindDirection = (degrees: number): string => {
 };
 
 // UV 지수 설명
-export const getUVIndexDescription = (uvIndex: number): { level: string; color: string } => {
+export const getUVIndexDescription = (
+  uvIndex: number
+): { level: string; color: string } => {
   if (uvIndex <= 2) return { level: '낮음', color: '#00E400' };
   if (uvIndex <= 5) return { level: '보통', color: '#FFFF00' };
   if (uvIndex <= 7) return { level: '높음', color: '#FF8C00' };

@@ -39,7 +39,7 @@ export const getLocalNetworkIp = (): string | null => {
  */
 export const getBackendUrl = (port: number = 8000): string => {
   const ip = getLocalNetworkIp();
-  
+
   if (ip) {
     return `http://${ip}:${port}`;
   }
@@ -62,12 +62,12 @@ export const checkNetworkConnection = async (): Promise<boolean> => {
     // 간단한 네트워크 연결 테스트 (Google DNS)
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 3000);
-    
+
     await fetch('https://8.8.8.8', {
       method: 'HEAD',
       signal: controller.signal as any,
     });
-    
+
     clearTimeout(timeoutId);
     return true;
   } catch (error) {
@@ -102,7 +102,9 @@ export const testApiConnection = async (baseUrl: string): Promise<boolean> => {
  * 여러 URL 중 작동하는 것 찾기
  * @param urls 테스트할 URL 배열
  */
-export const findWorkingUrl = async (urls: string[]): Promise<string | null> => {
+export const findWorkingUrl = async (
+  urls: string[]
+): Promise<string | null> => {
   for (const url of urls) {
     console.log(`🔍 테스트 중: ${url}`);
     const isWorking = await testApiConnection(url);

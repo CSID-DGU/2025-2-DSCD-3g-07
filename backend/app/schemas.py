@@ -1,29 +1,60 @@
 # app/schemas.py
-from typing import Optional, List
-from pydantic import BaseModel
-from datetime import datetime, date
+from datetime import date, datetime
+from typing import List, Optional
+
+from pydantic import BaseModel, EmailStr, Field
 
 # API 요청/응답용 Pydantic 스키마
 
-# 사용자 프로필 관련
-class UserProfileRequest(BaseModel):
-    user_id: str
-    age: int
-    fatigue_level: int  # 1-5 (피로도)
-    walking_speed: Optional[float] = None  # m/s, 옵션
 
-class UserProfileResponse(BaseModel):
-    user_id: str
-    age: int
-    fatigue_level: int
-    walking_speed: Optional[float] = None
+# ============ 인증 관련 스키마 ============
+class UserRegisterRequest(BaseModel):
+    """회원가입 요청"""
 
+    username: str = Field(..., min_length=3, max_length=50, description="사용자 이름")
+    email: EmailStr = Field(..., description="이메일 주소")
+    password: str = Field(
+        ..., min_length=6, max_length=100, description="비밀번호 (최소 6자)"
+    )
+
+
+class UserLoginRequest(BaseModel):
+    """로그인 요청"""
+
+    email: EmailStr = Field(..., description="이메일 주소")
+    password: str = Field(..., description="비밀번호")
+
+
+class TokenResponse(BaseModel):
+    """토큰 응답"""
+
+    access_token: str
+    token_type: str = "bearer"
+    user: "UserResponse"
+
+
+class UserResponse(BaseModel):
+    """사용자 정보 응답"""
+
+    user_id: int
+    username: str
+    email: str
+    auth_provider: Optional[str]
+    created_at: datetime
+    last_login: Optional[datetime]
+
+    class Config:
+        from_attributes = True
+
+
+# ============ 기존 스키마 ============
 # 도보 구간 관련
 class WalkingSectionRequest(BaseModel):
     section_time_seconds: int
     distance_meters: int
     start_name: str
     end_name: str
+
 
 class WalkingSectionResponse(BaseModel):
     section_time_seconds: int
@@ -34,6 +65,7 @@ class WalkingSectionResponse(BaseModel):
     actual_vs_estimated_diff: int
     personalized_time_seconds: Optional[int] = None
     accuracy_warning: Optional[str] = None
+
 
 # 경로 응답 관련
 class RouteResponse(BaseModel):
@@ -48,6 +80,7 @@ class RouteResponse(BaseModel):
     adjustment_factor: Optional[float] = None
     overall_accuracy_note: str
 
+
 # DB 모델용 스키마들
 class UserCreate(BaseModel):
     username: str
@@ -55,16 +88,6 @@ class UserCreate(BaseModel):
     password_hash: str
     auth_provider: Optional[str] = "local"
 
-class UserResponse(BaseModel):
-    user_id: int
-    username: str
-    email: str
-    auth_provider: Optional[str]
-    created_at: datetime
-    last_login: Optional[datetime]
-
-    class Config:
-        from_attributes = True
 
 class WeatherCacheCreate(BaseModel):
     latitude: float
@@ -78,6 +101,7 @@ class WeatherCacheCreate(BaseModel):
     precipitation_mm: Optional[int]
     air_quality_index: Optional[int]
     data_source: Optional[str] = "KMA_API"
+
 
 class WeatherCacheResponse(BaseModel):
     weather_id: int
@@ -97,6 +121,7 @@ class WeatherCacheResponse(BaseModel):
     class Config:
         from_attributes = True
 
+
 class HealthDataCreate(BaseModel):
     user_id: int
     record_date: date
@@ -109,6 +134,7 @@ class HealthDataCreate(BaseModel):
     elevation_loss_m: Optional[float] = 0.0
     data_source: Optional[str]
     weather_id: Optional[int]
+
 
 class HealthDataResponse(BaseModel):
     health_data_id: int

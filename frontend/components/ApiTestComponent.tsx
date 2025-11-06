@@ -9,11 +9,24 @@ import { healthConnectService } from '../services/healthConnect';
 import { useWeatherContext } from '../contexts/WeatherContext';
 
 const ApiTestComponent: React.FC = () => {
-  const { data: healthData, loading: healthLoading, error: healthError, checkHealth } = useHealthCheck();
-  const { data: routeData, loading: routeLoading, error: routeError, getRoute } = useTransitRoute();
-  const [slopeAnalysis, setSlopeAnalysis] = useState<RouteElevationAnalysis | null>(null);
+  const {
+    data: healthData,
+    loading: healthLoading,
+    error: healthError,
+    checkHealth,
+  } = useHealthCheck();
+  const {
+    data: routeData,
+    loading: routeLoading,
+    error: routeError,
+    getRoute,
+  } = useTransitRoute();
+  const [slopeAnalysis, setSlopeAnalysis] =
+    useState<RouteElevationAnalysis | null>(null);
   const [slopeLoading, setSlopeLoading] = useState(false);
-  const [walkingSpeedCase1, setWalkingSpeedCase1] = useState<number | null>(null);
+  const [walkingSpeedCase1, setWalkingSpeedCase1] = useState<number | null>(
+    null
+  );
 
   // 날씨 Context 사용
   const { weatherData } = useWeatherContext();
@@ -23,12 +36,15 @@ const ApiTestComponent: React.FC = () => {
     const fetchWalkingSpeed = async () => {
       try {
         // 전체 기간 평균 속도 사용 (더 안정적)
-        const allTimeSpeed = await healthConnectService.getAllTimeAverageSpeeds();
+        const allTimeSpeed =
+          await healthConnectService.getAllTimeAverageSpeeds();
         if (allTimeSpeed.speedCase1 && allTimeSpeed.speedCase1 > 0) {
           // km/h를 m/s로 변환
           const speedMs = allTimeSpeed.speedCase1 / 3.6;
           setWalkingSpeedCase1(speedMs);
-          console.log(`✅ 보행 속도: ${allTimeSpeed.speedCase1.toFixed(2)} km/h`);
+          console.log(
+            `✅ 보행 속도: ${allTimeSpeed.speedCase1.toFixed(2)} km/h`
+          );
         }
       } catch (error) {
         console.warn('⚠️ 속도 데이터 로드 실패:', error);
@@ -41,7 +57,11 @@ const ApiTestComponent: React.FC = () => {
   // routeData가 업데이트되면 경사도 분석 수행
   useEffect(() => {
     const analyzeSlopeData = async () => {
-      if (routeData && !routeError && routeData.metaData?.plan?.itineraries?.[0]) {
+      if (
+        routeData &&
+        !routeError &&
+        routeData.metaData?.plan?.itineraries?.[0]
+      ) {
         const itineraries = routeData.metaData.plan.itineraries;
         console.log(`📊 경로 분석 중... (${itineraries.length}개 경로)`);
         setSlopeLoading(true);
@@ -64,13 +84,17 @@ const ApiTestComponent: React.FC = () => {
 
             const logParts = ['✅ 경사도 분석 완료'];
             if (walkingSpeedCase1) {
-              logParts.push(`보행속도: ${(walkingSpeedCase1 * 3.6).toFixed(2)} km/h`);
+              logParts.push(
+                `보행속도: ${(walkingSpeedCase1 * 3.6).toFixed(2)} km/h`
+              );
             }
             if (weatherData) {
               logParts.push(`날씨: ${weatherData.temp_c}°C`);
             }
             if (analysis.factors) {
-              logParts.push(`계수: ${analysis.factors.final_factor.toFixed(3)}`);
+              logParts.push(
+                `계수: ${analysis.factors.final_factor.toFixed(3)}`
+              );
             }
             console.log(logParts.join(', '));
           }
@@ -146,28 +170,38 @@ const ApiTestComponent: React.FC = () => {
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>경로 검색 테스트</Text>
         <TouchableOpacity
-          style={[styles.button, (routeLoading || slopeLoading) && styles.buttonDisabled]}
+          style={[
+            styles.button,
+            (routeLoading || slopeLoading) && styles.buttonDisabled,
+          ]}
           onPress={testTransitRoute}
           disabled={routeLoading || slopeLoading}
         >
           <Text style={styles.buttonText}>
-            {routeLoading ? '⏳ 검색 중...' : slopeLoading ? '📊 경사도 분석 중...' : '🗺️ 경로 검색 (망원시장→동대입구역)'}
+            {routeLoading
+              ? '⏳ 검색 중...'
+              : slopeLoading
+                ? '📊 경사도 분석 중...'
+                : '🗺️ 경로 검색 (망원시장→동대입구역)'}
           </Text>
         </TouchableOpacity>
 
         {routeData && (
           <View>
-            <Text style={styles.successText}>
-              ✅ 경로 검색 성공!
-            </Text>
+            <Text style={styles.successText}>✅ 경로 검색 성공!</Text>
             {routeData.metaData?.plan?.itineraries?.[0] && (
               <Text style={styles.successText}>
-                총 시간: {Math.round(routeData.metaData.plan.itineraries[0].totalTime / 60)}분
+                총 시간:{' '}
+                {Math.round(
+                  routeData.metaData.plan.itineraries[0].totalTime / 60
+                )}
+                분
               </Text>
             )}
             {walkingSpeedCase1 && (
               <Text style={styles.infoText}>
-                🚶 사용된 보행 속도: {(walkingSpeedCase1 * 3.6).toFixed(2)} km/h (Case 1)
+                🚶 사용된 보행 속도: {(walkingSpeedCase1 * 3.6).toFixed(2)} km/h
+                (Case 1)
               </Text>
             )}
             {weatherData && (
@@ -183,13 +217,19 @@ const ApiTestComponent: React.FC = () => {
             {slopeAnalysis && !slopeAnalysis.error && (
               <View>
                 <Text style={styles.successText}>
-                  ✅ 경사도 분석 완료! (보정 시간: {slopeAnalysis.total_route_time_adjustment > 0 ? '+' : ''}{Math.round(slopeAnalysis.total_route_time_adjustment / 60)}분)
+                  ✅ 경사도 분석 완료! (보정 시간:{' '}
+                  {slopeAnalysis.total_route_time_adjustment > 0 ? '+' : ''}
+                  {Math.round(slopeAnalysis.total_route_time_adjustment / 60)}
+                  분)
                 </Text>
                 {slopeAnalysis.factors ? (
                   <View style={[styles.factorsBox, { marginTop: 8 }]}>
-                    <Text style={styles.factorsTitle}>📊 보행속도 보정 계수</Text>
+                    <Text style={styles.factorsTitle}>
+                      📊 보행속도 보정 계수
+                    </Text>
                     <Text style={styles.factorsDetail}>
-                      사용자({slopeAnalysis.factors.user_speed_factor.toFixed(3)}) ×
+                      사용자(
+                      {slopeAnalysis.factors.user_speed_factor.toFixed(3)}) ×
                       경사도({slopeAnalysis.factors.slope_factor.toFixed(3)}) ×
                       날씨({slopeAnalysis.factors.weather_factor.toFixed(3)})
                     </Text>
@@ -199,7 +239,8 @@ const ApiTestComponent: React.FC = () => {
                   </View>
                 ) : (
                   <Text style={styles.errorText}>
-                    ⚠️ 계수 정보 없음 (factors: {JSON.stringify(slopeAnalysis.factors)})
+                    ⚠️ 계수 정보 없음 (factors:{' '}
+                    {JSON.stringify(slopeAnalysis.factors)})
                   </Text>
                 )}
               </View>

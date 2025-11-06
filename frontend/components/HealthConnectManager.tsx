@@ -6,25 +6,25 @@ import {
   Alert,
   ScrollView,
   TouchableOpacity,
-  AppState
+  AppState,
 } from 'react-native';
 import {
   healthConnectService as healthConnect,
   type HealthData,
-  type PermissionStatus
+  type PermissionStatus,
 } from '../services/healthConnect';
 
 const HealthConnectManager: React.FC = () => {
   const [healthData, setHealthData] = useState<HealthData>({
     available: false,
-    source: 'Not Available'
+    source: 'Not Available',
   });
 
   const [permissionStatus, setPermissionStatus] = useState<PermissionStatus>({
     sdkAvailable: false,
     permissionsGranted: false,
     grantedCount: 0,
-    totalCount: 0
+    totalCount: 0,
   });
 
   const [allTimeSpeed, setAllTimeSpeed] = useState<{
@@ -34,7 +34,7 @@ const HealthConnectManager: React.FC = () => {
     totalRecords: number;
   } | null>(null);
 
-  const [loading, setLoading] = useState<boolean>(false);  // 앱이 foreground로 돌아올 때마다 권한 확인
+  const [loading, setLoading] = useState<boolean>(false); // 앱이 foreground로 돌아올 때마다 권한 확인
   useEffect(() => {
     const subscription = AppState.addEventListener('change', nextAppState => {
       if (nextAppState === 'active') {
@@ -96,7 +96,10 @@ const HealthConnectManager: React.FC = () => {
       setHealthData(data);
     } catch (error) {
       console.error('❌ Error getting health data:', error);
-      Alert.alert('오류', `건강 데이터를 가져오는 중 오류가 발생했습니다: ${error}`);
+      Alert.alert(
+        '오류',
+        `건강 데이터를 가져오는 중 오류가 발생했습니다: ${error}`
+      );
     } finally {
       setLoading(false);
     }
@@ -111,7 +114,10 @@ const HealthConnectManager: React.FC = () => {
       setHealthData(data);
     } catch (error) {
       console.error('❌ Error getting week health data:', error);
-      Alert.alert('오류', `주간 건강 데이터를 가져오는 중 오류가 발생했습니다: ${error}`);
+      Alert.alert(
+        '오류',
+        `주간 건강 데이터를 가져오는 중 오류가 발생했습니다: ${error}`
+      );
     } finally {
       setLoading(false);
     }
@@ -131,28 +137,42 @@ const HealthConnectManager: React.FC = () => {
         Alert.alert(
           '✅ 전체 기간 평균 속도',
           `총 ${data.totalRecords}개 기록 분석 완료\n\n` +
-          `Case 1 (≥2.5km/h): ${data.speedCase1} km/h\n` +
-          `Case 2 (≥1.5km/h): ${data.speedCase2} km/h\n` +
-          `최고 속도: ${data.maxSpeed} km/h`
+            `Case 1 (≥2.5km/h): ${data.speedCase1} km/h\n` +
+            `Case 2 (≥1.5km/h): ${data.speedCase2} km/h\n` +
+            `최고 속도: ${data.maxSpeed} km/h`
         );
       }
     } catch (error) {
       console.error('❌ Error getting all-time speed:', error);
-      Alert.alert('오류', `전체 기간 속도 계산 중 오류가 발생했습니다: ${error}`);
+      Alert.alert(
+        '오류',
+        `전체 기간 속도 계산 중 오류가 발생했습니다: ${error}`
+      );
     } finally {
       setLoading(false);
     }
   };
 
   const renderPermissionStatus = () => {
-    const { sdkAvailable, sdkStatus, permissionsGranted, grantedCount, totalCount } = permissionStatus;
+    const {
+      sdkAvailable,
+      sdkStatus,
+      permissionsGranted,
+      grantedCount,
+      totalCount,
+    } = permissionStatus;
 
     return (
       <View style={styles.statusContainer}>
         <Text style={styles.sectionTitle}>📊 권한 상태</Text>
         <View style={styles.statusRow}>
           <Text style={styles.statusLabel}>SDK 사용 가능:</Text>
-          <Text style={[styles.statusValue, { color: sdkAvailable ? '#4CAF50' : '#F44336' }]}>
+          <Text
+            style={[
+              styles.statusValue,
+              { color: sdkAvailable ? '#4CAF50' : '#F44336' },
+            ]}
+          >
             {sdkAvailable ? '✅ 예' : '❌ 아니오'}
           </Text>
         </View>
@@ -162,13 +182,20 @@ const HealthConnectManager: React.FC = () => {
         </View>
         <View style={styles.statusRow}>
           <Text style={styles.statusLabel}>권한 부여됨:</Text>
-          <Text style={[styles.statusValue, { color: permissionsGranted ? '#4CAF50' : '#F44336' }]}>
+          <Text
+            style={[
+              styles.statusValue,
+              { color: permissionsGranted ? '#4CAF50' : '#F44336' },
+            ]}
+          >
             {permissionsGranted ? '✅ 예' : '❌ 아니오'}
           </Text>
         </View>
         <View style={styles.statusRow}>
           <Text style={styles.statusLabel}>부여된 권한:</Text>
-          <Text style={styles.statusValue}>{grantedCount}/{totalCount}</Text>
+          <Text style={styles.statusValue}>
+            {grantedCount}/{totalCount}
+          </Text>
         </View>
       </View>
     );
@@ -178,7 +205,9 @@ const HealthConnectManager: React.FC = () => {
     if (!healthData.available) {
       return (
         <View style={styles.noDataContainer}>
-          <Text style={styles.noDataText}>건강 데이터를 사용할 수 없습니다.</Text>
+          <Text style={styles.noDataText}>
+            건강 데이터를 사용할 수 없습니다.
+          </Text>
         </View>
       );
     }
@@ -191,13 +220,15 @@ const HealthConnectManager: React.FC = () => {
         <View style={styles.dataGrid}>
           <View style={styles.dataRow}>
             <Text style={styles.dataLabel}>👟 걸음 수:</Text>
-            <Text style={styles.dataValue}>{healthData.steps?.toLocaleString() || 0} 걸음</Text>
+            <Text style={styles.dataValue}>
+              {healthData.steps?.toLocaleString() || 0} 걸음
+            </Text>
           </View>
 
           <View style={styles.dataRow}>
             <Text style={styles.dataLabel}>📏 거리:</Text>
             <Text style={styles.dataValue}>
-              {Math.round((healthData.distance || 0) / 1000 * 100) / 100} km
+              {Math.round(((healthData.distance || 0) / 1000) * 100) / 100} km
             </Text>
           </View>
 
@@ -226,9 +257,7 @@ const HealthConnectManager: React.FC = () => {
           </View>
 
           <View style={styles.descRow}>
-            <Text style={styles.descText}>
-              ≥ 1.5 km/h (느린 산책 포함)
-            </Text>
+            <Text style={styles.descText}>≥ 1.5 km/h (느린 산책 포함)</Text>
           </View>
 
           <View style={styles.dataRow}>
@@ -262,7 +291,11 @@ const HealthConnectManager: React.FC = () => {
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[styles.button, styles.secondaryButton, loading && styles.buttonDisabled]}
+          style={[
+            styles.button,
+            styles.secondaryButton,
+            loading && styles.buttonDisabled,
+          ]}
           onPress={getTodayHealthData}
           disabled={loading || !permissionStatus.permissionsGranted}
         >
@@ -272,7 +305,11 @@ const HealthConnectManager: React.FC = () => {
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[styles.button, styles.secondaryButton, loading && styles.buttonDisabled]}
+          style={[
+            styles.button,
+            styles.secondaryButton,
+            loading && styles.buttonDisabled,
+          ]}
           onPress={getWeekHealthData}
           disabled={loading || !permissionStatus.permissionsGranted}
         >
@@ -282,7 +319,11 @@ const HealthConnectManager: React.FC = () => {
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[styles.button, styles.tertiaryButton, loading && styles.buttonDisabled]}
+          style={[
+            styles.button,
+            styles.tertiaryButton,
+            loading && styles.buttonDisabled,
+          ]}
           onPress={getAllTimeAverageSpeed}
           disabled={loading || !permissionStatus.permissionsGranted}
         >
@@ -291,7 +332,6 @@ const HealthConnectManager: React.FC = () => {
           </Text>
         </TouchableOpacity>
       </View>
-
 
       {renderHealthData()}
 
@@ -324,23 +364,20 @@ const HealthConnectManager: React.FC = () => {
             </View>
 
             <View style={styles.descRow}>
-              <Text style={styles.descText}>
-                ≥ 1.5 km/h (느린 산책 포함)
-              </Text>
+              <Text style={styles.descText}>≥ 1.5 km/h (느린 산책 포함)</Text>
             </View>
 
             <View style={styles.dataRow}>
               <Text style={styles.dataLabel}>⚡ 최고 속도:</Text>
-              <Text style={styles.dataValue}>
-                {allTimeSpeed.maxSpeed} km/h
-              </Text>
+              <Text style={styles.dataValue}>{allTimeSpeed.maxSpeed} km/h</Text>
             </View>
           </View>
         </View>
       )}
     </ScrollView>
   );
-}; const styles = StyleSheet.create({
+};
+const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,

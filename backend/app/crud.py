@@ -4,6 +4,7 @@
 
 # app/crud.py
 from sqlalchemy.orm import Session
+from datetime import datetime
 from app import models
 
 # ================================
@@ -23,6 +24,23 @@ def create_user(db: Session, username: str, email: str, password_hash: str, auth
 
 def get_user_by_id(db: Session, user_id: int):
     return db.query(models.Users).filter(models.Users.user_id == user_id).first()
+
+def get_user_by_email(db: Session, email: str):
+    """이메일로 사용자 조회"""
+    return db.query(models.Users).filter(models.Users.email == email).first()
+
+def get_user_by_username(db: Session, username: str):
+    """사용자명으로 사용자 조회"""
+    return db.query(models.Users).filter(models.Users.username == username).first()
+
+def update_last_login(db: Session, user_id: int):
+    """마지막 로그인 시간 업데이트"""
+    user = get_user_by_id(db, user_id)
+    if user:
+        user.last_login = datetime.utcnow()
+        db.commit()
+        db.refresh(user)
+    return user
 
 def get_all_users(db: Session):
     return db.query(models.Users).all()

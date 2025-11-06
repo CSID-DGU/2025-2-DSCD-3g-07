@@ -44,7 +44,7 @@ jobs:
     - name: Type check with mypy
       run: |
         cd backend
-        mypy app/
+        mypy app/ --config-file=setup.cfg
         
     - name: Security check with bandit
       run: |

@@ -18,6 +18,7 @@ types-requests==2.31.0.10
 
 # 보안 검사
 bandit==1.7.5
+pbr==6.0.0
 
 # 문서화
 sphinx==7.2.6

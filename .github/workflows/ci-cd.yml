@@ -83,12 +83,14 @@ jobs:
       run: npm run backend:test
       
     - name: 📊 Generate coverage
-      run: npm run backend:coverage
+      run: |
+        cd backend
+        python -m pytest --cov=app --cov-report=xml --cov-report=html
       
     - name: 📤 Upload coverage to Codecov
       uses: codecov/codecov-action@v3
       with:
-        file: backend/htmlcov/coverage.xml
+        file: backend/coverage.xml
         flags: backend
         
   # 📱 프론트엔드 테스트
@@ -131,9 +133,10 @@ jobs:
       uses: actions/setup-python@v4
       with:
         python-version: ${{ env.PYTHON_VERSION }}
+        cache: 'pip'
         
-    - name: 📦 Install bandit
-      run: pip install bandit
+    - name: 📦 Install dependencies
+      run: pip install -r backend/requirements-dev.txt
       
     - name: 🔒 Security scan
       run: npm run security:backend

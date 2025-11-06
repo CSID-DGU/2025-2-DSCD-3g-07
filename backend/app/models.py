@@ -1,5 +1,6 @@
 # app/models.py
 from sqlalchemy import (
+    JSON,
     Boolean,
     CheckConstraint,
     Column,
@@ -18,6 +19,12 @@ from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import relationship
 
 from app.database import Base
+
+# PostgreSQL에서는 JSONB, SQLite에서는 JSON 사용
+try:
+    from sqlalchemy.dialects.postgresql import JSONB as JSONType
+except ImportError:
+    JSONType = JSON
 
 
 # 1) users
@@ -170,8 +177,8 @@ class UserPreferences(Base):
     max_elevation_gain_m = Column(Numeric(6, 2))
     avoid_stairs = Column(Boolean, server_default="false")
     prefer_scenic_routes = Column(Boolean, server_default="false")
-    preferred_areas = Column(JSONB)
-    weather_preferences = Column(JSONB)
+    preferred_areas = Column(JSONType)
+    weather_preferences = Column(JSONType)
     updated_at = Column(
         DateTime,
         server_default=func.current_timestamp(),
@@ -195,12 +202,12 @@ class Routes(Base):
     max_elevation_m = Column(Numeric(6, 2))
     min_elevation_m = Column(Numeric(6, 2))
     difficulty_level = Column(String(20))
-    route_coordinates = Column(JSONB, nullable=False)
+    route_coordinates = Column(JSONType, nullable=False)
     source = Column(String(30))
     external_id = Column(String(100))
     avg_rating = Column(Numeric(2, 1))
     rating_count = Column(Integer, server_default="0")
-    tags = Column(JSONB)
+    tags = Column(JSONType)
     created_at = Column(DateTime, server_default=func.current_timestamp())
     updated_at = Column(
         DateTime,
@@ -376,7 +383,7 @@ class RouteRatings(Base):
     )
     rating = Column(Integer, nullable=False)
     review_text = Column(Text)
-    rating_factors = Column(JSONB)
+    rating_factors = Column(JSONType)
     created_at = Column(DateTime, server_default=func.current_timestamp())
 
     __table_args__ = (

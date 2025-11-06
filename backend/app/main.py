@@ -8,7 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.utils.api_helpers import call_tmap_transit_api
 # from app.utils.ml_helpers import predict_adjustment, train_personalization_model  # 제거됨: 더 이상 사용하지 않음
 from app.schemas import RouteResponse, WalkingSectionResponse
-from app.routers import routes, weather
+from app.routers import routes, weather, auth
 from app.utils import walking_only
 
 load_dotenv()  # .env 로드
@@ -37,6 +37,7 @@ app.add_middleware(
 )
 
 # 라우터 등록
+app.include_router(auth.router, prefix="/api")
 app.include_router(routes.router, prefix="/api")
 app.include_router(weather.router, prefix="/api")
 app.include_router(walking_only.router, prefix="/api")

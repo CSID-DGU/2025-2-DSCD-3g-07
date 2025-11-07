@@ -70,6 +70,9 @@ export interface Leg {
   type?: number;
   routeId?: string;
   passStopList?: PassStop;
+  passShape?: {
+    linestring: string;
+  };
 }
 
 export interface Location {

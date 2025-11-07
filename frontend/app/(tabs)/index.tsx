@@ -99,7 +99,28 @@ const extractRoutePath = (itinerary: Itinerary): RoutePath[] => {
       `  Leg ${legIndex}: ${leg.mode}, steps: ${leg.steps?.length || 0}`
     );
 
-    if (leg.steps && leg.steps.length > 0) {
+    // 🔥 핵심: passShape 먼저 확인! (대중교통 구간용)
+    if (leg.passShape && leg.passShape.linestring) {
+      console.log(`    Using passShape.linestring for ${leg.mode}`);
+      
+      const pairs = leg.passShape.linestring.trim().split(' ');
+      console.log(`      Added ${pairs.length} coordinates from passShape`);
+
+      pairs.forEach((pair: string) => {
+        if (!pair) return;
+        const parts = pair.split(',');
+        if (parts.length !== 2) return;
+
+        const [lngStr, latStr] = parts;
+        if (!lngStr || !latStr) return;
+
+        const lat = parseFloat(latStr);
+        const lng = parseFloat(lngStr);
+        pushCoord(lat, lng);
+      });
+    }
+    // 도보 구간의 steps 처리
+    else if (leg.steps && leg.steps.length > 0) {
       leg.steps.forEach((step, stepIndex) => {
         if (!step.linestring) {
           console.log(`    Step ${stepIndex}: No linestring`);
@@ -122,8 +143,9 @@ const extractRoutePath = (itinerary: Itinerary): RoutePath[] => {
           pushCoord(lat, lng);
         });
       });
-    } else {
-      // steps가 없으면 시작점과 끝점만 추가
+    }
+    // fallback: start/end만 있는 경우
+    else if (leg.start && leg.end) {
       console.log(`    Using start/end points only`);
       pushCoord(leg.start?.lat, leg.start?.lon);
       pushCoord(leg.end?.lat, leg.end?.lon);

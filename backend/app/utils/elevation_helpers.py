@@ -945,7 +945,7 @@ async def analyze_route_elevation(
     crosswalk_wait_time = int(crosswalk_count * 109.8)
 
     # 전체 평균 계수 계산 (실외 + 환승)
-    all_analysis = analysis + transfer_analysis
+    all_analysis = analysis + transfer_analysiqqqs
     if all_analysis:
         avg_user_factor = sum(a["user_speed_factor"] for a in all_analysis) / len(
             all_analysis

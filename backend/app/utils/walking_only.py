@@ -248,7 +248,7 @@ async def get_walking_route(request: WalkingRouteRequest):
                         # 에러가 있어도 횡단보도 정보는 유지
                         elevation_analysis["crosswalk_count"] = crosswalk_count
                 except Exception as e:
-                    logger.error(f"[보행자 경로] 경사도 분석 실패: {e}")
+                    logger.error(f"[보행자 경로] 경사도 분석 실패: {e}", exc_info=True)
                     elevation_analysis = {
                         "error": str(e),
                         "crosswalk_count": crosswalk_count,  # 횡단보도 정보 포함

@@ -119,11 +119,11 @@ def smart_sample_coordinates(
     linestring: str, target_points: int, distance: float
 ) -> List[Dict[str, float]]:
     """
-    목표 개수 기반 적응형 샘플링
+    거리 기반 적응형 샘플링 (20m 간격)
 
     Args:
         linestring: 좌표 문자열
-        target_points: 목표 샘플 개수
+        target_points: 목표 샘플 개수 (참고용, 실제로는 거리 기반)
         distance: 구간 거리 (미터)
 
     Returns:
@@ -134,46 +134,81 @@ def smart_sample_coordinates(
     if not coords:
         return []
 
-    # 좌표가 목표보다 적으면 그대로 반환
-    if len(coords) <= target_points:
+    # 10m 간격으로 샘플링 (높은 정확도)
+    SAMPLE_INTERVAL_M = 10.0
+
+    # 필요한 샘플 개수 계산 (올림 처리로 중간 샘플 보장)
+    needed_samples = max(2, math.ceil(distance / SAMPLE_INTERVAL_M) + 1)
+
+    # 좌표가 필요한 샘플보다 적으면 그대로 반환
+    if len(coords) <= needed_samples:
         return coords
 
-    # 최소 2개는 보장 (시작, 끝)
-    target_points = max(2, target_points)
-
-    # 균등 간격으로 샘플링
     # 시작점과 끝점은 항상 포함
-    if target_points == 2:
+    if needed_samples == 2:
         return [coords[0], coords[-1]]
 
     sampled = [coords[0]]
 
-    # 중간 포인트들 계산
-    step = (len(coords) - 1) / (target_points - 1)
-    for i in range(1, target_points - 1):
-        index = int(i * step)
-        sampled.append(coords[index])
+    # 각 좌표 간 실제 거리 계산하여 누적 거리 배열 생성
+    cumulative_distances = [0.0]
+    for i in range(1, len(coords)):
+        dist = haversine(coords[i - 1], coords[i])
+        cumulative_distances.append(cumulative_distances[-1] + dist)
 
-    # 끝점 추가
-    sampled.append(coords[-1])
+    total_distance = cumulative_distances[-1]
+
+    # 10m 간격으로 샘플링할 목표 거리들
+    target_distances = []
+    current_distance = SAMPLE_INTERVAL_M
+    while current_distance < total_distance:
+        target_distances.append(current_distance)
+        current_distance += SAMPLE_INTERVAL_M
+
+    # 각 목표 거리에 가장 가까운 좌표 선택
+    for target_dist in target_distances:
+        # 목표 거리에 가장 가까운 인덱스 찾기
+        closest_idx = 0
+        min_diff = float('inf')
+        
+        for i, cum_dist in enumerate(cumulative_distances):
+            diff = abs(cum_dist - target_dist)
+            if diff < min_diff:
+                min_diff = diff
+                closest_idx = i
+            elif diff > min_diff:
+                # 이미 최소값을 지나쳤으므로 종료
+                break
+        
+        # 중복 방지
+        if closest_idx > 0 and coords[closest_idx] != sampled[-1]:
+            sampled.append(coords[closest_idx])
+
+    # 끝점 추가 (중복 방지)
+    if coords[-1] != sampled[-1]:
+        sampled.append(coords[-1])
 
     return sampled
 
 
 def optimize_all_coordinates(
-    walk_legs: List[Dict], max_total: int = 300  # URL 길이 제한을 고려해 300개로 축소
+    walk_legs: List[Dict]
 ) -> Dict:
     """
-    전체 보행 구간을 512개 이하로 최적화
+    보행 구간의 좌표를 수집 (샘플링 없이 Tmap 원본 사용)
 
     Args:
         walk_legs: 보행 구간 리스트
-        max_total: 최대 좌표 개수 (기본: 500, API 제한: 512)
 
     Returns:
-        최적화된 좌표 데이터와 메타정보
+        좌표 데이터와 메타정보
+    
+    Note:
+        - Tmap API가 제공하는 좌표를 그대로 사용 (최적화된 간격)
+        - API 호출 시 250개씩 자동 배치 처리
+        - GPS 오차 필터링은 adjust_walking_time에서 처리
     """
-    # 1단계: 각 leg의 거리와 좌표 수 분석
+    # 각 leg의 거리와 좌표 수 분석
     leg_info = []
     total_distance = 0
     total_coords = 0
@@ -204,77 +239,32 @@ def optimize_all_coordinates(
         total_distance += leg_distance
         total_coords += leg_coords
 
-    print(f"[샘플링] 원본 좌표: {total_coords}개, 목표: {max_total}개")
+    print(f"[좌표 수집] 원본 좌표: {total_coords}개 (샘플링 없이 그대로 사용)")
+    print(f"[좌표 수집] 총 거리: {total_distance:.0f}m")
+    print(f"[좌표 수집] 평균 간격: {total_distance/total_coords:.1f}m" if total_coords > 0 else "[좌표 수집] 평균 간격: N/A")
 
     if total_distance == 0:
         return {"legs": [], "total_sampled_coords": 0}
 
-    # 좌표가 max_total 이하면 샘플링 불필요
-    if total_coords <= max_total:
-        result = {
-            "legs": [],
-            "total_sampled_coords": 0,
-            "original_coords": total_coords,
-        }
-        for info in leg_info:
-            step_coords = []
-            for i, step in enumerate(info["steps"]):
-                coords = parse_linestring(step["linestring"])
-                step_coords.append(
-                    {
-                        "step_index": i,
-                        "coords": coords,
-                        "distance": step.get("distance", 0),
-                    }
-                )
-            result["legs"].append(
+    # Tmap 좌표를 그대로 수집 (샘플링 없음)
+    result = {
+        "legs": [],
+        "total_sampled_coords": 0,
+        "original_coords": total_coords,
+    }
+    
+    for info in leg_info:
+        step_coords = []
+        for i, step in enumerate(info["steps"]):
+            coords = parse_linestring(step["linestring"])
+            step_coords.append(
                 {
-                    "leg_data": info["leg"],
-                    "steps_coords": step_coords,
-                    "total_coords": sum(len(s["coords"]) for s in step_coords),
+                    "step_index": i,
+                    "coords": coords,
+                    "distance": step.get("distance", 0),
                 }
             )
-            result["total_sampled_coords"] += sum(len(s["coords"]) for s in step_coords)
-        return result
-
-    # 2단계: 거리 비율에 따라 좌표 할당 (적극적 샘플링)
-    sampling_ratio = max_total / total_coords
-    print(f"[샘플링] 샘플링 비율: {sampling_ratio:.3f}")
-
-    result = {"legs": [], "total_sampled_coords": 0, "original_coords": total_coords}
-
-    for info in leg_info:
-        # 이 leg에 할당할 좌표 개수 (최소값 보장 제거)
-        leg_target = int(info["original_coords"] * sampling_ratio)
-        leg_target = max(2, leg_target)  # 최소 2개 (시작, 끝)
-
-        # 각 step별로 배분
-        step_coords = []
-        remaining = leg_target
-
-        for i, step in enumerate(info["steps"]):
-            is_last = i == len(info["steps"]) - 1
-            step_distance = step.get("distance", 0)
-
-            # 마지막 step은 남은 좌표 모두 사용
-            if is_last:
-                step_target = max(2, remaining)  # 최소 2개
-            else:
-                step_ratio = (
-                    step_distance / info["distance"] if info["distance"] > 0 else 0
-                )
-                step_target = int(leg_target * step_ratio)
-                step_target = max(2, step_target)  # 최소 2개
-                remaining -= step_target
-
-            sampled = smart_sample_coordinates(
-                step["linestring"], step_target, step_distance
-            )
-
-            step_coords.append(
-                {"step_index": i, "coords": sampled, "distance": step_distance}
-            )
-
+        
         result["legs"].append(
             {
                 "leg_data": info["leg"],
@@ -283,8 +273,14 @@ def optimize_all_coordinates(
             }
         )
         result["total_sampled_coords"] += sum(len(s["coords"]) for s in step_coords)
-
-    print(f"[샘플링] 최종 좌표: {result['total_sampled_coords']}개")
+    
+    print(f"[좌표 수집] 최종 좌표: {result['total_sampled_coords']}개")
+    
+    # 배치 처리 예상 정보
+    batch_count = (result['total_sampled_coords'] + 249) // 250
+    if batch_count > 1:
+        print(f"[좌표 수집] 배치 처리 예정: {batch_count}개 배치 (250개씩)")
+    
     return result
 
 
@@ -292,7 +288,7 @@ async def call_google_elevation_api(
     coords: List[Dict[str, float]], api_key: str
 ) -> List[float]:
     """
-    Google Elevation API를 호출하여 고도 데이터를 가져옴 (GET 방식)
+    Google Elevation API를 호출하여 고도 데이터를 가져옴 (배치 처리 지원)
 
     Args:
         coords: [{'lon': float, 'lat': float}, ...] 형식의 좌표 리스트
@@ -303,32 +299,61 @@ async def call_google_elevation_api(
 
     Raises:
         Exception: API 호출 실패 시
+    
+    Note:
+        좌표가 250개를 초과하면 자동으로 배치 처리하여 여러 번 API 호출
     """
     if not coords:
         return []
 
-    if len(coords) > MAX_COORDINATES_PER_REQUEST:
-        raise ValueError(
-            f"좌표 개수가 {MAX_COORDINATES_PER_REQUEST}개를 초과했습니다: {len(coords)}개"
-        )
+    # 250개씩 배치 처리
+    MAX_PER_BATCH = 250
+    
+    if len(coords) <= MAX_PER_BATCH:
+        # 단일 요청
+        locations = coords_to_latlng_string(coords)
+        params = {"locations": locations, "key": api_key}
 
-    # 좌표를 "lat,lng|lat,lng|..." 형식으로 변환
-    locations = coords_to_latlng_string(coords)
+        async with aiohttp.ClientSession() as session:
+            async with session.get(GOOGLE_ELEVATION_API_URL, params=params) as response:
+                data = await response.json()
 
-    params = {"locations": locations, "key": api_key}
+                if data.get("status") != "OK":
+                    error_message = data.get("error_message", data.get("status"))
+                    raise Exception(f"Google Elevation API 오류: {error_message}")
 
+                elevations = [result["elevation"] for result in data.get("results", [])]
+                return elevations
+    
+    # 배치 처리: 250개씩 나눠서 여러 번 호출
+    print(f"[배치 처리] 총 {len(coords)}개 좌표를 {math.ceil(len(coords) / MAX_PER_BATCH)}개 배치로 분할")
+    
+    all_elevations = []
+    
     async with aiohttp.ClientSession() as session:
-        async with session.get(GOOGLE_ELEVATION_API_URL, params=params) as response:
-            data = await response.json()
-
-            if data.get("status") != "OK":
-                error_message = data.get("error_message", data.get("status"))
-                raise Exception(f"Google Elevation API 오류: {error_message}")
-
-            # 고도 값만 추출
-            elevations = [result["elevation"] for result in data.get("results", [])]
-
-            return elevations
+        for i in range(0, len(coords), MAX_PER_BATCH):
+            batch = coords[i:i + MAX_PER_BATCH]
+            batch_num = (i // MAX_PER_BATCH) + 1
+            
+            print(f"  배치 {batch_num}: {len(batch)}개 좌표 요청 중...")
+            
+            locations = coords_to_latlng_string(batch)
+            params = {"locations": locations, "key": api_key}
+            
+            async with session.get(GOOGLE_ELEVATION_API_URL, params=params) as response:
+                data = await response.json()
+                
+                if data.get("status") != "OK":
+                    error_message = data.get("error_message", data.get("status"))
+                    raise Exception(f"Google Elevation API 오류 (배치 {batch_num}): {error_message}")
+                
+                elevations = [result["elevation"] for result in data.get("results", [])]
+                all_elevations.extend(elevations)
+                
+                print(f"  배치 {batch_num}: ✅ {len(elevations)}개 고도 데이터 수신")
+    
+    print(f"[배치 처리] 완료: 총 {len(all_elevations)}개 고도 데이터")
+    return all_elevations
 
 
 def calculate_slope(elevation1: float, elevation2: float, distance: float) -> float:
@@ -377,12 +402,12 @@ def validate_slope_data(segment_analysis: List[Dict]) -> Dict[str, any]:
                     "index": i,
                     "slope": seg["slope"],
                     "distance": seg["distance"],
-                    "elevation_dif": seg["elevation_diff"],
+                    "elevation_dif": seg["elevation_dif"],
                 }
             )
             warnings.append(
                 f"세그먼트 {i}: 극단 경사 {seg['slope']:.1f}% "
-                f"(거리: {seg['distance']:.1f}m, 고도차: {seg['elevation_diff']:.1f}m)"
+                f"(거리: {seg['distance']:.1f}m, 고도차: {seg['elevation_dif']:.1f}m)"
             )
 
     # 통계
@@ -499,6 +524,13 @@ def adjust_walking_time(
 
     segment_analysis = []
     elevation_idx = 0
+    
+    # 최소 거리 필터용 누적 버퍼
+    MIN_SEGMENT_DISTANCE = 10.0  # 10m 미만 구간은 합침 (GPS 오차 최소화)
+    accumulated_distance = 0.0
+    accumulated_elevation_diff = 0.0
+    segment_start_idx = 0
+    segment_start_coord = None
 
     for step_info in steps_coords:
         coords = step_info["coords"]
@@ -511,35 +543,64 @@ def adjust_walking_time(
             # 두 지점 간 거리 및 고도차
             segment_distance = haversine(coords[i], coords[i + 1])
             elevation_diff = elevations[elevation_idx + 1] - elevations[elevation_idx]
+            
+            # 첫 구간이면 시작점 설정
+            if accumulated_distance == 0:
+                segment_start_idx = elevation_idx
+                segment_start_coord = coords[i]
+            
+            # 거리 및 고도차 누적
+            accumulated_distance += segment_distance
+            accumulated_elevation_diff += elevation_diff
+            
+            # 누적 거리가 최소 거리 이상이면 구간 계산
+            if accumulated_distance >= MIN_SEGMENT_DISTANCE or i == len(coords) - 2:
+                # 경사도 계산 (누적값 사용)
+                slope = calculate_slope(
+                    elevations[segment_start_idx],
+                    elevations[elevation_idx + 1],
+                    accumulated_distance,
+                )
 
-            # 경사도 계산 (%, 양수=오르막, 음수=내리막)
-            slope = calculate_slope(
-                elevations[elevation_idx],
-                elevations[elevation_idx + 1],
-                segment_distance,
-            )
+                # Google Elevation API 데이터를 신뢰 - 보정하지 않음
+                # 극단 경사도가 있어도 실제 계단/급경사일 수 있으므로 그대로 사용
 
-            # 속도 보정 (Tobler's Hiking Function - 부호로 오르막/내리막 자동 구분)
-            speed_factor = calculate_slope_factor(slope)
-            adjusted_speed = base_speed * speed_factor
-            segment_time = (
-                segment_distance / adjusted_speed if adjusted_speed > 0 else 0
-            )
+                # 극단 경사도 감지 및 로깅 (30% 이상)
+                if abs(slope) > 30:
+                    print(f"⚠️ [극단 경사도 감지]")
+                    print(f"   위치: 좌표 {segment_start_idx} → {elevation_idx + 1}")
+                    print(f"   좌표: ({segment_start_coord.get('lat', 0):.6f}, {segment_start_coord.get('lon', 0):.6f})")
+                    print(f"   누적 거리: {accumulated_distance:.1f}m (최소 필터: {MIN_SEGMENT_DISTANCE}m)")
+                    print(f"   경사도: {slope:.1f}% ({'오르막' if slope > 0 else '내리막'})")
+                    print(f"   고도: {elevations[segment_start_idx]:.2f}m → {elevations[elevation_idx + 1]:.2f}m (차이: {accumulated_elevation_diff:.2f}m)")
+                    print(f"   속도 계수: {calculate_slope_factor(slope):.3f}")
 
-            total_adjusted_time += segment_time
+                # 속도 보정 (Tobler's Hiking Function - 부호로 오르막/내리막 자동 구분)
+                speed_factor = calculate_slope_factor(slope)
+                adjusted_speed = base_speed * speed_factor
+                segment_time = (
+                    accumulated_distance / adjusted_speed if adjusted_speed > 0 else 0
+                )
 
-            segment_analysis.append(
-                {
-                    "distance": round(segment_distance, 2),
-                    "elevation_start": round(elevations[elevation_idx], 2),
-                    "elevation_end": round(elevations[elevation_idx + 1], 2),
-                    "elevation_dif": round(elevation_diff, 2),
-                    "slope": round(slope, 2),
-                    "is_uphill": slope > 0,  # UI 표시용
-                    "speed_factor": round(speed_factor, 3),
-                    "time": round(segment_time, 1),
-                }
-            )
+                total_adjusted_time += segment_time
+
+                segment_analysis.append(
+                    {
+                        "distance": round(accumulated_distance, 2),
+                        "elevation_start": round(elevations[segment_start_idx], 2),
+                        "elevation_end": round(elevations[elevation_idx + 1], 2),
+                        "elevation_dif": round(accumulated_elevation_diff, 2),
+                        "slope": round(slope, 2),
+                        "is_uphill": slope > 0,  # UI 표시용
+                        "speed_factor": round(speed_factor, 3),
+                        "time": round(segment_time, 1),
+                        "coords_start": {"lat": segment_start_coord.get('lat', 0), "lon": segment_start_coord.get('lon', 0)},  # 디버깅용
+                    }
+                )
+                
+                # 누적값 초기화
+                accumulated_distance = 0.0
+                accumulated_elevation_diff = 0.0
 
             elevation_idx += 1
 
@@ -669,11 +730,11 @@ async def analyze_route_elevation(
             },
         }
 
-    # 좌표 최적화 (URL 길이 제한으로 250개로 축소)
-    optimized = optimize_all_coordinates(walk_legs, max_total=250)
+    # 좌표 수집 (샘플링 없이 Tmap 원본 사용)
+    optimized = optimize_all_coordinates(walk_legs)
 
     print(f"[경사도 분석] 원본 좌표: {optimized['original_coords']}개")
-    print(f"[경사도 분석] 샘플링 후: {optimized['total_sampled_coords']}개")
+    print(f"[경사도 분석] 사용 좌표: {optimized['total_sampled_coords']}개")
 
     # 모든 좌표를 하나의 리스트로 결합
     all_coords = []
@@ -756,6 +817,17 @@ async def analyze_route_elevation(
             slopes = [seg["slope"] for seg in segment_analysis]
             max_slope = max(slopes, default=0)
             min_slope = min(slopes, default=0)
+            
+            # 극단 경사도 요약 로그
+            extreme_slopes = [seg for seg in segment_analysis if abs(seg["slope"]) > 30]
+            if extreme_slopes:
+                print(f"\n📊 [경사도 요약 - {leg.get('start', {}).get('name', '')} → {leg.get('end', {}).get('name', '')}]")
+                print(f"   거리 가중 평균 경사도: {avg_slope:.2f}%")
+                print(f"   최대 경사도: {max_slope:.2f}%")
+                print(f"   최소 경사도: {min_slope:.2f}%")
+                print(f"   극단 구간 수 (±30% 초과): {len(extreme_slopes)}개 / 총 {len(segment_analysis)}개")
+                total_extreme_distance = sum(seg["distance"] for seg in extreme_slopes)
+                print(f"   극단 구간 거리: {total_extreme_distance:.1f}m / 총 {total_distance:.1f}m ({total_extreme_distance/total_distance*100:.1f}%)")
         else:
             avg_slope = 0
             max_slope = 0
@@ -869,8 +941,8 @@ async def analyze_route_elevation(
         f"  전체 합계: 원본 {total_original_walk_time}초 ({total_original_walk_time // 60}분 {total_original_walk_time % 60}초), 보정: {total_adjusted_walk_time}초 ({total_adjusted_walk_time // 60}분 {total_adjusted_walk_time % 60}초)"
     )
 
-    # 횡단보도 대기 시간 계산 (중앙값 기준: 116초/개)
-    crosswalk_wait_time = crosswalk_count * 116
+    # 횡단보도 대기 시간 계산 (중앙값 기준: 109.8초/개, 정수로 변환)
+    crosswalk_wait_time = int(crosswalk_count * 109.8)
 
     # 전체 평균 계수 계산 (실외 + 환승)
     all_analysis = analysis + transfer_analysis
@@ -920,7 +992,7 @@ async def analyze_route_elevation(
         # 횡단보도 정보
         "crosswalk_count": crosswalk_count,
         "crosswalk_wait_time": crosswalk_wait_time,
-        "total_time_with_crosswalk": total_adjusted_walk_time + crosswalk_wait_time,
+        "total_time_with_crosswalk": int(total_adjusted_walk_time + crosswalk_wait_time),
         # 통합 계수 정보
         "factors": {
             "user_speed_factor": avg_user_factor,

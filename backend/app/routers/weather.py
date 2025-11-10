@@ -202,7 +202,7 @@ async def proxy_kma_weather(
     print(f"[KMA API] 파라미터: {params}")
 
     # 타임아웃 25초로 증가 (KMA API가 매우 느릴 수 있음)
-    timeout = aiohttp.ClientTimeout(total=25, connect=10)
+    timeout = aiohttp.ClientTimeout(total=60, connect=15)
 
     # 재시도 로직 (최대 2번 시도)
     max_retries = 2

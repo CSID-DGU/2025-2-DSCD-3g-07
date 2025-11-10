@@ -6,7 +6,7 @@
     "dev": "concurrently --raw \"npm run backend:dev\" \"npm run frontend:dev\"",
     "dev:tunnel": "concurrently --raw \"npm run backend:dev\" \"npm run frontend:tunnel\"",
     "dev:local": "concurrently --raw \"npm run backend:dev\" \"npm run frontend:local\"",
-    "backend:dev": "cd backend && python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000",
+    "backend:dev": "cd backend && python run.py",
     "frontend:dev": "cd frontend && npx expo start",
     "frontend:tunnel": "cd frontend && npx expo start --tunnel",
     "frontend:local": "cd frontend && npx expo start --localhost",

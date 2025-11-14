@@ -8,7 +8,7 @@ from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 from app.database import engine, get_db
-from app.routers import auth, routes, weather
+from app.routers import auth, routes, weather, gpx_routes
 
 # from app.utils.ml_helpers import predict_adjustment, train_personalization_model  # 제거됨: 더 이상 사용하지 않음
 from app.utils import walking_only
@@ -44,6 +44,7 @@ app.include_router(auth.router, prefix="/api")
 app.include_router(routes.router, prefix="/api")
 app.include_router(weather.router, prefix="/api")
 app.include_router(walking_only.router, prefix="/api")
+app.include_router(gpx_routes.router)
 
 
 def calculate_walking_time(distance_meters: float, avg_speed_kmh: float = 4.5) -> int:

@@ -62,11 +62,20 @@ const RouteDetailModal: React.FC<RouteDetailModalProps> = ({
     const fetchRouteDetail = async () => {
         try {
             setLoading(true);
+            console.log('🔍 경로 상세 조회 시작:', route.route_id);
+            
             const detail = await getRouteDetail(route.route_id);
-            console.log('✅ 경로 상세 데이터:', detail);
+            console.log('✅ 경로 상세 응답:', {
+                hasRoute: !!detail.route,
+                hasCoordinates: !!detail.route?.route_coordinates,
+                coordinatesType: typeof detail.route?.route_coordinates,
+            });
             
             if (detail.route && detail.route.route_coordinates) {
+                console.log('📍 좌표 데이터 설정:', detail.route.route_coordinates);
                 setRouteCoordinates(detail.route.route_coordinates);
+            } else {
+                console.warn('⚠️ 좌표 데이터 없음');
             }
         } catch (error) {
             console.error('❌ 경로 상세 로드 실패:', error);
@@ -219,12 +228,18 @@ function generateMapHTML(
     let coordinates: number[][] = [];
     
     try {
+        let parsedCoords = routeCoordinates;
+        
         if (typeof routeCoordinates === 'string') {
-            routeCoordinates = JSON.parse(routeCoordinates);
+            console.log('📝 문자열 좌표 파싱 중...');
+            parsedCoords = JSON.parse(routeCoordinates);
         }
         
-        if (routeCoordinates && routeCoordinates.coordinates) {
-            coordinates = routeCoordinates.coordinates;
+        if (parsedCoords && parsedCoords.coordinates) {
+            coordinates = parsedCoords.coordinates;
+            console.log('✅ 좌표 추출 성공:', coordinates.length, '개');
+        } else {
+            console.warn('⚠️ coordinates 필드 없음:', parsedCoords);
         }
     } catch (error) {
         console.error('❌ GeoJSON 파싱 실패:', error);

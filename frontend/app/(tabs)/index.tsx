@@ -1,4 +1,5 @@
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import * as Location from 'expo-location';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import {
@@ -33,6 +34,7 @@ import {
 import type { RoutePath } from '@/services/routeService';
 import { useWeatherContext } from '@/contexts/WeatherContext';
 import { healthConnectService } from '@/services/healthConnect';
+import { locationService, type CurrentLocation } from '@/services/locationService';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 const PRIMARY_COLOR = '#2C6DE7';
@@ -232,6 +234,11 @@ export default function HomeScreen() {
   const [showRouteList, setShowRouteList] = useState(true); // 경로 목록 표시 여부
   const [routeMode, setRouteMode] = useState<'transit' | 'walking'>('transit'); // 경로 모드 (대중교통 / 도보)
 
+  // 현재 위치 추적 상태
+  const [currentLocation, setCurrentLocation] = useState<CurrentLocation | null>(null);
+  const [isTracking, setIsTracking] = useState(false);
+  const [centerOnLocation, setCenterOnLocation] = useState(false);
+
   // 애니메이션
   const searchBarTranslateY = useSharedValue(0);
   const bottomSheetHeight = useSharedValue(0);
@@ -328,6 +335,42 @@ export default function HomeScreen() {
 
     fetchWalkingSpeed();
   }, []);
+
+  // 컴포넌트 언마운트 시 위치 추적 중지
+  useEffect(() => {
+    return () => {
+      locationService.stopTracking();
+    };
+  }, []);
+
+  // 현재 위치 추적 버튼 핸들러
+  const handleCurrentLocationPress = async () => {
+    if (isTracking) {
+      // 추적 중지
+      locationService.stopTracking();
+      setIsTracking(false);
+      setCurrentLocation(null);
+      Alert.alert('위치 추적 중지', '실시간 위치 추적이 중지되었습니다.');
+    } else {
+      // 추적 시작
+      const success = await locationService.startTracking((location) => {
+        setCurrentLocation(location);
+        console.log('📍 위치 업데이트:', location);
+      });
+
+      if (success) {
+        setIsTracking(true);
+        setCenterOnLocation(true);  // 첫 번째는 중심 이동
+        
+        // 1초 후 자동 중심 이동 해제 (사용자가 지도를 움직일 수 있도록)
+        setTimeout(() => setCenterOnLocation(false), 1000);
+        
+        Alert.alert('위치 추적 시작', '실시간 위치 추적이 시작되었습니다.');
+      } else {
+        Alert.alert('위치 추적 실패', '위치 권한을 확인해주세요.');
+      }
+    }
+  };
 
   // 현재 위치 가져오기
   const getCurrentLocation = useCallback(async () => {
@@ -839,8 +882,42 @@ export default function HomeScreen() {
           endLng={endLocation?.longitude || 126.978}
           paths={routePath}
           routeMode={routeMode}
+          currentLocation={currentLocation}
+          centerOnCurrentLocation={centerOnLocation}
         />
       </View>
+
+      {/* 현재 위치 추적 버튼 */}
+      <TouchableOpacity
+        style={[
+          styles.currentLocationTrackButton,
+          isTracking && styles.currentLocationTrackButtonActive
+        ]}
+        onPress={handleCurrentLocationPress}
+      >
+        <Ionicons 
+          name={isTracking ? "navigate" : "navigate-outline"} 
+          size={24} 
+          color={isTracking ? "#FFFFFF" : "#2C6DE7"} 
+        />
+      </TouchableOpacity>
+
+      {/* 위치 정보 표시 (디버깅용, 선택사항) */}
+      {currentLocation && isTracking && (
+        <View style={styles.locationInfoDebug}>
+          <Text style={styles.locationDebugText}>
+            📍 {currentLocation.latitude.toFixed(6)}, {currentLocation.longitude.toFixed(6)}
+          </Text>
+          {currentLocation.heading !== null && (
+            <Text style={styles.locationDebugText}>
+              🧭 {currentLocation.heading.toFixed(0)}°
+            </Text>
+          )}
+          <Text style={styles.locationDebugText}>
+            📏 ±{currentLocation.accuracy.toFixed(0)}m
+          </Text>
+        </View>
+      )}
 
       {/* 검색창 보이기 버튼 (숨겨져 있을 때) */}
       {!searchBarVisible && (
@@ -2199,5 +2276,44 @@ const styles = StyleSheet.create({
     color: '#5D4037',
     marginTop: 8,
     paddingLeft: 28,
+  },
+  // 현재 위치 추적 버튼 스타일
+  currentLocationTrackButton: {
+    position: 'absolute',
+    bottom: 100,
+    right: 20,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: '#FFFFFF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  currentLocationTrackButtonActive: {
+    backgroundColor: '#2C6DE7',
+  },
+  // 위치 정보 디버깅 스타일
+  locationInfoDebug: {
+    position: 'absolute',
+    top: 60,
+    left: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    padding: 12,
+    borderRadius: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 3.84,
+    elevation: 3,
+  },
+  locationDebugText: {
+    fontSize: 11,
+    color: '#1C1E21',
+    fontFamily: 'monospace',
   },
 });

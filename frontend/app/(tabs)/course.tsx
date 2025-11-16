@@ -177,12 +177,23 @@ export default function CourseScreen() {
         duration_minutes: searchMode === 'time' ? value : undefined,
         user_lat: currentLocation.latitude,
         user_lng: currentLocation.longitude,
-        max_distance_from_user: 10.0, // 10km 이내 경로만
+        max_distance_from_user: 50.0, // 50km 이내 경로만 (테스트용으로 증가)
+        distance_tolerance: 3.0, // ±3km 허용
+        duration_tolerance: 30, // ±30분 허용
         limit: 10,
       });
 
+      console.log('✅ 경로 검색 완료:', {
+        총개수: recommendedRoutes.length,
+        첫번째경로: recommendedRoutes[0],
+        전체데이터: recommendedRoutes
+      });
+
+      if (recommendedRoutes.length === 0) {
+        Alert.alert('검색 결과 없음', `반경 10km 내에 ${searchMode === 'distance' ? value + 'km' : value + '분'} 거리의 경로가 없습니다.\n\n검색 조건을 변경해보세요.`);
+      }
+
       setRoutes(recommendedRoutes);
-      console.log('✅ 경로 검색 완료:', recommendedRoutes);
 
     } catch (error) {
       console.error('❌ 경로 검색 실패:', error);

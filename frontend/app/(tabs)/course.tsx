@@ -16,12 +16,15 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { healthConnectService } from '@/services/healthConnect';
+import { getRecommendedRoutes, GPXRouteRecommendation } from '@/services/gpxRouteService';
+import CourseDetailModal from '@/components/CourseDetailModal';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const PRIMARY_COLOR = '#2C6DE7';
 const SECONDARY_TEXT = '#4A5968';
 const LIGHT_BACKGROUND = '#F2F5FC';
 const BORDER_COLOR = '#E6E9F2';
+const KAKAO_JS_KEY = '9a91bb579fe8e58cc9e5e25d6a073869'; // 카카오맵 JS 키
 
 type SearchMode = 'distance' | 'time';
 
@@ -51,12 +54,15 @@ interface RouteRecommendation {
 export default function CourseScreen() {
   // 상태 관리
   const [searchMode, setSearchMode] = useState<SearchMode>('distance');
-  const [inputValue, setInputValue] = useState('');
+  const [distanceValue, setDistanceValue] = useState(''); // 목표 거리 입력값
+  const [timeValue, setTimeValue] = useState(''); // 목표 시간 입력값
   const [currentLocation, setCurrentLocation] = useState<CurrentLocation | null>(null);
   const [loadingLocation, setLoadingLocation] = useState(false);
   const [walkingSpeed, setWalkingSpeed] = useState<number | null>(null); // km/h
-  const [routes, setRoutes] = useState<RouteRecommendation[]>([]);
+  const [routes, setRoutes] = useState<GPXRouteRecommendation[]>([]);
   const [loading, setLoading] = useState(false);
+  const [selectedRoute, setSelectedRoute] = useState<GPXRouteRecommendation | null>(null);
+  const [modalVisible, setModalVisible] = useState(false);
 
   // 앱 시작 시 사용자 도보 속도 불러오기
   useEffect(() => {
@@ -85,7 +91,7 @@ export default function CourseScreen() {
     try {
       setLoadingLocation(true);
       const { status } = await Location.requestForegroundPermissionsAsync();
-      
+
       if (status !== 'granted') {
         Alert.alert('권한 필요', '위치 권한이 필요합니다.');
         return;
@@ -129,6 +135,8 @@ export default function CourseScreen() {
 
   // 경로 검색
   const searchRoutes = async () => {
+    const inputValue = searchMode === 'distance' ? distanceValue : timeValue;
+
     if (!inputValue) {
       Alert.alert('알림', `${searchMode === 'distance' ? '거리' : '시간'}를 입력해주세요.`);
       return;
@@ -146,88 +154,38 @@ export default function CourseScreen() {
 
     try {
       setLoading(true);
-      
+
       const value = parseFloat(inputValue);
       if (isNaN(value) || value <= 0) {
         Alert.alert('오류', '올바른 값을 입력해주세요.');
         return;
       }
 
-      // API 호출 (백엔드 구현 필요)
-      const params = {
-        latitude: currentLocation.latitude,
-        longitude: currentLocation.longitude,
-        walkingSpeed: walkingSpeed,
-        ...(searchMode === 'distance' 
-          ? { targetDistance: value } 
-          : { targetDuration: value }
-        ),
-      };
+      console.log('🔍 경로 검색:', {
+        searchMode,
+        value,
+        location: currentLocation,
+        walkingSpeed
+      });
 
-      console.log('🔍 경로 검색:', params);
+      // 백엔드 GPX API 호출
+      // PostgreSQL에 저장된 GPX 경로만 조회
+      // 현재 위치에서 가까운 순으로 정렬
+      // 목표 거리/시간에 맞는 코스만 필터링
+      const recommendedRoutes = await getRecommendedRoutes({
+        distance_km: searchMode === 'distance' ? value : undefined,
+        duration_minutes: searchMode === 'time' ? value : undefined,
+        user_lat: currentLocation.latitude,
+        user_lng: currentLocation.longitude,
+        max_distance_from_user: 10.0, // 10km 이내 경로만
+        limit: 10,
+      });
 
-      // TODO: 실제 API 호출
-      // const response = await fetch(`${API_BASE_URL}/api/routes/recommend`, {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify(params),
-      // });
-      // const data = await response.json();
-      // setRoutes(data.routes);
+      setRoutes(recommendedRoutes);
+      console.log('✅ 경로 검색 완료:', recommendedRoutes);
 
-      // 임시 목업 데이터
-      const mockRoutes: RouteRecommendation[] = [
-        {
-          id: '1',
-          name: '한강 둘레길',
-          distance: searchMode === 'distance' ? value : (value / 60) * walkingSpeed,
-          duration: searchMode === 'time' ? value : (value / walkingSpeed) * 60,
-          difficulty: 'easy',
-          startPoint: {
-            lat: 37.5219,
-            lng: 126.9245,
-            address: '서울 영등포구 여의도동',
-          },
-          distanceFromUser: 1.2,
-          elevation: 5,
-          description: '평탄한 강변길, 야경 명소',
-        },
-        {
-          id: '2',
-          name: '서울숲 산책로',
-          distance: searchMode === 'distance' ? value * 0.9 : (value / 60) * walkingSpeed * 0.9,
-          duration: searchMode === 'time' ? value * 0.95 : ((value * 0.9) / walkingSpeed) * 60,
-          difficulty: 'easy',
-          startPoint: {
-            lat: 37.5447,
-            lng: 127.0384,
-            address: '서울 성동구 성수동1가',
-          },
-          distanceFromUser: 2.5,
-          elevation: 10,
-          description: '숲길과 잔디밭, 카페 근처',
-        },
-        {
-          id: '3',
-          name: '남산 순환로',
-          distance: searchMode === 'distance' ? value * 1.1 : (value / 60) * walkingSpeed * 1.1,
-          duration: searchMode === 'time' ? value * 1.1 : ((value * 1.1) / walkingSpeed) * 60,
-          difficulty: 'moderate',
-          startPoint: {
-            lat: 37.5512,
-            lng: 126.9882,
-            address: '서울 중구 예장동',
-          },
-          distanceFromUser: 3.8,
-          elevation: 120,
-          description: '경사 있음, 도심 야경',
-        },
-      ];
-
-      setRoutes(mockRoutes);
-      
     } catch (error) {
-      console.error('경로 검색 실패:', error);
+      console.error('❌ 경로 검색 실패:', error);
       Alert.alert('오류', '경로 검색에 실패했습니다.');
     } finally {
       setLoading(false);
@@ -255,7 +213,7 @@ export default function CourseScreen() {
   return (
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" />
-      
+
       <SafeAreaView edges={['top']} style={styles.safeArea}>
         {/* 헤더 */}
         <View style={styles.header}>
@@ -265,7 +223,7 @@ export default function CourseScreen() {
           </Text>
         </View>
 
-        <ScrollView 
+        <ScrollView
           style={styles.content}
           showsVerticalScrollIndicator={false}
         >
@@ -336,8 +294,8 @@ export default function CourseScreen() {
                 style={styles.input}
                 placeholder={searchMode === 'distance' ? '5' : '30'}
                 placeholderTextColor="#999"
-                value={inputValue}
-                onChangeText={setInputValue}
+                value={searchMode === 'distance' ? distanceValue : timeValue}
+                onChangeText={searchMode === 'distance' ? setDistanceValue : setTimeValue}
                 keyboardType="numeric"
               />
               <Text style={styles.inputUnit}>
@@ -346,13 +304,13 @@ export default function CourseScreen() {
             </View>
 
             {/* 예상 정보 */}
-            {inputValue && walkingSpeed && (
+            {((searchMode === 'distance' && distanceValue) || (searchMode === 'time' && timeValue)) && walkingSpeed && (
               <View style={styles.estimationBox}>
                 <Ionicons name="information-circle" size={16} color={PRIMARY_COLOR} />
                 <Text style={styles.estimationText}>
                   {searchMode === 'distance'
-                    ? `약 ${Math.round((parseFloat(inputValue) / walkingSpeed) * 60)}분 소요 예상`
-                    : `약 ${((parseFloat(inputValue) / 60) * walkingSpeed).toFixed(1)}km 이동 예상`
+                    ? `약 ${Math.round((parseFloat(distanceValue) / walkingSpeed) * 60)}분 소요 예상`
+                    : `약 ${((parseFloat(timeValue) / 60) * walkingSpeed).toFixed(1)}km 이동 예상`
                   }
                 </Text>
               </View>
@@ -408,10 +366,10 @@ export default function CourseScreen() {
           <TouchableOpacity
             style={[
               styles.searchButton,
-              (!inputValue || !currentLocation) && styles.searchButtonDisabled,
+              ((searchMode === 'distance' ? !distanceValue : !timeValue) || !currentLocation) && styles.searchButtonDisabled,
             ]}
             onPress={searchRoutes}
-            disabled={!inputValue || !currentLocation || loading}
+            disabled={(searchMode === 'distance' ? !distanceValue : !timeValue) || !currentLocation || loading}
           >
             {loading ? (
               <ActivityIndicator size="small" color="white" />
@@ -432,59 +390,61 @@ export default function CourseScreen() {
 
               {routes.map((route) => (
                 <TouchableOpacity
-                  key={route.id}
+                  key={route.route_id}
                   style={styles.routeCard}
                   onPress={() => {
-                    // TODO: 경로 상세 화면으로 이동
-                    Alert.alert(route.name, route.description);
+                    setSelectedRoute(route);
+                    setModalVisible(true);
                   }}
                 >
                   <View style={styles.routeCardHeader}>
-                    <Text style={styles.routeName}>{route.name}</Text>
+                    <Text style={styles.routeName}>{route.route_name}</Text>
                     <View style={[
                       styles.difficultyBadge,
-                      { backgroundColor: getDifficultyColor(route.difficulty) + '20' }
+                      { backgroundColor: getDifficultyColor(route.difficulty_level) + '20' }
                     ]}>
                       <Text style={[
                         styles.difficultyText,
-                        { color: getDifficultyColor(route.difficulty) }
+                        { color: getDifficultyColor(route.difficulty_level) }
                       ]}>
-                        {getDifficultyLabel(route.difficulty)}
+                        {getDifficultyLabel(route.difficulty_level)}
                       </Text>
                     </View>
                   </View>
 
                   <Text style={styles.routeAddress}>
-                    {route.startPoint.address}
+                    {route.start_point ? `위도: ${route.start_point.lat.toFixed(4)}, 경도: ${route.start_point.lng.toFixed(4)}` : '위치 정보 없음'}
                   </Text>
 
                   <View style={styles.routeStats}>
                     <View style={styles.routeStat}>
                       <MaterialIcons name="straighten" size={16} color={SECONDARY_TEXT} />
                       <Text style={styles.routeStatText}>
-                        {route.distance.toFixed(1)}km
+                        {route.distance_km.toFixed(1)}km
                       </Text>
                     </View>
 
                     <View style={styles.routeStat}>
                       <MaterialIcons name="schedule" size={16} color={SECONDARY_TEXT} />
                       <Text style={styles.routeStatText}>
-                        {Math.round(route.duration)}분
+                        {Math.round(route.estimated_duration_minutes)}분
                       </Text>
                     </View>
 
-                    <View style={styles.routeStat}>
-                      <MaterialIcons name="near-me" size={16} color={SECONDARY_TEXT} />
-                      <Text style={styles.routeStatText}>
-                        {route.distanceFromUser.toFixed(1)}km
-                      </Text>
-                    </View>
+                    {route.distance_from_user && (
+                      <View style={styles.routeStat}>
+                        <MaterialIcons name="near-me" size={16} color={SECONDARY_TEXT} />
+                        <Text style={styles.routeStatText}>
+                          {route.distance_from_user.toFixed(1)}km
+                        </Text>
+                      </View>
+                    )}
 
-                    {route.elevation > 0 && (
+                    {route.total_elevation_gain_m > 0 && (
                       <View style={styles.routeStat}>
                         <MaterialIcons name="terrain" size={16} color={SECONDARY_TEXT} />
                         <Text style={styles.routeStatText}>
-                          {route.elevation}m
+                          {Math.round(route.total_elevation_gain_m)}m
                         </Text>
                       </View>
                     )}
@@ -512,6 +472,20 @@ export default function CourseScreen() {
             </View>
           )}
         </ScrollView>
+
+        {/* 경로 상세 모달 */}
+        {selectedRoute && (
+          <CourseDetailModal
+            visible={modalVisible}
+            onClose={() => {
+              setModalVisible(false);
+              setSelectedRoute(null);
+            }}
+            route={selectedRoute}
+            currentLocation={currentLocation}
+            kakaoJsKey={KAKAO_JS_KEY}
+          />
+        )}
       </SafeAreaView>
     </View>
   );

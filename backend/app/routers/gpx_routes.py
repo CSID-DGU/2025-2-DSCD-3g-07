@@ -5,8 +5,11 @@
 
 from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
+from sqlalchemy import text
 from typing import List, Optional
 from pydantic import BaseModel
+import math
+import json
 
 from app.database import get_db
 
@@ -15,6 +18,82 @@ router = APIRouter(
     prefix="/api/routes",
     tags=["routes"]
 )
+
+
+def calculate_distance(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
+    """
+    두 GPS 좌표 간 거리 계산 (Haversine formula)
+    
+    Returns:
+        거리 (km)
+    """
+    R = 6371  # 지구 반지름 (km)
+    
+    phi1 = math.radians(lat1)
+    phi2 = math.radians(lat2)
+    delta_phi = math.radians(lat2 - lat1)
+    delta_lambda = math.radians(lon2 - lon1)
+    
+    a = math.sin(delta_phi/2)**2 + math.cos(phi1) * math.cos(phi2) * math.sin(delta_lambda/2)**2
+    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
+    
+    return R * c
+
+
+def clean_route_name(route_name: str) -> str:
+    """
+    경로 이름 정리
+    - '/' 기준 중복 제거
+    - '|' 이후 Strava 메타데이터 제거
+    - 거리 정보 중복 제거
+    
+    예시:
+    "사천교~홍제천 탑수부 왕복(5.0km) / 사천교~홍제천 탑수부 왕복(5.0km) | Strava Run Segment"
+    → "사천교~홍제천 탑수부 왕복(5.0km)"
+    """
+    if not route_name:
+        return route_name
+    
+    # 1. '|' 이후 Strava 정보 제거
+    if '|' in route_name:
+        route_name = route_name.split('|')[0].strip()
+    
+    # 2. '/' 로 나눠진 경우 중복 제거
+    if '/' in route_name:
+        parts = [part.strip() for part in route_name.split('/')]
+        # 중복 제거 (순서 유지)
+        seen = set()
+        unique_parts = []
+        for part in parts:
+            if part and part not in seen:
+                seen.add(part)
+                unique_parts.append(part)
+        route_name = unique_parts[0] if unique_parts else route_name
+    
+    return route_name.strip()
+
+
+def extract_start_point(route_coordinates: dict) -> tuple:
+    """
+    GeoJSON에서 시작점 좌표 추출
+    
+    Returns:
+        (lat, lng) tuple
+    """
+    try:
+        if isinstance(route_coordinates, str):
+            route_coordinates = json.loads(route_coordinates)
+        
+        coordinates = route_coordinates.get('coordinates', [])
+        if coordinates:
+            # GeoJSON은 [경도, 위도] 순서
+            lng, lat = coordinates[0]
+            return (lat, lng)
+    except:
+        pass
+    
+    return (None, None)
+
 
 
 class RouteResponse(BaseModel):
@@ -89,8 +168,8 @@ async def list_routes(
         경로 목록 및 총 개수
     """
     try:
-        # 기본 쿼리
-        query = """
+        # 기본 쿼리문
+        base_query = """
         SELECT 
             route_id, route_name, route_type, distance_km,
             estimated_duration_minutes, total_elevation_gain_m,
@@ -102,49 +181,33 @@ async def list_routes(
         params = {}
         
         # 필터 조건 추가
+        conditions = []
         if route_type:
-            query += " AND route_type = :route_type"
+            conditions.append(" AND route_type = :route_type")
             params['route_type'] = route_type
         
         if difficulty:
-            query += " AND difficulty_level = :difficulty"
+            conditions.append(" AND difficulty_level = :difficulty")
             params['difficulty'] = difficulty
         
         if min_distance is not None:
-            query += " AND distance_km >= :min_distance"
+            conditions.append(" AND distance_km >= :min_distance")
             params['min_distance'] = min_distance
         
         if max_distance is not None:
-            query += " AND distance_km <= :max_distance"
+            conditions.append(" AND distance_km <= :max_distance")
             params['max_distance'] = max_distance
         
-        query += " ORDER BY created_at DESC LIMIT :limit OFFSET :offset"
+        # 쿼리 조립
+        full_query = base_query + ''.join(conditions) + " ORDER BY created_at DESC LIMIT :limit OFFSET :offset"
         params['limit'] = limit
         params['offset'] = offset
         
-        results = db.execute(query, params).fetchall()
+        results = db.execute(text(full_query), params).fetchall()
         
         # 총 개수 조회
-        count_query = "SELECT COUNT(*) FROM routes WHERE 1=1"
-        count_params = {}
-        
-        if route_type:
-            count_query += " AND route_type = :route_type"
-            count_params['route_type'] = route_type
-        
-        if difficulty:
-            count_query += " AND difficulty_level = :difficulty"
-            count_params['difficulty'] = difficulty
-        
-        if min_distance is not None:
-            count_query += " AND distance_km >= :min_distance"
-            count_params['min_distance'] = min_distance
-        
-        if max_distance is not None:
-            count_query += " AND distance_km <= :max_distance"
-            count_params['max_distance'] = max_distance
-        
-        total_count = db.execute(count_query, count_params).fetchone()[0]
+        count_query = "SELECT COUNT(*) FROM routes WHERE 1=1" + ''.join(conditions)
+        total_count = db.execute(text(count_query), params).fetchone()[0]
         
         return {
             "total_count": total_count,
@@ -153,7 +216,7 @@ async def list_routes(
             "routes": [
                 {
                     "route_id": r[0],
-                    "route_name": r[1],
+                    "route_name": clean_route_name(r[1]),  # 경로 이름 정리
                     "route_type": r[2],
                     "distance_km": float(r[3]),
                     "estimated_duration_minutes": r[4],
@@ -191,7 +254,7 @@ async def get_route_detail(
     """
     try:
         # Routes 테이블에서 경로 정보 조회
-        query = """
+        query = text("""
         SELECT 
             route_id, route_name, route_type, distance_km,
             estimated_duration_minutes, total_elevation_gain_m,
@@ -200,7 +263,7 @@ async def get_route_detail(
             avg_rating, rating_count, created_at
         FROM routes
         WHERE route_id = :route_id
-        """
+        """)
         
         result = db.execute(query, {'route_id': route_id}).fetchone()
         
@@ -211,7 +274,7 @@ async def get_route_detail(
             )
         
         # 세그먼트 정보 조회
-        segment_query = """
+        segment_query = text("""
         SELECT 
             segment_id, segment_order, start_lat, start_lon,
             end_lat, end_lon, segment_distance_m, segment_grade_percent,
@@ -219,14 +282,14 @@ async def get_route_detail(
         FROM route_segments
         WHERE route_id = :route_id
         ORDER BY segment_order
-        """
+        """)
         
         segments = db.execute(segment_query, {'route_id': route_id}).fetchall()
         
         return {
             "route": {
                 "route_id": result[0],
-                "route_name": result[1],
+                "route_name": clean_route_name(result[1]),  # 경로 이름 정리
                 "route_type": result[2],
                 "distance_km": float(result[3]),
                 "estimated_duration_minutes": result[4],
@@ -274,84 +337,201 @@ async def recommend_routes(
     duration_minutes: Optional[int] = None,
     difficulty: Optional[str] = None,
     route_type: Optional[str] = None,
-    limit: int = 5,
+    user_lat: Optional[float] = None,
+    user_lng: Optional[float] = None,
+    max_distance_from_user: float = 10.0,
+    distance_tolerance: float = 1.0,
+    duration_tolerance: int = 15,
+    limit: int = 10,
     db: Session = Depends(get_db)
 ):
     """
-    조건에 맞는 경로 추천
+    사용자 위치 기반 경로 추천
+    
+    로직:
+    1. PostgreSQL에서 모든 GPX 경로 조회
+    2. 각 경로의 시작점과 사용자 위치 간 거리 계산
+    3. 사용자 위치에서 가까운 순으로 정렬
+    4. 목표 거리/시간에 맞는 코스만 필터링
     
     Args:
-        distance_km: 원하는 거리 (km) - 근처 경로 추천
-        duration_minutes: 원하는 시간 (분) - 근처 경로 추천
-        difficulty: 선호 난이도
-        route_type: 경로 타입
-        limit: 추천 개수
+        distance_km: 목표 거리 (km)
+        duration_minutes: 목표 시간 (분)
+        difficulty: 선호 난이도 (easy/moderate/hard)
+        route_type: 경로 타입 (walking/running/mixed)
+        user_lat: 사용자 위도 (필수)
+        user_lng: 사용자 경도 (필수)
+        max_distance_from_user: 검색 반경 (km, 기본 10km)
+        distance_tolerance: 거리 허용 오차 (km, 기본 ±1km)
+        duration_tolerance: 시간 허용 오차 (분, 기본 ±15분)
+        limit: 최대 반환 개수
         db: DB 세션
     
     Returns:
-        추천 경로 목록
+        추천 경로 목록 (가까운 순)
     """
     try:
-        query = """
+        # 1️⃣ 사용자 위치 필수 체크
+        if not user_lat or not user_lng:
+            raise HTTPException(
+                status_code=400,
+                detail="사용자 위치(user_lat, user_lng)가 필요합니다."
+            )
+        
+        # 2️⃣ 목표 거리 또는 시간 중 하나는 필수
+        if not distance_km and not duration_minutes:
+            raise HTTPException(
+                status_code=400,
+                detail="목표 거리(distance_km) 또는 목표 시간(duration_minutes) 중 하나를 입력해주세요."
+            )
+        
+        # 3️⃣ PostgreSQL에서 모든 GPX 경로 조회
+        base_query = """
         SELECT 
             route_id, route_name, route_type, distance_km,
             estimated_duration_minutes, total_elevation_gain_m,
-            difficulty_level, avg_rating, rating_count,
-            ABS(distance_km - :target_distance) as distance_diff
+            difficulty_level, avg_rating, rating_count, route_coordinates,
+            tags
         FROM routes
         WHERE 1=1
         """
         
         params = {}
-        
-        # 거리 기준 (입력한 거리와 가까운 순)
-        if distance_km:
-            params['target_distance'] = distance_km
-        else:
-            params['target_distance'] = 5.0  # 기본값
-        
-        # 시간 기준
-        if duration_minutes:
-            query += """ 
-            AND estimated_duration_minutes BETWEEN :duration_min AND :duration_max
-            """
-            params['duration_min'] = duration_minutes - 10
-            params['duration_max'] = duration_minutes + 10
+        conditions = []
         
         # 난이도 필터
         if difficulty:
-            query += " AND difficulty_level = :difficulty"
+            conditions.append(" AND difficulty_level = :difficulty")
             params['difficulty'] = difficulty
         
         # 경로 타입 필터
         if route_type:
-            query += " AND route_type = :route_type"
+            conditions.append(" AND route_type = :route_type")
             params['route_type'] = route_type
         
-        # 거리 차이 순으로 정렬 (가까운 거리 우선)
-        query += " ORDER BY distance_diff ASC, avg_rating DESC NULLS LAST LIMIT :limit"
-        params['limit'] = limit
+        # 쿼리 실행
+        full_query = base_query + ''.join(conditions)
+        results = db.execute(text(full_query), params).fetchall()
         
-        results = db.execute(query, params).fetchall()
+        # 4️⃣ 각 경로 처리: 거리 계산 및 필터링
+        routes = []
+        
+        for r in results:
+            route_id, route_name, r_route_type, dist_km, est_duration, elevation_gain, \
+            diff_level, avg_rating, rating_count, route_coords, tags = r
+            
+            # 4-1. 시작점 좌표 추출
+            start_lat, start_lng = extract_start_point(route_coords)
+            if start_lat is None or start_lng is None:
+                continue
+            
+            # 4-2. 사용자 위치와의 거리 계산 (Haversine)
+            distance_from_user = calculate_distance(user_lat, user_lng, start_lat, start_lng)
+            
+            # 4-3. 검색 반경 필터링 (기본 10km 이내)
+            if distance_from_user > max_distance_from_user:
+                continue
+            
+            # 4-4. 목표 거리/시간 필터링
+            match = False
+            
+            if distance_km:
+                # 목표 거리 ± 허용 오차 범위
+                # Decimal을 float로 변환하여 비교
+                if abs(float(dist_km) - distance_km) <= distance_tolerance:
+                    match = True
+            
+            if duration_minutes and not match:
+                # 목표 시간 ± 허용 오차 범위
+                if abs(est_duration - duration_minutes) <= duration_tolerance:
+                    match = True
+            
+            if not match:
+                continue
+            
+            # 4-5. 설명 생성
+            description_parts = []
+            if tags:
+                try:
+                    tags_list = json.loads(tags) if isinstance(tags, str) else tags
+                    if isinstance(tags_list, list) and len(tags_list) > 1:
+                        tag_value = tags_list[1]
+                        # strava.segments, 특수문자(_-), 숫자만 있는 태그, 언더바 포함 태그 제외
+                        if not (
+                            'strava.segments' in tag_value.lower() or
+                            tag_value.startswith('strava') or
+                            '_' in tag_value or  # 언더바 포함 제외
+                            all(c in '0123456789-_.' for c in tag_value)
+                        ):
+                            description_parts.append(tag_value)
+                except:
+                    pass
+            
+            if elevation_gain:
+                if elevation_gain < 50:
+                    description_parts.append("평탄한 코스")
+                elif elevation_gain < 200:
+                    description_parts.append("적당한 오르막")
+                else:
+                    description_parts.append("경사 있는 코스")
+            
+            description = ", ".join(description_parts) if description_parts else ""
+            
+            # 경로 이름 정리 (중복 및 Strava 정보 제거)
+            cleaned_name = clean_route_name(route_name)
+            
+            # 목표 거리/시간과의 차이 계산
+            target_diff = 0
+            if distance_km:
+                # 목표 거리와의 차이 (km)
+                target_diff = abs(float(dist_km) - distance_km)
+            elif duration_minutes:
+                # 목표 시간과의 차이 (분)
+                target_diff = abs(est_duration - duration_minutes)
+            
+            # 4-6. 결과 목록에 추가
+            routes.append({
+                'route_id': route_id,
+                'route_name': cleaned_name,
+                'route_type': r_route_type,
+                'distance_km': float(dist_km),
+                'estimated_duration_minutes': est_duration,
+                'total_elevation_gain_m': float(elevation_gain) if elevation_gain else 0,
+                'difficulty_level': diff_level,
+                'avg_rating': float(avg_rating) if avg_rating else None,
+                'rating_count': rating_count,
+                'start_point': {
+                    'lat': start_lat,
+                    'lng': start_lng,
+                },
+                'distance_from_user': round(distance_from_user, 2),
+                'description': description,
+                'target_diff': target_diff  # 목표 거리/시간과의 차이
+            })
+        
+        # 5️⃣ 정렬: 사용자 위치에 가까운 순 → 목표 거리/시간에 가까운 순
+        # 1차: 사용자 위치에서의 거리 (가까울수록 우선)
+        # 2차: 목표값과의 차이 (작을수록 우선)
+        routes.sort(key=lambda x: (x['distance_from_user'], x['target_diff']))
+        
+        # 6️⃣ 상위 N개만 반환 (target_diff는 응답에서 제거)
+        recommended = []
+        for route in routes[:limit]:
+            # target_diff는 내부 정렬용이므로 제거
+            route_copy = {k: v for k, v in route.items() if k != 'target_diff'}
+            recommended.append(route_copy)
         
         return {
-            "recommended_routes": [
-                {
-                    "route_id": r[0],
-                    "route_name": r[1],
-                    "route_type": r[2],
-                    "distance_km": float(r[3]),
-                    "estimated_duration_minutes": r[4],
-                    "total_elevation_gain_m": float(r[5]) if r[5] else None,
-                    "difficulty_level": r[6],
-                    "avg_rating": float(r[7]) if r[7] else None,
-                    "rating_count": r[8]
-                }
-                for r in results
-            ]
+            "total_count": len(routes),
+            "recommended_routes": recommended
         }
     
+    except HTTPException:
+        raise
     except Exception as e:
+        import traceback
+        print(f"❌ 경로 추천 에러: {str(e)}")
+        print(traceback.format_exc())
         raise HTTPException(
             status_code=500,
             detail=f"경로 추천 중 오류가 발생했습니다: {str(e)}"

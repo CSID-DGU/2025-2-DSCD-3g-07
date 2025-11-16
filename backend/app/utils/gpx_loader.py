@@ -9,6 +9,7 @@ import math
 from pathlib import Path
 from typing import List, Dict
 from sqlalchemy.orm import Session
+from sqlalchemy import text
 
 
 class GPXLoader:
@@ -254,7 +255,7 @@ class GPXLoader:
         tags = json.dumps(['gpx_import', route_data['source_file']])
         
         # Raw SQL 실행
-        insert_query = """
+        insert_query = text("""
         INSERT INTO routes (
             route_name, route_type, distance_km, estimated_duration_minutes,
             total_elevation_gain_m, total_elevation_loss_m, max_elevation_m, min_elevation_m,
@@ -264,7 +265,7 @@ class GPXLoader:
             :total_elevation_gain_m, :total_elevation_loss_m, :max_elevation_m, :min_elevation_m,
             :difficulty_level, :route_coordinates, :source, :external_id, :tags
         ) RETURNING route_id
-        """
+        """)
         
         result = self.db.execute(
             insert_query,
@@ -294,7 +295,7 @@ class GPXLoader:
         """route_segments 테이블에 세그먼트 삽입"""
         
         for seg in segments:
-            insert_query = """
+            insert_query = text("""
             INSERT INTO route_segments (
                 route_id, segment_order, start_lat, start_lon, end_lat, end_lon,
                 segment_distance_m, segment_grade_percent, elevation_change_m,
@@ -304,7 +305,7 @@ class GPXLoader:
                 :segment_distance_m, :segment_grade_percent, :elevation_change_m,
                 :start_elevation_m, :end_elevation_m, :terrain_type
             )
-            """
+            """)
             
             self.db.execute(insert_query, {
                 'route_id': route_id,

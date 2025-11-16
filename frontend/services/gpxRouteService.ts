@@ -31,6 +31,8 @@ export interface RecommendRoutesParams {
     user_lat?: number;
     user_lng?: number;
     max_distance_from_user?: number;
+    distance_tolerance?: number; // 거리 허용 오차 (km)
+    duration_tolerance?: number; // 시간 허용 오차 (분)
     limit?: number;
 }
 
@@ -63,6 +65,12 @@ export async function getRecommendedRoutes(
         }
         if (params.max_distance_from_user !== undefined) {
             queryParams.append('max_distance_from_user', params.max_distance_from_user.toString());
+        }
+        if (params.distance_tolerance !== undefined) {
+            queryParams.append('distance_tolerance', params.distance_tolerance.toString());
+        }
+        if (params.duration_tolerance !== undefined) {
+            queryParams.append('duration_tolerance', params.duration_tolerance.toString());
         }
         if (params.limit !== undefined) {
             queryParams.append('limit', params.limit.toString());

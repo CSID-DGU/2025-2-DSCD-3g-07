@@ -380,14 +380,23 @@ export default function HomeScreen() {
   // 현재 위치 가져오기
   const getCurrentLocation = useCallback(async () => {
     try {
+      // 로딩 표시
+      if (activeInput === 'start') {
+        setStartInput('위치 검색 중...');
+      } else if (activeInput === 'end') {
+        setEndInput('위치 검색 중...');
+      }
+
       const { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
         Alert.alert('권한 필요', '위치 권한이 필요합니다.');
+        if (activeInput === 'start') setStartInput('');
+        else if (activeInput === 'end') setEndInput('');
         return;
       }
 
       const location = await Location.getCurrentPositionAsync({
-        accuracy: Location.Accuracy.Balanced,
+        accuracy: Location.Accuracy.High, // Balanced -> High로 변경
       });
 
       const [address] = await Location.reverseGeocodeAsync({
@@ -395,11 +404,12 @@ export default function HomeScreen() {
         longitude: location.coords.longitude,
       });
 
-      // 상세 주소 포맷: 시 + 구 + 동
+      // 상세 주소 포맷: 시 + 구 + 동 + 도로명/지번
       const detailedAddress = [
         address?.city,
         address?.district,
-        address?.subregion
+        address?.subregion || address?.street,
+        address?.streetNumber || address?.name
       ]
         .filter(Boolean)
         .join(' ') || '현재 위치';
@@ -426,6 +436,8 @@ export default function HomeScreen() {
     } catch (error) {
       console.error('위치 가져오기 실패:', error);
       Alert.alert('오류', '현재 위치를 가져올 수 없습니다.');
+      if (activeInput === 'start') setStartInput('');
+      else if (activeInput === 'end') setEndInput('');
     }
   }, [activeInput]);
 

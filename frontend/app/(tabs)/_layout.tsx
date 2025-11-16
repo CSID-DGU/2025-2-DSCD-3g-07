@@ -34,11 +34,11 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="routes"
+        name="course"
         options={{
           title: '코스',
           tabBarIcon: ({ color }) => (
-            <MaterialIcons size={26} name="map" color={color} />
+            <MaterialIcons size={26} name="explore" color={color} />
           ),
         }}
       />
@@ -49,6 +49,12 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => (
             <MaterialIcons size={26} name="person" color={color} />
           ),
+        }}
+      />
+      <Tabs.Screen
+        name="routes"
+        options={{
+          href: null, // 탭바에서 숨김
         }}
       />
       <Tabs.Screen

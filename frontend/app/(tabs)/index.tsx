@@ -239,6 +239,11 @@ export default function HomeScreen() {
   const [isTracking, setIsTracking] = useState(false);
   const [centerOnLocation, setCenterOnLocation] = useState(false);
 
+  // 안내 시작/종료 상태
+  const [isNavigating, setIsNavigating] = useState(false);
+  const [navigationStartTime, setNavigationStartTime] = useState<Date | null>(null);
+  const [navigationLog, setNavigationLog] = useState<any[]>([]);
+
   // 애니메이션
   const searchBarTranslateY = useSharedValue(0);
   const bottomSheetHeight = useSharedValue(0);
@@ -390,11 +395,17 @@ export default function HomeScreen() {
         longitude: location.coords.longitude,
       });
 
+      // 상세 주소 포맷: 시 + 구 + 동
+      const detailedAddress = [
+        address?.city,
+        address?.district,
+        address?.subregion
+      ]
+        .filter(Boolean)
+        .join(' ') || '현재 위치';
+
       const locationData: LocationData = {
-        address: address
-          ? `${address.city || ''} ${address.district || ''}`.trim() ||
-          '현재 위치'
-          : '현재 위치',
+        address: detailedAddress,
         latitude: location.coords.latitude,
         longitude: location.coords.longitude,
       };
@@ -487,6 +498,62 @@ export default function HomeScreen() {
     setStartInput(endInput);
     setEndLocation(tempLocation);
     setEndInput(tempInput);
+  };
+
+  // 안내 시작/종료 핸들러
+  const handleNavigationToggle = () => {
+    if (isNavigating) {
+      // 안내 종료
+      const endTime = new Date();
+      const duration = navigationStartTime 
+        ? (endTime.getTime() - navigationStartTime.getTime()) / 1000 
+        : 0;
+      
+      // 로그 저장 (나중에 DB에 저장할 데이터)
+      const log = {
+        startTime: navigationStartTime,
+        endTime,
+        duration,
+        route: routeInfo,
+        startLocation,
+        endLocation,
+        routeMode,
+      };
+      
+      setNavigationLog(prev => [...prev, log]);
+      console.log('📊 Navigation Log:', log);
+      
+      // 위치 추적 중지
+      if (isTracking) {
+        locationService.stopTracking();
+        setIsTracking(false);
+        setCurrentLocation(null);
+      }
+      
+      setIsNavigating(false);
+      setNavigationStartTime(null);
+      
+      Alert.alert(
+        '안내 종료',
+        `총 소요 시간: ${Math.floor(duration / 60)}분 ${Math.floor(duration % 60)}초`
+      );
+    } else {
+      // 안내 시작
+      setIsNavigating(true);
+      setNavigationStartTime(new Date());
+      
+      // 위치 추적 자동 시작
+      if (!isTracking) {
+        locationService.startTracking((location) => {
+          setCurrentLocation(location);
+        });
+        setIsTracking(true);
+        setCenterOnLocation(true);
+        setTimeout(() => setCenterOnLocation(false), 1000);
+      }
+      
+      Alert.alert('안내 시작', '경로 안내가 시작되었습니다.');
+    }
   };
 
   // 경로 검색
@@ -884,6 +951,7 @@ export default function HomeScreen() {
           routeMode={routeMode}
           currentLocation={currentLocation}
           centerOnCurrentLocation={centerOnLocation}
+          legs={routeInfo?.legs}
         />
       </View>
 
@@ -946,73 +1014,80 @@ export default function HomeScreen() {
           </View>
 
           <View style={styles.searchContainer}>
-            {/* 출발지 */}
-            <View style={styles.searchRow}>
-              <View style={styles.searchIconContainer}>
+            {/* 출발지/도착지 입력 그룹 */}
+            <View style={styles.locationInputGroup}>
+              {/* 좌측 아이콘 영역 */}
+              <View style={styles.leftIconColumn}>
                 <View style={[styles.dot, styles.startDot]} />
+                <View style={styles.connectingLine} />
+                <View style={[styles.dot, styles.endDot]} />
               </View>
-              <TextInput
-                style={styles.searchInput}
-                placeholder="출발지를 입력하세요"
-                placeholderTextColor="#999"
-                value={startInput}
-                onChangeText={setStartInput}
-                onFocus={() => setActiveInput('start')}
-              />
-              <TouchableOpacity
-                style={styles.currentLocationButton}
-                onPress={getCurrentLocation}
-              >
-                <MaterialIcons
-                  name="my-location"
-                  size={20}
-                  color={PRIMARY_COLOR}
-                />
-              </TouchableOpacity>
-            </View>
 
-            {/* 교환 버튼 */}
-            <View style={styles.swapButtonContainer}>
+              {/* 입력 필드 영역 */}
+              <View style={styles.inputColumn}>
+                {/* 출발지 */}
+                <View style={styles.inputRow}>
+                  <TextInput
+                    style={styles.searchInput}
+                    placeholder="출발지를 입력하세요"
+                    placeholderTextColor="#999"
+                    value={startInput}
+                    onChangeText={setStartInput}
+                    onFocus={() => setActiveInput('start')}
+                  />
+                  {activeInput === 'start' && (
+                    <TouchableOpacity
+                      style={styles.inlineButton}
+                      onPress={getCurrentLocation}
+                    >
+                      <MaterialIcons
+                        name="my-location"
+                        size={18}
+                        color={PRIMARY_COLOR}
+                      />
+                    </TouchableOpacity>
+                  )}
+                </View>
+
+                {/* 도착지 */}
+                <View style={styles.inputRow}>
+                  <TextInput
+                    style={styles.searchInput}
+                    placeholder="도착지를 입력하세요"
+                    placeholderTextColor="#999"
+                    value={endInput}
+                    onChangeText={setEndInput}
+                    onFocus={() => setActiveInput('end')}
+                  />
+                  {endInput.length > 0 && activeInput === 'end' && (
+                    <TouchableOpacity
+                      style={styles.inlineButton}
+                      onPress={() => {
+                        setEndInput('');
+                        setEndLocation(null);
+                      }}
+                    >
+                      <MaterialIcons
+                        name="close"
+                        size={18}
+                        color={SECONDARY_TEXT}
+                      />
+                    </TouchableOpacity>
+                  )}
+                </View>
+              </View>
+
+              {/* 우측 교환 버튼 */}
               <TouchableOpacity
                 style={styles.swapButton}
                 onPress={handleSwapLocations}
               >
                 <MaterialIcons
                   name="swap-vert"
-                  size={20}
+                  size={24}
                   color={SECONDARY_TEXT}
                 />
               </TouchableOpacity>
-            </View>
-
-            {/* 도착지 */}
-            <View style={styles.searchRow}>
-              <View style={styles.searchIconContainer}>
-                <View style={[styles.dot, styles.endDot]} />
-              </View>
-              <TextInput
-                style={styles.searchInput}
-                placeholder="도착지를 입력하세요"
-                placeholderTextColor="#999"
-                value={endInput}
-                onChangeText={setEndInput}
-                onFocus={() => setActiveInput('end')}
-              />
-              {endInput.length > 0 && (
-                <TouchableOpacity
-                  style={styles.clearButton}
-                  onPress={() => {
-                    setEndInput('');
-                    setEndLocation(null);
-                  }}
-                >
-                  <MaterialIcons
-                    name="close"
-                    size={20}
-                    color={SECONDARY_TEXT}
-                  />
-                </TouchableOpacity>
-              )}
             </View>
 
             {/* 검색 버튼 */}
@@ -1366,6 +1441,24 @@ export default function HomeScreen() {
                     )}
                   </View>
                 )}
+
+                {/* 안내 시작/종료 버튼 */}
+                <TouchableOpacity
+                  style={[
+                    styles.navigationButton,
+                    isNavigating && styles.navigationButtonActive
+                  ]}
+                  onPress={handleNavigationToggle}
+                >
+                  <MaterialIcons 
+                    name={isNavigating ? "stop" : "navigation"} 
+                    size={20} 
+                    color="white" 
+                  />
+                  <Text style={styles.navigationButtonText}>
+                    {isNavigating ? '안내 종료' : '안내 시작'}
+                  </Text>
+                </TouchableOpacity>
 
                 {/* 경사도 분석 정보 */}
                 {(() => {
@@ -1777,6 +1870,35 @@ const styles = StyleSheet.create({
     shadowRadius: 12,
     elevation: 8,
   },
+  locationInputGroup: {
+    flexDirection: 'row',
+    alignItems: 'stretch',
+  },
+  leftIconColumn: {
+    width: 24,
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 12,
+    marginRight: 12,
+  },
+  connectingLine: {
+    width: 2,
+    flex: 1,
+    backgroundColor: '#DDD',
+    marginVertical: 4,
+  },
+  inputColumn: {
+    flex: 1,
+    gap: 8,
+  },
+  inputRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    height: 44,
+    backgroundColor: LIGHT_BACKGROUND,
+    borderRadius: 12,
+    paddingHorizontal: 14,
+  },
   searchRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -1788,24 +1910,47 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   dot: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
+    width: 10,
+    height: 10,
+    borderRadius: 5,
   },
   startDot: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#4285F4',
   },
   endDot: {
-    backgroundColor: '#F44336',
+    backgroundColor: '#EA4335',
   },
   searchInput: {
     flex: 1,
-    height: 44,
-    backgroundColor: LIGHT_BACKGROUND,
-    borderRadius: 12,
-    paddingHorizontal: 14,
+    height: '100%',
     fontSize: 15,
     color: '#222',
+  },
+  inlineButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: 8,
+  },
+  inlineButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: 8,
+  },
+  swapButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 12,
+    backgroundColor: LIGHT_BACKGROUND,
+    alignItems: 'center',
+    justifyContent: 'center',
+    alignSelf: 'center',
+    marginLeft: 8,
   },
   currentLocationButton: {
     marginLeft: 12,
@@ -1816,26 +1961,26 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  swapButtonRight: {
+    position: 'absolute',
+    right: -48,
+    top: '50%',
+    marginTop: -20,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'white',
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 4,
+  },
   swapButtonContainer: {
     alignItems: 'center',
     marginBottom: 12,
-  },
-  swapButton: {
-    width: 32,
-    height: 32,
-    borderRadius: 8,
-    backgroundColor: LIGHT_BACKGROUND,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  clearButton: {
-    marginLeft: 12,
-    width: 40,
-    height: 40,
-    borderRadius: 12,
-    backgroundColor: LIGHT_BACKGROUND,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   searchButtonsContainer: {
     flexDirection: 'row',
@@ -2277,6 +2422,25 @@ const styles = StyleSheet.create({
     marginTop: 8,
     paddingLeft: 28,
   },
+  // 안내 시작/종료 버튼 스타일
+  navigationButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    marginTop: 16,
+    padding: 16,
+    backgroundColor: PRIMARY_COLOR,
+    borderRadius: 12,
+  },
+  navigationButtonActive: {
+    backgroundColor: '#EA4335',
+  },
+  navigationButtonText: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: 'white',
+  },
   // 현재 위치 추적 버튼 스타일
   currentLocationTrackButton: {
     position: 'absolute',
@@ -2296,6 +2460,30 @@ const styles = StyleSheet.create({
   },
   currentLocationTrackButtonActive: {
     backgroundColor: '#2C6DE7',
+  },
+  // 안내 시작/종료 버튼 스타일
+  navigationButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    marginTop: 16,
+    padding: 16,
+    backgroundColor: PRIMARY_COLOR,
+    borderRadius: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+    elevation: 4,
+  },
+  navigationButtonActive: {
+    backgroundColor: '#F44336',
+  },
+  navigationButtonText: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: 'white',
   },
   // 위치 정보 디버깅 스타일
   locationInfoDebug: {

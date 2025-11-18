@@ -154,9 +154,16 @@ const RouteDetailComponent: React.FC<RouteDetailComponentProps> = ({
                   <Text
                     style={[
                       styles.slopeValue,
-                      slopeAnalysis.total_route_time_adjustment > 0
-                        ? styles.slopeValueIncrease
-                        : styles.slopeValueDecrease,
+                      (() => {
+                        const value = slopeAnalysis.total_route_time_adjustment;
+                        const isNegative = value < 0;
+                        console.log('🎨 [보정 시간 색상]', {
+                          value,
+                          isNegative,
+                          willApply: isNegative ? 'slopeValueDecrease (초록)' : 'slopeValueIncrease (빨강)'
+                        });
+                        return isNegative ? styles.slopeValueDecrease : styles.slopeValueIncrease;
+                      })()
                     ]}
                   >
                     {formatTimeDifference(

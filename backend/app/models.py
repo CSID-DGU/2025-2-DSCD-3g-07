@@ -114,9 +114,9 @@ class HealthData(Base):
     elevation_gain_m = Column(Numeric(7, 2), server_default="0")
     elevation_loss_m = Column(Numeric(7, 2), server_default="0")
     data_source = Column(String(20))
-    weather_id = Column(
-        Integer, ForeignKey("weather_cache.weather_id", ondelete="SET NULL")
-    )
+    # weather_id = Column(
+    #     Integer, ForeignKey("weather_cache.weather_id", ondelete="SET NULL")
+    # )
     created_at = Column(DateTime, server_default=func.current_timestamp())
 
     __table_args__ = (
@@ -142,12 +142,12 @@ class ActivitySpeedProfile(Base):
     )
     activity_type = Column(String(20), nullable=False)  # walking/running/cycling
     avg_speed_flat_kmh = Column(Numeric(4, 2))
-    avg_speed_uphill_kmh = Column(Numeric(4, 2))
-    avg_speed_downhill_kmh = Column(Numeric(4, 2))
-    max_speed_kmh = Column(Numeric(4, 2))
-    min_speed_kmh = Column(Numeric(4, 2))
-    speed_variance = Column(Numeric(4, 2))
-    confidence_score = Column(Numeric(3, 2))
+    # avg_speed_uphill_kmh = Column(Numeric(4, 2))
+    # avg_speed_downhill_kmh = Column(Numeric(4, 2))
+    # max_speed_kmh = Column(Numeric(4, 2))
+    # min_speed_kmh = Column(Numeric(4, 2))
+    # speed_variance = Column(Numeric(4, 2))
+    # confidence_score = Column(Numeric(3, 2))
     data_points_count = Column(Integer, server_default="0")
     last_updated = Column(
         DateTime,

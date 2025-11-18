@@ -65,6 +65,9 @@ class Users(Base):
     route_ratings = relationship(
         "RouteRatings", back_populates="user", cascade="all, delete-orphan"
     )
+    navigation_logs = relationship(
+        "NavigationLogs", back_populates="user", cascade="all, delete-orphan"
+    )
 
 
 # 2) weather_cache
@@ -397,3 +400,60 @@ class RouteRatings(Base):
 
     user = relationship("Users", back_populates="route_ratings")
     route = relationship("Routes", back_populates="ratings")
+
+
+# 12) navigation_logs
+class NavigationLogs(Base):
+    __tablename__ = "navigation_logs"
+
+    log_id = Column(Integer, primary_key=True)
+    user_id = Column(
+        Integer,
+        ForeignKey("users.user_id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    
+    # 기본 정보
+    route_mode = Column(String(20), nullable=False)  # 'transit' or 'walking'
+    start_location = Column(String(200))
+    end_location = Column(String(200))
+    start_lat = Column(Numeric(9, 6), nullable=False)
+    start_lon = Column(Numeric(9, 6), nullable=False)
+    end_lat = Column(Numeric(9, 6), nullable=False)
+    end_lon = Column(Numeric(9, 6), nullable=False)
+    
+    # 경로 상세 정보
+    total_distance_m = Column(Numeric(8, 2), nullable=False)  # 총 거리 (m)
+    transport_modes = Column(JSONType)  # 대중교통 경로의 경우 사용한 교통수단 리스트
+    crosswalk_count = Column(Integer, server_default="0")  # 횡단보도 개수
+    
+    # 보행 시간 계산 관련 계수들
+    user_speed_factor = Column(Numeric(5, 3))  # 사용자 속도 계수
+    slope_factor = Column(Numeric(5, 3))  # 경사도 계수
+    weather_factor = Column(Numeric(5, 3))  # 날씨 계수
+    
+    # 시간 정보
+    estimated_time_seconds = Column(Integer, nullable=False)  # 예상 시간 (초)
+    actual_time_seconds = Column(Integer, nullable=False)  # 실제 소요 시간 (초)
+    
+    # 날씨 정보
+    weather_id = Column(
+        Integer, ForeignKey("weather_cache.weather_id", ondelete="SET NULL")
+    )
+    
+    # 상세 경로 데이터 (JSON)
+    route_data = Column(JSONType)  # 전체 경로 상세 정보
+    
+    # 타임스탬프
+    started_at = Column(DateTime, nullable=False)  # 안내 시작 시간
+    ended_at = Column(DateTime, nullable=False)  # 안내 종료 시간
+    created_at = Column(DateTime, server_default=func.current_timestamp())
+
+    __table_args__ = (
+        Index("idx_nav_user_time", "user_id", "started_at"),
+        Index("idx_nav_route_mode", "route_mode"),
+        Index("idx_nav_created_at", "created_at"),
+    )
+
+    user = relationship("Users", back_populates="navigation_logs")

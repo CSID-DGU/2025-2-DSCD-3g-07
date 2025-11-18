@@ -5,6 +5,9 @@ pytest-mock==3.11.1
 pytest-cov==4.1.0
 httpx==0.25.0
 
+# 데이터베이스 마이그레이션
+alembic==1.13.1
+
 # 코드 품질 및 포맷팅
 black==25.9.0
 flake8==6.1.0

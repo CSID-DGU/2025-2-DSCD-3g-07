@@ -35,6 +35,7 @@ import type { RoutePath } from '@/services/routeService';
 import { useWeatherContext } from '@/contexts/WeatherContext';
 import { healthConnectService } from '@/services/healthConnect';
 import { locationService, type CurrentLocation } from '@/services/locationService';
+import { saveNavigationLog, extractNavigationLogData } from '@/services/navigationLogService';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 const PRIMARY_COLOR = '#2C6DE7';
@@ -366,10 +367,10 @@ export default function HomeScreen() {
       if (success) {
         setIsTracking(true);
         setCenterOnLocation(true);  // 첫 번째는 중심 이동
-        
+
         // 1초 후 자동 중심 이동 해제 (사용자가 지도를 움직일 수 있도록)
         setTimeout(() => setCenterOnLocation(false), 1000);
-        
+
         Alert.alert('위치 추적 시작', '실시간 위치 추적이 시작되었습니다.');
       } else {
         Alert.alert('위치 추적 실패', '위치 권한을 확인해주세요.');
@@ -513,15 +514,15 @@ export default function HomeScreen() {
   };
 
   // 안내 시작/종료 핸들러
-  const handleNavigationToggle = () => {
+  const handleNavigationToggle = async () => {
     if (isNavigating) {
       // 안내 종료
       const endTime = new Date();
-      const duration = navigationStartTime 
-        ? (endTime.getTime() - navigationStartTime.getTime()) / 1000 
+      const duration = navigationStartTime
+        ? (endTime.getTime() - navigationStartTime.getTime()) / 1000
         : 0;
-      
-      // 로그 저장 (나중에 DB에 저장할 데이터)
+
+      // 로그 데이터 준비
       const log = {
         startTime: navigationStartTime,
         endTime,
@@ -531,20 +532,43 @@ export default function HomeScreen() {
         endLocation,
         routeMode,
       };
-      
+
       setNavigationLog(prev => [...prev, log]);
       console.log('📊 Navigation Log:', log);
-      
+
+      // DB에 저장
+      if (navigationStartTime && routeInfo && startLocation && endLocation) {
+        try {
+          const logData = extractNavigationLogData(
+            routeInfo,
+            startLocation,
+            endLocation,
+            routeMode,
+            navigationStartTime,
+            endTime
+          );
+
+          // TODO: 실제 user_id는 로그인 시스템에서 가져와야 함
+          const userId = 1; // 임시 user_id
+
+          const savedLog = await saveNavigationLog(userId, logData);
+          console.log('✅ 네비게이션 로그 저장 완료:', savedLog);
+        } catch (error) {
+          console.error('❌ 네비게이션 로그 저장 실패:', error);
+          // 저장 실패해도 사용자 경험에는 영향 없도록 처리
+        }
+      }
+
       // 위치 추적 중지
       if (isTracking) {
         locationService.stopTracking();
         setIsTracking(false);
         setCurrentLocation(null);
       }
-      
+
       setIsNavigating(false);
       setNavigationStartTime(null);
-      
+
       Alert.alert(
         '안내 종료',
         `총 소요 시간: ${Math.floor(duration / 60)}분 ${Math.floor(duration % 60)}초`
@@ -553,7 +577,7 @@ export default function HomeScreen() {
       // 안내 시작
       setIsNavigating(true);
       setNavigationStartTime(new Date());
-      
+
       // 위치 추적 자동 시작
       if (!isTracking) {
         locationService.startTracking((location) => {
@@ -563,7 +587,7 @@ export default function HomeScreen() {
         setCenterOnLocation(true);
         setTimeout(() => setCenterOnLocation(false), 1000);
       }
-      
+
       Alert.alert('안내 시작', '경로 안내가 시작되었습니다.');
     }
   };
@@ -975,10 +999,10 @@ export default function HomeScreen() {
         ]}
         onPress={handleCurrentLocationPress}
       >
-        <Ionicons 
-          name={isTracking ? "navigate" : "navigate-outline"} 
-          size={24} 
-          color={isTracking ? "#FFFFFF" : "#2C6DE7"} 
+        <Ionicons
+          name={isTracking ? "navigate" : "navigate-outline"}
+          size={24}
+          color={isTracking ? "#FFFFFF" : "#2C6DE7"}
         />
       </TouchableOpacity>
 
@@ -1462,10 +1486,10 @@ export default function HomeScreen() {
                   ]}
                   onPress={handleNavigationToggle}
                 >
-                  <MaterialIcons 
-                    name={isNavigating ? "stop" : "navigation"} 
-                    size={20} 
-                    color="white" 
+                  <MaterialIcons
+                    name={isNavigating ? "stop" : "navigation"}
+                    size={20}
+                    color="white"
                   />
                   <Text style={styles.navigationButtonText}>
                     {isNavigating ? '안내 종료' : '안내 시작'}

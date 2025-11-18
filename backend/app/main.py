@@ -25,15 +25,16 @@ PORT = int(os.getenv("PORT", 8000))
 DEBUG = os.getenv("DEBUG", "True").lower() == "true"
 
 # 로그 디렉토리 설정 (환경에 따라 자동 변경)
-LOG_DIR = os.getenv("LOG_DIR", "./logs")  # 기본값: 현재 디렉토리의 logs
-Path(LOG_DIR).mkdir(parents=True, exist_ok=True)  # 디렉토리 자동 생성
+BASE_DIR = Path(__file__).parent.parent  # backend 디렉토리
+LOG_DIR = BASE_DIR / "logs"
+LOG_DIR.mkdir(parents=True, exist_ok=True)  # 디렉토리 자동 생성
 
 # 로깅 설정
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.FileHandler('/home/ubuntu/logs/api.log'),
+        logging.FileHandler(LOG_DIR / 'api.log'),
         logging.StreamHandler()
     ]
 )

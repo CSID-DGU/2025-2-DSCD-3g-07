@@ -4,8 +4,11 @@ import os
 from dotenv import load_dotenv
 from fastapi import Depends, FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
+import logging
+from datetime import datetime
 from sqlalchemy import text
 from sqlalchemy.orm import Session
+from pathlib import Path
 
 from app.database import engine, get_db
 from app.routers import auth, routes, weather, gpx_routes, navigation_logs
@@ -20,6 +23,23 @@ load_dotenv()  # .env 로드
 HOST = os.getenv("HOST", "0.0.0.0")  # nosec B104
 PORT = int(os.getenv("PORT", 8000))
 DEBUG = os.getenv("DEBUG", "True").lower() == "true"
+
+# 로그 디렉토리 설정 (환경에 따라 자동 변경)
+LOG_DIR = os.getenv("LOG_DIR", "./logs")  # 기본값: 현재 디렉토리의 logs
+Path(LOG_DIR).mkdir(parents=True, exist_ok=True)  # 디렉토리 자동 생성
+
+# 로깅 설정
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler('/home/ubuntu/logs/api.log'),
+        logging.StreamHandler()
+    ]
+)
+
+logger = logging.getLogger(__name__)
+
 
 app = FastAPI(
     title="PaceTry API",
@@ -84,6 +104,8 @@ async def read_root() -> dict:
     Returns:
         환영 메시지 및 서버 정보
     """
+    logger.info("Root endpoint accessed")
+
     return {
         "message": "🚶‍♂️ PaceTry API Server",
         "version": "1.0.0",
@@ -96,7 +118,10 @@ async def read_root() -> dict:
 @app.get("/api-health", tags=["Health"])
 async def api_health_check():
     """API 서버 상태를 확인합니다."""
-    return {"status": "healthy", "version": "1.0.0"}
+    logger.info("Health check endpoint accessed")
+    return {"status": "healthy", "version": "1.0.0",
+            "timestamp": datetime.now().isoformat()
+            }
 
 
 @app.get("/transit-route", tags=["Routes"])

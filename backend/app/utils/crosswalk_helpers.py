@@ -15,7 +15,7 @@ def crosswalk_wait_avg(real_coord):
         wait_avg = 0
     else:
         red, green = gyo.iloc[idx, -2], gyo.iloc[idx, -1]
-        wait_avg = (green - 7 + red) ** 2 / 2
+        wait_avg = (green + red - 7) ** 2 / (2 * (green + red))
 
     return int(wait_avg)
 

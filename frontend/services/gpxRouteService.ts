@@ -30,6 +30,7 @@ export interface RecommendRoutesParams {
     route_type?: 'walking' | 'running' | 'mixed';
     user_lat?: number;
     user_lng?: number;
+    user_speed_kmh?: number; // 사용자 평균 보행 속도 (km/h, Health Connect Case 2)
     max_distance_from_user?: number;
     distance_tolerance?: number; // 거리 허용 오차 (km)
     duration_tolerance?: number; // 시간 허용 오차 (분)
@@ -62,6 +63,9 @@ export async function getRecommendedRoutes(
         }
         if (params.user_lng !== undefined) {
             queryParams.append('user_lng', params.user_lng.toString());
+        }
+        if (params.user_speed_kmh !== undefined) {
+            queryParams.append('user_speed_kmh', params.user_speed_kmh.toString());
         }
         if (params.max_distance_from_user !== undefined) {
             queryParams.append('max_distance_from_user', params.max_distance_from_user.toString());

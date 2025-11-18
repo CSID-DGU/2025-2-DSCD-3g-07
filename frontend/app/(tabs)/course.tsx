@@ -72,9 +72,9 @@ export default function CourseScreen() {
   const loadUserWalkingSpeed = async () => {
     try {
       const speeds = await healthConnectService.getAllTimeAverageSpeeds();
-      if (speeds.speedCase1 && speeds.speedCase1 > 0) {
-        setWalkingSpeed(speeds.speedCase1); // km/h
-        console.log(`✅ 사용자 도보 속도: ${speeds.speedCase1.toFixed(2)} km/h`);
+      if (speeds.speedCase2 && speeds.speedCase2 > 0) {
+        setWalkingSpeed(speeds.speedCase2); // km/h - Case 2: 느린 산책 포함
+        console.log(`✅ 사용자 도보 속도 (Case 2): ${speeds.speedCase2.toFixed(2)} km/h`);
       } else {
         // 기본값: 평균 도보 속도 4.5 km/h
         setWalkingSpeed(4.5);
@@ -177,6 +177,7 @@ export default function CourseScreen() {
         duration_minutes: searchMode === 'time' ? value : undefined,
         user_lat: currentLocation.latitude,
         user_lng: currentLocation.longitude,
+        user_speed_kmh: walkingSpeed || undefined, // Case 2 속도 전달
         max_distance_from_user: 30.0, // 30km 이내 경로 검색 (서울-경기 권역)
         distance_tolerance: 2.0, // ±2km 허용
         duration_tolerance: 20, // ±20분 허용

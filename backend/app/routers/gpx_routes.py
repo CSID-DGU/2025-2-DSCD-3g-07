@@ -339,6 +339,7 @@ async def recommend_routes(
     route_type: Optional[str] = None,
     user_lat: Optional[float] = None,
     user_lng: Optional[float] = None,
+    user_speed_kmh: Optional[float] = None,
     max_distance_from_user: float = 10.0,
     distance_tolerance: float = 1.0,
     duration_tolerance: int = 15,
@@ -361,6 +362,7 @@ async def recommend_routes(
         route_type: 경로 타입 (walking/running/mixed)
         user_lat: 사용자 위도 (필수)
         user_lng: 사용자 경도 (필수)
+        user_speed_kmh: 사용자 평균 보행 속도 (km/h, Health Connect Case 2)
         max_distance_from_user: 검색 반경 (km, 기본 10km)
         distance_tolerance: 거리 허용 오차 (km, 기본 ±1km)
         duration_tolerance: 시간 허용 오차 (분, 기본 ±15분)
@@ -442,9 +444,16 @@ async def recommend_routes(
                     match = True
             
             if duration_minutes and not match:
-                # 목표 시간 ± 허용 오차 범위
-                if abs(est_duration - duration_minutes) <= duration_tolerance:
-                    match = True
+                # 사용자 속도가 제공되면 실시간 재계산, 아니면 DB 값 사용
+                if user_speed_kmh and user_speed_kmh > 0:
+                    # 사용자 속도 기반 예상 시간 재계산
+                    user_estimated_duration = (float(dist_km) / user_speed_kmh) * 60
+                    if abs(user_estimated_duration - duration_minutes) <= duration_tolerance:
+                        match = True
+                else:
+                    # 목표 시간 ± 허용 오차 범위 (DB 저장 값 사용)
+                    if abs(est_duration - duration_minutes) <= duration_tolerance:
+                        match = True
             
             if not match:
                 continue

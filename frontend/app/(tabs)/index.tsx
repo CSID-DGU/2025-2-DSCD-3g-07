@@ -1560,9 +1560,9 @@ export default function HomeScreen() {
                             style={[
                               styles.slopeStatValue,
                               routeInfo.slopeAnalysis.factors?.slope_factor &&
-                                routeInfo.slopeAnalysis.factors.slope_factor < 1
-                                ? styles.slopeStatValueIncrease
-                                : styles.slopeStatValueDecrease,
+                                routeInfo.slopeAnalysis.factors.slope_factor > 1
+                                ? styles.slopeStatValueIncrease  // 계수 > 1 = 시간 증가 = 빨간색
+                                : styles.slopeStatValueDecrease, // 계수 < 1 = 시간 감소 = 초록색
                             ]}
                           >
                             {(() => {

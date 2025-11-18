@@ -153,3 +153,90 @@ class HealthDataResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+# ============ 네비게이션 로그 스키마 ============
+class NavigationLogCreate(BaseModel):
+    """네비게이션 로그 생성 요청"""
+    
+    route_mode: str = Field(..., description="경로 모드: 'transit' 또는 'walking'")
+    
+    # 위치 정보
+    start_location: Optional[str] = Field(None, description="출발지 주소/명칭")
+    end_location: Optional[str] = Field(None, description="도착지 주소/명칭")
+    start_lat: float = Field(..., description="출발지 위도")
+    start_lon: float = Field(..., description="출발지 경도")
+    end_lat: float = Field(..., description="도착지 위도")
+    end_lon: float = Field(..., description="도착지 경도")
+    
+    # 경로 상세 정보
+    total_distance_m: float = Field(..., description="총 거리 (m)")
+    transport_modes: Optional[List[str]] = Field(None, description="대중교통 수단 리스트")
+    crosswalk_count: int = Field(0, description="횡단보도 개수")
+    
+    # 보행 시간 계산 계수
+    user_speed_factor: Optional[float] = Field(None, description="사용자 속도 계수")
+    slope_factor: Optional[float] = Field(None, description="경사도 계수")
+    weather_factor: Optional[float] = Field(None, description="날씨 계수")
+    
+    # 시간 정보
+    estimated_time_seconds: int = Field(..., description="예상 시간 (초)")
+    actual_time_seconds: int = Field(..., description="실제 소요 시간 (초)")
+    
+    # 날씨 및 상세 데이터
+    weather_id: Optional[int] = Field(None, description="날씨 캐시 ID")
+    route_data: Optional[dict] = Field(None, description="전체 경로 상세 정보 (JSON)")
+    
+    # 타임스탬프
+    started_at: datetime = Field(..., description="안내 시작 시간")
+    ended_at: datetime = Field(..., description="안내 종료 시간")
+
+
+class NavigationLogResponse(BaseModel):
+    """네비게이션 로그 응답"""
+    
+    log_id: int
+    user_id: int
+    route_mode: str
+    
+    # 위치 정보
+    start_location: Optional[str]
+    end_location: Optional[str]
+    start_lat: float
+    start_lon: float
+    end_lat: float
+    end_lon: float
+    
+    # 경로 상세 정보
+    total_distance_m: float
+    transport_modes: Optional[List[str]]
+    crosswalk_count: int
+    
+    # 보행 시간 계산 계수
+    user_speed_factor: Optional[float]
+    slope_factor: Optional[float]
+    weather_factor: Optional[float]
+    
+    # 시간 정보
+    estimated_time_seconds: int
+    actual_time_seconds: int
+    time_difference_seconds: int = Field(description="실제 - 예상 시간 차이")
+    
+    # 날씨 및 상세 데이터
+    weather_id: Optional[int]
+    route_data: Optional[dict]
+    
+    # 타임스탬프
+    started_at: datetime
+    ended_at: datetime
+    created_at: datetime
+    
+    class Config:
+        from_attributes = True
+
+
+class NavigationLogListResponse(BaseModel):
+    """네비게이션 로그 목록 응답"""
+    
+    total_count: int
+    logs: List[NavigationLogResponse]

@@ -126,7 +126,7 @@ class HealthData(Base):
     )
 
     user = relationship("Users", back_populates="health_data")
-    weather = relationship("WeatherCache")
+    # weather = relationship("WeatherCache")  # weather_id가 주석 처리되어 비활성화
 
 
 # 4) activity_speed_profile

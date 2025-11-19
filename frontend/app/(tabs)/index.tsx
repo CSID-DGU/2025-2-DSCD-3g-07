@@ -539,13 +539,14 @@ export default function HomeScreen() {
       // DB에 저장
       if (navigationStartTime && routeInfo && startLocation && endLocation) {
         try {
-          const logData = extractNavigationLogData(
+          const logData = await extractNavigationLogData(
             routeInfo,
             startLocation,
             endLocation,
             routeMode,
             navigationStartTime,
-            endTime
+            endTime,
+            weatherData // 날씨 데이터 전달
           );
 
           // TODO: 실제 user_id는 로그인 시스템에서 가져와야 함
@@ -1394,90 +1395,6 @@ export default function HomeScreen() {
                   </View>
                 </View>
 
-                {/* 사용자 속도 및 날씨 정보 */}
-                {(walkingSpeedCase1 || weatherData) && (
-                  <View style={styles.additionalInfoContainer}>
-                    {walkingSpeedCase1 && (
-                      <View style={styles.infoItem}>
-                        <Text style={styles.infoIcon}>🚶</Text>
-                        <View style={styles.infoTextContainer}>
-                          <Text style={styles.infoText}>
-                            사용자 속도: {(walkingSpeedCase1 * 3.6).toFixed(2)}{' '}
-                            km/h
-                          </Text>
-                          {routeInfo.slopeAnalysis?.factors
-                            ?.user_speed_factor && (
-                              <Text
-                                style={[
-                                  styles.infoImpact,
-                                  routeInfo.slopeAnalysis.factors
-                                    .user_speed_factor > 1
-                                    ? styles.infoImpactIncrease
-                                    : styles.infoImpactDecrease,
-                                ]}
-                              >
-                                {(() => {
-                                  const factor =
-                                    routeInfo.slopeAnalysis.factors
-                                      .user_speed_factor;
-                                  // 원본 도보 시간에 사용자 속도 계수만 적용한 시간 계산
-                                  const originalTime =
-                                    routeInfo.slopeAnalysis
-                                      .total_original_walk_time;
-                                  const timeWithUserSpeed = originalTime * factor;
-                                  const impact = Math.round(
-                                    timeWithUserSpeed - originalTime
-                                  );
-                                  const sign =
-                                    impact > 0 ? '+' : impact < 0 ? '-' : '';
-                                  return `${sign}${Math.floor(Math.abs(impact) / 60)}분 ${Math.abs(impact) % 60}초`;
-                                })()}
-                              </Text>
-                            )}
-                        </View>
-                      </View>
-                    )}
-                    {weatherData && (
-                      <View style={styles.infoItem}>
-                        <Text style={styles.infoIcon}>🌤️</Text>
-                        <View style={styles.infoTextContainer}>
-                          <Text style={styles.infoText}>
-                            날씨: {weatherData.temp_c}°C
-                          </Text>
-                          {routeInfo.slopeAnalysis?.factors?.weather_factor && (
-                            <Text
-                              style={[
-                                styles.infoImpact,
-                                routeInfo.slopeAnalysis.factors.weather_factor >
-                                  1
-                                  ? styles.infoImpactIncrease
-                                  : styles.infoImpactDecrease,
-                              ]}
-                            >
-                              {(() => {
-                                const factor =
-                                  routeInfo.slopeAnalysis.factors
-                                    .weather_factor;
-                                // 원본 도보 시간에 날씨 계수만 적용한 시간 계산
-                                const originalTime =
-                                  routeInfo.slopeAnalysis
-                                    .total_original_walk_time;
-                                const timeWithWeather = originalTime * factor;
-                                const impact = Math.round(
-                                  timeWithWeather - originalTime
-                                );
-                                const sign =
-                                  impact > 0 ? '+' : impact < 0 ? '-' : '';
-                                return `${sign}${Math.floor(Math.abs(impact) / 60)}분 ${Math.abs(impact) % 60}초`;
-                              })()}
-                            </Text>
-                          )}
-                        </View>
-                      </View>
-                    )}
-                  </View>
-                )}
-
                 {/* 안내 시작/종료 버튼 */}
                 <TouchableOpacity
                   style={[
@@ -1496,19 +1413,7 @@ export default function HomeScreen() {
                   </Text>
                 </TouchableOpacity>
 
-                {/* 경사도 분석 정보 */}
-                {(() => {
-                  const hasSlope =
-                    routeInfo.slopeAnalysis &&
-                    !routeInfo.slopeAnalysis.error &&
-                    routeInfo.slopeAnalysis.walk_legs_analysis &&
-                    routeInfo.slopeAnalysis.walk_legs_analysis.length > 0;
-
-                  // 디버깅 로그 제거 (렌더링 시 반복 실행 방지)
-                  // console.log('🔍 [경사도 표시 조건]', { ... });
-
-                  return null;
-                })()}
+                {/* 보행 경로 분석 (통합) */}
                 {routeInfo.slopeAnalysis &&
                   !routeInfo.slopeAnalysis.error &&
                   routeInfo.slopeAnalysis.walk_legs_analysis &&
@@ -1516,15 +1421,16 @@ export default function HomeScreen() {
                     <View style={styles.slopeAnalysisContainer}>
                       <View style={styles.slopeAnalysisHeader}>
                         <MaterialIcons
-                          name="terrain"
+                          name="analytics"
                           size={18}
-                          color="#FF6B6B"
+                          color="#4F46E5"
                         />
                         <Text style={styles.slopeAnalysisTitle}>
-                          경사도 분석
+                          보행 경로 분석
                         </Text>
                       </View>
 
+                      {/* 상단 요약 정보 */}
                       <View style={styles.slopeStatsRow}>
                         <View style={styles.slopeStatItem}>
                           <Text style={styles.slopeStatLabel}>평균 경사</Text>
@@ -1555,51 +1461,171 @@ export default function HomeScreen() {
                         </View>
 
                         <View style={styles.slopeStatItem}>
-                          <Text style={styles.slopeStatLabel}>보정 시간</Text>
+                          <Text style={styles.slopeStatLabel}>총 보정</Text>
                           <Text
                             style={[
                               styles.slopeStatValue,
-                              routeInfo.slopeAnalysis.factors?.slope_factor &&
-                                routeInfo.slopeAnalysis.factors.slope_factor > 1
-                                ? styles.slopeStatValueIncrease  // 계수 > 1 = 시간 증가 = 빨간색
-                                : styles.slopeStatValueDecrease, // 계수 < 1 = 시간 감소 = 초록색
+                              routeInfo.slopeAnalysis.total_adjusted_walk_time <
+                                routeInfo.slopeAnalysis.total_original_walk_time
+                                ? styles.slopeStatValueDecrease
+                                : styles.slopeStatValueIncrease,
                             ]}
                           >
                             {(() => {
-                              if (
-                                !routeInfo.slopeAnalysis.factors?.slope_factor
-                              ) {
-                                return '0분 0초';
-                              }
-                              const factor =
-                                routeInfo.slopeAnalysis.factors.slope_factor;
-                              const originalTime =
-                                routeInfo.slopeAnalysis
-                                  .total_original_walk_time;
-                              const timeWithSlope = originalTime * factor;
-                              const impact = Math.round(
-                                timeWithSlope - originalTime
-                              );
-                              const sign =
-                                impact > 0 ? '+' : impact < 0 ? '-' : '';
+                              const impact =
+                                routeInfo.slopeAnalysis.total_adjusted_walk_time -
+                                routeInfo.slopeAnalysis.total_original_walk_time;
+                              const sign = impact > 0 ? '+' : '-';
                               return `${sign}${Math.floor(Math.abs(impact) / 60)}분 ${Math.abs(impact) % 60}초`;
                             })()}
                           </Text>
                         </View>
 
                         <View style={styles.slopeStatItem}>
-                          <Text style={styles.slopeStatLabel}>보정 후</Text>
+                          <Text style={styles.slopeStatLabel}>예상 시간</Text>
                           <Text style={styles.slopeStatValue}>
                             {Math.floor(
-                              routeInfo.slopeAnalysis.total_adjusted_walk_time /
-                              60
+                              routeInfo.slopeAnalysis.total_adjusted_walk_time / 60
                             )}
-                            분
+                            분 {routeInfo.slopeAnalysis.total_adjusted_walk_time % 60}초
                           </Text>
                         </View>
                       </View>
 
-                      {/* 계산 설명 */}
+                      {/* 순차 적용 분석 */}
+                      <View style={{
+                        marginTop: 16,
+                        paddingTop: 16,
+                        borderTopWidth: 1,
+                        borderTopColor: '#E6E9F2',
+                      }}>
+                        {/* 사용자 속도 */}
+                        {walkingSpeedCase1 && routeInfo.slopeAnalysis.factors?.user_speed_factor && (
+                          <View style={{
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            marginBottom: 12,
+                            paddingHorizontal: 8,
+                          }}>
+                            <Text style={{ fontSize: 16, marginRight: 8 }}>🚶</Text>
+                            <View style={{ flex: 1 }}>
+                              <Text style={{
+                                fontSize: 13,
+                                color: '#374151',
+                                fontWeight: '500',
+                              }}>
+                                사용자 속도: {(walkingSpeedCase1 * 3.6).toFixed(2)} km/h
+                              </Text>
+                              <Text style={{
+                                fontSize: 12,
+                                color: '#6B7280',
+                                marginTop: 2,
+                              }}>
+                                → {(() => {
+                                  const originalTime = routeInfo.slopeAnalysis.total_original_walk_time;
+                                  const factor = routeInfo.slopeAnalysis.factors.user_speed_factor;
+                                  const afterTime = Math.round(originalTime * factor);
+                                  const impact = afterTime - originalTime;
+                                  const sign = impact > 0 ? '+' : impact < 0 ? '-' : '';
+                                  const percentage = (1 - factor) * 100;
+                                  const percentSign = factor < 1 ? '-' : factor > 1 ? '+' : '';
+                                  return `${Math.floor(afterTime / 60)}분 ${afterTime % 60}초 (${sign}${Math.floor(Math.abs(impact) / 60)}분 ${Math.abs(impact) % 60}초, ${percentSign}${Math.abs(percentage).toFixed(0)}%)`;
+                                })()}
+                              </Text>
+                            </View>
+                          </View>
+                        )}
+
+                        {/* 날씨 */}
+                        {weatherData && routeInfo.slopeAnalysis.factors?.weather_factor && (
+                          <View style={{
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            marginBottom: 12,
+                            paddingHorizontal: 8,
+                          }}>
+                            <Text style={{ fontSize: 16, marginRight: 8 }}>🌤️</Text>
+                            <View style={{ flex: 1 }}>
+                              <Text style={{
+                                fontSize: 13,
+                                color: '#374151',
+                                fontWeight: '500',
+                              }}>
+                                날씨: {weatherData.temp_c}°C
+                              </Text>
+                              <Text style={{
+                                fontSize: 12,
+                                color: '#6B7280',
+                                marginTop: 2,
+                              }}>
+                                → {(() => {
+                                  const originalTime = routeInfo.slopeAnalysis.total_original_walk_time;
+                                  const userFactor = routeInfo.slopeAnalysis.factors.user_speed_factor;
+                                  const weatherFactor = routeInfo.slopeAnalysis.factors.weather_factor;
+                                  const beforeTime = Math.round(originalTime * userFactor);
+                                  const afterTime = Math.round(beforeTime * weatherFactor);
+                                  const impact = afterTime - beforeTime;
+                                  const sign = impact > 0 ? '+' : impact < 0 ? '-' : '';
+                                  const percentage = (1 - weatherFactor) * 100;
+                                  const percentSign = weatherFactor < 1 ? '-' : weatherFactor > 1 ? '+' : '';
+                                  return `${Math.floor(afterTime / 60)}분 ${afterTime % 60}초 (${sign}${Math.floor(Math.abs(impact) / 60)}분 ${Math.abs(impact) % 60}초, ${percentSign}${Math.abs(percentage).toFixed(0)}%)`;
+                                })()}
+                              </Text>
+                            </View>
+                          </View>
+                        )}
+
+                        {/* 경사도 */}
+                        {routeInfo.slopeAnalysis.factors?.slope_factor && (
+                          <View style={{
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            marginBottom: 12,
+                            paddingHorizontal: 8,
+                          }}>
+                            <Text style={{ fontSize: 16, marginRight: 8 }}>🏔️</Text>
+                            <View style={{ flex: 1 }}>
+                              <Text style={{
+                                fontSize: 13,
+                                color: '#374151',
+                                fontWeight: '500',
+                              }}>
+                                경사도: {(() => {
+                                  const legs = routeInfo.slopeAnalysis.walk_legs_analysis;
+                                  const totalDistance = legs.reduce((sum, leg) => sum + (leg.distance || 0), 0);
+                                  const weightedSum = legs.reduce(
+                                    (sum, leg) => sum + (leg.avg_slope || 0) * (leg.distance || 0),
+                                    0
+                                  );
+                                  const avgSlope = totalDistance > 0 ? (weightedSum / totalDistance) : 0;
+                                  return avgSlope > 0 ? `오르막 ${avgSlope.toFixed(1)}%` : avgSlope < 0 ? `내리막 ${Math.abs(avgSlope).toFixed(1)}%` : '평지';
+                                })()}
+                              </Text>
+                              <Text style={{
+                                fontSize: 12,
+                                color: '#6B7280',
+                                marginTop: 2,
+                              }}>
+                                → {(() => {
+                                  const originalTime = routeInfo.slopeAnalysis.total_original_walk_time;
+                                  const userFactor = routeInfo.slopeAnalysis.factors.user_speed_factor;
+                                  const weatherFactor = routeInfo.slopeAnalysis.factors.weather_factor;
+                                  const slopeFactor = routeInfo.slopeAnalysis.factors.slope_factor;
+                                  const beforeTime = Math.round(originalTime * userFactor * weatherFactor);
+                                  const afterTime = Math.round(beforeTime * slopeFactor);
+                                  const impact = afterTime - beforeTime;
+                                  const sign = impact > 0 ? '+' : impact < 0 ? '-' : '';
+                                  const percentage = (1 - slopeFactor) * 100;
+                                  const percentSign = slopeFactor < 1 ? '-' : slopeFactor > 1 ? '+' : '';
+                                  return `${Math.floor(afterTime / 60)}분 ${afterTime % 60}초 (${sign}${Math.floor(Math.abs(impact) / 60)}분 ${Math.abs(impact) % 60}초, ${percentSign}${Math.abs(percentage).toFixed(0)}%)`;
+                                })()}
+                              </Text>
+                            </View>
+                          </View>
+                        )}
+                      </View>
+
+                      {/* 하단 설명 */}
                       <View
                         style={{
                           marginTop: 12,
@@ -1615,13 +1641,7 @@ export default function HomeScreen() {
                             lineHeight: 16,
                           }}
                         >
-                          💡 기준 시간(
-                          {Math.floor(
-                            routeInfo.slopeAnalysis.total_original_walk_time /
-                            60
-                          )}
-                          분)에 사용자 속도, 경사도, 날씨를 반영한 예상
-                          시간입니다.
+                          💡 기준 시간({Math.floor(routeInfo.slopeAnalysis.total_original_walk_time / 60)}분 {routeInfo.slopeAnalysis.total_original_walk_time % 60}초)에 모든 요소를 순차 적용한 결과입니다.
                         </Text>
                         {routeInfo.slopeAnalysis.walk_legs_analysis.some(
                           leg => leg.is_transfer
@@ -1634,8 +1654,7 @@ export default function HomeScreen() {
                                 marginTop: 4,
                               }}
                             >
-                              ℹ️ 환승(실내) 구간은 경사도와 날씨 영향 없이 개인
-                              속도만 반영됩니다.
+                              ℹ️ 환승(실내) 구간은 경사도와 날씨 영향 없이 개인 속도만 반영됩니다.
                             </Text>
                           )}
                       </View>
@@ -1961,14 +1980,6 @@ const styles = StyleSheet.create({
     height: '100%',
     fontSize: 15,
     color: '#222',
-  },
-  inlineButton: {
-    width: 32,
-    height: 32,
-    borderRadius: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginLeft: 8,
   },
   inlineButton: {
     width: 32,
@@ -2496,30 +2507,6 @@ const styles = StyleSheet.create({
   },
   currentLocationTrackButtonActive: {
     backgroundColor: '#2C6DE7',
-  },
-  // 안내 시작/종료 버튼 스타일
-  navigationButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    marginTop: 16,
-    padding: 16,
-    backgroundColor: PRIMARY_COLOR,
-    borderRadius: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 4,
-    elevation: 4,
-  },
-  navigationButtonActive: {
-    backgroundColor: '#F44336',
-  },
-  navigationButtonText: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: 'white',
   },
   // 위치 정보 디버깅 스타일
   locationInfoDebug: {

@@ -545,3 +545,46 @@ async def get_model_info() -> dict:
             "안전 경고 생성",
         ],
     }
+
+
+# ==========================================
+# 날씨 데이터 저장 API
+# ==========================================
+
+class WeatherSaveRequest(BaseModel):
+    latitude: float
+    longitude: float
+    temperature_celsius: float
+    weather_condition: Optional[str] = None
+    precipitation_mm: Optional[float] = 0
+
+
+from fastapi import Depends
+from sqlalchemy.orm import Session
+from ..database import get_db
+from .. import crud, schemas
+
+
+@router.post("/save", response_model=schemas.WeatherCacheResponse, status_code=201)
+async def save_weather_data(
+    weather_data: WeatherSaveRequest,
+    db: Session = Depends(get_db)
+):
+    """
+    날씨 데이터를 DB에 저장하고 weather_id 반환
+    
+    네비게이션 로그 저장 시 weather_id를 함께 저장하기 위해 사용
+    """
+    weather_cache = crud.create_weather_cache(
+        db,
+        latitude=weather_data.latitude,
+        longitude=weather_data.longitude,
+        weather_time=datetime.now(KST),
+        temperature_celsius=weather_data.temperature_celsius,
+        weather_condition=weather_data.weather_condition,
+        precipitation_mm=int(weather_data.precipitation_mm) if weather_data.precipitation_mm else 0,
+        data_source="APP"
+    )
+    
+    return weather_cache
+

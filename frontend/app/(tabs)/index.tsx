@@ -978,7 +978,7 @@ export default function HomeScreen() {
       {/* 지도 (전체 화면) */}
       <View style={styles.mapContainer}>
         <KakaoMapWithRoute
-          jsKey="d377e8ba6e5edd8176c63a3f97c9e17b"
+          jsKey={process.env.EXPO_PUBLIC_KAKAO_JS_KEY || '9a91bb579fe8e58cc9e5e25d6a073869'}
           startLat={startLocation?.latitude || 37.5665}
           startLng={startLocation?.longitude || 126.978}
           endLat={endLocation?.latitude || 37.5665}

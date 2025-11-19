@@ -24,7 +24,7 @@ const PRIMARY_COLOR = '#2C6DE7';
 const SECONDARY_TEXT = '#4A5968';
 const LIGHT_BACKGROUND = '#F2F5FC';
 const BORDER_COLOR = '#E6E9F2';
-const KAKAO_JS_KEY = 'd377e8ba6e5edd8176c63a3f97c9e17b'; // 카카오맵 JavaScript API 키
+const KAKAO_JS_KEY = process.env.EXPO_PUBLIC_KAKAO_JS_KEY || '9a91bb579fe8e58cc9e5e25d6a073869'; // 카카오맵 JavaScript API 키
 
 type SearchMode = 'distance' | 'time';
 

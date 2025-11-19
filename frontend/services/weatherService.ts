@@ -13,7 +13,7 @@ const KMA_BASE_URL =
 
 // Use encoded API key as-is (no decodeURIComponent)
 const KMA_API_KEY =
-  'fd3ec2dea8cbb11a251a2ce60843ea3236811fca06f2a8eb8f63426b208f35da';
+  process.env.EXPO_PUBLIC_KMA_API_KEY || 'fd3ec2dea8cbb11a251a2ce60843ea3236811fca06f2a8eb8f63426b208f35da';
 
 const IS_WEB = Platform.OS === 'web';
 

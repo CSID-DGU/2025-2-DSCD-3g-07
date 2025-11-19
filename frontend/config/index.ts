@@ -85,23 +85,23 @@ const getExpoBasedApiUrl = (): string | null => {
   }
 };
 
-// 자동 IP 감지 함수 (Expo hostUri 우선)
+// EC2 URL 우선 적용 함수
 const getAutoDetectedApiUrl = (): string => {
   console.log('🔍 Starting API URL detection...');
 
-  // 1순위: Expo hostUri에서 실시간 IP 추출 (가장 정확)
-  const expoApiUrl = getExpoBasedApiUrl();
-  if (expoApiUrl) {
-    return expoApiUrl;
-  }
-
-  // 2순위: 환경 변수
+  // 1순위: 환경 변수 (EC2 URL)
   const envApiUrl =
     Constants.expoConfig?.extra?.API_BASE_URL ||
     process.env.EXPO_PUBLIC_API_URL;
   if (envApiUrl && envApiUrl !== 'http://localhost:8000') {
-    console.log('📌 Using environment variable:', envApiUrl);
+    console.log('📌 Using EC2 URL from environment variable:', envApiUrl);
     return envApiUrl;
+  }
+
+  // 2순위: Expo hostUri에서 실시간 IP 추출 (자동 감지)
+  const expoApiUrl = getExpoBasedApiUrl();
+  if (expoApiUrl) {
+    return expoApiUrl;
   }
 
   // 3순위: 플랫폼별 기본값
@@ -111,6 +111,7 @@ const getAutoDetectedApiUrl = (): string => {
 
   // 4순위: 개발 환경 fallback
   const fallbackIPs = [
+    'http://43.200.164.224:8000', // EC2 서버
     'http://172.30.1.59:8000', // 현재 백엔드 서버 IP
     'http://192.168.45.161:8000', // 이전 IP (백업용)
     'http://10.0.2.2:8000', // Android 에뮬레이터

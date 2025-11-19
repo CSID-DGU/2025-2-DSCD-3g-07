@@ -88,7 +88,12 @@ export async function saveNavigationLog(
     logData: NavigationLogData
 ): Promise<NavigationLogResponse> {
     try {
-        const response = await fetch(`${Config.API_BASE_URL}/navigation/logs?user_id=${userId}`, {
+        console.log('📤 네비게이션 로그 저장 시도:', {
+            url: `${Config.API_BASE_URL}/api/navigation/logs?user_id=${userId}`,
+            logData
+        });
+
+        const response = await fetch(`${Config.API_BASE_URL}/api/navigation/logs?user_id=${userId}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -96,14 +101,29 @@ export async function saveNavigationLog(
             body: JSON.stringify(logData),
         });
 
+        console.log('📥 응답 상태:', response.status, response.statusText);
+
         if (!response.ok) {
-            const error: any = await response.json();
-            throw new Error(error.detail || '네비게이션 로그 저장 실패');
+            const errorText = await response.text();
+            console.error('❌ 서버 에러 응답:', errorText);
+
+            try {
+                const error = JSON.parse(errorText);
+                throw new Error(error.detail || `네비게이션 로그 저장 실패 (${response.status})`);
+            } catch (parseError) {
+                throw new Error(`네비게이션 로그 저장 실패 (${response.status}): ${errorText}`);
+            }
         }
 
-        return await response.json() as NavigationLogResponse;
+        const result = await response.json();
+        console.log('✅ 네비게이션 로그 저장 성공:', result);
+        return result as NavigationLogResponse;
     } catch (error) {
-        console.error('❌ 네비게이션 로그 저장 오류:', error);
+        console.error('❌ 네비게이션 로그 저장 오류:', {
+            error,
+            message: error instanceof Error ? error.message : String(error),
+            stack: error instanceof Error ? error.stack : undefined
+        });
         throw error;
     }
 }
@@ -142,7 +162,7 @@ export async function getNavigationLogs(
             params.append('offset', options.offset.toString());
         }
 
-        const response = await fetch(`${Config.API_BASE_URL}/navigation/logs?${params}`);
+        const response = await fetch(`${Config.API_BASE_URL}/api/navigation/logs?${params}`);
 
         if (!response.ok) {
             const error: any = await response.json();
@@ -165,7 +185,7 @@ export async function getNavigationLogDetail(
 ): Promise<NavigationLogResponse> {
     try {
         const response = await fetch(
-            `${Config.API_BASE_URL}/navigation/logs/${logId}?user_id=${userId}`
+            `${Config.API_BASE_URL}/api/navigation/logs/${logId}?user_id=${userId}`
         );
 
         if (!response.ok) {
@@ -189,7 +209,7 @@ export async function getNavigationStatistics(
 ): Promise<NavigationStatistics> {
     try {
         const response = await fetch(
-            `${Config.API_BASE_URL}/navigation/logs/statistics/summary?user_id=${userId}&days=${days}`
+            `${Config.API_BASE_URL}/api/navigation/logs/statistics/summary?user_id=${userId}&days=${days}`
         );
 
         if (!response.ok) {
@@ -213,7 +233,7 @@ export async function deleteNavigationLog(
 ): Promise<void> {
     try {
         const response = await fetch(
-            `${Config.API_BASE_URL}/navigation/logs/${logId}?user_id=${userId}`,
+            `${Config.API_BASE_URL}/api/navigation/logs/${logId}?user_id=${userId}`,
             {
                 method: 'DELETE',
             }
@@ -232,14 +252,15 @@ export async function deleteNavigationLog(
 /**
  * routeInfo에서 네비게이션 로그 데이터 추출
  */
-export function extractNavigationLogData(
+export async function extractNavigationLogData(
     routeInfo: any,
     startLocation: any,
     endLocation: any,
     routeMode: 'transit' | 'walking',
     startTime: Date,
-    endTime: Date
-): NavigationLogData {
+    endTime: Date,
+    weatherData?: any
+): Promise<NavigationLogData> {
     // 총 거리 계산 (m)
     const totalDistanceM = routeInfo.totalDistance || 0;
 
@@ -269,14 +290,74 @@ export function extractNavigationLogData(
     // 실제 시간 (초)
     const actualTimeSeconds = Math.floor((endTime.getTime() - startTime.getTime()) / 1000);
 
+    // 좌표 추출 (여러 형식 지원)
+    let startLat = startLocation?.y || startLocation?.lat || routeInfo.rawItinerary?.legs?.[0]?.start?.lat;
+    let startLon = startLocation?.x || startLocation?.lng || startLocation?.lon || routeInfo.rawItinerary?.legs?.[0]?.start?.lon;
+    let endLat = endLocation?.y || endLocation?.lat || routeInfo.rawItinerary?.legs?.[routeInfo.rawItinerary?.legs?.length - 1]?.end?.lat;
+    let endLon = endLocation?.x || endLocation?.lng || endLocation?.lon || routeInfo.rawItinerary?.legs?.[routeInfo.rawItinerary?.legs?.length - 1]?.end?.lon;
+
+    console.log('🗺️ 좌표 추출:', { startLat, startLon, endLat, endLon });
+
+    // 날씨 데이터 저장 및 weather_id 획득
+    let weatherId: number | undefined = undefined;
+    console.log('🌤️ Weather save 조건 체크:', {
+        hasWeatherData: !!weatherData,
+        weatherData: weatherData,
+        startLat,
+        startLon,
+        willSave: !!(weatherData && startLat && startLon)
+    });
+
+    if (weatherData && startLat && startLon) {
+        try {
+            console.log('🌤️ Weather save 시작:', {
+                url: `${Config.API_BASE_URL}/api/weather/save`,
+                data: {
+                    latitude: startLat,
+                    longitude: startLon,
+                    temperature_celsius: weatherData.temp_c || 0,
+                    weather_condition: weatherData.pty === 0 ? 'sunny' : weatherData.pty === 1 ? 'rainy' : weatherData.pty === 3 ? 'snowy' : 'cloudy',
+                    precipitation_mm: weatherData.rain_mm_per_h || 0,
+                }
+            });
+
+            const weatherSaveResponse = await fetch(`${Config.API_BASE_URL}/api/weather/save`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    latitude: startLat,
+                    longitude: startLon,
+                    temperature_celsius: weatherData.temp_c || 0,
+                    weather_condition: weatherData.pty === 0 ? 'sunny' : weatherData.pty === 1 ? 'rainy' : weatherData.pty === 3 ? 'snowy' : 'cloudy',
+                    precipitation_mm: weatherData.rain_mm_per_h || 0,
+                }),
+            });
+
+            console.log('🌤️ Weather save 응답 상태:', weatherSaveResponse.status);
+
+            if (weatherSaveResponse.ok) {
+                const savedWeather = await weatherSaveResponse.json();
+                weatherId = savedWeather.weather_id;
+                console.log('☁️ 날씨 데이터 저장 완료:', { savedWeather, weatherId });
+            } else {
+                const errorText = await weatherSaveResponse.text();
+                console.error('❌ 날씨 저장 응답 실패:', { status: weatherSaveResponse.status, error: errorText });
+            }
+        } catch (error) {
+            console.error('❌ 날씨 데이터 저장 실패:', error);
+        }
+    }
+
     return {
         route_mode: routeMode,
-        start_location: startLocation?.place_name || startLocation?.address,
-        end_location: endLocation?.place_name || endLocation?.address,
-        start_lat: startLocation?.y || startLocation?.lat,
-        start_lon: startLocation?.x || startLocation?.lng,
-        end_lat: endLocation?.y || endLocation?.lat,
-        end_lon: endLocation?.x || endLocation?.lng,
+        start_location: startLocation?.place_name || startLocation?.address || startLocation?.name || routeInfo.rawItinerary?.legs?.[0]?.start?.name,
+        end_location: endLocation?.place_name || endLocation?.address || endLocation?.name || routeInfo.rawItinerary?.legs?.[routeInfo.rawItinerary?.legs?.length - 1]?.end?.name,
+        start_lat: startLat,
+        start_lon: startLon,
+        end_lat: endLat,
+        end_lon: endLon,
         total_distance_m: totalDistanceM,
         transport_modes: transportModes.length > 0 ? transportModes : undefined,
         crosswalk_count: crosswalkCount,
@@ -285,6 +366,7 @@ export function extractNavigationLogData(
         weather_factor: weatherFactor,
         estimated_time_seconds: estimatedTimeSeconds,
         actual_time_seconds: actualTimeSeconds,
+        weather_id: weatherId,
         route_data: routeInfo,  // 전체 경로 데이터 저장
         started_at: startTime.toISOString(),
         ended_at: endTime.toISOString(),

@@ -28,7 +28,7 @@ import {
 } from '../../services/placeSearchService';
 
 // 카카오맵 JS 키 (환경변수로 관리)
-const KAKAO_JS_KEY = process.env.EXPO_PUBLIC_KAKAO_JS_KEY || '9a91bb579fe8e58cc9e5e25d6a073869';
+const KAKAO_JS_KEY = process.env.EXPO_PUBLIC_KAKAO_JS_KEY || 'd377e8ba6e5edd8176c63a3f97c9e17b';
 
 const TABS = [
   { id: 'recommended', label: '추천', helper: '맞춤 추천' },

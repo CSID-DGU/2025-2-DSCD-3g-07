@@ -1,5 +1,5 @@
 // 카카오 로컬 API를 사용한 장소 검색 서비스
-const KAKAO_REST_API_KEY = '39bab28c8bead59001f0ad345662d76e'; // 카카오 REST API 키
+const KAKAO_REST_API_KEY = process.env.EXPO_PUBLIC_KAKAO_REST_API_KEY || '39bab28c8bead59001f0ad345662d76e'; // 카카오 REST API 키
 const KAKAO_LOCAL_API = 'https://dapi.kakao.com/v2/local/search/keyword.json';
 
 export interface PlaceSearchResult {

@@ -31,7 +31,7 @@ export interface RouteSegment {
   routeName?: string; // 버스/지하철 노선명
 }
 
-const TMAP_API_KEY = 'uAD0x6MeRK3WiaTxMW3ck23uBsilTxXA7hLk0Lo4';
+const TMAP_API_KEY = process.env.EXPO_PUBLIC_TMAP_API_KEY || 'uAD0x6MeRK3WiaTxMW3ck23uBsilTxXA7hLk0Lo4';
 const TMAP_PEDESTRIAN_URL =
   'https://apis.openapi.sk.com/tmap/routes/pedestrian';
 const TMAP_TRANSIT_URL = 'https://apis.openapi.sk.com/transit/routes';

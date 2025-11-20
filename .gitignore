@@ -71,14 +71,14 @@ out/
 *.tmp
 *.temp
 
-# Android
-android/app/build/
-android/.gradle/
-android/gradle/
-android/gradlew
-android/gradlew.bat
-android/local.properties
-android/app/src/main/assets/
+# Android (root level only - frontend/android is managed by prebuild)
+/android/
+
+# Test files in root
+/test_*.py
+/test_*.json
+/test_*.txt
+/tsconfig.json
 
 # iOS
 ios/build/

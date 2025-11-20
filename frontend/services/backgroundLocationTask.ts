@@ -5,8 +5,18 @@
  * 경로 안내 중 정확한 보행 속도를 측정합니다.
  */
 
-import * as TaskManager from 'expo-task-manager';
 import * as Location from 'expo-location';
+
+// TaskManager를 선택적으로 import
+let TaskManager: any = null;
+let isTaskManagerAvailable = false;
+
+try {
+    TaskManager = require('expo-task-manager');
+    isTaskManagerAvailable = true;
+} catch (error) {
+    console.warn('⚠️ expo-task-manager를 사용할 수 없습니다. 백그라운드 위치 추적은 development build에서만 사용 가능합니다.');
+}
 
 // 백그라운드 위치 추적 태스크 이름
 export const BACKGROUND_LOCATION_TASK = 'background-location-task';
@@ -29,42 +39,57 @@ export function clearBackgroundLocations(): void {
 }
 
 /**
+ * TaskManager 사용 가능 여부 확인
+ */
+export function isTaskManagerSupported(): boolean {
+    return isTaskManagerAvailable;
+}
+
+/**
  * 백그라운드 위치 추적 태스크 정의
  */
-TaskManager.defineTask(BACKGROUND_LOCATION_TASK, async ({ data, error }: any) => {
-    if (error) {
-        console.error('❌ 백그라운드 위치 추적 오류:', error);
-        return;
-    }
-
-    if (data) {
-        const { locations } = data as { locations: Location.LocationObject[] };
-
-        // 위치 데이터 저장
-        backgroundLocations.push(...locations);
-
-        // 메모리 관리: 최근 1000개만 유지
-        if (backgroundLocations.length > 1000) {
-            backgroundLocations = backgroundLocations.slice(-1000);
+if (isTaskManagerAvailable && TaskManager) {
+    TaskManager.defineTask(BACKGROUND_LOCATION_TASK, async ({ data, error }: any) => {
+        if (error) {
+            console.error('❌ 백그라운드 위치 추적 오류:', error);
+            return;
         }
 
-        console.log(`📍 백그라운드 위치 수집됨: ${locations.length}개, 총: ${backgroundLocations.length}개`);
+        if (data) {
+            const { locations } = data as { locations: Location.LocationObject[] };
 
-        // 최신 위치 로깅
-        if (locations.length > 0) {
-            const latest = locations[locations.length - 1];
-            if (latest) {
-                console.log(`   └─ 최신: (${latest.coords.latitude.toFixed(6)}, ${latest.coords.longitude.toFixed(6)})`);
+            // 위치 데이터 저장
+            backgroundLocations.push(...locations);
+
+            // 메모리 관리: 최근 1000개만 유지
+            if (backgroundLocations.length > 1000) {
+                backgroundLocations = backgroundLocations.slice(-1000);
+            }
+
+            console.log(`📍 백그라운드 위치 수집됨: ${locations.length}개, 총: ${backgroundLocations.length}개`);
+
+            // 최신 위치 로깅
+            if (locations.length > 0) {
+                const latest = locations[locations.length - 1];
+                if (latest) {
+                    console.log(`   └─ 최신: (${latest.coords.latitude.toFixed(6)}, ${latest.coords.longitude.toFixed(6)})`);
+                }
             }
         }
-    }
-});
+    });
+}
 
 /**
  * 백그라운드 위치 추적 시작
  */
 export async function startBackgroundLocationTracking(): Promise<boolean> {
     try {
+        // TaskManager가 사용 가능한지 확인
+        if (!isTaskManagerAvailable || !TaskManager) {
+            console.warn('⚠️ 백그라운드 위치 추적은 development build에서만 사용 가능합니다. Expo Go에서는 지원되지 않습니다.');
+            return false;
+        }
+
         // 1. 백그라운드 권한 확인
         const { status: foregroundStatus } = await Location.requestForegroundPermissionsAsync();
 
@@ -120,6 +145,11 @@ export async function startBackgroundLocationTracking(): Promise<boolean> {
  */
 export async function stopBackgroundLocationTracking(): Promise<void> {
     try {
+        if (!isTaskManagerAvailable || !TaskManager) {
+            console.warn('⚠️ TaskManager를 사용할 수 없습니다.');
+            return;
+        }
+
         const isRegistered = await TaskManager.isTaskRegisteredAsync(BACKGROUND_LOCATION_TASK);
 
         if (isRegistered) {
@@ -136,6 +166,10 @@ export async function stopBackgroundLocationTracking(): Promise<void> {
  */
 export async function isBackgroundLocationTrackingActive(): Promise<boolean> {
     try {
+        if (!isTaskManagerAvailable || !TaskManager) {
+            return false;
+        }
+
         return await TaskManager.isTaskRegisteredAsync(BACKGROUND_LOCATION_TASK);
     } catch (error) {
         console.error('❌ 백그라운드 위치 추적 상태 확인 실패:', error);

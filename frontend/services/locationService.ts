@@ -5,6 +5,7 @@ import {
   isBackgroundLocationTrackingActive,
   getBackgroundLocations,
   clearBackgroundLocations,
+  isTaskManagerSupported,
 } from './backgroundLocationTask';
 
 export interface CurrentLocation {
@@ -123,6 +124,12 @@ class LocationService {
    */
   async startBackgroundTracking(): Promise<boolean> {
     try {
+      // TaskManager가 지원되는지 확인
+      if (!isTaskManagerSupported()) {
+        console.warn('⚠️ 백그라운드 위치 추적은 Expo Go에서 지원되지 않습니다. 포어그라운드 추적만 사용됩니다.');
+        return false;
+      }
+
       const success = await startBackgroundLocationTracking();
 
       if (success) {

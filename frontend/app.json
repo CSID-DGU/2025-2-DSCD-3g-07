@@ -64,6 +64,8 @@
     },
     "plugins": [
       "expo-router",
+      "expo-location",
+      "expo-task-manager",
       [
         "expo-splash-screen",
         {

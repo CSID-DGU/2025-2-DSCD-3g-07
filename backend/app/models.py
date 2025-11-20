@@ -149,6 +149,7 @@ class ActivitySpeedProfile(Base):
     # speed_variance = Column(Numeric(4, 2))
     # confidence_score = Column(Numeric(3, 2))
     data_points_count = Column(Integer, server_default="0")
+    speed_history = Column(JSONType, server_default="[]")  # 속도 변화 이력 [{speed, source, timestamp, nav_log_id}, ...]
     last_updated = Column(
         DateTime,
         server_default=func.current_timestamp(),
@@ -436,6 +437,13 @@ class NavigationLogs(Base):
     # 시간 정보
     estimated_time_seconds = Column(Integer, nullable=False)  # 예상 시간 (초)
     actual_time_seconds = Column(Integer, nullable=False)  # 실제 소요 시간 (초)
+    
+    # 실제 보행속도 측정 (하이브리드 방식)
+    active_walking_time_seconds = Column(Integer)  # 실제 걷는 시간 (정지 제외)
+    paused_time_seconds = Column(Integer, server_default="0")  # 5초 이상 정지한 시간
+    real_walking_speed_kmh = Column(Numeric(4, 2))  # 실제 보행속도 (km/h)
+    pause_count = Column(Integer, server_default="0")  # 정지 구간 횟수
+    movement_data = Column(JSONType)  # 움직임 구간 상세 데이터
     
     # 날씨 정보
     weather_id = Column(

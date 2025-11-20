@@ -1,4 +1,3 @@
-// frontend/app/(auth)/register.tsx
 import React, { useState } from 'react';
 import {
   View,
@@ -16,6 +15,12 @@ import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../contexts/AuthContext';
 import { authService } from '../../services/authService';
+import {
+  requestHealthConnectPermissions,
+  readHealthData,
+  checkHealthConnectAvailability
+} from '../../health';
+import { apiService } from '../../services/api';
 
 export default function RegisterScreen() {
   const { register } = useAuth();
@@ -68,26 +73,146 @@ export default function RegisterScreen() {
     setIsLoading(true);
 
     try {
-      // 회원가입 API 호출
+      // 1. 회원가입 API 호출
       const response = await authService.register({
         username,
         email,
         password,
       });
 
-      // Context에 저장 (AsyncStorage에도 자동 저장됨)
+      // 2. Context에 저장 (AsyncStorage에도 자동 저장됨)
       await register(response.access_token, response.user);
 
-      Alert.alert('회원가입 성공', `환영합니다, ${response.user.username}님!`, [
-        {
-          text: '확인',
-          onPress: () => router.replace('/(tabs)'),
-        },
-      ]);
+      // 3. 헬스 커넥트 연동 시도
+      await setupHealthConnect(response.user.user_id);
+
     } catch (error: any) {
       Alert.alert('회원가입 실패', error.message || '회원가입에 실패했습니다');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  /**
+   * 헬스 커넥트 연동 프로세스
+   */
+  const setupHealthConnect = async (userId: number) => {
+    try {
+      // 1. 헬스 커넥트 사용 가능 여부 확인
+      const availability = await checkHealthConnectAvailability();
+
+      if (!availability.available) {
+        // 헬스 커넥트를 사용할 수 없으면 기본 속도(4km/h)로 설정하고 완료
+        console.log('ℹ️ 헬스 커넥트 사용 불가:', availability.error);
+        Alert.alert(
+          '회원가입 완료',
+          `환영합니다, ${username}님!\n\n기본 보행 속도 4km/h로 설정되었습니다.\n경로 안내를 사용하면 자동으로 속도가 조정됩니다.`,
+          [{ text: '확인', onPress: () => router.replace('/(tabs)') }]
+        );
+        return;
+      }
+
+      // 2. 헬스 커넥트 권한 요청
+      Alert.alert(
+        '헬스 커넥트 연결',
+        '더 정확한 보행 속도 예측을 위해\n헬스 데이터 접근 권한이 필요합니다.',
+        [
+          {
+            text: '나중에',
+            style: 'cancel',
+            onPress: () => {
+              Alert.alert(
+                '회원가입 완료',
+                `환영합니다, ${username}님!\n\n기본 보행 속도 4km/h로 설정되었습니다.\n경로 안내를 사용하면 자동으로 속도가 조정됩니다.`,
+                [{ text: '확인', onPress: () => router.replace('/(tabs)') }]
+              );
+            }
+          },
+          {
+            text: '권한 허용',
+            onPress: async () => {
+              await requestHealthPermissionsAndSync(userId);
+            }
+          }
+        ]
+      );
+
+    } catch (error) {
+      console.error('❌ 헬스 커넥트 연동 오류:', error);
+      // 오류가 발생해도 회원가입은 완료된 상태이므로 홈으로 이동
+      Alert.alert(
+        '회원가입 완료',
+        `환영합니다, ${username}님!\n\n기본 보행 속도 4km/h로 설정되었습니다.`,
+        [{ text: '확인', onPress: () => router.replace('/(tabs)') }]
+      );
+    }
+  };
+
+  /**
+   * 헬스 커넥트 권한 요청 및 데이터 동기화
+   */
+  const requestHealthPermissionsAndSync = async (userId: number) => {
+    try {
+      // 1. 권한 요청
+      const permissionResult = await requestHealthConnectPermissions();
+
+      if (!permissionResult.success) {
+        console.log('⚠️ 헬스 커넥트 권한 거부됨');
+        Alert.alert(
+          '회원가입 완료',
+          `환영합니다, ${username}님!\n\n기본 보행 속도 4km/h로 설정되었습니다.\n설정에서 언제든지 헬스 커넥트를 연결할 수 있습니다.`,
+          [{ text: '확인', onPress: () => router.replace('/(tabs)') }]
+        );
+        return;
+      }
+
+      // 2. 권한이 허용되었으면 데이터 읽기 시도
+      console.log('✅ 헬스 커넥트 권한 허용됨');
+      const healthData = await readHealthData();
+
+      if (!healthData || !healthData.walkingSpeed || healthData.walkingSpeed <= 0) {
+        // 권한은 있지만 데이터가 없는 경우
+        console.log('ℹ️ 헬스 데이터가 없음, 기본 속도 유지');
+        Alert.alert(
+          '회원가입 완료',
+          `환영합니다, ${username}님!\n\n헬스 커넥트에 보행 데이터가 없어\n기본 보행 속도 4km/h로 설정되었습니다.\n\n경로 안내를 사용하면 자동으로 속도가 조정됩니다.`,
+          [{ text: '확인', onPress: () => router.replace('/(tabs)') }]
+        );
+        return;
+      }
+
+      // 3. 헬스 데이터가 있으면 서버에 업데이트
+      console.log('📊 헬스 데이터 발견:', healthData);
+
+      try {
+        await apiService.updateSpeedProfile({
+          activity_type: 'walking',
+          avg_speed_flat_kmh: healthData.walkingSpeed,
+          source: 'health_connect',
+        });
+
+        Alert.alert(
+          '회원가입 완료',
+          `환영합니다, ${username}님!\n\n헬스 커넥트에서 보행 속도를 가져왔습니다.\n평균 보행 속도: ${healthData.walkingSpeed.toFixed(1)} km/h`,
+          [{ text: '확인', onPress: () => router.replace('/(tabs)') }]
+        );
+      } catch (updateError) {
+        console.error('❌ 속도 프로필 업데이트 실패:', updateError);
+        // 업데이트 실패해도 회원가입은 완료
+        Alert.alert(
+          '회원가입 완료',
+          `환영합니다, ${username}님!\n\n기본 보행 속도 4km/h로 설정되었습니다.`,
+          [{ text: '확인', onPress: () => router.replace('/(tabs)') }]
+        );
+      }
+
+    } catch (error) {
+      console.error('❌ 헬스 커넥트 권한 요청 오류:', error);
+      Alert.alert(
+        '회원가입 완료',
+        `환영합니다, ${username}님!\n\n기본 보행 속도 4km/h로 설정되었습니다.`,
+        [{ text: '확인', onPress: () => router.replace('/(tabs)') }]
+      );
     }
   };
 

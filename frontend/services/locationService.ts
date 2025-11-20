@@ -1,4 +1,12 @@
 import * as Location from 'expo-location';
+import {
+  startBackgroundLocationTracking,
+  stopBackgroundLocationTracking,
+  isBackgroundLocationTrackingActive,
+  getBackgroundLocations,
+  clearBackgroundLocations,
+  isTaskManagerSupported,
+} from './backgroundLocationTask';
 
 export interface CurrentLocation {
   latitude: number;
@@ -23,7 +31,7 @@ class LocationService {
     try {
       // 1. 위치 권한 요청
       const { status } = await Location.requestForegroundPermissionsAsync();
-      
+
       if (status !== 'granted') {
         console.error('❌ 위치 권한이 거부되었습니다');
         return false;
@@ -88,7 +96,7 @@ class LocationService {
   async getCurrentLocation(): Promise<CurrentLocation | null> {
     try {
       const { status } = await Location.requestForegroundPermissionsAsync();
-      
+
       if (status !== 'granted') {
         console.error('❌ 위치 권한이 거부되었습니다');
         return null;
@@ -109,6 +117,65 @@ class LocationService {
       console.error('❌ 현재 위치 가져오기 실패:', error);
       return null;
     }
+  }
+
+  /**
+   * 백그라운드 위치 추적 시작 (경로 안내용)
+   */
+  async startBackgroundTracking(): Promise<boolean> {
+    try {
+      // TaskManager가 지원되는지 확인
+      if (!isTaskManagerSupported()) {
+        console.warn('⚠️ 백그라운드 위치 추적은 Expo Go에서 지원되지 않습니다. 포어그라운드 추적만 사용됩니다.');
+        return false;
+      }
+
+      const success = await startBackgroundLocationTracking();
+
+      if (success) {
+        console.log('✅ 백그라운드 위치 추적 시작됨');
+      } else {
+        console.error('❌ 백그라운드 위치 추적 시작 실패');
+      }
+
+      return success;
+    } catch (error) {
+      console.error('❌ 백그라운드 위치 추적 시작 오류:', error);
+      return false;
+    }
+  }
+
+  /**
+   * 백그라운드 위치 추적 중지
+   */
+  async stopBackgroundTracking(): Promise<void> {
+    try {
+      await stopBackgroundLocationTracking();
+      console.log('🛑 백그라운드 위치 추적 중지됨');
+    } catch (error) {
+      console.error('❌ 백그라운드 위치 추적 중지 오류:', error);
+    }
+  }
+
+  /**
+   * 백그라운드 위치 추적 활성 상태 확인
+   */
+  async isBackgroundTrackingActive(): Promise<boolean> {
+    return await isBackgroundLocationTrackingActive();
+  }
+
+  /**
+   * 백그라운드에서 수집된 위치 데이터 가져오기
+   */
+  getBackgroundLocations(): Location.LocationObject[] {
+    return getBackgroundLocations();
+  }
+
+  /**
+   * 백그라운드 위치 데이터 초기화
+   */
+  clearBackgroundLocations(): void {
+    clearBackgroundLocations();
   }
 }
 

@@ -59,7 +59,7 @@ const mockEndLocation = {
 /**
  * 테스트 1: 대중교통 경로 데이터 추출
  */
-function testTransitDataExtraction() {
+async function testTransitDataExtraction() {
     console.log('\n' + '='.repeat(60));
     console.log('1. 대중교통 경로 데이터 추출 테스트');
     console.log('='.repeat(60));
@@ -68,7 +68,7 @@ function testTransitDataExtraction() {
     const endTime = new Date('2025-11-18T14:42:30');
 
     try {
-        const logData = extractNavigationLogData(
+        const logData = await extractNavigationLogData(
             mockTransitRouteInfo,
             mockStartLocation,
             mockEndLocation,
@@ -101,7 +101,7 @@ function testTransitDataExtraction() {
 /**
  * 테스트 2: 도보 경로 데이터 추출
  */
-function testWalkingDataExtraction() {
+async function testWalkingDataExtraction() {
     console.log('\n' + '='.repeat(60));
     console.log('2. 도보 경로 데이터 추출 테스트');
     console.log('='.repeat(60));
@@ -110,7 +110,7 @@ function testWalkingDataExtraction() {
     const endTime = new Date('2025-11-18T10:27:30');
 
     try {
-        const logData = extractNavigationLogData(
+        const logData = await extractNavigationLogData(
             mockWalkingRouteInfo,
             { place_name: '동국대학교', y: 37.558, x: 127.000 },
             { place_name: '남산타워', y: 37.551, x: 126.988 },
@@ -139,7 +139,7 @@ function testWalkingDataExtraction() {
 /**
  * 테스트 3: 교통수단 추출 검증
  */
-function testTransportModesExtraction() {
+async function testTransportModesExtraction() {
     console.log('\n' + '='.repeat(60));
     console.log('3. 교통수단 추출 검증');
     console.log('='.repeat(60));
@@ -147,7 +147,7 @@ function testTransportModesExtraction() {
     const startTime = new Date();
     const endTime = new Date(startTime.getTime() + 2550000); // 42.5분 후
 
-    const logData = extractNavigationLogData(
+    const logData = await extractNavigationLogData(
         mockTransitRouteInfo,
         mockStartLocation,
         mockEndLocation,
@@ -171,7 +171,7 @@ function testTransportModesExtraction() {
 /**
  * 테스트 4: 계수 누락 처리
  */
-function testMissingFactors() {
+async function testMissingFactors() {
     console.log('\n' + '='.repeat(60));
     console.log('4. 계수 누락 처리 테스트');
     console.log('='.repeat(60));
@@ -186,7 +186,7 @@ function testMissingFactors() {
     const endTime = new Date(startTime.getTime() + 650000); // 10분 50초 후
 
     try {
-        const logData = extractNavigationLogData(
+        const logData = await extractNavigationLogData(
             routeInfoWithoutFactors,
             mockStartLocation,
             mockEndLocation,
@@ -211,7 +211,7 @@ function testMissingFactors() {
 /**
  * 테스트 5: 시간 계산 정확성
  */
-function testTimeCalculation() {
+async function testTimeCalculation() {
     console.log('\n' + '='.repeat(60));
     console.log('5. 시간 계산 정확성 테스트');
     console.log('='.repeat(60));
@@ -219,7 +219,7 @@ function testTimeCalculation() {
     const startTime = new Date('2025-11-18T10:00:00');
     const endTime = new Date('2025-11-18T10:27:30'); // 27분 30초 = 1650초
 
-    const logData = extractNavigationLogData(
+    const logData = await extractNavigationLogData(
         mockWalkingRouteInfo,
         mockStartLocation,
         mockEndLocation,
@@ -247,18 +247,18 @@ function testTimeCalculation() {
 /**
  * 메인 테스트 실행
  */
-function runTests() {
+async function runTests() {
     console.log('\n' + '='.repeat(60));
     console.log('네비게이션 로그 프론트엔드 테스트');
     console.log('='.repeat(60));
 
     const results: boolean[] = [];
 
-    results.push(testTransitDataExtraction());
-    results.push(testWalkingDataExtraction());
-    results.push(testTransportModesExtraction());
-    results.push(testMissingFactors());
-    results.push(testTimeCalculation());
+    results.push(await testTransitDataExtraction());
+    results.push(await testWalkingDataExtraction());
+    results.push(await testTransportModesExtraction());
+    results.push(await testMissingFactors());
+    results.push(await testTimeCalculation());
 
     // 결과 요약
     console.log('\n' + '='.repeat(60));

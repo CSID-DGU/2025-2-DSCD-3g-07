@@ -9,12 +9,28 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "privacy": "public",
-    "platforms": ["ios", "android", "web"],
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ],
     "description": "개인의 보행 속도에 맞춘 개인화된 교통 경로 안내 앱",
-    "keywords": ["walking", "personalization", "transit", "health"],
+    "keywords": [
+      "walking",
+      "personalization",
+      "transit",
+      "health"
+    ],
     "githubUrl": "https://github.com/your-username/pacetry",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "PaceTry는 경로 안내 중 백그라운드에서도 위치를 추적하여 정확한 보행 속도를 측정합니다.",
+        "NSLocationWhenInUseUsageDescription": "PaceTry는 경로 안내를 위해 현재 위치가 필요합니다.",
+        "UIBackgroundModes": [
+          "location"
+        ]
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -27,6 +43,11 @@
       "predictiveBackGestureEnabled": false,
       "package": "com.pacetry.app",
       "permissions": [
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_BACKGROUND_LOCATION",
+        "FOREGROUND_SERVICE",
+        "FOREGROUND_SERVICE_LOCATION",
         "android.permission.health.READ_STEPS",
         "android.permission.health.READ_DISTANCE",
         "android.permission.health.READ_ACTIVE_CALORIES_BURNED",
@@ -43,6 +64,8 @@
     },
     "plugins": [
       "expo-router",
+      "expo-location",
+      "expo-task-manager",
       [
         "expo-splash-screen",
         {
@@ -83,6 +106,8 @@
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": ["**/*"]
+    "assetBundlePatterns": [
+      "**/*"
+    ]
   }
 }

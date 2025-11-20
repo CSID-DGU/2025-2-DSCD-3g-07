@@ -4,7 +4,7 @@
  */
 
 import Config from '../config';
-import { testApiConnection, findWorkingUrl } from './networkUtils';
+import { testApiConnection } from './networkUtils';
 
 /**
  * API 요청 래퍼
@@ -13,54 +13,53 @@ class ApiClient {
   private baseUrl: string;
   private isConnected: boolean = false;
   private initialized: boolean = false;
+  private initPromise: Promise<void> | null = null;
 
   constructor() {
     this.baseUrl = Config.API_BASE_URL;
-    this.initialize();
+    // constructor에서 자동 초기화 제거
   }
 
   /**
-   * 초기화 - 동적 IP 감지 실행
+   * 초기화 - 동적 IP 감지 실행 (한 번만 실행, 중복 방지)
    */
   private async initialize() {
-    if (this.initialized) return;
+    // 이미 초기화되었으면 즉시 반환
+    if (this.initialized) {
+      return;
+    }
 
-    console.log('🚀 Initializing API Client with dynamic IP detection...');
+    // 초기화 중이면 기존 Promise 반환
+    if (this.initPromise) {
+      return this.initPromise;
+    }
 
-    // Config의 동적 감지 시스템 실행
-    this.baseUrl = await Config.initializeApiUrl();
-    this.initialized = true;
+    // 새로운 초기화 시작
+    this.initPromise = (async () => {
+      console.log('🚀 Initializing API Client...');
 
-    console.log('📡 API Client initialized with URL:', this.baseUrl);
+      // Config의 동적 감지 시스템 실행 (Config에서 중복 방지 처리됨)
+      this.baseUrl = await Config.initializeApiUrl();
+      this.initialized = true;
+      this.initPromise = null;
 
-    // 연결 테스트
-    this.checkConnection();
+      console.log('📡 API Client initialized with URL:', this.baseUrl);
+    })();
+
+    return this.initPromise;
   }
 
   /**
-   * 연결 상태 확인
+   * 연결 상태 확인 (초기화와 분리)
    */
   private async checkConnection() {
     this.isConnected = await testApiConnection(this.baseUrl);
 
-    if (!this.isConnected && __DEV__) {
-      console.warn('⚠️ 기본 URL 연결 실패, 대체 URL 탐색 중...');
-
-      // 여러 가능한 URL 시도
-      const possibleUrls: string[] = [
-        this.baseUrl,
-        'http://localhost:8000',
-        'http://10.0.2.2:8000',
-        'http://172.30.1.59:8000',
-        'http://192.168.45.161:8000',
-      ];
-
-      const workingUrl = await findWorkingUrl(possibleUrls);
-      if (workingUrl) {
-        this.baseUrl = workingUrl;
-        this.isConnected = true;
-        console.log('✅ 작동하는 서버 발견:', workingUrl);
-      }
+    if (!this.isConnected) {
+      console.warn('⚠️ Backend server connection failed:', this.baseUrl);
+      console.warn('⚠️ Please check if the backend server is running.');
+    } else {
+      console.log('✅ Backend server connected:', this.baseUrl);
     }
   }
 

@@ -4,12 +4,14 @@ import { Platform } from 'react-native';
 // API 연결 테스트 함수
 const testApiConnection = async (url: string): Promise<boolean> => {
   try {
-    console.log(`🔍 Testing Health Check for: ${url}`);
+    const timestamp = new Date().toLocaleTimeString();
+    console.log(`[${timestamp}] 🔍 Testing Health Check for: ${url}`);
     const controller = new AbortController();
     const timeoutId = setTimeout(() => {
-      console.log(`⏰ Timeout (10s) reached for ${url}`);
+      const timeoutTime = new Date().toLocaleTimeString();
+      console.log(`[${timeoutTime}] ⏰ Timeout (10s) reached for ${url}`);
       controller.abort();
-    }, 10000); // 10초 타임아웃으로 증가
+    }, 10000); // 10초 타임아웃
 
     const startTime = Date.now();
 
@@ -127,6 +129,8 @@ const getAutoDetectedApiUrl = (): string => {
 class ApiConfig {
   private _baseUrl: string;
   private _isInitialized = false;
+  private _initPromise: Promise<string> | null = null;
+  private static _instanceInitialized = false; // 클래스 레벨 플래그
 
   constructor() {
     console.log('=====================================');
@@ -170,11 +174,37 @@ class ApiConfig {
 
   // 실시간으로 작동하는 API URL을 찾아서 업데이트
   async initializeApiUrl(): Promise<string> {
-    if (this._isInitialized) {
+    const timestamp = new Date().toLocaleTimeString();
+
+    // 클래스 레벨에서 이미 초기화되었으면 즉시 반환
+    if (ApiConfig._instanceInitialized && this._isInitialized) {
+      console.log(`[${timestamp}] ✅ API already initialized (cached):`, this._baseUrl);
       return this._baseUrl;
     }
 
-    console.log('� Starting smart API URL detection...');
+    // 초기화 중이면 기존 Promise 반환 (중복 호출 완전 차단)
+    if (this._initPromise) {
+      console.log(`[${timestamp}] ⏳ Waiting for ongoing initialization...`);
+      return this._initPromise;
+    }
+
+    console.log(`[${timestamp}] 🔄 Starting API URL initialization...`);
+
+    // 새로운 초기화 Promise 생성
+    this._initPromise = this._performInitialization();
+
+    try {
+      const result = await this._initPromise;
+      return result;
+    } finally {
+      // 초기화 완료 표시 (성공/실패 무관)
+      this._initPromise = null;
+    }
+  }
+
+  private async _performInitialization(): Promise<string> {
+    const timestamp = new Date().toLocaleTimeString();
+    console.log(`[${timestamp}] 🔍 Detecting working API URL...`);
 
     // 1단계: Expo hostUri에서 실시간 IP 추출 (최우선)
     const expoDynamicUrl = this.getExpoBasedApiUrl();
@@ -182,33 +212,38 @@ class ApiConfig {
     // 여러 후보 URL들을 우선순위에 따라 구성
     const candidateUrls = [
       expoDynamicUrl, // Expo 실시간 감지 (최우선)
+      'http://43.200.164.224:8000', // EC2 서버 (우선)
       'http://172.30.1.59:8000', // 현재 네트워크 IP
       this._baseUrl, // 초기 자동 감지된 URL
-      'http://192.168.0.20:8000', // 이전 IP
       'http://10.0.2.2:8000', // Android 에뮬레이터
       'http://localhost:8000', // 로컬 개발
-      process.env.EXPO_PUBLIC_API_URL, // 환경변수 (fallback)
-      'http://192.168.45.161:8000', // 구 IP (낮은 우선순위)
     ].filter(Boolean) as string[]; // null/undefined 제거
 
-    // 각 URL을 순차적으로 테스트
-    for (const url of candidateUrls) {
-      console.log(`🔍 Testing: ${url}`);
+    // 중복 제거
+    const uniqueUrls = Array.from(new Set(candidateUrls));
+    console.log(`[${timestamp}] 📋 Testing ${uniqueUrls.length} unique URLs`);
+
+    // 각 URL을 순차적으로 테스트 (첫 번째 성공 시 즉시 종료)
+    for (const url of uniqueUrls) {
       const isWorking = await testApiConnection(url);
 
       if (isWorking) {
         this._baseUrl = url;
-        console.log(`✅ Found working API URL: ${url}`);
         this._isInitialized = true;
+        ApiConfig._instanceInitialized = true; // 클래스 레벨 플래그 설정
+        console.log(`[${timestamp}] ✅ API URL detected: ${url}`);
         return this._baseUrl;
       }
     }
 
-    // 모든 URL이 실패한 경우 첫 번째 후보를 사용
-    this._baseUrl = candidateUrls[0] || 'http://localhost:8000';
-    console.warn('⚠️ No working API URL found, using fallback:', this._baseUrl);
-
+    // 모든 URL이 실패한 경우에도 초기화 완료로 표시 (무한 반복 방지)
+    this._baseUrl = uniqueUrls[0] || 'http://localhost:8000';
     this._isInitialized = true;
+    ApiConfig._instanceInitialized = true;
+
+    console.warn(`[${timestamp}] ⚠️ All API URLs failed. Using fallback: ${this._baseUrl}`);
+    console.warn('⚠️ Backend server may not be running.');
+
     return this._baseUrl;
   }
 

@@ -376,3 +376,45 @@ def calculate_route_time(
         "total_time_difference": total_adjusted - total_base,
         "segment_count": len(segment_results),
     }
+
+
+def reverse_calculate_base_speed(
+    real_walking_speed_kmh: float,
+    slope_factor: float = 1.0,
+    weather_factor: float = 1.0,
+) -> float:
+    """
+    실측 보행속도에서 평지+맑은날 기준 속도로 역산
+    
+    Args:
+        real_walking_speed_kmh: 실제 측정된 보행속도 (km/h)
+        slope_factor: 경사도 계수 (> 1.0 = 느려짐)
+        weather_factor: 날씨 계수 (> 1.0 = 느려짐)
+    
+    Returns:
+        평지+맑은날 기준 보행속도 (km/h)
+    
+    설명:
+        실측 속도 = 기준 속도 / (slope_factor × weather_factor)
+        기준 속도 = 실측 속도 × slope_factor × weather_factor
+        
+    예시:
+        실측 3.2 km/h, slope=1.25 (오르막), weather=1.15 (비)
+        → 기준 = 3.2 × 1.25 × 1.15 = 4.6 km/h
+    """
+    if real_walking_speed_kmh <= 0:
+        logger.warning(f"[역산] 유효하지 않은 실측 속도: {real_walking_speed_kmh}")
+        return 4.0  # 기본값
+    
+    base_speed = real_walking_speed_kmh * slope_factor * weather_factor
+    
+    # 안전 범위: 2.0 ~ 8.0 km/h
+    base_speed = max(2.0, min(8.0, base_speed))
+    
+    logger.debug(
+        f"[역산] 실측 {real_walking_speed_kmh:.2f} km/h "
+        f"× slope {slope_factor:.3f} × weather {weather_factor:.3f} "
+        f"= 기준 {base_speed:.2f} km/h"
+    )
+    
+    return base_speed

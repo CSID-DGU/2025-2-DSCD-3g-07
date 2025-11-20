@@ -183,6 +183,13 @@ class NavigationLogCreate(BaseModel):
     estimated_time_seconds: int = Field(..., description="예상 시간 (초)")
     actual_time_seconds: int = Field(..., description="실제 소요 시간 (초)")
     
+    # 실제 보행속도 측정 (하이브리드 방식)
+    active_walking_time_seconds: Optional[int] = Field(None, description="실제 걷는 시간 (정지 제외)")
+    paused_time_seconds: int = Field(0, description="5초 이상 정지한 시간")
+    real_walking_speed_kmh: Optional[float] = Field(None, description="실제 보행속도 (km/h)")
+    pause_count: int = Field(0, description="정지 구간 횟수")
+    movement_data: Optional[dict] = Field(None, description="움직임 구간 상세 데이터")
+    
     # 날씨 및 상세 데이터
     weather_id: Optional[int] = Field(None, description="날씨 캐시 ID")
     route_data: Optional[dict] = Field(None, description="전체 경로 상세 정보 (JSON)")
@@ -221,6 +228,13 @@ class NavigationLogResponse(BaseModel):
     estimated_time_seconds: int
     actual_time_seconds: int
     time_difference_seconds: int = Field(description="실제 - 예상 시간 차이")
+    
+    # 실제 보행속도 측정 (하이브리드 방식) - 기존 데이터 호환성을 위해 Optional
+    active_walking_time_seconds: Optional[int] = None
+    paused_time_seconds: Optional[int] = None
+    real_walking_speed_kmh: Optional[float] = None
+    pause_count: Optional[int] = None
+    movement_data: Optional[dict] = None
     
     # 날씨 및 상세 데이터
     weather_id: Optional[int]

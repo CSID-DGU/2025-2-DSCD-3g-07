@@ -163,6 +163,100 @@ def delete_speed_profile(db: Session, profile_id: int):
     return profile
 
 
+def update_speed_profile_with_weighted_avg(
+    db: Session,
+    user_id: int,
+    activity_type: str,
+    new_speed_kmh: float,
+    weight_old: float = 0.7,
+    weight_new: float = 0.3,
+    source: str = "navigation_log",
+    navigation_log_id: int = None,
+):
+    """
+    가중 평균으로 속도 프로필 업데이트 + 이력 기록
+    
+    Args:
+        db: 데이터베이스 세션
+        user_id: 사용자 ID
+        activity_type: 활동 유형 ('walking', 'running', 'cycling')
+        new_speed_kmh: 새로 측정된 속도 (km/h)
+        weight_old: 기존 데이터 가중치 (기본 0.7)
+        weight_new: 새 데이터 가중치 (기본 0.3)
+        source: 속도 출처 ('navigation_log', 'manual', 'health_connect', 'initial')
+        navigation_log_id: 네비게이션 로그 ID (있는 경우)
+    
+    Returns:
+        업데이트된 ActivitySpeedProfile 객체
+    """
+    from datetime import datetime
+    
+    # 기존 프로필 조회
+    profile = (
+        db.query(models.ActivitySpeedProfile)
+        .filter(
+            models.ActivitySpeedProfile.user_id == user_id,
+            models.ActivitySpeedProfile.activity_type == activity_type,
+        )
+        .first()
+    )
+    
+    if profile:
+        # 기존 프로필 있음 - 가중 평균 계산
+        old_speed = float(profile.avg_speed_flat_kmh or 4.0)
+        updated_speed = old_speed * weight_old + new_speed_kmh * weight_new
+        
+        profile.avg_speed_flat_kmh = round(updated_speed, 2)
+        profile.data_points_count += 1
+        
+        # 이력 추가
+        history_entry = {
+            "speed_kmh": round(new_speed_kmh, 2),
+            "source": source,
+            "timestamp": datetime.now().isoformat(),
+            "navigation_log_id": navigation_log_id,
+            "old_avg": round(old_speed, 2),
+            "new_avg": round(updated_speed, 2)
+        }
+        
+        # JSONB 배열에 추가 (최근 100개만 유지)
+        current_history = profile.speed_history or []
+        if isinstance(current_history, str):
+            import json
+            current_history = json.loads(current_history)
+        
+        current_history.append(history_entry)
+        profile.speed_history = current_history[-100:]  # 최근 100개만 유지
+        
+        # SQLAlchemy에게 JSONB 변경 알림
+        from sqlalchemy.orm.attributes import flag_modified
+        flag_modified(profile, "speed_history")
+        
+    else:
+        # 기존 프로필 없음 - 새로 생성
+        history_entry = {
+            "speed_kmh": round(new_speed_kmh, 2),
+            "source": source,
+            "timestamp": datetime.now().isoformat(),
+            "navigation_log_id": navigation_log_id,
+            "old_avg": None,
+            "new_avg": round(new_speed_kmh, 2)
+        }
+        
+        profile = models.ActivitySpeedProfile(
+            user_id=user_id,
+            activity_type=activity_type,
+            avg_speed_flat_kmh=round(new_speed_kmh, 2),
+            data_points_count=1,
+            speed_history=[history_entry]
+        )
+        db.add(profile)
+    
+    db.commit()
+    db.refresh(profile)
+    return profile
+
+
 # ================================
 # 5. USER_PREFERENCES
 # ================================
@@ -337,4 +431,35 @@ def get_user_rating_for_route(db: Session, user_id: int, route_id: int):
             models.RouteRatings.route_id == route_id,
         )
         .first()
+    )
+
+
+# ================================
+# 12. SPEED_HISTORY
+# ================================
+def create_speed_history(db: Session, **kwargs):
+    """속도 이력 기록 생성"""
+    history = models.SpeedHistory(**kwargs)
+    db.add(history)
+    db.commit()
+    db.refresh(history)
+    return history
+
+
+def get_speed_history_by_user(
+    db: Session,
+    user_id: int,
+    activity_type: str = "walking",
+    limit: int = 100
+):
+    """사용자의 속도 이력 조회 (최신순)"""
+    return (
+        db.query(models.SpeedHistory)
+        .filter(
+            models.SpeedHistory.user_id == user_id,
+            models.SpeedHistory.activity_type == activity_type
+        )
+        .order_by(models.SpeedHistory.recorded_at.desc())
+        .limit(limit)
+        .all()
     )

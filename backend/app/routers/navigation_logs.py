@@ -54,6 +54,11 @@ async def create_navigation_log(
         weather_factor=log_data.weather_factor,
         estimated_time_seconds=log_data.estimated_time_seconds,
         actual_time_seconds=log_data.actual_time_seconds,
+        active_walking_time_seconds=log_data.active_walking_time_seconds,
+        paused_time_seconds=log_data.paused_time_seconds,
+        real_walking_speed_kmh=log_data.real_walking_speed_kmh,
+        pause_count=log_data.pause_count,
+        movement_data=log_data.movement_data,
         weather_id=log_data.weather_id,
         route_data=log_data.route_data,
         started_at=log_data.started_at,
@@ -63,6 +68,38 @@ async def create_navigation_log(
     db.add(nav_log)
     db.commit()
     db.refresh(nav_log)
+    
+    # 🔄 자동 프로필 업데이트: 실측 속도로 사용자 기준 속도 갱신
+    if (
+        nav_log.real_walking_speed_kmh
+        and nav_log.slope_factor
+        and nav_log.weather_factor
+        and nav_log.active_walking_time_seconds
+        and nav_log.active_walking_time_seconds >= 300  # 최소 5분 이상 걸었을 때만
+    ):
+        try:
+            from app.utils.Factors_Affecting_Walking_Speed import reverse_calculate_base_speed
+            
+            # 역산: 평지+맑은날 기준 속도 계산
+            base_speed_kmh = reverse_calculate_base_speed(
+                real_walking_speed_kmh=float(nav_log.real_walking_speed_kmh),
+                slope_factor=float(nav_log.slope_factor),
+                weather_factor=float(nav_log.weather_factor),
+            )
+            
+            # 가중 평균으로 프로필 업데이트
+            crud.update_speed_profile_with_weighted_avg(
+                db=db,
+                user_id=user_id,
+                activity_type="walking",
+                new_speed_kmh=base_speed_kmh,
+                source="navigation_log",
+                navigation_log_id=nav_log.log_id,
+            )
+            
+            print(f"✅ 속도 프로필 자동 업데이트: {base_speed_kmh:.2f} km/h")
+        except Exception as e:
+            print(f"⚠️ 속도 프로필 업데이트 실패 (무시): {e}")
     
     # 응답 생성
     response = NavigationLogResponse(
@@ -84,6 +121,11 @@ async def create_navigation_log(
         estimated_time_seconds=nav_log.estimated_time_seconds,
         actual_time_seconds=nav_log.actual_time_seconds,
         time_difference_seconds=nav_log.actual_time_seconds - nav_log.estimated_time_seconds,
+        active_walking_time_seconds=nav_log.active_walking_time_seconds,
+        paused_time_seconds=nav_log.paused_time_seconds or 0,
+        real_walking_speed_kmh=float(nav_log.real_walking_speed_kmh) if nav_log.real_walking_speed_kmh else None,
+        pause_count=nav_log.pause_count or 0,
+        movement_data=nav_log.movement_data,
         weather_id=nav_log.weather_id,
         route_data=nav_log.route_data,
         started_at=nav_log.started_at,
@@ -155,6 +197,11 @@ async def get_navigation_logs(
             estimated_time_seconds=log.estimated_time_seconds,
             actual_time_seconds=log.actual_time_seconds,
             time_difference_seconds=log.actual_time_seconds - log.estimated_time_seconds,
+            active_walking_time_seconds=log.active_walking_time_seconds,
+            paused_time_seconds=log.paused_time_seconds or 0,
+            real_walking_speed_kmh=float(log.real_walking_speed_kmh) if log.real_walking_speed_kmh else None,
+            pause_count=log.pause_count or 0,
+            movement_data=log.movement_data,
             weather_id=log.weather_id,
             route_data=log.route_data,
             started_at=log.started_at,

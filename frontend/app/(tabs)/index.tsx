@@ -36,6 +36,7 @@ import { useWeatherContext } from '@/contexts/WeatherContext';
 import { healthConnectService } from '@/services/healthConnect';
 import { locationService, type CurrentLocation } from '@/services/locationService';
 import { saveNavigationLog, extractNavigationLogData } from '@/services/navigationLogService';
+import { movementTrackingService } from '@/services/movementTrackingService';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 const PRIMARY_COLOR = '#2C6DE7';
@@ -522,6 +523,12 @@ export default function HomeScreen() {
         ? (endTime.getTime() - navigationStartTime.getTime()) / 1000
         : 0;
 
+      // 움직임 추적 중지 및 데이터 수집
+      movementTrackingService.stopTracking();
+      const trackingData = movementTrackingService.getCurrentData();
+
+      console.log('📊 움직임 추적 데이터:', trackingData);
+
       // 로그 데이터 준비
       const log = {
         startTime: navigationStartTime,
@@ -531,6 +538,7 @@ export default function HomeScreen() {
         startLocation,
         endLocation,
         routeMode,
+        trackingData,
       };
 
       setNavigationLog(prev => [...prev, log]);
@@ -546,7 +554,8 @@ export default function HomeScreen() {
             routeMode,
             navigationStartTime,
             endTime,
-            weatherData // 날씨 데이터 전달
+            weatherData, // 날씨 데이터 전달
+            trackingData // 움직임 추적 데이터 전달
           );
 
           // TODO: 실제 user_id는 로그인 시스템에서 가져와야 함
@@ -554,10 +563,45 @@ export default function HomeScreen() {
 
           const savedLog = await saveNavigationLog(userId, logData);
           console.log('✅ 네비게이션 로그 저장 완료:', savedLog);
+
+          // 🔔 예측 시간과 실제 시간 차이 확인 (±20% 이상이면 알림)
+          const estimatedTime = logData.estimated_time_seconds;
+          const actualTime = logData.actual_time_seconds;
+          const timeDifference = Math.abs(actualTime - estimatedTime);
+          const differencePercent = (timeDifference / estimatedTime) * 100;
+
+          const hasSignificantDifference = differencePercent >= 20;
+
+          // 추적 결과 표시
+          let message =
+            `총 소요 시간: ${Math.floor(duration / 60)}분 ${Math.floor(duration % 60)}초\n` +
+            `실제 걷기: ${Math.floor(trackingData.activeWalkingTime / 60)}분 ${trackingData.activeWalkingTime % 60}초\n` +
+            `대기 시간: ${Math.floor(trackingData.pausedTime / 60)}분 ${trackingData.pausedTime % 60}초\n` +
+            `평균 속도: ${(trackingData.realSpeed * 3.6).toFixed(2)} km/h`;
+
+          // 5분 이상 걸었고 차이가 크면 자동 업데이트 알림
+          if (hasSignificantDifference && trackingData.activeWalkingTime >= 300) {
+            message += `\n\n⚠️ 예상 시간과 ${differencePercent.toFixed(0)}% 차이가 발생했습니다.\n실제 속도를 반영하여 다음 예측을 개선합니다.`;
+          }
+
+          Alert.alert('안내 종료', message);
         } catch (error) {
           console.error('❌ 네비게이션 로그 저장 실패:', error);
           // 저장 실패해도 사용자 경험에는 영향 없도록 처리
+          Alert.alert(
+            '안내 종료',
+            `총 소요 시간: ${Math.floor(duration / 60)}분 ${Math.floor(duration % 60)}초`
+          );
         }
+      } else {
+        // navigationStartTime 등이 없는 경우
+        Alert.alert(
+          '안내 종료',
+          `총 소요 시간: ${Math.floor(duration / 60)}분 ${Math.floor(duration % 60)}초\n` +
+          `실제 걷기: ${Math.floor(trackingData.activeWalkingTime / 60)}분 ${trackingData.activeWalkingTime % 60}초\n` +
+          `대기 시간: ${Math.floor(trackingData.pausedTime / 60)}분 ${trackingData.pausedTime % 60}초\n` +
+          `평균 속도: ${(trackingData.realSpeed * 3.6).toFixed(2)} km/h`
+        );
       }
 
       // 위치 추적 중지
@@ -567,13 +611,11 @@ export default function HomeScreen() {
         setCurrentLocation(null);
       }
 
+      // 백그라운드 위치 추적 중지
+      await locationService.stopBackgroundTracking();
+
       setIsNavigating(false);
       setNavigationStartTime(null);
-
-      Alert.alert(
-        '안내 종료',
-        `총 소요 시간: ${Math.floor(duration / 60)}분 ${Math.floor(duration % 60)}초`
-      );
     } else {
       // 안내 시작
       setIsNavigating(true);
@@ -589,7 +631,26 @@ export default function HomeScreen() {
         setTimeout(() => setCenterOnLocation(false), 1000);
       }
 
-      Alert.alert('안내 시작', '경로 안내가 시작되었습니다.');
+      // 백그라운드 위치 추적 시작
+      const backgroundSuccess = await locationService.startBackgroundTracking();
+
+      if (!backgroundSuccess) {
+        console.warn('⚠️ 백그라운드 위치 추적을 시작할 수 없습니다. 포어그라운드 추적만 사용합니다.');
+      }
+
+      // 움직임 추적 시작
+      try {
+        await movementTrackingService.startTracking();
+        Alert.alert(
+          '안내 시작',
+          backgroundSuccess
+            ? '경로 안내 및 백그라운드 보행속도 측정이 시작되었습니다.\n\n앱을 백그라운드로 전환해도 위치 추적이 계속됩니다.'
+            : '경로 안내 및 실제 보행속도 측정이 시작되었습니다.'
+        );
+      } catch (error) {
+        console.error('❌ 움직임 추적 시작 실패:', error);
+        Alert.alert('안내 시작', '경로 안내가 시작되었습니다. (보행속도 측정 비활성화)');
+      }
     }
   };
 
@@ -1610,13 +1671,17 @@ export default function HomeScreen() {
                                   const originalTime = routeInfo.slopeAnalysis.total_original_walk_time;
                                   const userFactor = routeInfo.slopeAnalysis.factors.user_speed_factor;
                                   const weatherFactor = routeInfo.slopeAnalysis.factors.weather_factor;
-                                  const slopeFactor = routeInfo.slopeAnalysis.factors.slope_factor;
+                                  const finalTime = routeInfo.slopeAnalysis.total_adjusted_walk_time;
+
+                                  // 실제 적용된 경사도 계수를 역산 (정확한 값)
                                   const beforeTime = Math.round(originalTime * userFactor * weatherFactor);
-                                  const afterTime = Math.round(beforeTime * slopeFactor);
+                                  const actualSlopeFactor = beforeTime > 0 ? finalTime / beforeTime : 1.0;
+
+                                  const afterTime = finalTime; // 실제 최종 시간 사용
                                   const impact = afterTime - beforeTime;
                                   const sign = impact > 0 ? '+' : impact < 0 ? '-' : '';
-                                  const percentage = (1 - slopeFactor) * 100;
-                                  const percentSign = slopeFactor < 1 ? '-' : slopeFactor > 1 ? '+' : '';
+                                  const percentage = (1 - actualSlopeFactor) * 100;
+                                  const percentSign = actualSlopeFactor < 1 ? '-' : actualSlopeFactor > 1 ? '+' : '';
                                   return `${Math.floor(afterTime / 60)}분 ${afterTime % 60}초 (${sign}${Math.floor(Math.abs(impact) / 60)}분 ${Math.abs(impact) % 60}초, ${percentSign}${Math.abs(percentage).toFixed(0)}%)`;
                                 })()}
                               </Text>

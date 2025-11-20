@@ -63,10 +63,19 @@ async def register(user_data: UserRegisterRequest, db: Session = Depends(get_db)
         auth_provider="local",
     )
 
-    # 5. 로그인 시간 업데이트
+    # 5. 초기 속도 프로필 생성 (기본 4 km/h)
+    crud.create_speed_profile(
+        db=db,
+        user_id=new_user.user_id,
+        activity_type="walking",
+        avg_speed_flat_kmh=4.0,
+        data_points_count=0,
+    )
+
+    # 6. 로그인 시간 업데이트
     crud.update_last_login(db, new_user.user_id)
 
-    # 6. JWT 토큰 생성
+    # 7. JWT 토큰 생성
     access_token = create_access_token(data={"sub": new_user.user_id})
 
     return TokenResponse(

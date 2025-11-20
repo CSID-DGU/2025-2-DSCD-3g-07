@@ -6,6 +6,16 @@
 
 import Config from '@/config';
 
+export interface MovementSegment {
+    start_time: string;
+    end_time: string;
+    distance_m: number;
+    duration_seconds: number;
+    avg_speed_ms: number;
+    status: 'walking' | 'paused';
+    reason?: string;
+}
+
 export interface NavigationLogData {
     route_mode: 'transit' | 'walking';
 
@@ -30,6 +40,18 @@ export interface NavigationLogData {
     // 시간 정보
     estimated_time_seconds: number;
     actual_time_seconds: number;
+
+    // 실제 보행속도 측정 (하이브리드 방식)
+    active_walking_time_seconds?: number;
+    paused_time_seconds?: number;
+    real_walking_speed_kmh?: number;
+    pause_count?: number;
+    movement_data?: {
+        segments: MovementSegment[];
+        detection_method: string;
+        total_pauses: number;
+        crosswalk_pauses?: number;
+    };
 
     // 날씨 및 상세 데이터
     weather_id?: number;
@@ -259,7 +281,14 @@ export async function extractNavigationLogData(
     routeMode: 'transit' | 'walking',
     startTime: Date,
     endTime: Date,
-    weatherData?: any
+    weatherData?: any,
+    trackingData?: {
+        activeWalkingTime: number;
+        pausedTime: number;
+        realSpeed: number;
+        pauseCount: number;
+        segments: MovementSegment[];
+    }
 ): Promise<NavigationLogData> {
     // 총 거리 계산 (m)
     const totalDistanceM = routeInfo.totalDistance || 0;
@@ -338,7 +367,7 @@ export async function extractNavigationLogData(
             console.log('🌤️ Weather save 응답 상태:', weatherSaveResponse.status);
 
             if (weatherSaveResponse.ok) {
-                const savedWeather = await weatherSaveResponse.json();
+                const savedWeather = await weatherSaveResponse.json() as { weather_id: number };
                 weatherId = savedWeather.weather_id;
                 console.log('☁️ 날씨 데이터 저장 완료:', { savedWeather, weatherId });
             } else {
@@ -366,6 +395,16 @@ export async function extractNavigationLogData(
         weather_factor: weatherFactor,
         estimated_time_seconds: estimatedTimeSeconds,
         actual_time_seconds: actualTimeSeconds,
+        active_walking_time_seconds: trackingData?.activeWalkingTime,
+        paused_time_seconds: trackingData?.pausedTime || 0,
+        real_walking_speed_kmh: trackingData?.realSpeed ? trackingData.realSpeed * 3.6 : undefined,
+        pause_count: trackingData?.pauseCount || 0,
+        movement_data: trackingData ? {
+            segments: trackingData.segments,
+            detection_method: 'gps_accel_hybrid',
+            total_pauses: trackingData.pauseCount,
+            crosswalk_pauses: trackingData.segments.filter(s => s.reason === 'crosswalk').length
+        } : undefined,
         weather_id: weatherId,
         route_data: routeInfo,  // 전체 경로 데이터 저장
         started_at: startTime.toISOString(),

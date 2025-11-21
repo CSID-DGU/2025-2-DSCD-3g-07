@@ -37,6 +37,8 @@ import { healthConnectService } from '@/services/healthConnect';
 import { locationService, type CurrentLocation } from '@/services/locationService';
 import { saveNavigationLog, extractNavigationLogData } from '@/services/navigationLogService';
 import { movementTrackingService } from '@/services/movementTrackingService';
+import WeatherButton from '@/components/WeatherButton';
+import { useRouter } from 'expo-router';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 const PRIMARY_COLOR = '#2C6DE7';
@@ -270,6 +272,9 @@ const getModeLabel = (mode: string) => {
 export default function HomeScreen() {
   // 날씨 Context 사용
   const { weatherData } = useWeatherContext();
+  
+  // Router
+  const router = useRouter();
 
   // 기본 상태
   const [startLocation, setStartLocation] = useState<LocationData | null>(null);
@@ -1115,20 +1120,35 @@ export default function HomeScreen() {
         />
       </View>
 
-      {/* 현재 위치 추적 버튼 */}
-      <TouchableOpacity
-        style={[
-          styles.currentLocationTrackButton,
-          isTracking && styles.currentLocationTrackButtonActive
-        ]}
-        onPress={handleCurrentLocationPress}
-      >
-        <Ionicons
-          name={isTracking ? "navigate" : "navigate-outline"}
-          size={24}
-          color={isTracking ? "#FFFFFF" : "#2C6DE7"}
+      {/* 우하단 버튼 그룹 */}
+      <View style={styles.bottomRightButtons}>
+        {/* 현재 위치 추적 버튼 */}
+        <TouchableOpacity
+          style={[
+            styles.currentLocationTrackButton,
+            isTracking && styles.currentLocationTrackButtonActive
+          ]}
+          onPress={handleCurrentLocationPress}
+        >
+          <Ionicons
+            name={isTracking ? "navigate" : "navigate-outline"}
+            size={20}
+            color={isTracking ? "#FFFFFF" : "#2C6DE7"}
+          />
+        </TouchableOpacity>
+        
+        {/* 날씨 버튼 */}
+        <WeatherButton
+          temperature={weatherData?.temp_c}
+          weatherEmoji={
+            weatherData?.pty === 1 ? '🌧️' : // 비
+            weatherData?.pty === 2 ? '🌨️' : // 진눈깨비
+            weatherData?.pty === 3 ? '❄️' : // 눈
+            '☀️' // 맑음
+          }
+          onPress={() => router.push('/weather')}
         />
-      </TouchableOpacity>
+      </View>
 
       {/* 위치 정보 표시 (디버깅용, 선택사항) */}
       {currentLocation && isTracking && (
@@ -1168,7 +1188,7 @@ export default function HomeScreen() {
         style={[styles.searchOverlay, animatedSearchBarStyle]}
         {...searchPanResponder.panHandlers}
       >
-        <SafeAreaView edges={['top']}>
+        <SafeAreaView edges={[]}>
           <View style={styles.dragHandle}>
             <View style={styles.dragBar} />
           </View>
@@ -2615,21 +2635,26 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: 'white',
   },
+  // 우하단 버튼 그룹
+  bottomRightButtons: {
+    position: 'absolute',
+    bottom: 20,
+    right: 16,
+    gap: 12,
+    alignItems: 'flex-end',
+  },
   // 현재 위치 추적 버튼 스타일
   currentLocationTrackButton: {
-    position: 'absolute',
-    bottom: 100,
-    right: 20,
-    width: 56,
-    height: 56,
-    borderRadius: 28,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     backgroundColor: '#FFFFFF',
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
     elevation: 5,
   },
   currentLocationTrackButtonActive: {

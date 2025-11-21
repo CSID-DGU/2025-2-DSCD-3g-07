@@ -140,7 +140,7 @@ export class HealthConnectService {
       const sdkAvailable =
         sdkStatus === SdkAvailabilityStatus.SDK_AVAILABLE ||
         sdkStatus ===
-          SdkAvailabilityStatus.SDK_UNAVAILABLE_PROVIDER_UPDATE_REQUIRED;
+        SdkAvailabilityStatus.SDK_UNAVAILABLE_PROVIDER_UPDATE_REQUIRED;
 
       // 부여된 권한 확인
       let grantedCount = 0;
@@ -697,14 +697,12 @@ export class HealthConnectService {
         endTime.getTime() - days * 24 * 60 * 60 * 1000
       );
 
-      // 병렬로 데이터 요청
-      const [stepsData, distanceData, speedData, caloriesData, exerciseData] =
+      // 병렬로 데이터 요청 (calories, exercise 제외 - 권한 불필요)
+      const [stepsData, distanceData, speedData] =
         await Promise.allSettled([
           this.readStepsData(startTime, endTime),
           this.readDistanceData(startTime, endTime),
           this.readSpeedData(startTime, endTime),
-          this.readCaloriesData(startTime, endTime),
-          this.readExerciseData(startTime, endTime),
         ]);
 
       // 안전하게 데이터 추출
@@ -712,10 +710,8 @@ export class HealthConnectService {
       const distance =
         distanceData.status === 'fulfilled' ? distanceData.value : [];
       const speed = speedData.status === 'fulfilled' ? speedData.value : [];
-      const calories =
-        caloriesData.status === 'fulfilled' ? caloriesData.value : [];
-      const exercise =
-        exerciseData.status === 'fulfilled' ? exerciseData.value : [];
+      const calories: any[] = []; // 사용하지 않음
+      const exercise: any[] = []; // 사용하지 않음
 
       // 데이터 집계
       const totalSteps = steps.reduce(
@@ -1086,14 +1082,12 @@ export class HealthConnectService {
         };
       }
 
-      // 병렬로 데이터 요청
-      const [stepsData, distanceData, speedData, caloriesData, exerciseData] =
+      // 병렬로 데이터 요청 (calories, exercise 제외 - 권한 불필요)
+      const [stepsData, distanceData, speedData] =
         await Promise.allSettled([
           this.readStepsData(startTime, endTime),
           this.readDistanceData(startTime, endTime),
           this.readSpeedData(startTime, endTime),
-          this.readCaloriesData(startTime, endTime),
-          this.readExerciseData(startTime, endTime),
         ]);
 
       // 안전하게 데이터 추출
@@ -1101,10 +1095,8 @@ export class HealthConnectService {
       const distance =
         distanceData.status === 'fulfilled' ? distanceData.value : [];
       const speed = speedData.status === 'fulfilled' ? speedData.value : [];
-      const calories =
-        caloriesData.status === 'fulfilled' ? caloriesData.value : [];
-      const exercise =
-        exerciseData.status === 'fulfilled' ? exerciseData.value : [];
+      const calories: any[] = []; // 사용하지 않음
+      const exercise: any[] = []; // 사용하지 않음
 
       // 데이터 집계 (기존 getHealthData와 동일한 로직)
       const totalSteps = steps.reduce(

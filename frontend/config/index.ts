@@ -206,13 +206,27 @@ class ApiConfig {
     const timestamp = new Date().toLocaleTimeString();
     console.log(`[${timestamp}] 🔍 Detecting working API URL...`);
 
+    // 환경 변수에 명시적으로 설정된 URL이 있으면 바로 사용
+    const envApiUrl = process.env.EXPO_PUBLIC_API_URL;
+    if (envApiUrl && envApiUrl !== 'http://localhost:8000') {
+      console.log(`[${timestamp}] 📌 Using explicit URL from .env.local: ${envApiUrl}`);
+      const isWorking = await testApiConnection(envApiUrl);
+      if (isWorking) {
+        this._baseUrl = envApiUrl;
+        this._isInitialized = true;
+        ApiConfig._instanceInitialized = true;
+        console.log(`[${timestamp}] ✅ API URL detected: ${envApiUrl}`);
+        return this._baseUrl;
+      }
+      console.warn(`[${timestamp}] ⚠️ Configured URL ${envApiUrl} is not responding, trying alternatives...`);
+    }
+
     // 1단계: Expo hostUri에서 실시간 IP 추출 (최우선)
     const expoDynamicUrl = this.getExpoBasedApiUrl();
 
     // 여러 후보 URL들을 우선순위에 따라 구성
     const candidateUrls = [
       expoDynamicUrl, // Expo 실시간 감지 (최우선)
-      'http://43.200.164.224:8000', // EC2 서버 (우선)
       'http://172.30.1.59:8000', // 현재 네트워크 IP
       this._baseUrl, // 초기 자동 감지된 URL
       'http://10.0.2.2:8000', // Android 에뮬레이터

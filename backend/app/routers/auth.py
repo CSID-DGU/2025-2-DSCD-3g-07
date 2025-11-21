@@ -76,7 +76,7 @@ async def register(user_data: UserRegisterRequest, db: Session = Depends(get_db)
     crud.update_last_login(db, new_user.user_id)
 
     # 7. JWT 토큰 생성
-    access_token = create_access_token(data={"sub": new_user.user_id})
+    access_token = create_access_token(data={"sub": str(new_user.user_id)})
 
     return TokenResponse(
         access_token=access_token,
@@ -119,7 +119,7 @@ async def login(login_data: UserLoginRequest, db: Session = Depends(get_db)):
     crud.update_last_login(db, user.user_id)
 
     # 5. JWT 토큰 생성
-    access_token = create_access_token(data={"sub": user.user_id})
+    access_token = create_access_token(data={"sub": str(user.user_id)})
 
     return TokenResponse(
         access_token=access_token,

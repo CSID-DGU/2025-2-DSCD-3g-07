@@ -83,7 +83,11 @@ def verify_token(token: str) -> Optional[dict]:
         Optional[dict]: 토큰이 유효하면 페이로드, 아니면 None
     """
     try:
+        print(f"🔍 Verifying token with SECRET_KEY: {SECRET_KEY[:20]}...")
+        print(f"🔍 ALGORITHM: {ALGORITHM}")
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        print(f"✅ Token verified successfully: {payload}")
         return payload
-    except JWTError:
+    except JWTError as e:
+        print(f"❌ JWT Error: {type(e).__name__} - {str(e)}")
         return None

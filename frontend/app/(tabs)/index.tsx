@@ -160,6 +160,68 @@ const extractRoutePath = (itinerary: Itinerary): RoutePath[] => {
   return coords;
 };
 
+// 🆕 각 leg별로 좌표를 추출하는 함수 (지도 표시용)
+const extractLegsWithCoords = (itinerary: Itinerary): Array<Leg & { coords: RoutePath[] }> => {
+  if (!itinerary?.legs) return [];
+
+  return itinerary.legs.map((leg, legIndex) => {
+    const coords: RoutePath[] = [];
+
+    const pushCoord = (lat?: number, lng?: number) => {
+      if (typeof lat !== 'number' || typeof lng !== 'number') return;
+      if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
+
+      const last = coords[coords.length - 1];
+      if (!last || last.lat !== lat || last.lng !== lng) {
+        coords.push({ lat, lng });
+      }
+    };
+
+    // passShape 먼저 확인 (대중교통 구간)
+    if (leg.passShape && leg.passShape.linestring) {
+      const pairs = leg.passShape.linestring.trim().split(' ');
+      pairs.forEach((pair: string) => {
+        if (!pair) return;
+        const parts = pair.split(',');
+        if (parts.length !== 2) return;
+
+        const [lngStr, latStr] = parts;
+        if (!lngStr || !latStr) return;
+
+        pushCoord(parseFloat(latStr), parseFloat(lngStr));
+      });
+    }
+    // 도보 구간의 steps 처리
+    else if (leg.steps && leg.steps.length > 0) {
+      leg.steps.forEach((step) => {
+        if (!step.linestring) return;
+
+        const pairs = step.linestring.trim().split(' ');
+        pairs.forEach(pair => {
+          if (!pair) return;
+          const parts = pair.split(',');
+          if (parts.length !== 2) return;
+
+          const [lngStr, latStr] = parts;
+          if (!lngStr || !latStr) return;
+
+          pushCoord(parseFloat(latStr), parseFloat(lngStr));
+        });
+      });
+    }
+    // fallback: start/end만 있는 경우
+    else if (leg.start && leg.end) {
+      pushCoord(leg.start?.lat, leg.start?.lon);
+      pushCoord(leg.end?.lat, leg.end?.lon);
+    }
+
+    return {
+      ...leg,
+      coords,
+    };
+  });
+};
+
 const getModeIcon = (mode: string) => {
   switch (mode) {
     case 'WALK':
@@ -794,7 +856,7 @@ export default function HomeScreen() {
         slopeAnalysis,
         rawItinerary: firstItinerary,
         totalDistance: firstItinerary.totalDistance || 0,
-        legs: firstItinerary.legs || [],
+        legs: extractLegsWithCoords(firstItinerary), // 각 leg에 coords 포함
       });
 
       // 검색창 숨기기
@@ -945,7 +1007,7 @@ export default function HomeScreen() {
         slopeAnalysis,
         rawItinerary: walkingItinerary,
         totalDistance: totalDistance,
-        legs: walkingItinerary.legs,
+        legs: extractLegsWithCoords(walkingItinerary), // 각 leg에 coords 포함
       });
 
       // 경로 옵션 초기화 (보행자 경로는 1개만)
@@ -1012,7 +1074,7 @@ export default function HomeScreen() {
         slopeAnalysis,
         rawItinerary: selected,
         totalDistance: selected.totalDistance || 0,
-        legs: selected.legs || [],
+        legs: extractLegsWithCoords(selected), // 각 leg에 coords 포함
       });
 
       setShowRouteList(false);

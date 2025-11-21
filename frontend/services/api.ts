@@ -113,13 +113,15 @@ class ApiService {
     return this.makeRequest('/api-health');
   }
 
-  async updateSpeedProfile(params: SpeedProfileUpdateParams): Promise<ApiResponse<any>> {
+  async updateSpeedProfile(params: SpeedProfileUpdateParams, token?: string): Promise<ApiResponse<any>> {
     try {
-      // 토큰 가져오기
-      const token = await AsyncStorage.getItem(TOKEN_KEY);
-      if (!token) {
+      // 토큰 가져오기 (파라미터로 전달되지 않으면 AsyncStorage에서)
+      const authToken = token || await AsyncStorage.getItem(TOKEN_KEY);
+      if (!authToken) {
         throw new Error('인증 토큰이 없습니다');
       }
+
+      console.log('🔐 Using token:', authToken.substring(0, 20) + '...');
 
       const body = {
         activity_type: params.activity_type,
@@ -132,7 +134,7 @@ class ApiService {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
+          'Authorization': `Bearer ${authToken}`,
         },
         body: JSON.stringify(body),
       });

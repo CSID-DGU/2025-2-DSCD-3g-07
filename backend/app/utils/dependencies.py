@@ -42,9 +42,12 @@ async def get_current_user(
     )
 
     token = credentials.credentials
+    print(f"🔐 Received token: {token[:20]}...")
     payload = verify_token(token)
+    print(f"📦 Decoded payload: {payload}")
 
     if payload is None:
+        print("❌ Token verification failed")
         raise credentials_exception
 
     user_id: Optional[int] = payload.get("sub")

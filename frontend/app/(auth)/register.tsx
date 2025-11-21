@@ -83,8 +83,8 @@ export default function RegisterScreen() {
       // 2. Context에 저장 (AsyncStorage에도 자동 저장됨)
       await register(response.access_token, response.user);
 
-      // 3. 헬스 커넥트 연동 시도
-      await setupHealthConnect(response.user.user_id);
+      // 3. 헬스 커넥트 연동 시도 (토큰 전달)
+      await setupHealthConnect(response.user.user_id, response.access_token);
 
     } catch (error: any) {
       Alert.alert('회원가입 실패', error.message || '회원가입에 실패했습니다');
@@ -96,7 +96,7 @@ export default function RegisterScreen() {
   /**
    * 헬스 커넥트 연동 프로세스
    */
-  const setupHealthConnect = async (userId: number) => {
+  const setupHealthConnect = async (userId: number, token: string) => {
     try {
       // 1. 헬스 커넥트 사용 가능 여부 확인
       const availability = await checkHealthConnectAvailability();
@@ -131,7 +131,7 @@ export default function RegisterScreen() {
           {
             text: '권한 허용',
             onPress: async () => {
-              await requestHealthPermissionsAndSync(userId);
+              await requestHealthPermissionsAndSync(userId, token);
             }
           }
         ]
@@ -151,7 +151,7 @@ export default function RegisterScreen() {
   /**
    * 헬스 커넥트 권한 요청 및 데이터 동기화
    */
-  const requestHealthPermissionsAndSync = async (userId: number) => {
+  const requestHealthPermissionsAndSync = async (userId: number, token: string) => {
     try {
       // 1. 권한 요청
       const permissionResult = await requestHealthConnectPermissions();
@@ -202,11 +202,14 @@ export default function RegisterScreen() {
       console.log(`   - 총 레코드: ${speedData.totalRecords}개`);
 
       try {
-        await apiService.updateSpeedProfile({
-          activity_type: 'walking',
-          avg_speed_flat_kmh: walkingSpeed,
-          source: 'health_connect',
-        });
+        await apiService.updateSpeedProfile(
+          {
+            activity_type: 'walking',
+            avg_speed_flat_kmh: walkingSpeed,
+            source: 'health_connect',
+          },
+          token
+        );
 
         Alert.alert(
           '회원가입 완료',

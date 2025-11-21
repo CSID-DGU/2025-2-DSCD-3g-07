@@ -262,13 +262,6 @@ const html = (
       const bounds = new kakao.maps.LatLngBounds();
       linePath.forEach(point => bounds.extend(point));
       map.setBounds(bounds);
-          });
-        }
-      }
-
-      const bounds = new kakao.maps.LatLngBounds();
-      linePath.forEach(point => bounds.extend(point));
-      map.setBounds(bounds);
       `
           : `
       // 경로가 없으면 출발지와 도착지만 보이도록

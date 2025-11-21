@@ -17,9 +17,9 @@ import { useAuth } from '../../contexts/AuthContext';
 import { authService } from '../../services/authService';
 import {
   requestHealthConnectPermissions,
-  readHealthData,
   checkHealthConnectAvailability
 } from '../../health';
+import { healthConnectService } from '../../services/healthConnect';
 import { apiService } from '../../services/api';
 
 export default function RegisterScreen() {
@@ -166,11 +166,21 @@ export default function RegisterScreen() {
         return;
       }
 
-      // 2. 권한이 허용되었으면 데이터 읽기 시도
+      // 2. 권한이 허용되었으면 전체 기간 데이터 읽기 시도
       console.log('✅ 헬스 커넥트 권한 허용됨');
-      const healthData = await readHealthData();
 
-      if (!healthData || !healthData.walkingSpeed || healthData.walkingSpeed <= 0) {
+      // 전체 기간(10년) 보행 속도 데이터 가져오기
+      const speedData = await healthConnectService.getAllTimeAverageSpeeds();
+
+      console.log('📊 헬스 속도 데이터 결과:', {
+        speedCase1: speedData.speedCase1,
+        speedCase2: speedData.speedCase2,
+        maxSpeed: speedData.maxSpeed,
+        totalRecords: speedData.totalRecords,
+        error: speedData.error,
+      });
+
+      if (speedData.error || (!speedData.speedCase1 && !speedData.speedCase2)) {
         // 권한은 있지만 데이터가 없는 경우
         console.log('ℹ️ 헬스 데이터가 없음, 기본 속도 유지');
         Alert.alert(
@@ -182,18 +192,25 @@ export default function RegisterScreen() {
       }
 
       // 3. 헬스 데이터가 있으면 서버에 업데이트
-      console.log('📊 헬스 데이터 발견:', healthData);
+      // Case 1 (≥ 2.5 km/h)을 우선 사용, 없으면 Case 2 (≥ 1.5 km/h) 사용
+      const walkingSpeed = speedData.speedCase1 || speedData.speedCase2 || 0;
+
+      console.log('📊 헬스 데이터 발견:');
+      console.log(`   - Case 1 (≥2.5km/h): ${speedData.speedCase1} km/h`);
+      console.log(`   - Case 2 (≥1.5km/h): ${speedData.speedCase2} km/h`);
+      console.log(`   - 선택된 속도: ${walkingSpeed} km/h`);
+      console.log(`   - 총 레코드: ${speedData.totalRecords}개`);
 
       try {
         await apiService.updateSpeedProfile({
           activity_type: 'walking',
-          avg_speed_flat_kmh: healthData.walkingSpeed,
+          avg_speed_flat_kmh: walkingSpeed,
           source: 'health_connect',
         });
 
         Alert.alert(
           '회원가입 완료',
-          `환영합니다, ${username}님!\n\n헬스 커넥트에서 보행 속도를 가져왔습니다.\n평균 보행 속도: ${healthData.walkingSpeed.toFixed(1)} km/h`,
+          `환영합니다, ${username}님!\n\n헬스 커넥트에서 보행 속도를 가져왔습니다.\n평균 보행 속도: ${walkingSpeed.toFixed(1)} km/h`,
           [{ text: '확인', onPress: () => router.replace('/(tabs)') }]
         );
       } catch (updateError) {

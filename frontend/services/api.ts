@@ -1,4 +1,7 @@
 import { apiClient } from '../utils/apiClient';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const TOKEN_KEY = '@pacetry_auth_token';
 
 interface TransitRouteParams {
   start_x: number;
@@ -19,6 +22,12 @@ interface WalkingRouteParams {
   end_name?: string;
   user_speed_mps?: number; // 사용자 보행속도 (m/s)
   weather_data?: any; // 날씨 데이터
+}
+
+interface SpeedProfileUpdateParams {
+  activity_type: string;
+  avg_speed_flat_kmh: number;
+  source?: string;
 }
 
 interface ApiResponse<T> {
@@ -103,9 +112,52 @@ class ApiService {
   > {
     return this.makeRequest('/api-health');
   }
+
+  async updateSpeedProfile(params: SpeedProfileUpdateParams): Promise<ApiResponse<any>> {
+    try {
+      // 토큰 가져오기
+      const token = await AsyncStorage.getItem(TOKEN_KEY);
+      if (!token) {
+        throw new Error('인증 토큰이 없습니다');
+      }
+
+      const body = {
+        activity_type: params.activity_type,
+        avg_speed_flat_kmh: params.avg_speed_flat_kmh,
+      };
+
+      // 직접 fetch 사용하여 인증 헤더 포함
+      const url = `${apiClient.getBaseUrl()}/api/profile/speed`;
+      const response = await fetch(url, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(body),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`API 오류: ${response.status} - ${errorText}`);
+      }
+
+      const data = await response.json();
+      return {
+        status: response.status,
+        data,
+      };
+    } catch (error) {
+      console.error('❌ Speed profile update failed:', error);
+      return {
+        status: 0,
+        error: error instanceof Error ? error.message : 'Unknown error',
+      };
+    }
+  }
 }
 
 // 싱글톤 인스턴스 생성
 export const apiService = new ApiService();
 export default ApiService;
-export type { TransitRouteParams, WalkingRouteParams, ApiResponse };
+export type { TransitRouteParams, WalkingRouteParams, SpeedProfileUpdateParams, ApiResponse };

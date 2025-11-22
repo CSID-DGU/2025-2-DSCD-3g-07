@@ -1,4 +1,4 @@
-from typing import Dict
+# from typing import Dict
 import pandas as pd
 
 
@@ -11,18 +11,17 @@ def crosswalk_wait_avg(real_coord):
         lst.append(dist)
     idx = lst.index(min(lst))
 
-    if min(lst) > 0.01:
+    if min(lst) > 0.0003:
         wait_avg = 0
     else:
-        red, green = gyo.iloc[idx, -2], gyo.iloc[idx, -1]
-        wait_avg = (green + red - 7) ** 2 / (2 * (green + red))
+        wait_avg = gyo.iloc[idx, -2]
 
-    return int(wait_avg)
+    return wait_avg
 
 
-def dongjak_waiting_time(itinerary: Dict) -> float:
+def dongjak_waiting_time(itinerary):
     legs = itinerary.get("legs", [])
-    total_wait = 0
+    # total_wait = 0
 
     for leg in legs:
         if leg.get("mode") != "WALK":
@@ -42,6 +41,8 @@ def dongjak_waiting_time(itinerary: Dict) -> float:
             wait_avg = crosswalk_wait_avg(coord)
             waiting_avg.append(wait_avg)
 
-        total_wait += sum(waiting_avg)
+    crosswalk_count = len(waiting_avg)
+    crosswalk_wait_time = int(sum(waiting_avg))
+    crosswalk_lst = waiting_avg
 
-    return float(total_wait)  # 항상 float 반환
+    return crosswalk_count, crosswalk_wait_time, crosswalk_lst

@@ -943,7 +943,7 @@ async def analyze_route_elevation(
     )
 
     # 횡단보도 대기 시간 계산
-    crosswalk_wait_time = int(dongjak_waiting_time(itinerary))
+    crosswalk_count, crosswalk_wait_time, crosswalk_lst = dongjak_waiting_time(itinerary)
 
     # 전체 평균 계수 계산 (실외 + 환승)
     all_analysis = analysis + transfer_analysis
@@ -974,7 +974,7 @@ async def analyze_route_elevation(
     print(f"  Tmap 기준 시간: {total_original_walk_time}초")
     print(f"  최종 보정 시간: {total_adjusted_walk_time}초")
     print(
-        f"  횡단보도 대기 시간: {crosswalk_wait_time}초 ({crosswalk_count}개 × 116초)"
+        f"  횡단보도 대기 시간: {crosswalk_wait_time}초 ({crosswalk_lst})"
     )
     print(f"  전체 시간: {total_adjusted_walk_time + crosswalk_wait_time}초")
     print(f"  시간 차이: {total_adjusted_walk_time - total_original_walk_time:+}초")

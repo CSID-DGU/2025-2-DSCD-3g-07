@@ -16,6 +16,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { healthConnectService } from '@/services/healthConnect';
+import { apiService } from '@/services/api';
 import { getRecommendedRoutes, GPXRouteRecommendation } from '@/services/gpxRouteService';
 import CourseDetailModal from '@/components/CourseDetailModal';
 
@@ -71,22 +72,25 @@ export default function CourseScreen() {
 
   const loadUserWalkingSpeed = async () => {
     try {
-      const speeds = await healthConnectService.getAllTimeAverageSpeeds();
-      if (speeds.speedCase2 && speeds.speedCase2 > 0) {
-        setWalkingSpeed(speeds.speedCase2); // km/h - Case 2: 느린 산책 포함
-        console.log(`✅ 사용자 도보 속도 (Case 2): ${speeds.speedCase2.toFixed(2)} km/h`);
+      // DB에서 속도 프로필 가져오기 (Case2: 코스 추천용)
+      const result = await apiService.getSpeedProfile();
+
+      if (result.status === 200 && result.data) {
+        const slowWalkSpeed = result.data.speed_case2 ||
+          (result.data.speed_case1 * 0.8) ||
+          3.2;
+        setWalkingSpeed(slowWalkSpeed);
+        console.log(`✅ 코스 추천 속도 (Case 2): ${slowWalkSpeed.toFixed(2)} km/h`);
       } else {
-        // 기본값: 평균 도보 속도 4.5 km/h
-        setWalkingSpeed(4.5);
-        console.log('⚠️ 도보 속도 데이터 없음, 기본값 사용: 4.5 km/h');
+        // 기본값: 3.2 km/h (느린 산책)
+        setWalkingSpeed(3.2);
+        console.log('⚠️ 속도 프로필 없음, 기본값 사용: 3.2 km/h');
       }
     } catch (error) {
       console.error('도보 속도 로드 실패:', error);
-      setWalkingSpeed(4.5);
+      setWalkingSpeed(3.2);
     }
-  };
-
-  // 현재 위치 가져오기
+  };  // 현재 위치 가져오기
   const fetchCurrentLocation = useCallback(async () => {
     try {
       setLoadingLocation(true);

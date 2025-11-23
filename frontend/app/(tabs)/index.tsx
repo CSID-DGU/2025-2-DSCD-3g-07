@@ -615,8 +615,15 @@ export default function HomeScreen() {
       setNavigationLog(prev => [...prev, log]);
       console.log('📊 Navigation Log:', log);
 
-      // DB에 저장
-      if (navigationStartTime && routeInfo && startLocation && endLocation) {
+      // 기본 결과 메시지 생성
+      let resultMessage =
+        `총 소요 시간: ${Math.floor(duration / 60)}분 ${Math.floor(duration % 60)}초\n` +
+        `실제 걷기: ${Math.floor(trackingData.activeWalkingTime / 60)}분 ${trackingData.activeWalkingTime % 60}초\n` +
+        `대기 시간: ${Math.floor(trackingData.pausedTime / 60)}분 ${trackingData.pausedTime % 60}초\n` +
+        `평균 속도: ${(trackingData.realSpeed * 3.6).toFixed(2)} km/h`;
+
+      // DB에 저장 (로그인한 경우만)
+      if (navigationStartTime && routeInfo && startLocation && endLocation && user) {
         try {
           const logData = await extractNavigationLogData(
             routeInfo,
@@ -629,12 +636,6 @@ export default function HomeScreen() {
             trackingData // 움직임 추적 데이터 전달
           );
 
-          // 로그인한 사용자의 user_id 사용
-          if (!user) {
-            Alert.alert('오류', '로그인이 필요합니다.');
-            return;
-          }
-
           const savedLog = await saveNavigationLog(user.user_id, logData);
           console.log('✅ 네비게이션 로그 저장 완료:', savedLog);
 
@@ -646,27 +647,22 @@ export default function HomeScreen() {
 
           const hasSignificantDifference = differencePercent >= 20;
 
-          // 추적 결과 표시
-          let message =
-            `총 소요 시간: ${Math.floor(duration / 60)}분 ${Math.floor(duration % 60)}초\n` +
-            `실제 걷기: ${Math.floor(trackingData.activeWalkingTime / 60)}분 ${trackingData.activeWalkingTime % 60}초\n` +
-            `대기 시간: ${Math.floor(trackingData.pausedTime / 60)}분 ${trackingData.pausedTime % 60}초\n` +
-            `평균 속도: ${(trackingData.realSpeed * 3.6).toFixed(2)} km/h`;
-
-          // 5분 이상 걸었고 차이가 크면 자동 업데이트 알림
+          // 5분 이상 걸었고 차이가 크면 자동 업데이트 알림 추가
           if (hasSignificantDifference && trackingData.activeWalkingTime >= 300) {
-            message += `\n\n⚠️ 예상 시간과 ${differencePercent.toFixed(0)}% 차이가 발생했습니다.\n실제 속도를 반영하여 다음 예측을 개선합니다.`;
+            resultMessage += `\n\n⚠️ 예상 시간과 ${differencePercent.toFixed(0)}% 차이가 발생했습니다.\n실제 속도를 반영하여 다음 예측을 개선합니다.`;
           }
-
-          Alert.alert('안내 종료', message);
         } catch (error) {
           console.error('❌ 네비게이션 로그 저장 실패:', error);
-          // 저장 실패해도 사용자 경험에는 영향 없도록 처리
-          Alert.alert(
-            '안내 종료',
-            `총 소요 시간: ${Math.floor(duration / 60)}분 ${Math.floor(duration % 60)}초`
-          );
+          resultMessage += '\n\n⚠️ 로그 저장에 실패했지만 기록은 완료되었습니다.';
         }
+      } else if (!user) {
+        console.log('ℹ️ 로그인하지 않아 네비게이션 로그를 저장하지 않습니다.');
+        resultMessage += '\n\n💡 로그인하면 이동 기록이 저장됩니다.';
+      }
+
+      // 사용자에게 결과 표시
+      if (navigationStartTime && routeInfo && startLocation && endLocation) {
+        Alert.alert('안내 종료', resultMessage);
       } else {
         // navigationStartTime 등이 없는 경우
         Alert.alert(

@@ -180,8 +180,9 @@ export default function RegisterScreen() {
         error: speedData.error,
       });
 
-      if (speedData.error || (!speedData.speedCase1 && !speedData.speedCase2)) {
+      if (speedData.error || !speedData.speedCase1) {
         // 권한은 있지만 데이터가 없는 경우
+        // Case1이 없으면 Case2도 없음 (Case2 ⊃ Case1)
         console.log('ℹ️ 헬스 데이터가 없음, 기본 속도 유지');
         Alert.alert(
           '회원가입 완료',
@@ -192,28 +193,30 @@ export default function RegisterScreen() {
       }
 
       // 3. 헬스 데이터가 있으면 서버에 업데이트
-      // Case 1 (≥ 2.5 km/h)을 우선 사용, 없으면 Case 2 (≥ 1.5 km/h) 사용
-      const walkingSpeed = speedData.speedCase1 || speedData.speedCase2 || 0;
+      // 백엔드에서 이미 기본값(4.0, 3.2)으로 생성했으므로
+      // 헬스 데이터가 있으면 이를 덮어쓰기
+      const walkingSpeedCase1 = speedData.speedCase1;  // 경로 안내용
+      const walkingSpeedCase2 = speedData.speedCase2;  // 코스 추천용
 
       console.log('📊 헬스 데이터 발견:');
-      console.log(`   - Case 1 (≥2.5km/h): ${speedData.speedCase1} km/h`);
-      console.log(`   - Case 2 (≥1.5km/h): ${speedData.speedCase2} km/h`);
-      console.log(`   - 선택된 속도: ${walkingSpeed} km/h`);
+      console.log(`   - Case 1 (≥2.5km/h): ${speedData.speedCase1} km/h (경로 안내용)`);
+      console.log(`   - Case 2 (≥1.5km/h): ${speedData.speedCase2} km/h (코스 추천용)`);
       console.log(`   - 총 레코드: ${speedData.totalRecords}개`);
 
       try {
+        // updateSpeedProfile로 기본값 덮어쓰기
         await apiService.updateSpeedProfile(
           {
             activity_type: 'walking',
-            avg_speed_flat_kmh: walkingSpeed,
-            source: 'health_connect',
+            speed_case1: walkingSpeedCase1,
+            speed_case2: walkingSpeedCase2,
           },
           token
         );
 
         Alert.alert(
           '회원가입 완료',
-          `환영합니다, ${username}님!\n\n헬스 커넥트에서 보행 속도를 가져왔습니다.\n평균 보행 속도: ${walkingSpeed.toFixed(1)} km/h`,
+          `환영합니다, ${username}님!\n\n헬스 커넥트에서 보행 속도를 가져왔습니다.\n경로 안내: ${walkingSpeedCase1.toFixed(1)} km/h\n코스 추천: ${walkingSpeedCase2.toFixed(1)} km/h`,
           [{ text: '확인', onPress: () => router.replace('/(tabs)') }]
         );
       } catch (updateError) {

@@ -26,7 +26,8 @@ interface WalkingRouteParams {
 
 interface SpeedProfileUpdateParams {
   activity_type: string;
-  avg_speed_flat_kmh: number;
+  speed_case1: number;
+  speed_case2?: number;  // Case2: 코스 추천용
   source?: string;
 }
 
@@ -125,7 +126,8 @@ class ApiService {
 
       const body = {
         activity_type: params.activity_type,
-        avg_speed_flat_kmh: params.avg_speed_flat_kmh,
+        speed_case1: params.speed_case1,
+        speed_case2: params.speed_case2,
       };
 
       // 직접 fetch 사용하여 인증 헤더 포함
@@ -151,6 +153,40 @@ class ApiService {
       };
     } catch (error) {
       console.error('❌ Speed profile update failed:', error);
+      return {
+        status: 0,
+        error: error instanceof Error ? error.message : 'Unknown error',
+      };
+    }
+  }
+
+  async getSpeedProfile(token?: string): Promise<ApiResponse<any>> {
+    try {
+      const authToken = token || await AsyncStorage.getItem(TOKEN_KEY);
+      if (!authToken) {
+        throw new Error('인증 토큰이 없습니다');
+      }
+
+      const url = `${apiClient.getBaseUrl()}/api/profile/speed`;
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${authToken}`,
+        },
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`API 오류: ${response.status} - ${errorText}`);
+      }
+
+      const data = await response.json();
+      return {
+        status: response.status,
+        data,
+      };
+    } catch (error) {
+      console.error('❌ Speed profile get failed:', error);
       return {
         status: 0,
         error: error instanceof Error ? error.message : 'Unknown error',

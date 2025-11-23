@@ -19,6 +19,7 @@ from app.schemas import (
 )
 from app.utils.auth_utils import create_access_token, get_password_hash, verify_password
 from app.utils.dependencies import get_current_user
+from app.constants.speed_constants import DEFAULT_WALKING_SPEED_CASE1, DEFAULT_WALKING_SPEED_CASE2
 
 router = APIRouter(prefix="/auth", tags=["인증"])
 
@@ -63,12 +64,13 @@ async def register(user_data: UserRegisterRequest, db: Session = Depends(get_db)
         auth_provider="local",
     )
 
-    # 5. 초기 속도 프로필 생성 (기본 4 km/h)
+    # 5. 초기 속도 프로필 생성 (기본값)
     crud.create_speed_profile(
         db=db,
         user_id=new_user.user_id,
         activity_type="walking",
-        avg_speed_flat_kmh=4.0,
+        speed_case1=DEFAULT_WALKING_SPEED_CASE1,
+        speed_case2=DEFAULT_WALKING_SPEED_CASE2,
         data_points_count=0,
     )
 

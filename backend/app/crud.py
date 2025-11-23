@@ -203,10 +203,12 @@ def update_speed_profile_with_weighted_avg(
     
     if profile:
         # 기존 프로필 있음 - 가중 평균 계산
-        old_speed = float(profile.avg_speed_flat_kmh or 4.0)
+        old_speed = float(profile.speed_case1 or 4.0)
         updated_speed = old_speed * weight_old + new_speed_kmh * weight_new
         
-        profile.avg_speed_flat_kmh = round(updated_speed, 2)
+        profile.speed_case1 = round(updated_speed, 2)
+        # Case2도 자동 업데이트 (비율 유지)
+        profile.speed_case2 = round(updated_speed * SLOW_WALK_SPEED_RATIO, 2)
         profile.data_points_count += 1
         
         # 이력 추가
@@ -246,7 +248,8 @@ def update_speed_profile_with_weighted_avg(
         profile = models.ActivitySpeedProfile(
             user_id=user_id,
             activity_type=activity_type,
-            avg_speed_flat_kmh=round(new_speed_kmh, 2),
+            speed_case1=round(new_speed_kmh, 2),
+            speed_case2=round(new_speed_kmh * SLOW_WALK_SPEED_RATIO, 2),
             data_points_count=1,
             speed_history=[history_entry]
         )

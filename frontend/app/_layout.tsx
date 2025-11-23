@@ -8,10 +8,6 @@ import { Config } from '../config';
 import { WeatherProvider } from '../contexts/WeatherContext';
 import { AuthProvider } from '../contexts/AuthContext';
 
-export const unstable_settings = {
-  anchor: '(tabs)',
-};
-
 export default function RootLayout() {
   // 앱 시작시 API URL 자동 감지 및 초기화
   useEffect(() => {
@@ -34,6 +30,10 @@ export default function RootLayout() {
       <WeatherProvider>
         <GestureHandlerRootView style={{ flex: 1 }}>
           <Stack>
+            <Stack.Screen
+              name="index"
+              options={{ headerShown: false }}
+            />
             <Stack.Screen
               name="(auth)/login"
               options={{ headerShown: false }}

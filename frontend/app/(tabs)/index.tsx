@@ -33,6 +33,7 @@ import {
 } from '@/services/placeSearchService';
 import type { RoutePath } from '@/services/routeService';
 import { useWeatherContext } from '@/contexts/WeatherContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { healthConnectService } from '@/services/healthConnect';
 import { locationService, type CurrentLocation } from '@/services/locationService';
 import { saveNavigationLog, extractNavigationLogData } from '@/services/navigationLogService';
@@ -272,7 +273,10 @@ const getModeLabel = (mode: string) => {
 export default function HomeScreen() {
   // 날씨 Context 사용
   const { weatherData } = useWeatherContext();
-  
+
+  // 인증 Context 사용
+  const { user } = useAuth();
+
   // Router
   const router = useRouter();
 
@@ -625,10 +629,13 @@ export default function HomeScreen() {
             trackingData // 움직임 추적 데이터 전달
           );
 
-          // TODO: 실제 user_id는 로그인 시스템에서 가져와야 함
-          const userId = 1; // 임시 user_id
+          // 로그인한 사용자의 user_id 사용
+          if (!user) {
+            Alert.alert('오류', '로그인이 필요합니다.');
+            return;
+          }
 
-          const savedLog = await saveNavigationLog(userId, logData);
+          const savedLog = await saveNavigationLog(user.user_id, logData);
           console.log('✅ 네비게이션 로그 저장 완료:', savedLog);
 
           // 🔔 예측 시간과 실제 시간 차이 확인 (±20% 이상이면 알림)
@@ -1136,15 +1143,15 @@ export default function HomeScreen() {
             color={isTracking ? "#FFFFFF" : "#2C6DE7"}
           />
         </TouchableOpacity>
-        
+
         {/* 날씨 버튼 */}
         <WeatherButton
           temperature={weatherData?.temp_c}
           weatherEmoji={
             weatherData?.pty === 1 ? '🌧️' : // 비
-            weatherData?.pty === 2 ? '🌨️' : // 진눈깨비
-            weatherData?.pty === 3 ? '❄️' : // 눈
-            '☀️' // 맑음
+              weatherData?.pty === 2 ? '🌨️' : // 진눈깨비
+                weatherData?.pty === 3 ? '❄️' : // 눈
+                  '☀️' // 맑음
           }
           onPress={() => router.push('/weather')}
         />

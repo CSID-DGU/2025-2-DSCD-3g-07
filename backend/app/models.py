@@ -141,7 +141,8 @@ class ActivitySpeedProfile(Base):
         index=True,
     )
     activity_type = Column(String(20), nullable=False)  # walking/running/cycling
-    avg_speed_flat_kmh = Column(Numeric(4, 2))
+    speed_case1 = Column(Numeric(4, 2))  # Case1: 경로 안내용 (≥2.5 km/h)
+    speed_case2 = Column(Numeric(4, 2))  # Case2: 코스 추천용 (≥1.5 km/h, 느린 산책)
     # avg_speed_uphill_kmh = Column(Numeric(4, 2))
     # avg_speed_downhill_kmh = Column(Numeric(4, 2))
     # max_speed_kmh = Column(Numeric(4, 2))

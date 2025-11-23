@@ -1,0 +1,22 @@
+# app/constants/__init__.py
+"""
+상수 모듈
+"""
+
+from .speed_constants import (
+    SLOW_WALK_SPEED_RATIO,
+    DEFAULT_WALKING_SPEED_CASE1,
+    DEFAULT_WALKING_SPEED_CASE2,
+    MIN_WALKING_SPEED,
+    MAX_WALKING_SPEED,
+    MIN_ACTIVE_WALKING_TIME,
+)
+
+__all__ = [
+    'SLOW_WALK_SPEED_RATIO',
+    'DEFAULT_WALKING_SPEED_CASE1',
+    'DEFAULT_WALKING_SPEED_CASE2',
+    'MIN_WALKING_SPEED',
+    'MAX_WALKING_SPEED',
+    'MIN_ACTIVE_WALKING_TIME',
+]

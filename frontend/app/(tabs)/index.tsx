@@ -33,6 +33,7 @@ import {
 } from '@/services/placeSearchService';
 import type { RoutePath } from '@/services/routeService';
 import { useWeatherContext } from '@/contexts/WeatherContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { healthConnectService } from '@/services/healthConnect';
 import { locationService, type CurrentLocation } from '@/services/locationService';
 import { saveNavigationLog, extractNavigationLogData } from '@/services/navigationLogService';
@@ -272,7 +273,10 @@ const getModeLabel = (mode: string) => {
 export default function HomeScreen() {
   // 날씨 Context 사용
   const { weatherData } = useWeatherContext();
-  
+
+  // 인증 Context 사용
+  const { user } = useAuth();
+
   // Router
   const router = useRouter();
 
@@ -611,8 +615,15 @@ export default function HomeScreen() {
       setNavigationLog(prev => [...prev, log]);
       console.log('📊 Navigation Log:', log);
 
-      // DB에 저장
-      if (navigationStartTime && routeInfo && startLocation && endLocation) {
+      // 기본 결과 메시지 생성
+      let resultMessage =
+        `총 소요 시간: ${Math.floor(duration / 60)}분 ${Math.floor(duration % 60)}초\n` +
+        `실제 걷기: ${Math.floor(trackingData.activeWalkingTime / 60)}분 ${trackingData.activeWalkingTime % 60}초\n` +
+        `대기 시간: ${Math.floor(trackingData.pausedTime / 60)}분 ${trackingData.pausedTime % 60}초\n` +
+        `평균 속도: ${(trackingData.realSpeed * 3.6).toFixed(2)} km/h`;
+
+      // DB에 저장 (로그인한 경우만)
+      if (navigationStartTime && routeInfo && startLocation && endLocation && user) {
         try {
           const logData = await extractNavigationLogData(
             routeInfo,
@@ -625,10 +636,7 @@ export default function HomeScreen() {
             trackingData // 움직임 추적 데이터 전달
           );
 
-          // TODO: 실제 user_id는 로그인 시스템에서 가져와야 함
-          const userId = 1; // 임시 user_id
-
-          const savedLog = await saveNavigationLog(userId, logData);
+          const savedLog = await saveNavigationLog(user.user_id, logData);
           console.log('✅ 네비게이션 로그 저장 완료:', savedLog);
 
           // 🔔 예측 시간과 실제 시간 차이 확인 (±20% 이상이면 알림)
@@ -639,27 +647,22 @@ export default function HomeScreen() {
 
           const hasSignificantDifference = differencePercent >= 20;
 
-          // 추적 결과 표시
-          let message =
-            `총 소요 시간: ${Math.floor(duration / 60)}분 ${Math.floor(duration % 60)}초\n` +
-            `실제 걷기: ${Math.floor(trackingData.activeWalkingTime / 60)}분 ${trackingData.activeWalkingTime % 60}초\n` +
-            `대기 시간: ${Math.floor(trackingData.pausedTime / 60)}분 ${trackingData.pausedTime % 60}초\n` +
-            `평균 속도: ${(trackingData.realSpeed * 3.6).toFixed(2)} km/h`;
-
-          // 5분 이상 걸었고 차이가 크면 자동 업데이트 알림
+          // 5분 이상 걸었고 차이가 크면 자동 업데이트 알림 추가
           if (hasSignificantDifference && trackingData.activeWalkingTime >= 300) {
-            message += `\n\n⚠️ 예상 시간과 ${differencePercent.toFixed(0)}% 차이가 발생했습니다.\n실제 속도를 반영하여 다음 예측을 개선합니다.`;
+            resultMessage += `\n\n⚠️ 예상 시간과 ${differencePercent.toFixed(0)}% 차이가 발생했습니다.\n실제 속도를 반영하여 다음 예측을 개선합니다.`;
           }
-
-          Alert.alert('안내 종료', message);
         } catch (error) {
           console.error('❌ 네비게이션 로그 저장 실패:', error);
-          // 저장 실패해도 사용자 경험에는 영향 없도록 처리
-          Alert.alert(
-            '안내 종료',
-            `총 소요 시간: ${Math.floor(duration / 60)}분 ${Math.floor(duration % 60)}초`
-          );
+          resultMessage += '\n\n⚠️ 로그 저장에 실패했지만 기록은 완료되었습니다.';
         }
+      } else if (!user) {
+        console.log('ℹ️ 로그인하지 않아 네비게이션 로그를 저장하지 않습니다.');
+        resultMessage += '\n\n💡 로그인하면 이동 기록이 저장됩니다.';
+      }
+
+      // 사용자에게 결과 표시
+      if (navigationStartTime && routeInfo && startLocation && endLocation) {
+        Alert.alert('안내 종료', resultMessage);
       } else {
         // navigationStartTime 등이 없는 경우
         Alert.alert(
@@ -1136,15 +1139,15 @@ export default function HomeScreen() {
             color={isTracking ? "#FFFFFF" : "#2C6DE7"}
           />
         </TouchableOpacity>
-        
+
         {/* 날씨 버튼 */}
         <WeatherButton
           temperature={weatherData?.temp_c}
           weatherEmoji={
             weatherData?.pty === 1 ? '🌧️' : // 비
-            weatherData?.pty === 2 ? '🌨️' : // 진눈깨비
-            weatherData?.pty === 3 ? '❄️' : // 눈
-            '☀️' // 맑음
+              weatherData?.pty === 2 ? '🌨️' : // 진눈깨비
+                weatherData?.pty === 3 ? '❄️' : // 눈
+                  '☀️' // 맑음
           }
           onPress={() => router.push('/weather')}
         />

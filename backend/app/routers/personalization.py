@@ -12,6 +12,7 @@ from app import crud
 from app.database import get_db
 from app.models import Users
 from app.utils.dependencies import get_current_user
+from app.constants.speed_constants import SLOW_WALK_SPEED_RATIO, DEFAULT_WALKING_SPEED_CASE1, DEFAULT_WALKING_SPEED_CASE2
 from pydantic import BaseModel, Field
 
 router = APIRouter(
@@ -26,7 +27,8 @@ class SpeedProfileResponse(BaseModel):
     profile_id: int
     user_id: int
     activity_type: str
-    avg_speed_flat_kmh: float = Field(..., description="평지 기준 평균 속도 (km/h)")
+    speed_case1: float = Field(..., description="평지 기준 평균 속도 (km/h) - Case1: 경로 안내용")
+    speed_case2: Optional[float] = Field(None, description="느린 산책 속도 (km/h) - Case2: 코스 추천용")
     data_points_count: int = Field(..., description="누적 데이터 포인트 수")
     
     class Config:
@@ -35,7 +37,8 @@ class SpeedProfileResponse(BaseModel):
 
 class SpeedProfileUpdateRequest(BaseModel):
     """속도 프로필 수동 업데이트 요청"""
-    avg_speed_flat_kmh: float = Field(..., ge=2.0, le=8.0, description="새로운 평균 속도 (km/h)")
+    speed_case1: float = Field(..., ge=2.0, le=8.0, description="새로운 평균 속도 (km/h)")
+    speed_case2: Optional[float] = Field(None, ge=1.5, le=7.0, description="느린 산책 속도 (km/h)")
     activity_type: str = Field(default="walking", description="활동 유형")
 
 
@@ -63,7 +66,8 @@ async def get_speed_profile(
             db=db,
             user_id=current_user.user_id,
             activity_type=activity_type,
-            avg_speed_flat_kmh=4.0,
+            speed_case1=DEFAULT_WALKING_SPEED_CASE1,
+            speed_case2=DEFAULT_WALKING_SPEED_CASE2,
             data_points_count=0,
         )
     
@@ -96,14 +100,17 @@ async def update_speed_profile(
     
     if profile:
         # 기존 프로필 덮어쓰기
-        profile.avg_speed_flat_kmh = update_data.avg_speed_flat_kmh
+        profile.speed_case1 = update_data.speed_case1
+        # Case2는 명시적으로 전달되면 사용, 아니면 Case1 비율 적용
+        profile.speed_case2 = update_data.speed_case2 or (update_data.speed_case1 * SLOW_WALK_SPEED_RATIO)
         profile.data_points_count += 1
     else:
         # 새 프로필 생성
         profile = ActivitySpeedProfile(
             user_id=current_user.user_id,
             activity_type=update_data.activity_type,
-            avg_speed_flat_kmh=update_data.avg_speed_flat_kmh,
+            speed_case1=update_data.speed_case1,
+            speed_case2=update_data.speed_case2 or (update_data.speed_case1 * SLOW_WALK_SPEED_RATIO),
             data_points_count=1,
         )
         db.add(profile)

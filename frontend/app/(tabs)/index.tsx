@@ -376,6 +376,42 @@ export default function HomeScreen() {
     })
   ).current;
 
+  // 앱 첫 실행 시 알림 권한 요청 (Android 13+)
+  useEffect(() => {
+    const requestNotificationPermission = async () => {
+      try {
+        const { PermissionsAndroid, Platform } = await import('react-native');
+        if (Platform.OS === 'android' && Platform.Version >= 33) {
+          const granted = await PermissionsAndroid.check(
+            PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS
+          );
+
+          if (!granted) {
+            const result = await PermissionsAndroid.request(
+              PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
+              {
+                title: '알림 권한 필요',
+                message: '경로 안내 중 백그라운드에서도 위치 추적 상태를 알림바에 표시하기 위해 알림 권한이 필요합니다.',
+                buttonPositive: '허용',
+                buttonNegative: '거부',
+              }
+            );
+
+            if (result === PermissionsAndroid.RESULTS.GRANTED) {
+              console.log('✅ 알림 권한 허용됨');
+            } else {
+              console.log('⚠️ 알림 권한 거부됨');
+            }
+          }
+        }
+      } catch (error) {
+        console.warn('⚠️ 알림 권한 확인 실패:', error);
+      }
+    };
+
+    requestNotificationPermission();
+  }, []);
+
   // Health Connect에서 보행 속도 가져오기
   useEffect(() => {
     const fetchWalkingSpeed = async () => {

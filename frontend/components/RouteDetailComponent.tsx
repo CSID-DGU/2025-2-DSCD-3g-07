@@ -7,11 +7,17 @@ import { formatTimeDifference } from '../services/elevationService';
 interface RouteDetailComponentProps {
   routeData: TransitRouteResponse | null;
   slopeAnalysis?: RouteElevationAnalysis | null;
+  routeMode?: 'transit' | 'walking';
+  totalTime?: number;
+  totalWalkTime?: number;
 }
 
 const RouteDetailComponent: React.FC<RouteDetailComponentProps> = ({
   routeData,
   slopeAnalysis,
+  routeMode = 'walking',
+  totalTime = 0,
+  totalWalkTime = 0,
 }) => {
   if (!routeData?.metaData?.plan?.itineraries?.[0]) {
     return (
@@ -197,11 +203,15 @@ const RouteDetailComponent: React.FC<RouteDetailComponentProps> = ({
                     </View>
                     {slopeAnalysis.total_time_with_crosswalk && (
                       <Text style={styles.crosswalkTotalTime}>
-                        횡단보도 포함 총 시간:{' '}
-                        {Math.floor(
-                          slopeAnalysis.total_time_with_crosswalk / 60
-                        )}
-                        분 {slopeAnalysis.total_time_with_crosswalk % 60}초
+                        횡단보도 포함 최종 보정 시간:{' '}
+                        {(() => {
+                          // 대중교통: 보행시간 + 대중교통 탑승시간
+                          // 도보: 보행시간만
+                          const finalTime = routeMode === 'transit'
+                            ? slopeAnalysis.total_time_with_crosswalk + (totalTime - totalWalkTime)
+                            : slopeAnalysis.total_time_with_crosswalk;
+                          return `${Math.floor(finalTime / 60)}분 ${finalTime % 60}초`;
+                        })()}
                       </Text>
                     )}
                   </View>

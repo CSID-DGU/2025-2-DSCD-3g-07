@@ -61,6 +61,6 @@ yarn-error.*
 
 app-example
 
-# generated native folders
-/ios
-/android
+# generated native folders - 빌드 파일만 제외, 소스 코드는 포함
+# /ios
+# /android

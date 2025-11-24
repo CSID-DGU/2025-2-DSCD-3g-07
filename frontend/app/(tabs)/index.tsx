@@ -1892,7 +1892,8 @@ export default function HomeScreen() {
                         <Text style={styles.crosswalkTitle}>
                           횡단보도: {routeInfo.slopeAnalysis.crosswalk_count}개
                         </Text>
-                        {routeInfo.slopeAnalysis.crosswalk_wait_time && (
+                        {typeof routeInfo.slopeAnalysis.crosswalk_wait_time === "number" && 
+                         routeInfo.slopeAnalysis.crosswalk_wait_time > 0 && (
                           <Text style={styles.crosswalkWaitTime}>
                             (+
                             {Math.floor(
@@ -1904,7 +1905,9 @@ export default function HomeScreen() {
                           </Text>
                         )}
                       </View>
-                      {routeInfo.slopeAnalysis.total_time_with_crosswalk && (
+                      {typeof routeInfo.slopeAnalysis.crosswalk_wait_time === "number" &&
+                       routeInfo.slopeAnalysis.crosswalk_wait_time > 0 &&
+                       typeof routeInfo.slopeAnalysis.total_time_with_crosswalk === "number" ? (
                         <Text style={styles.crosswalkTotalTime}>
                           횡단보도 포함 총 시간:{' '}
                           {Math.floor(
@@ -1915,6 +1918,10 @@ export default function HomeScreen() {
                           {routeInfo.slopeAnalysis.total_time_with_crosswalk %
                             60}
                           초
+                        </Text>
+                      ) : (
+                        <Text style={styles.crosswalkTotalTime}>
+                          횡단보도 대기 시간이 없거나 신호 정보가 없습니다.
                         </Text>
                       )}
                     </View>

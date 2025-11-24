@@ -19,6 +19,7 @@ import aiohttp
 
 from .Factors_Affecting_Walking_Speed import get_integrator
 from .geo_helpers import coords_to_latlng_string, haversine, parse_linestring
+from .crosswalk_helpers import crosswalk_waiting_time
 
 # 경사도별 속도 계수 (참고용 - 실제로는 Tobler's Function 사용)
 # Tobler's Function은 연속적인 값을 반환하므로 더 정확함
@@ -941,8 +942,9 @@ async def analyze_route_elevation(
         f"  전체 합계: 원본 {total_original_walk_time}초 ({total_original_walk_time // 60}분 {total_original_walk_time % 60}초), 보정: {total_adjusted_walk_time}초 ({total_adjusted_walk_time // 60}분 {total_adjusted_walk_time % 60}초)"
     )
 
-    # 횡단보도 대기 시간 계산 (중앙값 기준: 109.8초/개, 정수로 변환)
-    crosswalk_wait_time = int(crosswalk_count * 109.8)
+    # 횡단보도 대기 시간 계산
+    crosswalk_count = count_crosswalks(itinerary)
+    crosswalk_wait_time = int(crosswalk_waiting_time(itinerary))
 
     # 전체 평균 계수 계산 (실외 + 환승)
     all_analysis = analysis + transfer_analysis
@@ -973,7 +975,7 @@ async def analyze_route_elevation(
     print(f"  Tmap 기준 시간: {total_original_walk_time}초")
     print(f"  최종 보정 시간: {total_adjusted_walk_time}초")
     print(
-        f"  횡단보도 대기 시간: {crosswalk_wait_time}초 ({crosswalk_count}개 × 116초)"
+        f"  횡단보도 대기 시간: {crosswalk_wait_time}초 (횡단보도 {crosswalk_count}개 포함)"
     )
     print(f"  전체 시간: {total_adjusted_walk_time + crosswalk_wait_time}초")
     print(f"  시간 차이: {total_adjusted_walk_time - total_original_walk_time:+}초")

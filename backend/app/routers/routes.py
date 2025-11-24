@@ -8,7 +8,7 @@ from typing import Dict, List, Optional
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
-from ..utils.elevation_helpers import analyze_route_elevation, count_crosswalks
+from ..utils.elevation_helpers import analyze_route_elevation
 
 router = APIRouter(prefix="/routes", tags=["routes"])
 logger = logging.getLogger(__name__)
@@ -123,17 +123,12 @@ async def analyze_slope(request: AnalyzeSlopeRequest):
     try:
         logger.info("경사도 분석 요청 시작")
 
-        # 횡단보도 개수 카운팅
-        crosswalk_count = count_crosswalks(request.itinerary)
-        logger.info(f"🚦 횡단보도 개수: {crosswalk_count}개")
-
-        # 경사도 분석 실행 (통합 계산)
+        # 경사도 분석 실행 (횡단보도 계산 포함)
         result = await analyze_route_elevation(
             request.itinerary,
             api_key=request.api_key,
             weather_data=request.weather_data,
             user_speed_mps=request.user_speed_mps,
-            crosswalk_count=crosswalk_count,
         )
 
         if "error" in result and not result.get("walk_legs_analysis"):
@@ -141,21 +136,7 @@ async def analyze_slope(request: AnalyzeSlopeRequest):
             # 에러가 있어도 원본 시간 정보는 반환
             return result
 
-        logger.info(
-            f"경사도 분석 완료 - "
-            f"원본: {result['total_original_walk_time']}초, "
-            f"보정: {result['total_adjusted_walk_time']}초, "
-            f"차이: {result['total_route_time_adjustment']}초"
-        )
-
-        # ✨ factors 확인 로그
-        logger.info(f"🔍 [라우터] factors 포함 여부: {'factors' in result}")
-        if "factors" in result:
-            logger.info(f"🔍 [라우터] factors 값: {result['factors']}")
-        else:
-            logger.warning("⚠️ [라우터] factors가 응답에 없습니다!")
-            logger.info(f"🔍 [라우터] 응답 키 목록: {list(result.keys())}")
-
+        logger.info(f"경사도 분석 완료 - 횡단보도: {result.get('crosswalk_count', 0)}개")
         return result
 
     except ValueError as e:

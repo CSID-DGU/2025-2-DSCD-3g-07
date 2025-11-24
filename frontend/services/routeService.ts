@@ -69,7 +69,10 @@ export const searchPedestrianRoute = async (
     }
 
     const data = (await response.json()) as any;
-    console.log('📦 [티맵 API] 도보 경로 응답:', data);
+
+    // 간단한 요약 로그만 출력
+    const featureCount = data.features?.length || 0;
+    console.log(`✅ 도보 경로 응답: ${featureCount}개 구간`);
 
     // 티맵 응답을 우리 형식으로 변환
     const paths: RoutePath[] = [];
@@ -145,7 +148,10 @@ export const searchTransitRoute = async (
     }
 
     const data = (await response.json()) as any;
-    console.log('📦 [티맵 API] 대중교통 경로 응답:', data);
+
+    // 간단한 요약 로그만 출력
+    const itineraryCount = data.metaData?.plan?.itineraries?.length || 0;
+    console.log(`✅ 대중교통 경로 응답: ${itineraryCount}개 경로`);
 
     // 첫 번째 경로만 사용
     const itinerary = data.metaData?.plan?.itineraries?.[0];

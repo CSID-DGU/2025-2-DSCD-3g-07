@@ -104,7 +104,26 @@ class ApiClient {
         );
       }
 
-      return response.json() as Promise<T>;
+      const data = await response.json() as T;
+
+      // Transit route 응답일 경우 간단한 요약 로그만 출력
+      if (endpoint.includes('/transit-route') && data && typeof data === 'object') {
+        const routeData = data as any;
+        const itineraries = routeData.metaData?.plan?.itineraries;
+        if (itineraries && Array.isArray(itineraries)) {
+          console.log(`✅ 경로 검색 완료: ${itineraries.length}개 경로`);
+          if (itineraries[0]) {
+            const first = itineraries[0];
+            console.log(`  - 소요시간: ${Math.round(first.totalTime / 60)}분`);
+            console.log(`  - 환승: ${first.transfers || 0}회`);
+            console.log(`  - 경로 수: ${first.legs?.length || 0}개 구간`);
+          }
+        }
+      } else {
+        console.log(`✅ Response received for ${endpoint}`);
+      }
+
+      return data;
     } catch (error) {
       clearTimeout(timeoutId);
 
@@ -140,7 +159,9 @@ class ApiClient {
       throw new Error(`API 오류: ${response.status} ${response.statusText}`);
     }
 
-    return response.json() as Promise<T>;
+    const result = await response.json() as T;
+    console.log(`✅ Response received for ${endpoint}`);
+    return result;
   }
 
   /**

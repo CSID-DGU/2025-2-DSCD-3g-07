@@ -222,13 +222,7 @@ async def get_walking_route(request: WalkingRouteRequest):
                                 }
                             )
 
-                # 횡단보도 개수 카운팅 (GeoJSON features를 직접 전달)
-                from .elevation_helpers import count_crosswalks
-
-                crosswalk_count = count_crosswalks(features)  # features 전달
-                logger.info(f"[보행자 경로] 횡단보도 개수: {crosswalk_count}개")
-
-                # 경사도/날씨/속도 분석 수행
+                # 경사도/날씨/속도 분석 수행 (횡단보도 계산 포함)
                 elevation_analysis = None
                 try:
                     elevation_analysis = await analyze_route_elevation(
@@ -236,17 +230,19 @@ async def get_walking_route(request: WalkingRouteRequest):
                         api_key=None,  # Google API 키는 elevation_helpers에서 자동으로 가져옴
                         weather_data=request.weather_data,
                         user_speed_mps=request.user_speed_mps,
-                        crosswalk_count=crosswalk_count,  # 횡단보도 개수 전달
                     )
                     logger.info(
                         f"[보행자 경로] 경사도 분석 완료: {elevation_analysis is not None}"
                     )
+                    if elevation_analysis:
+                        logger.info(
+                            f"[보행자 경로] 횡단보도: {elevation_analysis.get('crosswalk_count', 0)}개, "
+                            f"대기시간: {elevation_analysis.get('crosswalk_wait_time', 0)}초"
+                        )
                     if elevation_analysis and elevation_analysis.get("error"):
                         logger.warning(
                             f"[보행자 경로] 경사도 분석 에러: {elevation_analysis['error']}"
                         )
-                        # 에러가 있어도 횡단보도 정보는 유지
-                        elevation_analysis["crosswalk_count"] = crosswalk_count
                 except Exception as e:
                     logger.error(f"[보행자 경로] 경사도 분석 실패: {e}", exc_info=True)
                     elevation_analysis = {

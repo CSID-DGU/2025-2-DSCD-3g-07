@@ -99,20 +99,11 @@ const extractRoutePath = (itinerary: Itinerary): RoutePath[] => {
     return coords;
   }
 
-  console.log(`🗺️ Extracting route from ${itinerary.legs.length} legs`);
-
+  // 경로 좌표 추출
   itinerary.legs.forEach((leg, legIndex) => {
-    console.log(
-      `  Leg ${legIndex}: ${leg.mode}, steps: ${leg.steps?.length || 0}`
-    );
-
     // 🔥 핵심: passShape 먼저 확인! (대중교통 구간용)
     if (leg.passShape && leg.passShape.linestring) {
-      console.log(`    Using passShape.linestring for ${leg.mode}`);
-
       const pairs = leg.passShape.linestring.trim().split(' ');
-      console.log(`      Added ${pairs.length} coordinates from passShape`);
-
       pairs.forEach((pair: string) => {
         if (!pair) return;
         const parts = pair.split(',');
@@ -129,14 +120,9 @@ const extractRoutePath = (itinerary: Itinerary): RoutePath[] => {
     // 도보 구간의 steps 처리
     else if (leg.steps && leg.steps.length > 0) {
       leg.steps.forEach((step, stepIndex) => {
-        if (!step.linestring) {
-          console.log(`    Step ${stepIndex}: No linestring`);
-          return;
-        }
+        if (!step.linestring) return;
 
         const pairs = step.linestring.trim().split(' ');
-        console.log(`    Step ${stepIndex}: ${pairs.length} coordinate pairs`);
-
         pairs.forEach(pair => {
           if (!pair) return;
           const parts = pair.split(',');
@@ -153,13 +139,12 @@ const extractRoutePath = (itinerary: Itinerary): RoutePath[] => {
     }
     // fallback: start/end만 있는 경우
     else if (leg.start && leg.end) {
-      console.log(`    Using start/end points only`);
       pushCoord(leg.start?.lat, leg.start?.lon);
       pushCoord(leg.end?.lat, leg.end?.lon);
     }
   });
 
-  console.log(`✅ Extracted ${coords.length} total coordinates`);
+  console.log(`✅ 경로 좌표 추출: ${coords.length}개`);
   return coords;
 };
 
@@ -749,13 +734,9 @@ export default function HomeScreen() {
 
       console.log('🔍 Transit API Request:', params);
       const response = await apiService.getTransitRoute(params);
-      console.log(
-        '📦 Full API Response:',
-        JSON.stringify(response.data, null, 2)
-      );
 
       const itineraries = response.data?.metaData?.plan?.itineraries || [];
-      console.log(`🗺️ Received ${itineraries.length} route options`);
+      console.log(`✅ 경로 ${itineraries.length}개 검색 완료`);
 
       if (itineraries.length === 0) {
         Alert.alert('경로 없음', '경로를 찾을 수 없습니다.');
@@ -769,41 +750,7 @@ export default function HomeScreen() {
 
       // 첫 번째 경로 표시
       const firstItinerary = itineraries[0];
-      console.log(
-        '🗺️ First itinerary structure:',
-        JSON.stringify(firstItinerary, null, 2).substring(0, 1000)
-      );
-      console.log(
-        '🗺️ Processing itinerary with',
-        firstItinerary.legs?.length || 0,
-        'legs'
-      );
-
-      // 각 leg의 구조 상세 로깅
-      firstItinerary.legs?.forEach((leg: any, idx: number) => {
-        console.log(`  Leg ${idx}:`);
-        console.log(`    - mode: ${leg.mode}`);
-        console.log(`    - steps: ${leg.steps?.length || 0}`);
-        if (leg.steps && leg.steps.length > 0) {
-          leg.steps.forEach((step: any, stepIdx: number) => {
-            console.log(`      Step ${stepIdx}:`);
-            console.log(`        - linestring exists: ${!!step.linestring}`);
-            if (step.linestring) {
-              const coords = step.linestring.trim().split(' ');
-              console.log(`        - coord count: ${coords.length}`);
-              console.log(`        - first coord: ${coords[0]}`);
-              console.log(`        - last coord: ${coords[coords.length - 1]}`);
-            }
-          });
-        }
-      });
-
       const path = extractRoutePath(firstItinerary);
-      console.log('✅ Route path extracted:', path.length, 'coordinates');
-      if (path.length > 0) {
-        console.log('  First coord:', path[0]);
-        console.log('  Last coord:', path[path.length - 1]);
-      }
       setRoutePath(path);
 
       const totalTimeSec = firstItinerary.totalTime || 0;
@@ -1883,47 +1830,52 @@ export default function HomeScreen() {
                     </View>
                   )}
 
-                {/* 횡단보도 정보 */}
+                {/* 횡단보도 개수 및 대기시간 */}
                 {routeInfo.slopeAnalysis?.crosswalk_count !== undefined &&
                   routeInfo.slopeAnalysis.crosswalk_count > 0 && (
-                    <View style={styles.crosswalkInfoContainer}>
+                    <View style={styles.crosswalkCountContainer}>
                       <View style={styles.crosswalkHeader}>
                         <Text style={styles.crosswalkIcon}>🚦</Text>
                         <Text style={styles.crosswalkTitle}>
                           횡단보도: {routeInfo.slopeAnalysis.crosswalk_count}개
                         </Text>
-                        {typeof routeInfo.slopeAnalysis.crosswalk_wait_time === "number" && 
-                         routeInfo.slopeAnalysis.crosswalk_wait_time > 0 && (
-                          <Text style={styles.crosswalkWaitTime}>
-                            (+
-                            {Math.floor(
-                              routeInfo.slopeAnalysis.crosswalk_wait_time / 60
-                            )}
-                            분{' '}
-                            {routeInfo.slopeAnalysis.crosswalk_wait_time % 60}초
-                            대기)
-                          </Text>
-                        )}
-                      </View>
-                      {typeof routeInfo.slopeAnalysis.crosswalk_wait_time === "number" &&
-                       routeInfo.slopeAnalysis.crosswalk_wait_time > 0 &&
-                       typeof routeInfo.slopeAnalysis.total_time_with_crosswalk === "number" ? (
-                        <Text style={styles.crosswalkTotalTime}>
-                          횡단보도 포함 총 시간:{' '}
-                          {Math.floor(
-                            routeInfo.slopeAnalysis.total_time_with_crosswalk /
-                            60
+                        {typeof routeInfo.slopeAnalysis.crosswalk_wait_time === "number" &&
+                          routeInfo.slopeAnalysis.crosswalk_wait_time > 0 && (
+                            <Text style={styles.crosswalkWaitTime}>
+                              (+
+                              {Math.floor(
+                                routeInfo.slopeAnalysis.crosswalk_wait_time / 60
+                              )}
+                              분{' '}
+                              {routeInfo.slopeAnalysis.crosswalk_wait_time % 60}초
+                              대기)
+                            </Text>
                           )}
-                          분{' '}
-                          {routeInfo.slopeAnalysis.total_time_with_crosswalk %
-                            60}
-                          초
-                        </Text>
-                      ) : (
-                        <Text style={styles.crosswalkTotalTime}>
-                          횡단보도 대기 시간이 없거나 신호 정보가 없습니다.
-                        </Text>
-                      )}
+                      </View>
+                    </View>
+                  )}
+
+                {/* 횡단보도 포함 최종 보정 시간 */}
+                {routeInfo.slopeAnalysis?.crosswalk_count !== undefined &&
+                  routeInfo.slopeAnalysis.crosswalk_count > 0 &&
+                  typeof routeInfo.slopeAnalysis.crosswalk_wait_time === "number" &&
+                  routeInfo.slopeAnalysis.crosswalk_wait_time > 0 &&
+                  typeof routeInfo.slopeAnalysis.total_time_with_crosswalk === "number" && (
+                    <View style={styles.crosswalkFinalTimeContainer}>
+                      <Text style={styles.crosswalkFinalTimeTitle}>
+                        횡단보도 포함 최종 보정 시간
+                      </Text>
+                      <Text style={styles.crosswalkFinalTimeValue}>
+                        {(() => {
+                          // 대중교통: 보행시간 + 대중교통 탑승시간
+                          // 도보: 보행시간만
+                          const finalTime = routeMode === 'transit'
+                            ? routeInfo.slopeAnalysis.total_time_with_crosswalk +
+                            (routeInfo.totalTime - routeInfo.totalWalkTime)
+                            : routeInfo.slopeAnalysis.total_time_with_crosswalk;
+                          return `${Math.floor(finalTime / 60)}분 ${finalTime % 60}초`;
+                        })()}
+                      </Text>
                     </View>
                   )}
 
@@ -2539,7 +2491,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#FFE0E0',
+    borderColor: '#e0f2ffff',
   },
   slopeAnalysisHeader: {
     flexDirection: 'row',
@@ -2550,7 +2502,7 @@ const styles = StyleSheet.create({
   slopeAnalysisTitle: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#FF6B6B',
+    color: '#000000ff',
   },
   slopeStatsRow: {
     flexDirection: 'row',
@@ -2592,14 +2544,14 @@ const styles = StyleSheet.create({
     color: '#E65100',
     lineHeight: 18,
   },
-  // 횡단보도 정보 스타일
-  crosswalkInfoContainer: {
+  // 횡단보도 개수 정보 스타일
+  crosswalkCountContainer: {
     marginTop: 12,
     padding: 16,
-    backgroundColor: '#FFF3E0',
+    backgroundColor: '#ebf7ffff',
     borderRadius: 12,
     borderLeftWidth: 4,
-    borderLeftColor: '#FF9800',
+    borderLeftColor: '#6a8fd4ff',
   },
   crosswalkHeader: {
     flexDirection: 'row',
@@ -2611,18 +2563,44 @@ const styles = StyleSheet.create({
     fontSize: 20,
   },
   crosswalkTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#E65100',
+    fontSize: 15,
+    fontWeight: '500',
+    color: '#262626ff',
   },
   crosswalkWaitTime: {
     fontSize: 14,
-    color: '#F57C00',
-    fontWeight: '600',
+    color: '#262626ff',
+    fontWeight: '500',
   },
-  crosswalkTotalTime: {
+  // 횡단보도 포함 최종 시간 스타일
+  crosswalkFinalTimeContainer: {
+    marginTop: 12,
+    padding: 16,
+    backgroundColor: '#effbf0ff',
+    borderRadius: 12,
+    borderLeftWidth: 4,
+    borderLeftColor: '#6ebb71ff',
+    borderRightWidth: 4,
+    borderRightColor: '#6ebb71ff',
+  },
+  crosswalkFinalTimeTitle: {
     fontSize: 14,
-    color: '#5D4037',
+    fontWeight: '600',
+    color: '#000000ff',
+    marginBottom: 6,
+    textAlign: 'center',
+  },
+  crosswalkFinalTimeValue: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#000000ff',
+    textAlign: 'center',
+  },
+  // 레거시 (사용 안함)
+  crosswalkTotalTime: {
+    fontSize: 15,
+    color: '#2C6DE7',
+    fontWeight: '600',
     marginTop: 8,
     paddingLeft: 28,
   },

@@ -30,14 +30,19 @@ LOG_DIR = BASE_DIR / "logs"
 LOG_DIR.mkdir(parents=True, exist_ok=True)  # 디렉토리 자동 생성
 
 # 로깅 설정
+import sys
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.FileHandler(LOG_DIR / 'api.log'),
-        logging.StreamHandler()
+        logging.FileHandler(LOG_DIR / 'api.log', encoding='utf-8'),
+        logging.StreamHandler(sys.stdout)
     ]
 )
+# StreamHandler의 인코딩을 UTF-8로 설정
+for handler in logging.getLogger().handlers:
+    if isinstance(handler, logging.StreamHandler):
+        handler.stream.reconfigure(encoding='utf-8')
 
 logger = logging.getLogger(__name__)
 

@@ -613,7 +613,6 @@ async def analyze_route_elevation(
     api_key: Optional[str] = None,
     weather_data: Optional[Dict] = None,
     user_speed_mps: Optional[float] = None,
-    crosswalk_count: int = 0,
 ) -> Dict:
     """
     전체 경로의 경사도를 분석하고 시간을 보정 (통합 계산)
@@ -627,7 +626,6 @@ async def analyze_route_elevation(
             - rain_mm_per_h: 시간당 강수량 (mm/h)
             - snow_cm_per_h: 시간당 신적설 (cm/h)
         user_speed_mps: 사용자 평균 보행속도 (m/s, Health Connect)
-        crosswalk_count: 경로 상 횡단보도 개수 (기본값: 0)
 
     Returns:
         경사도 분석 결과 및 보정된 시간 정보 (모든 요인 통합)
@@ -942,9 +940,10 @@ async def analyze_route_elevation(
         f"  전체 합계: 원본 {total_original_walk_time}초 ({total_original_walk_time // 60}분 {total_original_walk_time % 60}초), 보정: {total_adjusted_walk_time}초 ({total_adjusted_walk_time // 60}분 {total_adjusted_walk_time % 60}초)"
     )
 
-    # 횡단보도 대기 시간 계산
-    crosswalk_count = count_crosswalks(itinerary)
-    crosswalk_wait_time = int(crosswalk_waiting_time(itinerary))
+    # 횡단보도 대기 시간 및 개수 계산 (통합)
+    crosswalk_result = crosswalk_waiting_time(itinerary)
+    crosswalk_count = crosswalk_result["count"]
+    crosswalk_wait_time = crosswalk_result["total_wait_time"]
 
     # 전체 평균 계수 계산 (실외 + 환승)
     all_analysis = analysis + transfer_analysis

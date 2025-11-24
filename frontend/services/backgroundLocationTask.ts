@@ -90,7 +90,27 @@ export async function startBackgroundLocationTracking(): Promise<boolean> {
             return false;
         }
 
-        // 1. 백그라운드 권한 확인
+        // 1. 알림 권한 요청 (Android 13+)
+        try {
+            const { PermissionsAndroid, Platform } = await import('react-native');
+            if (Platform.OS === 'android' && Platform.Version >= 33) {
+                const granted = await PermissionsAndroid.request(
+                    PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
+                    {
+                        title: '알림 권한 필요',
+                        message: '백그라운드에서 경로 안내를 계속하려면 알림 권한이 필요합니다.',
+                        buttonPositive: '허용',
+                    }
+                );
+                if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
+                    console.warn('⚠️ 알림 권한이 거부되었습니다. 알림바에 표시되지 않을 수 있습니다.');
+                }
+            }
+        } catch (error) {
+            console.warn('⚠️ 알림 권한 요청 실패:', error);
+        }
+
+        // 2. 백그라운드 위치 권한 확인
         const { status: foregroundStatus } = await Location.requestForegroundPermissionsAsync();
 
         if (foregroundStatus !== 'granted') {
@@ -105,7 +125,7 @@ export async function startBackgroundLocationTracking(): Promise<boolean> {
             return false;
         }
 
-        // 2. 이미 등록된 태스크가 있는지 확인
+        // 3. 이미 등록된 태스크가 있는지 확인
         const isRegistered = await TaskManager.isTaskRegisteredAsync(BACKGROUND_LOCATION_TASK);
 
         if (isRegistered) {
@@ -113,7 +133,7 @@ export async function startBackgroundLocationTracking(): Promise<boolean> {
             return true;
         }
 
-        // 3. 백그라운드 위치 추적 시작
+        // 4. 백그라운드 위치 추적 시작
         await Location.startLocationUpdatesAsync(BACKGROUND_LOCATION_TASK, {
             accuracy: Location.Accuracy.BestForNavigation,
             timeInterval: 1000, // 1초마다 업데이트
@@ -128,10 +148,10 @@ export async function startBackgroundLocationTracking(): Promise<boolean> {
             deferredUpdatesDistance: 1, // 1m 간격
         });
 
-        // 4. 기존 데이터 초기화
+        // 5. 기존 데이터 초기화
         clearBackgroundLocations();
 
-        console.log('✅ 백그라운드 위치 추적 시작됨');
+        console.log('✅ 백그라운드 위치 추적 시작됨 - 알림바를 확인하세요');
         return true;
 
     } catch (error) {

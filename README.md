@@ -147,7 +147,6 @@ python -m pytest
 
 - **최소 SDK**: 26 (Android 8.0)
 - **권장 SDK**: 34 (Android 14+)
-- **Health Connect 앱** 설치 필요 ([Play Store](https://play.google.com/store/apps/details?id=com.google.android.apps.healthdata))
 
 ### 권한 설정
 

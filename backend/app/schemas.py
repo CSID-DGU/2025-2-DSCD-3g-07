@@ -171,6 +171,7 @@ class NavigationLogCreate(BaseModel):
     
     # 경로 상세 정보
     total_distance_m: float = Field(..., description="총 거리 (m)")
+    walking_distance_m: Optional[float] = Field(None, description="실제 보행 거리 (m, GPS 추적)")
     transport_modes: Optional[List[str]] = Field(None, description="대중교통 수단 리스트")
     crosswalk_count: int = Field(0, description="횡단보도 개수")
     
@@ -216,6 +217,7 @@ class NavigationLogResponse(BaseModel):
     
     # 경로 상세 정보
     total_distance_m: float
+    walking_distance_m: Optional[float]
     transport_modes: Optional[List[str]]
     crosswalk_count: int
     

@@ -157,8 +157,9 @@ class MovementTrackingService {
         // 하이브리드 판단
         const isMoving = activityType === 'walking' || activityType === 'running';
 
-        // 거리 계산 (이전 위치가 있을 때만)
-        if (this.lastLocation) {
+        // 거리 계산 (이전 위치가 있고, 걷기/뛰기 상태일 때만)
+        // 차량/정지 구간은 거리 누적 제외하여 실제 보행 거리만 추적
+        if (this.lastLocation && (activityType === 'walking' || activityType === 'running')) {
             const distance = this.calculateDistance(
                 this.lastLocation.coords.latitude,
                 this.lastLocation.coords.longitude,
@@ -217,6 +218,12 @@ class MovementTrackingService {
 
         // 구간이 너무 짧으면 무시 (1초 미만)
         if (durationSeconds < 1) {
+            return;
+        }
+
+        // walking 구간인데 거리가 0이면 무시 (GPS 신호 불량)
+        if (this.currentSegment.status === 'walking' && this.currentSegment.distanceM < 0.5) {
+            console.log(`⚠️ 구간 무시: walking이지만 거리 ${this.currentSegment.distanceM}m (GPS 신호 불량)`);
             return;
         }
 
@@ -405,13 +412,35 @@ class MovementTrackingService {
         pauseCount: number;
         segments: MovementSegment[];
     } {
-        // 진행 중인 구간이 있으면 임시로 종료
+        // 진행 중인 구간이 있으면 현재 시점까지의 임시 구간 생성
+        let allSegments = [...this.segments];
         if (this.currentSegment) {
-            this.finishCurrentSegment();
+            const now = new Date();
+            const currentDuration = Math.floor(
+                (now.getTime() - this.currentSegment.startTime.getTime()) / 1000
+            );
+
+            // 현재 진행 중인 구간을 임시로 추가 (1초 이상이고, walking이면 0.5m 이상일 때만)
+            if (currentDuration >= 1) {
+                if (this.currentSegment.status === 'paused' || this.currentSegment.distanceM >= 0.5) {
+                    const avgSpeed = currentDuration > 0
+                        ? this.currentSegment.distanceM / currentDuration
+                        : 0;
+
+                    allSegments.push({
+                        start_time: this.currentSegment.startTime.toISOString(),
+                        end_time: now.toISOString(),
+                        distance_m: Math.round(this.currentSegment.distanceM * 100) / 100,
+                        duration_seconds: currentDuration,
+                        avg_speed_ms: Math.round(avgSpeed * 100) / 100,
+                        status: this.currentSegment.status,
+                    });
+                }
+            }
         }
 
-        const walkingSegments = this.segments.filter(s => s.status === 'walking');
-        const pausedSegments = this.segments.filter(s => s.status === 'paused');
+        const walkingSegments = allSegments.filter(s => s.status === 'walking');
+        const pausedSegments = allSegments.filter(s => s.status === 'paused');
 
         const activeWalkingTime = walkingSegments.reduce(
             (sum, s) => sum + s.duration_seconds,
@@ -435,7 +464,7 @@ class MovementTrackingService {
             pausedTime,
             realSpeed: Math.round(realSpeed * 100) / 100,
             pauseCount: pausedSegments.length,
-            segments: this.segments,
+            segments: allSegments,
         };
     }
 

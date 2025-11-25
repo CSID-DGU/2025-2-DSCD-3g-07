@@ -29,6 +29,7 @@ export interface NavigationLogData {
 
     // 경로 상세 정보
     total_distance_m: number;
+    walking_distance_m?: number;
     transport_modes?: string[];
     crosswalk_count?: number;
 
@@ -73,6 +74,7 @@ export interface NavigationLogResponse {
     end_lat: number;
     end_lon: number;
     total_distance_m: number;
+    walking_distance_m?: number;
     transport_modes?: string[];
     crosswalk_count: number;
     user_speed_factor?: number;
@@ -293,6 +295,13 @@ export async function extractNavigationLogData(
     // 총 거리 계산 (m)
     const totalDistanceM = routeInfo.totalDistance || 0;
 
+    // 실제 보행 거리 계산 (GPS 추적 데이터 기반)
+    let walkingDistanceM: number | undefined = undefined;
+    if (trackingData?.segments) {
+        const walkingSegments = trackingData.segments.filter(s => s.status === 'walking');
+        walkingDistanceM = walkingSegments.reduce((sum, s) => sum + s.distance_m, 0);
+    }
+
     // 교통수단 추출 (대중교통 경로인 경우)
     let transportModes: string[] = [];
     if (routeMode === 'transit' && routeInfo.legs) {
@@ -401,6 +410,7 @@ export async function extractNavigationLogData(
         end_lat: endLat,
         end_lon: endLon,
         total_distance_m: totalDistanceM,
+        walking_distance_m: walkingDistanceM,
         transport_modes: transportModes.length > 0 ? transportModes : undefined,
         crosswalk_count: crosswalkCount,
         user_speed_factor: userSpeedFactor,

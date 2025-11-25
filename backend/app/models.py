@@ -427,6 +427,7 @@ class NavigationLogs(Base):
     
     # 경로 상세 정보
     total_distance_m = Column(Numeric(8, 2), nullable=False)  # 총 거리 (m)
+    walking_distance_m = Column(Numeric(8, 2))  # 실제 보행 거리 (m, GPS 추적)
     transport_modes = Column(JSONType)  # 대중교통 경로의 경우 사용한 교통수단 리스트
     crosswalk_count = Column(Integer, server_default="0")  # 횡단보도 개수
     

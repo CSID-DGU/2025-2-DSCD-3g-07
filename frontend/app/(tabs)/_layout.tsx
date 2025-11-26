@@ -60,19 +60,13 @@ export default function TabLayout() {
       <Tabs.Screen
         name="api-test"
         options={{
-          title: 'API',
-          tabBarIcon: ({ color }) => (
-            <MaterialIcons size={26} name="api" color={color} />
-          ),
+          href: null, // 탭바에서 숨김
         }}
       />
       <Tabs.Screen
         name="weather"
         options={{
-          title: '날씨',
-          tabBarIcon: ({ color }) => (
-            <MaterialIcons size={26} name="wb-sunny" color={color} />
-          ),
+          href: null, // 탭바에서 숨김
         }}
       />
       <Tabs.Screen

@@ -19,6 +19,7 @@ import { healthConnectService } from '@/services/healthConnect';
 import { apiService } from '@/services/api';
 import { getRecommendedRoutes, GPXRouteRecommendation } from '@/services/gpxRouteService';
 import CourseDetailModal from '@/components/CourseDetailModal';
+import { searchPlaces, PlaceSearchResult, placeToCoordinates } from '@/services/placeSearchService';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const PRIMARY_COLOR = '#2C6DE7';
@@ -64,6 +65,11 @@ export default function CourseScreen() {
   const [loading, setLoading] = useState(false);
   const [selectedRoute, setSelectedRoute] = useState<GPXRouteRecommendation | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
+  
+  // 장소 검색 상태
+  const [locationSearchText, setLocationSearchText] = useState('');
+  const [locationSearchResults, setLocationSearchResults] = useState<PlaceSearchResult[]>([]);
+  const [showLocationResults, setShowLocationResults] = useState(false);
 
   // 앱 시작 시 사용자 도보 속도 불러오기
   useEffect(() => {
@@ -127,6 +133,9 @@ export default function CourseScreen() {
         address: detailedAddress,
         timestamp: Date.now(),
       });
+      
+      setLocationSearchText(detailedAddress);
+      setShowLocationResults(false);
 
       Alert.alert('완료', detailedAddress);
     } catch (error) {
@@ -136,6 +145,49 @@ export default function CourseScreen() {
       setLoadingLocation(false);
     }
   }, []);
+  
+  // 장소 검색
+  const handleLocationSearch = async (text: string) => {
+    setLocationSearchText(text);
+    
+    if (text.trim().length >= 2) {
+      try {
+        const results = await searchPlaces(
+          text,
+          currentLocation?.longitude,
+          currentLocation?.latitude
+        );
+        setLocationSearchResults(results);
+        setShowLocationResults(results.length > 0);
+      } catch (error) {
+        console.error('장소 검색 실패:', error);
+        setLocationSearchResults([]);
+        setShowLocationResults(false);
+      }
+    } else {
+      setLocationSearchResults([]);
+      setShowLocationResults(false);
+    }
+  };
+  
+  // 장소 선택
+  const handleSelectLocation = (place: PlaceSearchResult) => {
+    const coords = placeToCoordinates(place);
+    const displayName = place.place_name || place.address_name;
+    
+    setCurrentLocation({
+      latitude: coords.latitude,
+      longitude: coords.longitude,
+      address: displayName,
+      timestamp: Date.now(),
+    });
+    
+    setLocationSearchText(displayName);
+    setShowLocationResults(false);
+    setLocationSearchResults([]);
+    
+    console.log('✅ 위치 선택:', { name: displayName, coords });
+  };
 
   // 경로 검색
   const searchRoutes = async () => {
@@ -335,32 +387,78 @@ export default function CourseScreen() {
 
           {/* 현재 위치 설정 */}
           <View style={styles.locationSection}>
-            <TouchableOpacity
-              style={styles.locationButton}
-              onPress={fetchCurrentLocation}
-              disabled={loadingLocation}
-            >
-              {loadingLocation ? (
-                <ActivityIndicator size="small" color={PRIMARY_COLOR} />
-              ) : (
-                <>
-                  <MaterialIcons
-                    name={currentLocation ? "my-location" : "location-searching"}
-                    size={20}
-                    color={currentLocation ? PRIMARY_COLOR : SECONDARY_TEXT}
+            <Text style={styles.inputLabel}>기준 위치</Text>
+            
+            {/* 검색 입력 필드 */}
+            <View style={styles.locationInputContainer}>
+              <MaterialIcons 
+                name="place" 
+                size={20} 
+                color={currentLocation ? PRIMARY_COLOR : SECONDARY_TEXT}
+                style={styles.locationIcon}
+              />
+              <TextInput
+                style={styles.locationInput}
+                placeholder="장소를 검색하거나 현재 위치 사용"
+                placeholderTextColor="#999"
+                value={locationSearchText}
+                onChangeText={handleLocationSearch}
+                onFocus={() => {
+                  if (locationSearchResults.length > 0) {
+                    setShowLocationResults(true);
+                  }
+                }}
+              />
+              
+              {/* 현재 위치 버튼 */}
+              <TouchableOpacity
+                style={styles.currentLocationButton}
+                onPress={fetchCurrentLocation}
+                disabled={loadingLocation}
+              >
+                {loadingLocation ? (
+                  <ActivityIndicator size="small" color={PRIMARY_COLOR} />
+                ) : (
+                  <MaterialIcons 
+                    name="my-location" 
+                    size={20} 
+                    color={PRIMARY_COLOR}
                   />
-                  <Text style={[
-                    styles.locationButtonText,
-                    currentLocation && styles.locationButtonTextActive
-                  ]}>
-                    {currentLocation ? '현재 위치 설정됨' : '현재 위치 설정'}
-                  </Text>
-                </>
-              )}
-            </TouchableOpacity>
+                )}
+              </TouchableOpacity>
+            </View>
 
-            {/* 현재 위치 정보 표시 */}
-            {currentLocation && currentLocation.address && (
+            {/* 장소 검색 결과 */}
+            {showLocationResults && locationSearchResults.length > 0 && (
+              <View style={styles.searchResultsContainer}>
+                <ScrollView
+                  style={styles.searchResultsList}
+                  keyboardShouldPersistTaps="handled"
+                  nestedScrollEnabled={true}
+                >
+                  {locationSearchResults.map((place) => (
+                    <TouchableOpacity
+                      key={place.id}
+                      style={styles.searchResultItem}
+                      onPress={() => handleSelectLocation(place)}
+                    >
+                      <MaterialIcons name="place" size={18} color={SECONDARY_TEXT} />
+                      <View style={styles.searchResultTextContainer}>
+                        <Text style={styles.searchResultName}>
+                          {place.place_name}
+                        </Text>
+                        <Text style={styles.searchResultAddress}>
+                          {place.road_address_name || place.address_name}
+                        </Text>
+                      </View>
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
+              </View>
+            )}
+
+            {/* 선택된 위치 정보 표시 */}
+            {currentLocation && currentLocation.address && !showLocationResults && (
               <View style={styles.locationInfo}>
                 <View style={styles.locationInfoRow}>
                   <MaterialIcons name="place" size={16} color={PRIMARY_COLOR} />
@@ -620,6 +718,66 @@ const styles = StyleSheet.create({
   locationSection: {
     paddingHorizontal: 16,
     marginBottom: 16,
+  },
+  locationInputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: LIGHT_BACKGROUND,
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: BORDER_COLOR,
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+  },
+  locationIcon: {
+    marginRight: 8,
+  },
+  locationInput: {
+    flex: 1,
+    height: 48,
+    fontSize: 15,
+    color: '#1D2A3B',
+  },
+  currentLocationButton: {
+    padding: 8,
+    marginLeft: 4,
+  },
+  searchResultsContainer: {
+    marginTop: 8,
+    backgroundColor: 'white',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: BORDER_COLOR,
+    maxHeight: 240,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  searchResultsList: {
+    maxHeight: 240,
+  },
+  searchResultItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: BORDER_COLOR,
+  },
+  searchResultTextContainer: {
+    flex: 1,
+    marginLeft: 12,
+  },
+  searchResultName: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#1D2A3B',
+    marginBottom: 4,
+  },
+  searchResultAddress: {
+    fontSize: 13,
+    color: SECONDARY_TEXT,
   },
   locationButton: {
     flexDirection: 'row',

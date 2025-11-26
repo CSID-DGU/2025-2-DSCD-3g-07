@@ -8,7 +8,11 @@ import {
   Alert,
   RefreshControl,
   TouchableOpacity,
+  StatusBar,
+  TextInput,
 } from 'react-native';
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { useRouter } from 'expo-router';
 import * as Location from 'expo-location';
 import {
   getCurrentWeather,
@@ -20,6 +24,10 @@ import {
   getWeatherDescriptionFromCode,
   getWindDirection,
 } from '../types/weather';
+import {
+  searchPlaces,
+  type PlaceSearchResult,
+} from '../services/placeSearchService';
 
 interface LocationCoords {
   latitude: number;
@@ -28,17 +36,22 @@ interface LocationCoords {
 }
 
 export default function WeatherTestScreen() {
+  const router = useRouter();
   const [weatherData, setWeatherData] = useState<OpenMeteoResponse | null>(
     null
   );
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
-  const [includeForecasts, setIncludeForecasts] = useState(false);
   const [currentLocation, setCurrentLocation] = useState<LocationCoords | null>(
     null
   );
   const [locationLoading, setLocationLoading] = useState(false);
   const [useCurrentLocation, setUseCurrentLocation] = useState(false);
+  
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<PlaceSearchResult[]>([]);
+  const [showSearchResults, setShowSearchResults] = useState(false);
+  const [selectedLocation, setSelectedLocation] = useState<LocationCoords | null>(null);
 
   // 현재 위치 가져오기
   const getCurrentLocation = async (): Promise<LocationCoords | null> => {
@@ -101,7 +114,6 @@ export default function WeatherTestScreen() {
   };
 
   const fetchWeatherData = async (
-    withForecasts: boolean = false,
     coordsOverride?: { latitude: number; longitude: number }
   ) => {
     try {
@@ -115,23 +127,15 @@ export default function WeatherTestScreen() {
 
       console.log('[weather] 날씨 데이터 요청:', {
         좌표: coords,
-        예보포함: withForecasts,
       });
 
-      let data: OpenMeteoResponse;
-
-      if (withForecasts) {
-        // 모든 정보 포함 (48시간 예보 + 7일 예보)
-        data = await getCompleteWeather(
-          coords.latitude,
-          coords.longitude,
-          48,
-          7
-        );
-      } else {
-        // 현재 날씨만
-        data = await getCurrentWeather(coords.latitude, coords.longitude);
-      }
+      // 항상 전체 정보 가져오기 (48시간 예보 + 7일 예보)
+      const data = await getCompleteWeather(
+        coords.latitude,
+        coords.longitude,
+        48,
+        7
+      );
 
       setWeatherData(data);
       console.log('[weather] 날씨 데이터 가져오기 성공:', {
@@ -165,13 +169,16 @@ export default function WeatherTestScreen() {
 
   const onRefresh = async () => {
     setRefreshing(true);
-    await fetchWeatherData(includeForecasts);
+    await fetchWeatherData();
     setRefreshing(false);
   };
 
   const handleLocationToggle = async (enabled: boolean) => {
     if (enabled) {
       setUseCurrentLocation(true);
+      setSelectedLocation(null);
+      setSearchQuery('');
+      setShowSearchResults(false);
 
       const coords = currentLocation || (await getCurrentLocation());
       if (!coords) {
@@ -179,11 +186,44 @@ export default function WeatherTestScreen() {
         return;
       }
 
-      await fetchWeatherData(includeForecasts, coords);
+      await fetchWeatherData(coords);
     } else {
       setUseCurrentLocation(false);
-      await fetchWeatherData(includeForecasts, SEOUL_COORDS);
+      await fetchWeatherData(SEOUL_COORDS);
     }
+  };
+
+  const handleSearch = async (query: string) => {
+    setSearchQuery(query);
+    
+    if (query.trim().length < 2) {
+      setSearchResults([]);
+      setShowSearchResults(false);
+      return;
+    }
+
+    try {
+      const results = await searchPlaces(query);
+      setSearchResults(results);
+      setShowSearchResults(true);
+    } catch (error) {
+      console.error('검색 실패:', error);
+    }
+  };
+
+  const handleSelectPlace = async (place: PlaceSearchResult) => {
+    const location: LocationCoords = {
+      latitude: place.y,
+      longitude: place.x,
+      locationName: place.place_name,
+    };
+
+    setSelectedLocation(location);
+    setSearchQuery(place.place_name);
+    setShowSearchResults(false);
+    setUseCurrentLocation(false);
+
+    await fetchWeatherData(location);
   };
 
   useEffect(() => {
@@ -197,57 +237,48 @@ export default function WeatherTestScreen() {
     const weather = getWeatherDescriptionFromCode(current.weather_code);
     const windDir = getWindDirection(current.wind_direction_10m);
 
-    console.log('🎨 [UI 렌더링] 현재 날씨:', {
-      원본코드: current.weather_code,
-      변환결과: weather,
-      기온: current.temperature_2m,
-    });
-
     return (
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>🌡️ 현재 날씨</Text>
-
-        <View style={styles.weatherMain}>
+      <View style={styles.currentWeatherCard}>
+        <View style={styles.mainWeather}>
           <Text style={styles.emoji}>{weather.emoji}</Text>
-          <Text style={styles.temperature}>
-            {Math.round(current.temperature_2m)}°C
-          </Text>
-          <Text style={styles.weatherDesc}>{weather.description}</Text>
+          <View style={styles.tempContainer}>
+            <Text style={styles.temperature}>
+              {Math.round(current.temperature_2m)}°
+            </Text>
+            <Text style={styles.weatherDesc}>{weather.description}</Text>
+          </View>
         </View>
 
-        <View style={styles.weatherDetails}>
-          <View style={styles.detailRow}>
-            <Text style={styles.detailLabel}>체감온도:</Text>
+        <View style={styles.detailsGrid}>
+          <View style={styles.detailCard}>
+            <MaterialIcons name="thermostat" size={24} color="#FF6B6B" />
+            <Text style={styles.detailLabel}>체감</Text>
             <Text style={styles.detailValue}>
-              {Math.round(current.apparent_temperature)}°C
+              {Math.round(current.apparent_temperature)}°
             </Text>
           </View>
 
-          <View style={styles.detailRow}>
-            <Text style={styles.detailLabel}>습도:</Text>
+          <View style={styles.detailCard}>
+            <MaterialIcons name="opacity" size={24} color="#4ECDC4" />
+            <Text style={styles.detailLabel}>습도</Text>
             <Text style={styles.detailValue}>
               {current.relative_humidity_2m}%
             </Text>
           </View>
 
-          <View style={styles.detailRow}>
-            <Text style={styles.detailLabel}>풍속:</Text>
+          <View style={styles.detailCard}>
+            <MaterialIcons name="air" size={24} color="#95E1D3" />
+            <Text style={styles.detailLabel}>풍속</Text>
             <Text style={styles.detailValue}>
-              {current.wind_speed_10m} m/s ({windDir})
+              {current.wind_speed_10m}m/s
             </Text>
           </View>
 
-          <View style={styles.detailRow}>
-            <Text style={styles.detailLabel}>강수량:</Text>
-            <Text style={styles.detailValue}>{current.precipitation} mm</Text>
+          <View style={styles.detailCard}>
+            <MaterialIcons name="water-drop" size={24} color="#5DADE2" />
+            <Text style={styles.detailLabel}>강수</Text>
+            <Text style={styles.detailValue}>{current.precipitation}mm</Text>
           </View>
-
-          {current.rain > 0 && (
-            <View style={styles.detailRow}>
-              <Text style={styles.detailLabel}>비:</Text>
-              <Text style={styles.detailValue}>{current.rain} mm</Text>
-            </View>
-          )}
         </View>
       </View>
     );
@@ -256,27 +287,17 @@ export default function WeatherTestScreen() {
   const renderLocationInfo = () => {
     if (!weatherData) return null;
 
+    let locationName = '서울';
+    if (useCurrentLocation && currentLocation?.locationName) {
+      locationName = currentLocation.locationName;
+    } else if (selectedLocation?.locationName) {
+      locationName = selectedLocation.locationName;
+    }
+
     return (
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>📍 위치 정보</Text>
-        <View style={styles.weatherDetails}>
-          <View style={styles.detailRow}>
-            <Text style={styles.detailLabel}>위도:</Text>
-            <Text style={styles.detailValue}>
-              {weatherData.latitude.toFixed(4)}°
-            </Text>
-          </View>
-          <View style={styles.detailRow}>
-            <Text style={styles.detailLabel}>경도:</Text>
-            <Text style={styles.detailValue}>
-              {weatherData.longitude.toFixed(4)}°
-            </Text>
-          </View>
-          <View style={styles.detailRow}>
-            <Text style={styles.detailLabel}>시간대:</Text>
-            <Text style={styles.detailValue}>{weatherData.timezone}</Text>
-          </View>
-        </View>
+      <View style={styles.locationInfo}>
+        <MaterialIcons name="place" size={20} color="white" />
+        <Text style={styles.locationText}>{locationName}</Text>
       </View>
     );
   };
@@ -285,14 +306,19 @@ export default function WeatherTestScreen() {
     if (!weatherData?.hourly || !weatherData.hourly.time) return null;
 
     const hourly = weatherData.hourly;
-    const next6Hours = hourly.time.slice(0, 6);
+    const next12Hours = hourly.time.slice(0, 12);
 
     return (
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>⏰ 시간별 예보 (6시간)</Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          {next6Hours.map((time, index) => {
-            const hour = new Date(time).getHours();
+        <Text style={styles.sectionTitle}>시간별 예보</Text>
+        <ScrollView 
+          horizontal 
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.hourlyScroll}
+        >
+          {next12Hours.map((time, index) => {
+            const date = new Date(time);
+            const hour = date.getHours();
             const temp = Math.round(hourly.temperature_2m[index] || 0);
             const precipitation = hourly.precipitation_probability[index] || 0;
             const weather = getWeatherDescriptionFromCode(
@@ -304,7 +330,9 @@ export default function WeatherTestScreen() {
                 <Text style={styles.hourlyTime}>{hour}시</Text>
                 <Text style={styles.hourlyEmoji}>{weather.emoji}</Text>
                 <Text style={styles.hourlyTemp}>{temp}°</Text>
-                <Text style={styles.hourlyRain}>{precipitation}%</Text>
+                {precipitation > 0 && (
+                  <Text style={styles.hourlyRain}>💧{precipitation}%</Text>
+                )}
               </View>
             );
           })}
@@ -317,39 +345,35 @@ export default function WeatherTestScreen() {
     if (!weatherData?.daily || !weatherData.daily.time) return null;
 
     const daily = weatherData.daily;
-    const next5Days = daily.time.slice(0, 5);
+    const next7Days = daily.time.slice(0, 7);
 
     return (
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>📅 일별 예보 (5일)</Text>
-        {next5Days.map((dateStr, index) => {
+        <Text style={styles.sectionTitle}>주간 예보</Text>
+        {next7Days.map((dateStr, index) => {
           const date = new Date(dateStr);
-          const dayName = date.toLocaleDateString('ko-KR', {
+          const dayName = index === 0 ? '오늘' : date.toLocaleDateString('ko-KR', {
             weekday: 'short',
           });
           const maxTemp = Math.round(daily.temperature_2m_max[index] || 0);
           const minTemp = Math.round(daily.temperature_2m_min[index] || 0);
           const weatherCode = daily.weather_code[index] || 0;
           const weather = getWeatherDescriptionFromCode(weatherCode);
-          const precip = daily.precipitation_sum[index] || 0;
           const pop = daily.precipitation_probability_max[index] || 0;
 
           return (
             <View key={index} style={styles.dailyItem}>
               <View style={styles.dailyLeft}>
                 <Text style={styles.dayName}>{dayName}</Text>
-                <Text style={styles.dailyEmoji}>{weather.emoji}</Text>
               </View>
               <View style={styles.dailyCenter}>
+                <Text style={styles.dailyEmoji}>{weather.emoji}</Text>
                 <Text style={styles.dailyDesc}>{weather.description}</Text>
-                {precip > 0 && (
-                  <Text style={styles.dailyRain}>
-                    강수 {precip.toFixed(1)}mm
-                  </Text>
-                )}
-                {pop > 0 && <Text style={styles.dailyRain}>확률 {pop}%</Text>}
               </View>
               <View style={styles.dailyRight}>
+                {pop > 0 && (
+                  <Text style={styles.dailyRain}>💧 {pop}%</Text>
+                )}
                 <Text style={styles.dailyTemp}>
                   {maxTemp}° / {minTemp}°
                 </Text>
@@ -362,325 +386,371 @@ export default function WeatherTestScreen() {
   };
 
   return (
-    <ScrollView
-      style={styles.container}
-      refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-      }
-    >
+    <View style={styles.container}>
+      <StatusBar barStyle="light-content" />
+      
+      {/* 헤더 */}
       <View style={styles.header}>
-        <Text style={styles.title}>🌤️ 기상청 날씨 API 테스트</Text>
-        <Text style={styles.subtitle}>
-          {useCurrentLocation && currentLocation
-            ? currentLocation.locationName || '현재 위치'
-            : '서울 지역'}
-        </Text>
-      </View>
-
-      <View style={styles.locationControl}>
-        <View style={styles.locationToggle}>
-          <Text style={styles.locationLabel}>📍 현재 위치 사용</Text>
+        <View style={styles.headerTop}>
           <TouchableOpacity
-            style={[
-              styles.toggleButton,
-              useCurrentLocation && styles.toggleButtonActive,
-            ]}
-            onPress={() => handleLocationToggle(!useCurrentLocation)}
-            disabled={locationLoading}
+            onPress={() => router.back()}
+            style={styles.backButton}
           >
-            <Text
-              style={[
-                styles.toggleText,
-                useCurrentLocation && styles.toggleTextActive,
-              ]}
-            >
-              {locationLoading
-                ? '위치 가져오는 중...'
-                : useCurrentLocation
-                  ? 'ON'
-                  : 'OFF'}
-            </Text>
+            <MaterialIcons name="arrow-back" size={24} color="white" />
           </TouchableOpacity>
+          <Text style={styles.headerTitle}>날씨</Text>
+          <View style={styles.headerSpacer} />
         </View>
+        {renderLocationInfo()}
+        
+        {/* 검색창 */}
+        <View style={styles.searchContainer}>
+          <MaterialIcons name="search" size={20} color="#666" style={styles.searchIcon} />
+          <TextInput
+            style={styles.searchInput}
+            placeholder="지역을 검색하세요"
+            placeholderTextColor="#999"
+            value={searchQuery}
+            onChangeText={handleSearch}
+            onFocus={() => {
+              if (searchResults.length > 0) {
+                setShowSearchResults(true);
+              }
+            }}
+          />
+          {searchQuery.length > 0 ? (
+            <TouchableOpacity
+              onPress={() => {
+                setSearchQuery('');
+                setSearchResults([]);
+                setShowSearchResults(false);
+              }}
+              style={styles.clearButton}
+            >
+              <MaterialIcons name="close" size={20} color="#666" />
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity
+              onPress={() => handleLocationToggle(!useCurrentLocation)}
+              disabled={locationLoading}
+              style={styles.locationButtonInSearch}
+            >
+              <MaterialIcons 
+                name={useCurrentLocation ? "my-location" : "location-on"} 
+                size={20} 
+                color={useCurrentLocation ? "#2C6DE7" : "#666"} 
+              />
+            </TouchableOpacity>
+          )}
+        </View>
+      </View>
 
-        {useCurrentLocation && currentLocation && (
-          <View style={styles.coordsDisplay}>
-            <Text style={styles.coordsText}>
-              위도: {currentLocation.latitude.toFixed(4)}° / 경도:{' '}
-              {currentLocation.longitude.toFixed(4)}°
-            </Text>
+      {/* 검색 결과 */}
+      {showSearchResults && searchResults.length > 0 && (
+        <View style={styles.searchResultsContainer}>
+          <ScrollView style={styles.searchResultsList} keyboardShouldPersistTaps="handled">
+            {searchResults.map((result, index) => (
+              <TouchableOpacity
+                key={index}
+                style={styles.searchResultItem}
+                onPress={() => handleSelectPlace(result)}
+              >
+                <MaterialIcons name="place" size={20} color="#666" />
+                <View style={styles.searchResultText}>
+                  <Text style={styles.searchResultName}>{result.place_name}</Text>
+                  <Text style={styles.searchResultAddress}>{result.address_name}</Text>
+                </View>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        </View>
+      )}
+
+      <ScrollView
+        style={styles.content}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+        showsVerticalScrollIndicator={false}
+      >
+        {loading && !weatherData ? (
+          <View style={styles.loading}>
+            <ActivityIndicator size="large" color="#2C6DE7" />
+            <Text style={styles.loadingText}>날씨 정보를 불러오는 중...</Text>
           </View>
-        )}
-      </View>
-
-      <View style={styles.controls}>
-        <TouchableOpacity
-          style={[styles.button, !includeForecasts && styles.buttonActive]}
-          onPress={() => {
-            setIncludeForecasts(false);
-            fetchWeatherData(false);
-          }}
-        >
-          <Text style={styles.buttonText}>현재 날씨만</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[styles.button, includeForecasts && styles.buttonActive]}
-          onPress={() => {
-            setIncludeForecasts(true);
-            fetchWeatherData(true);
-          }}
-        >
-          <Text style={styles.buttonText}>전체 정보</Text>
-        </TouchableOpacity>
-      </View>
-
-      {loading && (
-        <View style={styles.loading}>
-          <ActivityIndicator size="large" color="#007AFF" />
-          <Text style={styles.loadingText}>날씨 정보를 가져오는 중...</Text>
-        </View>
-      )}
-
-      {weatherData && !loading && (
-        <>
-          {renderLocationInfo()}
-          {renderCurrentWeather()}
-          {renderHourlyPreview()}
-          {renderDailyPreview()}
-        </>
-      )}
-    </ScrollView>
+        ) : weatherData ? (
+          <>
+            {renderCurrentWeather()}
+            {renderHourlyPreview()}
+            {renderDailyPreview()}
+          </>
+        ) : null}
+      </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#F8F9FA',
   },
   header: {
-    backgroundColor: '#007AFF',
-    padding: 20,
-    alignItems: 'center',
+    backgroundColor: '#2C6DE7',
+    paddingTop: 60,
+    paddingBottom: 20,
+    paddingHorizontal: 20,
   },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: 'white',
-    marginBottom: 5,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: 'white',
-    opacity: 0.9,
-  },
-  locationControl: {
-    backgroundColor: 'white',
-    marginHorizontal: 15,
-    marginTop: 15,
-    borderRadius: 12,
-    padding: 15,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  locationToggle: {
+  headerTop: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    marginBottom: 12,
   },
-  locationLabel: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
+  backButton: {
+    padding: 8,
+    marginLeft: -8,
   },
-  toggleButton: {
-    backgroundColor: '#e0e0e0',
-    paddingHorizontal: 20,
-    paddingVertical: 8,
-    borderRadius: 20,
-    minWidth: 60,
-    alignItems: 'center',
-  },
-  toggleButtonActive: {
-    backgroundColor: '#007AFF',
-  },
-  toggleText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#666',
-  },
-  toggleTextActive: {
+  headerTitle: {
+    fontSize: 28,
+    fontWeight: 'bold',
     color: 'white',
-  },
-  coordsDisplay: {
-    marginTop: 10,
-    paddingTop: 10,
-    borderTopWidth: 1,
-    borderTopColor: '#eee',
-  },
-  coordsText: {
-    fontSize: 12,
-    color: '#666',
+    flex: 1,
     textAlign: 'center',
   },
-  controls: {
+  headerSpacer: {
+    width: 40,
+  },
+  locationInfo: {
     flexDirection: 'row',
-    padding: 15,
-    gap: 10,
-  },
-  button: {
-    flex: 1,
-    backgroundColor: '#e0e0e0',
-    padding: 12,
-    borderRadius: 8,
     alignItems: 'center',
+    gap: 6,
+    marginBottom: 16,
   },
-  buttonActive: {
-    backgroundColor: '#007AFF',
-  },
-  buttonText: {
+  locationText: {
     fontSize: 16,
+    color: 'white',
+    fontWeight: '600',
+  },
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'white',
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    height: 48,
+  },
+  searchIcon: {
+    marginRight: 8,
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: 16,
+    color: '#333',
+    padding: 0,
+  },
+  clearButton: {
+    padding: 4,
+  },
+  locationButtonInSearch: {
+    padding: 4,
+  },
+  searchResultsContainer: {
+    position: 'absolute',
+    top: 200,
+    left: 20,
+    right: 20,
+    maxHeight: 300,
+    backgroundColor: 'white',
+    borderRadius: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 5,
+    zIndex: 1000,
+  },
+  searchResultsList: {
+    maxHeight: 300,
+  },
+  searchResultItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F0F0F0',
+    gap: 12,
+  },
+  searchResultText: {
+    flex: 1,
+  },
+  searchResultName: {
+    fontSize: 15,
     fontWeight: '600',
     color: '#333',
+    marginBottom: 4,
+  },
+  searchResultAddress: {
+    fontSize: 13,
+    color: '#666',
+  },
+  content: {
+    flex: 1,
   },
   loading: {
     alignItems: 'center',
-    padding: 40,
+    justifyContent: 'center',
+    padding: 60,
   },
   loadingText: {
-    marginTop: 10,
+    marginTop: 16,
     fontSize: 16,
     color: '#666',
   },
-  section: {
+  currentWeatherCard: {
     backgroundColor: 'white',
-    margin: 15,
-    borderRadius: 12,
-    padding: 20,
+    margin: 16,
+    borderRadius: 20,
+    padding: 24,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    shadowRadius: 8,
+    elevation: 4,
   },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 15,
-    color: '#333',
-  },
-  weatherMain: {
+  mainWeather: {
+    flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: 24,
   },
   emoji: {
-    fontSize: 60,
-    marginBottom: 10,
+    fontSize: 80,
+    marginRight: 20,
+  },
+  tempContainer: {
+    flex: 1,
   },
   temperature: {
-    fontSize: 36,
+    fontSize: 56,
     fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 5,
+    color: '#2C6DE7',
   },
   weatherDesc: {
     fontSize: 18,
     color: '#666',
+    marginTop: 4,
   },
-  weatherDetails: {
+  detailsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+  },
+  detailCard: {
+    flex: 1,
+    minWidth: '45%',
+    backgroundColor: '#F8F9FA',
+    borderRadius: 12,
+    padding: 16,
+    alignItems: 'center',
     gap: 8,
   },
-  detailRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
   detailLabel: {
-    fontSize: 16,
+    fontSize: 13,
     color: '#666',
+    fontWeight: '500',
   },
   detailValue: {
-    fontSize: 16,
-    fontWeight: '600',
+    fontSize: 18,
+    fontWeight: 'bold',
     color: '#333',
+  },
+  section: {
+    backgroundColor: 'white',
+    marginHorizontal: 16,
+    marginBottom: 16,
+    borderRadius: 20,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 16,
+  },
+  hourlyScroll: {
+    gap: 12,
   },
   hourlyItem: {
     alignItems: 'center',
-    paddingHorizontal: 15,
-    paddingVertical: 10,
-    marginRight: 10,
-    backgroundColor: '#f8f8f8',
-    borderRadius: 8,
-    minWidth: 80,
+    backgroundColor: '#F8F9FA',
+    borderRadius: 16,
+    padding: 16,
+    minWidth: 70,
+    gap: 8,
   },
   hourlyTime: {
     fontSize: 14,
+    fontWeight: '600',
     color: '#666',
-    marginBottom: 5,
   },
   hourlyEmoji: {
-    fontSize: 24,
-    marginBottom: 5,
+    fontSize: 32,
   },
   hourlyTemp: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: 'bold',
     color: '#333',
-    marginBottom: 2,
   },
   hourlyRain: {
     fontSize: 12,
-    color: '#007AFF',
+    color: '#5DADE2',
+    fontWeight: '600',
   },
   dailyItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 12,
+    paddingVertical: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    borderBottomColor: '#F0F0F0',
   },
   dailyLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    width: 80,
+    width: 60,
   },
   dayName: {
     fontSize: 16,
     fontWeight: '600',
     color: '#333',
-    marginRight: 10,
-  },
-  dailyEmoji: {
-    fontSize: 20,
   },
   dailyCenter: {
     flex: 1,
-    paddingHorizontal: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  dailyEmoji: {
+    fontSize: 28,
   },
   dailyDesc: {
-    fontSize: 14,
-    color: '#333',
-  },
-  dailyRain: {
-    fontSize: 12,
-    color: '#007AFF',
-    marginTop: 2,
+    fontSize: 15,
+    color: '#666',
   },
   dailyRight: {
     alignItems: 'flex-end',
-    width: 100,
+    gap: 4,
+  },
+  dailyRain: {
+    fontSize: 12,
+    color: '#5DADE2',
+    fontWeight: '600',
   },
   dailyTemp: {
     fontSize: 16,
     fontWeight: 'bold',
     color: '#333',
-  },
-  dailyUV: {
-    fontSize: 12,
-    marginTop: 2,
   },
 });

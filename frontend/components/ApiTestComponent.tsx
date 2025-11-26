@@ -5,7 +5,7 @@ import RouteDetailComponent from './RouteDetailComponent';
 import Config from '../config';
 import { analyzeRouteSlope } from '../services/elevationService';
 import { RouteElevationAnalysis } from '../types/api';
-import { healthConnectService } from '../services/healthConnect';
+import { apiService } from '../services/api';
 import { useWeatherContext } from '../contexts/WeatherContext';
 
 const ApiTestComponent: React.FC = () => {
@@ -31,23 +31,22 @@ const ApiTestComponent: React.FC = () => {
   // 날씨 Context 사용
   const { weatherData } = useWeatherContext();
 
-  // 컴포넌트 마운트 시 Health Connect에서 Case 1 평균 속도 가져오기
+  // 컴포넌트 마운트 시 DB에서 Case 1 평균 속도 가져오기 (로그인 시에만)
   useEffect(() => {
     const fetchWalkingSpeed = async () => {
       try {
-        // 전체 기간 평균 속도 사용 (더 안정적)
-        const allTimeSpeed =
-          await healthConnectService.getAllTimeAverageSpeeds();
-        if (allTimeSpeed.speedCase1 && allTimeSpeed.speedCase1 > 0) {
+        const result = await apiService.getSpeedProfile();
+        if (result.success && result.data?.speed_case1) {
           // km/h를 m/s로 변환
-          const speedMs = allTimeSpeed.speedCase1 / 3.6;
+          const speedMs = result.data.speed_case1 / 3.6;
           setWalkingSpeedCase1(speedMs);
           console.log(
-            `✅ 보행 속도: ${allTimeSpeed.speedCase1.toFixed(2)} km/h`
+            `✅ 보행 속도 (DB): ${result.data.speed_case1.toFixed(2)} km/h`
           );
         }
       } catch (error) {
-        console.warn('⚠️ 속도 데이터 로드 실패:', error);
+        // 로그인하지 않은 경우 조용히 무시
+        console.log('ℹ️ 로그인 필요 - 기본 속도 사용');
       }
     };
 

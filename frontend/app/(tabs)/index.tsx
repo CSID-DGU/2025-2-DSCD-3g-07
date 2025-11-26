@@ -2666,6 +2666,7 @@ const styles = StyleSheet.create({
     right: 16,
     gap: 12,
     alignItems: 'flex-end',
+    zIndex: 100,
   },
   // 현재 위치 추적 버튼 스타일
   currentLocationTrackButton: {

@@ -412,23 +412,22 @@ export default function HomeScreen() {
     requestNotificationPermission();
   }, []);
 
-  // Health Connect에서 보행 속도 가져오기
+  // DB에서 사용자 보행 속도 가져오기 (로그인 시에만)
   useEffect(() => {
     const fetchWalkingSpeed = async () => {
       try {
-        // 전체 기간 평균 속도 사용 (더 안정적)
-        const allTimeSpeed =
-          await healthConnectService.getAllTimeAverageSpeeds();
-        if (allTimeSpeed.speedCase1 && allTimeSpeed.speedCase1 > 0) {
+        const result = await apiService.getSpeedProfile();
+        if (result.success && result.data?.speed_case1) {
           // km/h를 m/s로 변환
-          const speedMs = allTimeSpeed.speedCase1 / 3.6;
+          const speedMs = result.data.speed_case1 / 3.6;
           setWalkingSpeedCase1(speedMs);
           console.log(
-            `✅ 보행 속도 로드: ${allTimeSpeed.speedCase1.toFixed(2)} km/h (${speedMs.toFixed(3)} m/s)`
+            `✅ 보행 속도 로드 (DB): ${result.data.speed_case1.toFixed(2)} km/h (${speedMs.toFixed(3)} m/s)`
           );
         }
       } catch (error) {
-        console.warn('⚠️ 보행 속도 데이터 로드 실패:', error);
+        // 로그인하지 않은 경우 조용히 무시 (기본값 사용)
+        console.log('ℹ️ 로그인 필요 - 기본 속도 사용');
       }
     };
 
@@ -1629,7 +1628,7 @@ export default function HomeScreen() {
                         borderTopColor: '#E6E9F2',
                       }}>
                         {/* 사용자 속도 */}
-                        {walkingSpeedCase1 && routeInfo.slopeAnalysis.factors?.user_speed_factor && (
+                        {routeInfo.slopeAnalysis.factors?.user_speed_factor && (
                           <View style={{
                             flexDirection: 'row',
                             alignItems: 'center',
@@ -1643,7 +1642,7 @@ export default function HomeScreen() {
                                 color: '#374151',
                                 fontWeight: '500',
                               }}>
-                                사용자 속도: {(walkingSpeedCase1 * 3.6).toFixed(2)} km/h
+                                사용자 속도: {walkingSpeedCase1 ? (walkingSpeedCase1 * 3.6).toFixed(2) : '4.00'} km/h
                               </Text>
                               <Text style={{
                                 fontSize: 12,

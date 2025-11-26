@@ -8,12 +8,19 @@
     "scheme": "pacetryapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+    "privacy": "public",
     "platforms": [
       "ios",
       "android",
       "web"
     ],
     "description": "개인의 보행 속도에 맞춘 개인화된 교통 경로 안내 앱",
+    "keywords": [
+      "walking",
+      "personalization",
+      "transit",
+      "health"
+    ],
     "githubUrl": "https://github.com/your-username/pacetry",
     "ios": {
       "supportsTablet": true,

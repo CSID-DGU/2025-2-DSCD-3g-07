@@ -8,6 +8,7 @@ from datetime import datetime
 from sqlalchemy.orm import Session
 
 from app import models
+from app.constants.speed_constants import SLOW_WALK_SPEED_RATIO
 
 
 # ================================
@@ -163,13 +164,35 @@ def delete_speed_profile(db: Session, profile_id: int):
     return profile
 
 
+def get_alpha(data_points_count: int) -> float:
+    """
+    측정 횟수에 따른 동적 알파값 계산
+    
+    Args:
+        data_points_count: 현재까지 측정된 데이터 포인트 개수
+    
+    Returns:
+        알파값 (새 데이터의 가중치)
+    """
+    if data_points_count <= 3:
+        return 0.50  # 초기: 과감한 반영 (Cold Start 해결)
+    elif data_points_count <= 10:
+        return 0.40
+    elif data_points_count <= 20:
+        return 0.30
+    elif data_points_count <= 50:
+        return 0.20
+    else:
+        return 0.15  # 장기: 안정화 (노이즈 제거)
+
+
 def update_speed_profile_with_weighted_avg(
     db: Session,
     user_id: int,
     activity_type: str,
     new_speed_kmh: float,
-    weight_old: float = 0.7,
-    weight_new: float = 0.3,
+    weight_old: float = None,
+    weight_new: float = None,
     source: str = "navigation_log",
     navigation_log_id: int = None,
 ):
@@ -181,8 +204,8 @@ def update_speed_profile_with_weighted_avg(
         user_id: 사용자 ID
         activity_type: 활동 유형 ('walking', 'running', 'cycling')
         new_speed_kmh: 새로 측정된 속도 (km/h)
-        weight_old: 기존 데이터 가중치 (기본 0.7)
-        weight_new: 새 데이터 가중치 (기본 0.3)
+        weight_old: 기존 데이터 가중치 (None이면 동적 계산)
+        weight_new: 새 데이터 가중치 (None이면 동적 계산)
         source: 속도 출처 ('navigation_log', 'manual', 'health_connect', 'initial')
         navigation_log_id: 네비게이션 로그 ID (있는 경우)
     
@@ -202,6 +225,12 @@ def update_speed_profile_with_weighted_avg(
     )
     
     if profile:
+        # 동적 알파값 계산 (weight_new, weight_old가 None인 경우)
+        if weight_new is None:
+            alpha = get_alpha(profile.data_points_count)
+            weight_new = alpha
+            weight_old = 1.0 - alpha
+        
         # 기존 프로필 있음 - 가중 평균 계산
         old_speed = float(profile.speed_case1 or 4.0)
         updated_speed = old_speed * weight_old + new_speed_kmh * weight_new
@@ -218,7 +247,9 @@ def update_speed_profile_with_weighted_avg(
             "timestamp": datetime.now().isoformat(),
             "navigation_log_id": navigation_log_id,
             "old_avg": round(old_speed, 2),
-            "new_avg": round(updated_speed, 2)
+            "new_avg": round(updated_speed, 2),
+            "alpha": round(weight_new, 2),  # 적용된 알파값 기록
+            "data_points": profile.data_points_count + 1
         }
         
         # JSONB 배열에 추가 (최근 100개만 유지)
@@ -242,7 +273,9 @@ def update_speed_profile_with_weighted_avg(
             "timestamp": datetime.now().isoformat(),
             "navigation_log_id": navigation_log_id,
             "old_avg": None,
-            "new_avg": round(new_speed_kmh, 2)
+            "new_avg": round(new_speed_kmh, 2),
+            "alpha": 1.0,  # 첫 데이터는 100% 반영
+            "data_points": 1
         }
         
         profile = models.ActivitySpeedProfile(

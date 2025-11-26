@@ -91,18 +91,20 @@ const getExpoBasedApiUrl = (): string | null => {
 const getAutoDetectedApiUrl = (): string => {
   console.log('🔍 Starting API URL detection...');
 
-  // 1순위: 환경 변수 (EC2 URL)
+  // 1순위: 환경 변수 (EC2 URL) - localhost가 아닌 모든 값 우선 적용
   const envApiUrl =
     Constants.expoConfig?.extra?.API_BASE_URL ||
     process.env.EXPO_PUBLIC_API_URL;
-  if (envApiUrl && envApiUrl !== 'http://localhost:8000') {
-    console.log('📌 Using EC2 URL from environment variable:', envApiUrl);
+
+  if (envApiUrl) {
+    console.log('📌 Using URL from environment variable:', envApiUrl);
     return envApiUrl;
   }
 
-  // 2순위: Expo hostUri에서 실시간 IP 추출 (자동 감지)
+  // 2순위: Expo hostUri에서 실시간 IP 추출 (자동 감지) - 환경변수가 없을 때만
   const expoApiUrl = getExpoBasedApiUrl();
   if (expoApiUrl) {
+    console.log('⚠️ No environment variable found, using auto-detected IP:', expoApiUrl);
     return expoApiUrl;
   }
 
@@ -206,22 +208,20 @@ class ApiConfig {
     const timestamp = new Date().toLocaleTimeString();
     console.log(`[${timestamp}] 🔍 Detecting working API URL...`);
 
-    // 환경 변수에 명시적으로 설정된 URL이 있으면 바로 사용
+    // 환경 변수에 명시적으로 설정된 URL이 있으면 무조건 사용 (연결 테스트 없이)
     const envApiUrl = process.env.EXPO_PUBLIC_API_URL;
-    if (envApiUrl && envApiUrl !== 'http://localhost:8000') {
-      console.log(`[${timestamp}] 📌 Using explicit URL from .env.local: ${envApiUrl}`);
-      const isWorking = await testApiConnection(envApiUrl);
-      if (isWorking) {
-        this._baseUrl = envApiUrl;
-        this._isInitialized = true;
-        ApiConfig._instanceInitialized = true;
-        console.log(`[${timestamp}] ✅ API URL detected: ${envApiUrl}`);
-        return this._baseUrl;
-      }
-      console.warn(`[${timestamp}] ⚠️ Configured URL ${envApiUrl} is not responding, trying alternatives...`);
+    if (envApiUrl) {
+      console.log(`[${timestamp}] 📌 Using URL from EXPO_PUBLIC_API_URL: ${envApiUrl}`);
+      this._baseUrl = envApiUrl;
+      this._isInitialized = true;
+      ApiConfig._instanceInitialized = true;
+      console.log(`[${timestamp}] ✅ API URL set (no connection test): ${envApiUrl}`);
+      return this._baseUrl;
     }
 
-    // 1단계: Expo hostUri에서 실시간 IP 추출 (최우선)
+    console.log(`[${timestamp}] ⚠️ No EXPO_PUBLIC_API_URL found, trying auto-detection...`);
+
+    // 1단계: Expo hostUri에서 실시간 IP 추출 (환경변수가 없을 때만)
     const expoDynamicUrl = this.getExpoBasedApiUrl();
 
     // 여러 후보 URL들을 우선순위에 따라 구성

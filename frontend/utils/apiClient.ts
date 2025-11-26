@@ -72,9 +72,14 @@ class ApiClient {
       await this.initialize();
     }
 
-    console.log(`🔍 Making GET request to: ${this.baseUrl}${endpoint}`);
+    // URL 정규화 (이중 슬래시 제거)
+    const normalizedBaseUrl = this.baseUrl.endsWith('/') ? this.baseUrl.slice(0, -1) : this.baseUrl;
+    const normalizedEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+    const fullUrl = `${normalizedBaseUrl}${normalizedEndpoint}`;
 
-    const url = new URL(endpoint, this.baseUrl);
+    console.log(`🔍 Making GET request to: ${fullUrl}`);
+
+    const url = new URL(fullUrl);
 
     if (params) {
       Object.entries(params).forEach(([key, value]) => {
@@ -143,9 +148,12 @@ class ApiClient {
       await this.initialize();
     }
 
-    console.log(`📤 Making POST request to: ${this.baseUrl}${endpoint}`);
+    // URL 정규화 (이중 슬래시 제거)
+    const normalizedBaseUrl = this.baseUrl.endsWith('/') ? this.baseUrl.slice(0, -1) : this.baseUrl;
+    const normalizedEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+    const url = `${normalizedBaseUrl}${normalizedEndpoint}`;
 
-    const url = `${this.baseUrl}${endpoint}`;
+    console.log(`📤 Making POST request to: ${url}`);
 
     const response = await fetch(url, {
       method: 'POST',

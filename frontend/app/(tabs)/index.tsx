@@ -704,6 +704,7 @@ export default function HomeScreen() {
       if (isTracking) {
         locationService.stopTracking();
         setIsTracking(false);
+        setTrackingMode(false); // 추적 모드 해제
         setCurrentLocation(null);
       }
 
@@ -724,6 +725,7 @@ export default function HomeScreen() {
         });
         setIsTracking(true);
         setCenterOnLocation(true);
+        setTrackingMode(true); // 추적 모드 활성화
         setTimeout(() => setCenterOnLocation(false), 1000);
       }
 

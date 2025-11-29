@@ -47,6 +47,8 @@ const html = (
     let resetTrackingTimer = null; // 자동 복귀 타이머
     let lastMovedPosition = null; // 마지막으로 지도를 이동한 위치
     const MIN_MOVE_DISTANCE = 5; // 최소 이동 거리 (미터) - GPS 노이즈 필터링
+    const TRACKING_ZOOM_LEVEL = 3; // 추적 모드 줌 레벨 (더 확대, 숫자가 작을수록 확대)
+    let originalZoomLevel = 5; // 원래 줌 레벨
     
     kakao.maps.load(function () {
       // 지도 중심 (출발지와 도착지 중간)
@@ -394,6 +396,10 @@ const html = (
           if (!lastMovedPosition) {
             // 첫 위치 업데이트
             shouldMove = true;
+            // 추적 모드 시작 시 줌 레벨 확대
+            if (map.getLevel() !== TRACKING_ZOOM_LEVEL) {
+              map.setLevel(TRACKING_ZOOM_LEVEL);
+            }
           } else {
             // 이전 위치와의 거리 계산
             const distance = getDistance(
@@ -426,7 +432,17 @@ const html = (
           clearTimeout(resetTrackingTimer);
           resetTrackingTimer = null;
         }
-        console.log('🎯 추적 모드:', enabled ? 'ON' : 'OFF');
+        
+        if (enabled) {
+          // 추적 모드 활성화: 현재 줌 레벨 저장하고 확대
+          originalZoomLevel = map.getLevel();
+          map.setLevel(TRACKING_ZOOM_LEVEL);
+          console.log('🎯 추적 모드 ON - 줌 레벨:', TRACKING_ZOOM_LEVEL);
+        } else {
+          // 추적 모드 비활성화: 원래 줌 레벨로 복구
+          map.setLevel(originalZoomLevel);
+          console.log('🎯 추적 모드 OFF - 원래 줌 레벨:', originalZoomLevel);
+        }
       };
 
       if (window.ReactNativeWebView) {

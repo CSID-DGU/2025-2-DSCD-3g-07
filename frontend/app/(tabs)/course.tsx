@@ -1,6 +1,6 @@
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import * as Location from 'expo-location';
+import * as Lohttps://github.com/CSID-DGU/2025-2-DSCD-3g-07/pull/75/conflict?name=frontend%252Fapp%252F%2528tabs%2529%252Fcourse.tsx&ancestor_oid=fd13f5546585292116fe0ca68fc5c708aad2302b&base_oid=1b318cbe90a353d84a138968166363b79707a493&head_oid=e5b273317b8b48411b144dc260b9a92b0336488bcation from 'expo-location';
 import { useState, useEffect, useCallback } from 'react';
 import {
   View,
@@ -29,8 +29,9 @@ const SECONDARY_TEXT = '#4A5968';
 const LIGHT_BACKGROUND = '#F2F5FC';
 const BORDER_COLOR = '#E6E9F2';
 const KAKAO_JS_KEY = process.env.EXPO_PUBLIC_KAKAO_JS_KEY || '9a91bb579fe8e58cc9e5e25d6a073869'; // 카카오맵 JavaScript API 키
+const RUNNING_SPEED = 11.3; // 달리기 속도 (km/h)
 
-type SearchMode = 'distance' | 'time';
+type SearchMode = 'walking' | 'running' | 'time';
 
 interface CurrentLocation {
   latitude: number;
@@ -56,8 +57,8 @@ interface RouteRecommendation {
 }
 
 export default function CourseScreen() {
-  const { user, isAuthenticated } = useAuth();
-  const [searchMode, setSearchMode] = useState<SearchMode>('distance');
+  // 상태 관리
+  const [searchMode, setSearchMode] = useState<SearchMode>('walking');
   const [distanceValue, setDistanceValue] = useState(''); // 목표 거리 입력값
   const [timeValue, setTimeValue] = useState(''); // 목표 시간 입력값
   const [currentLocation, setCurrentLocation] = useState<CurrentLocation | null>(null);
@@ -229,10 +230,10 @@ export default function CourseScreen() {
 
   // 경로 검색
   const searchRoutes = async () => {
-    const inputValue = searchMode === 'distance' ? distanceValue : timeValue;
+    const inputValue = searchMode === 'time' ? timeValue : distanceValue;
 
     if (!inputValue) {
-      Alert.alert('알림', `${searchMode === 'distance' ? '거리' : '시간'}를 입력해주세요.`);
+      Alert.alert('알림', `${searchMode === 'time' ? '시간' : '거리'}를 입력해주세요.`);
       return;
     }
 
@@ -241,7 +242,7 @@ export default function CourseScreen() {
       return;
     }
 
-    if (!walkingSpeed) {
+    if (!walkingSpeed && searchMode === 'walking') {
       Alert.alert('알림', '사용자 속도 정보를 불러오는 중입니다.');
       return;
     }
@@ -255,11 +256,14 @@ export default function CourseScreen() {
         return;
       }
 
+      // 모드에 따라 속도 결정
+      const currentSpeed = searchMode === 'running' ? RUNNING_SPEED : (walkingSpeed || 4.0);
+
       console.log('🔍 경로 검색:', {
         searchMode,
         value,
         location: currentLocation,
-        walkingSpeed
+        speed: currentSpeed
       });
 
       // 백엔드 GPX API 호출
@@ -267,11 +271,11 @@ export default function CourseScreen() {
       // 현재 위치에서 가까운 순으로 정렬
       // 목표 거리/시간에 맞는 코스만 필터링
       const recommendedRoutes = await getRecommendedRoutes({
-        distance_km: searchMode === 'distance' ? value : undefined,
+        distance_km: searchMode === 'time' ? undefined : value,
         duration_minutes: searchMode === 'time' ? value : undefined,
         user_lat: currentLocation.latitude,
         user_lng: currentLocation.longitude,
-        user_speed_kmh: walkingSpeed || undefined, // Case 2 속도 전달
+        user_speed_kmh: currentSpeed,
         max_distance_from_user: 30.0, // 30km 이내 경로 검색 (서울-경기 권역)
         distance_tolerance: 2.0, // ±2km 허용
         duration_tolerance: 20, // ±20분 허용
@@ -285,7 +289,7 @@ export default function CourseScreen() {
       });
 
       if (recommendedRoutes.length === 0) {
-        Alert.alert('검색 결과 없음', `반경 10km 내에 ${searchMode === 'distance' ? value + 'km' : value + '분'} 거리의 경로가 없습니다.\n\n검색 조건을 변경해보세요.`);
+        Alert.alert('검색 결과 없음', `반경 10km 내에 ${searchMode === 'time' ? value + '분' : value + 'km'} 거리의 경로가 없습니다.\n\n검색 조건을 변경해보세요.`);
       }
 
       setRoutes(recommendedRoutes);
@@ -338,26 +342,53 @@ export default function CourseScreen() {
             <TouchableOpacity
               style={[
                 styles.modeButton,
-                searchMode === 'distance' && styles.modeButtonActive,
+                searchMode === 'walking' && styles.modeButtonActive,
               ]}
-              onPress={() => setSearchMode('distance')}
+              onPress={() => setSearchMode('walking')}
             >
               <MaterialIcons
-                name="straighten"
+                name="directions-walk"
                 size={20}
-                color={searchMode === 'distance' ? 'white' : SECONDARY_TEXT}
+                color={searchMode === 'walking' ? 'white' : SECONDARY_TEXT}
               />
               <Text
                 style={[
                   styles.modeButtonText,
-                  searchMode === 'distance' && styles.modeButtonTextActive,
+                  searchMode === 'walking' && styles.modeButtonTextActive,
                 ]}
               >
-                거리
+                걷기
               </Text>
-              {walkingSpeed && searchMode === 'distance' && (
+              {walkingSpeed && searchMode === 'walking' && (
                 <Text style={styles.speedInfo}>
                   {walkingSpeed.toFixed(1)}km/h
+                </Text>
+              )}
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[
+                styles.modeButton,
+                searchMode === 'running' && styles.modeButtonActive,
+              ]}
+              onPress={() => setSearchMode('running')}
+            >
+              <MaterialIcons
+                name="directions-run"
+                size={20}
+                color={searchMode === 'running' ? 'white' : SECONDARY_TEXT}
+              />
+              <Text
+                style={[
+                  styles.modeButtonText,
+                  searchMode === 'running' && styles.modeButtonTextActive,
+                ]}
+              >
+                달리기
+              </Text>
+              {searchMode === 'running' && (
+                <Text style={styles.speedInfo}>
+                  {RUNNING_SPEED.toFixed(1)}km/h
                 </Text>
               )}
             </TouchableOpacity>
@@ -382,41 +413,36 @@ export default function CourseScreen() {
               >
                 시간
               </Text>
-              {walkingSpeed && searchMode === 'time' && (
-                <Text style={styles.speedInfo}>
-                  {walkingSpeed.toFixed(1)}km/h
-                </Text>
-              )}
             </TouchableOpacity>
           </View>
 
           {/* 입력 영역 */}
           <View style={styles.inputSection}>
             <Text style={styles.inputLabel}>
-              목표 {searchMode === 'distance' ? '거리' : '시간'}
+              목표 {searchMode === 'time' ? '시간' : '거리'}
             </Text>
             <View style={styles.inputContainer}>
               <TextInput
                 style={styles.input}
-                placeholder={searchMode === 'distance' ? '5' : '30'}
+                placeholder={searchMode === 'time' ? '30' : '5'}
                 placeholderTextColor="#999"
-                value={searchMode === 'distance' ? distanceValue : timeValue}
-                onChangeText={searchMode === 'distance' ? setDistanceValue : setTimeValue}
+                value={searchMode === 'time' ? timeValue : distanceValue}
+                onChangeText={searchMode === 'time' ? setTimeValue : setDistanceValue}
                 keyboardType="numeric"
               />
               <Text style={styles.inputUnit}>
-                {searchMode === 'distance' ? 'km' : '분'}
+                {searchMode === 'time' ? '분' : 'km'}
               </Text>
             </View>
 
             {/* 예상 정보 */}
-            {((searchMode === 'distance' && distanceValue) || (searchMode === 'time' && timeValue)) && walkingSpeed && (
+            {((searchMode !== 'time' && distanceValue) || (searchMode === 'time' && timeValue)) && (
               <View style={styles.estimationBox}>
                 <Ionicons name="information-circle" size={16} color={PRIMARY_COLOR} />
                 <Text style={styles.estimationText}>
-                  {searchMode === 'distance'
-                    ? `약 ${Math.round((parseFloat(distanceValue) / walkingSpeed) * 60)}분 소요 예상`
-                    : `약 ${((parseFloat(timeValue) / 60) * walkingSpeed).toFixed(1)}km 이동 예상`
+                  {searchMode === 'time'
+                    ? `약 ${((parseFloat(timeValue) / 60) * (walkingSpeed || 4.0)).toFixed(1)}km 이동 예상`
+                    : `약 ${Math.round((parseFloat(distanceValue) / (searchMode === 'running' ? RUNNING_SPEED : (walkingSpeed || 4.0))) * 60)}분 소요 예상`
                   }
                 </Text>
               </View>
@@ -518,10 +544,10 @@ export default function CourseScreen() {
           <TouchableOpacity
             style={[
               styles.searchButton,
-              ((searchMode === 'distance' ? !distanceValue : !timeValue) || !currentLocation) && styles.searchButtonDisabled,
+              ((searchMode === 'time' ? !timeValue : !distanceValue) || !currentLocation) && styles.searchButtonDisabled,
             ]}
             onPress={searchRoutes}
-            disabled={(searchMode === 'distance' ? !distanceValue : !timeValue) || !currentLocation || loading}
+            disabled={(searchMode === 'time' ? !timeValue : !distanceValue) || !currentLocation || loading}
           >
             {loading ? (
               <ActivityIndicator size="small" color="white" />
@@ -676,16 +702,16 @@ const styles = StyleSheet.create({
   modeSelector: {
     flexDirection: 'row',
     padding: 16,
-    gap: 12,
+    gap: 8,
   },
   modeButton: {
     flex: 1,
-    flexDirection: 'row',
+    flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 8,
-    paddingVertical: 16,
-    paddingHorizontal: 16,
+    gap: 4,
+    paddingVertical: 14,
+    paddingHorizontal: 8,
     backgroundColor: LIGHT_BACKGROUND,
     borderRadius: 12,
     borderWidth: 2,

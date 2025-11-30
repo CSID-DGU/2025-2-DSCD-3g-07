@@ -17,7 +17,7 @@ import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { useAuth } from "../../contexts/AuthContext";
-import { getNavigationLogs, type NavigationLogResponse } from "../../services/navigationLogService";
+import { getNavigationLogs, getNavigationStatistics, type NavigationLogResponse, type NavigationStatistics } from "../../services/navigationLogService";
 
 const PRIMARY = "#2C6DE7";
 const MUTED = "#6B7280";
@@ -79,32 +79,32 @@ type DerivedStats = {
 type BarDatum = { label: string; value: number; unit?: string; color?: string };
 
 const formatNumber = (value?: number | null, digits = 1) => {
-  if (value === undefined || value === null || Number.isNaN(value)) return "-";
+  if (value === undefined || value === null || Number.isNaN(value) || !Number.isFinite(value)) return "-";
   return Number(value).toFixed(digits);
 };
 
 const formatDistance = (meters?: number) => {
-  if (meters === undefined || meters === null) return "-";
+  if (meters === undefined || meters === null || Number.isNaN(meters) || !Number.isFinite(meters) || meters < 0) return "-";
   if (meters >= 1000) return `${(meters / 1000).toFixed(1)} km`;
   return `${Math.round(meters)} m`;
 };
 
 const formatDurationMinutes = (seconds?: number) => {
-  if (seconds === undefined || seconds === null) return "-";
-  if (seconds < 60) return `${seconds}s`;
+  if (seconds === undefined || seconds === null || Number.isNaN(seconds) || !Number.isFinite(seconds) || seconds < 0) return "-";
+  if (seconds < 60) return `${Math.round(seconds)}s`;
   const minutes = Math.round(seconds / 60);
   return `${minutes}분`;
 };
 
 const formatDelta = (seconds?: number) => {
-  if (seconds === undefined || seconds === null) return "-";
+  if (seconds === undefined || seconds === null || Number.isNaN(seconds) || !Number.isFinite(seconds)) return "-";
   const sign = seconds > 0 ? "+" : "";
   const minutes = Math.round(seconds / 60);
   return `${sign}${minutes}분`;
 };
 
 const formatHours = (hours?: number) => {
-  if (hours === undefined || hours === null) return "-";
+  if (hours === undefined || hours === null || Number.isNaN(hours) || !Number.isFinite(hours) || hours < 0) return "-";
   const totalMinutes = Math.round(hours * 60);
   const h = Math.floor(totalMinutes / 60);
   const m = totalMinutes % 60;
@@ -116,18 +116,20 @@ const formatHours = (hours?: number) => {
 const formatDate = (iso?: string | null) => {
   if (!iso) return "기록 없음";
   const d = new Date(iso);
+  if (isNaN(d.getTime())) return "유효하지 않은 날짜";
   return `${(d.getMonth() + 1).toString().padStart(2, "0")}/${d
     .getDate()
     .toString()
     .padStart(2, "0")} ${d.getHours().toString().padStart(2, "0")}:${d
-    .getMinutes()
-    .toString()
-    .padStart(2, "0")}`;
+      .getMinutes()
+      .toString()
+      .padStart(2, "0")}`;
 };
 
 const formatDateShort = (iso?: string | null) => {
   if (!iso) return "-";
   const d = new Date(iso);
+  if (isNaN(d.getTime())) return "-";
   return `${(d.getMonth() + 1).toString().padStart(2, "0")}/${d
     .getDate()
     .toString()
@@ -198,7 +200,20 @@ const InsightCard = ({ label, value, subValue, icon, tint = PRIMARY }: {
 );
 
 const BarChart = ({ title, data, unit }: { title: string; data: BarDatum[]; unit?: string }) => {
-  const max = Math.max(...data.map(d => d.value), 1);
+  if (!data || data.length === 0) {
+    return (
+      <View style={styles.insightBox}>
+        <View style={styles.insightHeader}>
+          <Text style={styles.insightTitle}>{title}</Text>
+          <Ionicons name="stats-chart-outline" size={16} color={PRIMARY} />
+        </View>
+        <View style={styles.barRow}>
+          <Text style={styles.barLabel}>데이터 없음</Text>
+        </View>
+      </View>
+    );
+  }
+  const max = Math.max(...data.map(d => Math.max(0, d.value || 0)), 1);
   return (
     <View style={styles.insightBox}>
       <View style={styles.insightHeader}>
@@ -206,7 +221,8 @@ const BarChart = ({ title, data, unit }: { title: string; data: BarDatum[]; unit
         <Ionicons name="stats-chart-outline" size={16} color={PRIMARY} />
       </View>
       {data.map((item, index) => {
-        const width = Math.min(100, Math.round((item.value / max) * 100));
+        const safeValue = Math.max(0, item.value || 0);
+        const width = max > 0 ? Math.min(100, Math.round((safeValue / max) * 100)) : 0;
         return (
           <View key={`${title}-${item.label}-${index}`} style={styles.barRow}>
             <Text style={styles.barLabel}>{item.label}</Text>
@@ -214,7 +230,7 @@ const BarChart = ({ title, data, unit }: { title: string; data: BarDatum[]; unit
               <View style={[styles.barFill, { width: `${width}%`, backgroundColor: item.color || PRIMARY }]} />
             </View>
             <Text style={styles.barValue}>
-              {item.value}
+              {Number.isFinite(safeValue) ? safeValue.toFixed(1) : '0'}
               {unit || item.unit || ''}
             </Text>
           </View>
@@ -231,7 +247,7 @@ const ChartModal = ({ visible, onClose, title, bars, description }: {
   bars: BarDatum[];
   description?: string;
 }) => {
-  const max = Math.max(...bars.map(b => b.value), 1);
+  const max = Math.max(...bars.map(b => Math.max(0, b.value || 0)), 1);
   return (
     <Modal transparent animationType="fade" visible={visible} onRequestClose={onClose}>
       <View style={styles.modalBackdrop}>
@@ -245,7 +261,8 @@ const ChartModal = ({ visible, onClose, title, bars, description }: {
           {description ? <Text style={styles.modalDesc}>{description}</Text> : null}
           <View style={{ gap: 8, marginTop: 8 }}>
             {bars.map(bar => {
-              const width = Math.min(100, Math.round((bar.value / max) * 100));
+              const safeValue = Math.max(0, bar.value || 0);
+              const width = max > 0 ? Math.min(100, Math.round((safeValue / max) * 100)) : 0;
               return (
                 <View key={`${title}-${bar.label}`} style={styles.modalBarRow}>
                   <Text style={styles.modalBarLabel}>{bar.label}</Text>
@@ -253,7 +270,7 @@ const ChartModal = ({ visible, onClose, title, bars, description }: {
                     <View style={[styles.modalBarFill, { width: `${width}%`, backgroundColor: bar.color || PRIMARY }]} />
                   </View>
                   <Text style={styles.modalBarValue}>
-                    {bar.value}
+                    {Number.isFinite(safeValue) ? (bar.unit === '%' || bar.unit === 'x' ? safeValue.toFixed(1) : safeValue) : '0'}
                     {bar.unit || ''}
                   </Text>
                 </View>
@@ -288,8 +305,11 @@ const computeDerivedStats = (logs: NavigationLogResponse[]): DerivedStats => {
   const avgTimeDiffSeconds = logs.reduce((sum, log) => sum + (log.time_difference_seconds || 0), 0) / totalCount;
 
   const accurateCount = logs.reduce((sum, log) => {
-    if (!log.estimated_time_seconds) return sum;
-    const diffRatio = Math.abs((log.actual_time_seconds - log.estimated_time_seconds) / log.estimated_time_seconds);
+    if (!log.estimated_time_seconds || log.estimated_time_seconds === 0) return sum;
+    const actual = log.actual_time_seconds || 0;
+    const estimated = log.estimated_time_seconds;
+    const diffRatio = Math.abs((actual - estimated) / estimated);
+    if (!Number.isFinite(diffRatio)) return sum;
     return diffRatio <= 0.2 ? sum + 1 : sum;
   }, 0);
 
@@ -334,6 +354,7 @@ export default function SettingsScreen() {
 
   const [rawLogs, setRawLogs] = useState<NavigationLogResponse[]>([]);
   const [filteredLogs, setFilteredLogs] = useState<NavigationLogResponse[]>([]);
+  const [serverStats, setServerStats] = useState<NavigationStatistics | null>(null);
   const [excludedLogIds, setExcludedLogIds] = useState<Set<number>>(new Set());
   const [applyShortFilter, setApplyShortFilter] = useState(true);
   const [applyExclude, setApplyExclude] = useState(true);
@@ -377,6 +398,7 @@ export default function SettingsScreen() {
     if (!isAuthenticated || !user) {
       setRawLogs([]);
       setFilteredLogs([]);
+      setServerStats(null);
       return;
     }
     setIsLoading(true);
@@ -384,7 +406,14 @@ export default function SettingsScreen() {
     try {
       const excluded = await loadExcludedLogIds();
       setExcludedLogIds(excluded);
-      const logsResponse = await getNavigationLogs(user.user_id, { limit: 100 });
+
+      // 서버 통계와 최근 로그를 병렬로 가져오기
+      const [statsResponse, logsResponse] = await Promise.all([
+        getNavigationStatistics(user.user_id, 30),
+        getNavigationLogs(user.user_id, { limit: 100 }) // 최근 100개 로그
+      ]);
+
+      setServerStats(statsResponse);
       const ordered = logsResponse.logs.sort((a, b) => new Date(b.started_at).getTime() - new Date(a.started_at).getTime());
       setRawLogs(ordered);
       applyFilters(ordered, excluded);
@@ -406,7 +435,41 @@ export default function SettingsScreen() {
     applyFilters(rawLogs, excludedLogIds);
   }, [applyFilters, rawLogs, excludedLogIds]);
 
-  const derivedStats = useMemo(() => computeDerivedStats(filteredLogs), [filteredLogs]);
+  // 서버에서 가져온 통계 우선 사용, 없으면 클라이언트 계산 (fallback)
+  const derivedStats = useMemo(() => {
+    if (serverStats) {
+      // 서버 통계를 DerivedStats 형식으로 변환
+      return {
+        period_days: serverStats.period_days,
+        total_navigations: serverStats.total_navigations,
+        walking_count: serverStats.walking_count,
+        transit_count: serverStats.transit_count,
+        total_distance_km: serverStats.total_distance_km,
+        total_time_hours: serverStats.total_time_hours,
+        avg_time_difference_seconds: serverStats.avg_time_difference_seconds,
+        accuracy_rate: serverStats.accuracy_rate,
+        avg_user_speed_factor: serverStats.avg_user_speed_factor,
+        avg_slope_factor: serverStats.avg_slope_factor,
+        avg_weather_factor: serverStats.avg_weather_factor,
+        // 추가 필드는 최근 로그에서 계산
+        last_active_at: filteredLogs[0]?.started_at ?? null,
+        longest_distance_km: filteredLogs.length > 0
+          ? Math.max(...filteredLogs.map(log => (log.total_distance_m || 0) / 1000))
+          : null,
+        avg_distance_km: serverStats.total_navigations > 0
+          ? Number((serverStats.total_distance_km / serverStats.total_navigations).toFixed(1))
+          : null,
+        avg_duration_minutes: serverStats.total_navigations > 0
+          ? Math.round((serverStats.total_time_hours * 60) / serverStats.total_navigations)
+          : null,
+        walk_ratio_percent: serverStats.total_navigations > 0
+          ? Math.round((serverStats.walking_count / serverStats.total_navigations) * 100)
+          : null,
+      };
+    }
+    // 서버 통계가 없으면 클라이언트에서 계산 (fallback)
+    return computeDerivedStats(filteredLogs);
+  }, [serverStats, filteredLogs]);
 
   const paceSummary = useMemo(() => {
     if (!derivedStats.total_distance_km || !derivedStats.total_time_hours) return null;
@@ -509,22 +572,28 @@ export default function SettingsScreen() {
 
   const distanceBars: BarDatum[] =
     insightLogs.length > 0
-      ? insightLogs.map(log => ({
+      ? insightLogs.map(log => {
+        const distanceKm = (log.total_distance_m || 0) / 1000;
+        return {
           label: formatDateShort(log.started_at),
-          value: Number(((log.total_distance_m || 0) / 1000).toFixed(1)),
+          value: Number.isFinite(distanceKm) ? Number(distanceKm.toFixed(1)) : 0,
           unit: ' km',
           color: '#4F46E5',
-        }))
+        };
+      })
       : [{ label: '데이터 없음', value: 0, unit: '', color: '#CBD5E1' }];
 
   const timeBars: BarDatum[] =
     insightLogs.length > 0
-      ? insightLogs.map(log => ({
+      ? insightLogs.map(log => {
+        const minutes = (log.actual_time_seconds || 0) / 60;
+        return {
           label: formatDateShort(log.started_at),
-          value: Math.round((log.actual_time_seconds || 0) / 60),
+          value: Number.isFinite(minutes) ? Math.round(minutes) : 0,
           unit: ' 분',
           color: '#0EA5E9',
-        }))
+        };
+      })
       : [{ label: '데이터 없음', value: 0, unit: '', color: '#CBD5E1' }];
 
   const openChartModal = (type: 'distance' | 'time' | 'accuracy' | 'personalization') => {
@@ -550,8 +619,20 @@ export default function SettingsScreen() {
           visible: true,
           title: '예측 정확도',
           bars: [
-            { label: '정확도', value: derivedStats.accuracy_rate, unit: '%', color: WARNING },
-            { label: '평균 오차(분)', value: Math.round(derivedStats.avg_time_difference_seconds / 60), unit: ' 분', color: '#F97316' },
+            {
+              label: '정확도',
+              value: Number.isFinite(derivedStats.accuracy_rate) ? derivedStats.accuracy_rate : 0,
+              unit: '%',
+              color: WARNING
+            },
+            {
+              label: '평균 오차(분)',
+              value: Number.isFinite(derivedStats.avg_time_difference_seconds)
+                ? Math.round(derivedStats.avg_time_difference_seconds / 60)
+                : 0,
+              unit: ' 분',
+              color: '#F97316'
+            },
           ],
           description: '예측 값 대비 ±20% 이내 비율과 평균 오차',
         });
@@ -561,9 +642,30 @@ export default function SettingsScreen() {
           visible: true,
           title: '개인화 계수',
           bars: [
-            { label: '보행 계수', value: derivedStats.avg_user_speed_factor ?? 0, unit: 'x', color: '#7C3AED' },
-            { label: '경사', value: derivedStats.avg_slope_factor ?? 0, unit: '', color: '#6EE7B7' },
-            { label: '날씨', value: derivedStats.avg_weather_factor ?? 0, unit: '', color: '#60A5FA' },
+            {
+              label: '보행 계수',
+              value: (derivedStats.avg_user_speed_factor !== null && derivedStats.avg_user_speed_factor !== undefined && Number.isFinite(derivedStats.avg_user_speed_factor))
+                ? derivedStats.avg_user_speed_factor
+                : 0,
+              unit: 'x',
+              color: '#7C3AED'
+            },
+            {
+              label: '경사',
+              value: (derivedStats.avg_slope_factor !== null && derivedStats.avg_slope_factor !== undefined && Number.isFinite(derivedStats.avg_slope_factor))
+                ? derivedStats.avg_slope_factor
+                : 0,
+              unit: '',
+              color: '#6EE7B7'
+            },
+            {
+              label: '날씨',
+              value: (derivedStats.avg_weather_factor !== null && derivedStats.avg_weather_factor !== undefined && Number.isFinite(derivedStats.avg_weather_factor))
+                ? derivedStats.avg_weather_factor
+                : 0,
+              unit: '',
+              color: '#60A5FA'
+            },
           ],
           description: '실제 이동에 반영된 개인 보정 계수입니다.',
         });
@@ -666,7 +768,7 @@ export default function SettingsScreen() {
               <Ionicons name="person-outline" size={28} color={PRIMARY} />
             </View>
             <View style={{ flex: 1, gap: 6 }}>
-              <Text style={styles.userName}>{user?.nickname || '사용자'}</Text>
+              <Text style={styles.userName}>{user?.username || '사용자'}</Text>
               <Text style={styles.userEmail}>{user?.email}</Text>
               <View style={styles.statusRow}>
                 <View style={styles.statusBadge}>

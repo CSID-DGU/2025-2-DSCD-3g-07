@@ -1,6 +1,6 @@
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import * as Lohttps://github.com/CSID-DGU/2025-2-DSCD-3g-07/pull/75/conflict?name=frontend%252Fapp%252F%2528tabs%2529%252Fcourse.tsx&ancestor_oid=fd13f5546585292116fe0ca68fc5c708aad2302b&base_oid=1b318cbe90a353d84a138968166363b79707a493&head_oid=e5b273317b8b48411b144dc260b9a92b0336488bcation from 'expo-location';
+import * as Location from 'expo-location';
 import { useState, useEffect, useCallback } from 'react';
 import {
   View,
@@ -57,6 +57,8 @@ interface RouteRecommendation {
 }
 
 export default function CourseScreen() {
+  const { user, isAuthenticated } = useAuth();
+
   // 상태 관리
   const [searchMode, setSearchMode] = useState<SearchMode>('walking');
   const [distanceValue, setDistanceValue] = useState(''); // 목표 거리 입력값
@@ -192,7 +194,7 @@ export default function CourseScreen() {
     console.log('✅ 위치 선택:', { name: displayName, coords });
   };
 
-  const handleLogCourseUse = async (route: GPXRouteRecommendation) => {
+  const handleLogCourseUse = async (route: any) => {
     if (!isAuthenticated || !user) {
       Alert.alert('로그인 필요', '코스 이용 기록을 저장하려면 로그인해주세요.');
       return;

@@ -19,6 +19,11 @@ export interface GPXRouteRecommendation {
         lat: number;
         lng: number;
     };
+    end_point: {
+        lat: number;
+        lng: number;
+    };
+    total_elevation_loss_m: number;
     distance_from_user: number | null;
     description: string;
 }

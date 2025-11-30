@@ -143,10 +143,41 @@ class GPXLoader:
         distance_km = total_distance / 1000
         difficulty = self._calculate_difficulty(distance_km, elevation_gain)
         
-        # 예상 소요 시간 (분) - 평균 속도 기반
-        base_time = (distance_km / 5.0) * 60  # 분
-        elevation_time = (elevation_gain / 100) * 10  # 100m 당 10분 추가
-        estimated_duration = int(base_time + elevation_time)
+        # 예상 소요 시간 (분) - Tobler's Hiking Function 사용
+        # 세그먼트별로 경사도 계산하여 정확한 시간 산출
+        total_time_hours = 0.0
+        
+        for i in range(1, len(track_points)):
+            prev_pt = track_points[i-1]
+            curr_pt = track_points[i]
+            
+            # 세그먼트 거리
+            segment_dist_m = self.calculate_distance(
+                prev_pt['lat'], prev_pt['lon'],
+                curr_pt['lat'], curr_pt['lon']
+            )
+            
+            if segment_dist_m == 0:
+                continue
+            
+            # 세그먼트 경사도 계산 (상승/하강 모두 반영)
+            if prev_pt['ele'] is not None and curr_pt['ele'] is not None:
+                ele_diff = curr_pt['ele'] - prev_pt['ele']
+                segment_slope = (ele_diff / segment_dist_m) * 100  # 백분율
+            else:
+                segment_slope = 0.0
+            
+            # Tobler's Function으로 속도 계산 (km/h)
+            slope_decimal = segment_slope / 100.0
+            segment_speed_kmh = 6.0 * math.exp(-3.5 * abs(slope_decimal + 0.05))
+            
+            # 세그먼트 소요 시간 (시간)
+            segment_dist_km = segment_dist_m / 1000.0
+            segment_time_hours = segment_dist_km / segment_speed_kmh
+            total_time_hours += segment_time_hours
+        
+        # 분 단위로 변환
+        estimated_duration = int(total_time_hours * 60)
         
         return {
             'distance_km': round(distance_km, 2),

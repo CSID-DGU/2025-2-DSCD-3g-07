@@ -11,8 +11,8 @@ import * as Location from 'expo-location';
 import { Accelerometer } from 'expo-sensors';
 import type { MovementSegment } from './navigationLogService';
 
-const SPEED_THRESHOLD_MIN = 0.3; // m/s - 이하면 정지로 간주
-const SPEED_THRESHOLD_MAX = 2.5; // m/s - 이상이면 차량으로 간주
+const SPEED_THRESHOLD_MIN = 0.3; // m/s (1.08 km/h) - 이하면 정지로 간주
+const SPEED_THRESHOLD_MAX = 4.5; // m/s (16.2 km/h) - 이상이면 차량으로 간주
 const MIN_PAUSE_DURATION = 5; // 초 - 최소 정지 시간
 
 // 가속도 패턴 분석용 상수

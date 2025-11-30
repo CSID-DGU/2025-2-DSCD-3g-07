@@ -27,7 +27,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: '홈',
+          title: 'Home',
           tabBarIcon: ({ color }) => (
             <MaterialIcons size={26} name="home" color={color} />
           ),
@@ -36,7 +36,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="course"
         options={{
-          title: '코스',
+          title: 'Course',
           tabBarIcon: ({ color }) => (
             <MaterialIcons size={26} name="explore" color={color} />
           ),
@@ -45,28 +45,25 @@ export default function TabLayout() {
       <Tabs.Screen
         name="stats"
         options={{
-          title: 'MY',
-          tabBarIcon: ({ color }) => (
-            <MaterialIcons size={26} name="person" color={color} />
-          ),
+          href: null, // hidden: old dummy MY screen
         }}
       />
       <Tabs.Screen
         name="routes"
         options={{
-          href: null, // 탭바에서 숨김
+          href: null,
         }}
       />
       <Tabs.Screen
         name="api-test"
         options={{
-          href: null, // 탭바에서 숨김
+          href: null,
         }}
       />
       <Tabs.Screen
         name="weather"
         options={{
-          href: null, // 탭바에서 숨김
+          href: null,
         }}
       />
       <Tabs.Screen
@@ -81,9 +78,9 @@ export default function TabLayout() {
       <Tabs.Screen
         name="settings"
         options={{
-          title: '설정',
+          title: 'MY',
           tabBarIcon: ({ color }) => (
-            <MaterialIcons size={26} name="settings" color={color} />
+            <MaterialIcons size={26} name="person" color={color} />
           ),
         }}
       />

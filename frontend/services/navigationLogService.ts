@@ -105,6 +105,19 @@ export interface NavigationLogResponse {
     estimated_time_seconds: number;
     actual_time_seconds: number;
     time_difference_seconds: number;
+
+    // 실제 보행속도 측정 (하이브리드 방식)
+    active_walking_time_seconds?: number;
+    paused_time_seconds?: number;
+    real_walking_speed_kmh?: number;
+    pause_count?: number;
+    movement_data?: {
+        segments: MovementSegment[];
+        detection_method: string;
+        total_pauses: number;
+        crosswalk_pauses?: number;
+    };
+
     weather_id?: number;
     route_data?: any;
     started_at: string;

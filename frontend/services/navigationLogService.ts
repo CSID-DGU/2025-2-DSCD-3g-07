@@ -39,7 +39,7 @@ export interface MovementSegment {
 }
 
 export interface NavigationLogData {
-    route_mode: 'transit' | 'walking';
+    route_mode: 'transit' | 'walking' | 'course';
 
     // 위치 정보
     start_location?: string;
@@ -170,7 +170,7 @@ export async function saveNavigationLog(
 export async function getNavigationLogs(
     userId: number,
     options?: {
-        route_mode?: 'transit' | 'walking';
+        route_mode?: 'transit' | 'walking' | 'course';
         start_date?: Date;
         end_date?: Date;
         limit?: number;

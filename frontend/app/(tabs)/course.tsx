@@ -204,17 +204,29 @@ export default function CourseScreen() {
     const estimatedSeconds = Math.max(60, Math.round(route.estimated_duration_minutes * 60));
     const distanceM = Math.max(1, Math.round(route.distance_km * 1000));
 
+    // user_speed_factor 계산: 사용자 속도 / 기준 속도(5.036 km/h)
+    const baseSpeed = 5.036;
+    const userSpeedFactor = walkingSpeed ? walkingSpeed / baseSpeed : 1.0;
+
+    // slope_factor 계산: 고도 변화에 따른 보정 (이미 estimated_time에 반영됨)
+    const elevationGain = route.total_elevation_gain_m || 0;
+    const elevationLoss = route.total_elevation_loss_m || 0;
+    const avgSlope = (elevationGain - elevationLoss) / Math.max(1, distanceM) * 100;
+    const slopeFactor = Math.exp(-3.5 * Math.abs(avgSlope / 100 + 0.05));
+
     const logData: NavigationLogData = {
-      route_mode: 'walking',
+      route_mode: 'course',
       start_location: route.route_name || '코스 시작',
       end_location: route.route_name || '코스 완료',
       start_lat: route.start_point.lat,
       start_lon: route.start_point.lng,
-      end_lat: route.start_point.lat,
-      end_lon: route.start_point.lng,
+      end_lat: route.end_point?.lat ?? route.start_point.lat,
+      end_lon: route.end_point?.lng ?? route.start_point.lng,
       total_distance_m: distanceM,
       walking_distance_m: distanceM,
       crosswalk_count: 0,
+      user_speed_factor: userSpeedFactor,
+      slope_factor: slopeFactor,
       estimated_time_seconds: estimatedSeconds,
       actual_time_seconds: estimatedSeconds,
       started_at: new Date(now.getTime() - estimatedSeconds * 1000).toISOString(),

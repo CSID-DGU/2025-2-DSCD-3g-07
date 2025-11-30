@@ -95,6 +95,28 @@ def extract_start_point(route_coordinates: dict) -> tuple:
     return (None, None)
 
 
+def extract_end_point(route_coordinates: dict) -> tuple:
+    """
+    GeoJSON에서 종료점 좌표 추출
+    
+    Returns:
+        (lat, lng) tuple
+    """
+    try:
+        if isinstance(route_coordinates, str):
+            route_coordinates = json.loads(route_coordinates)
+        
+        coordinates = route_coordinates.get('coordinates', [])
+        if coordinates:
+            # GeoJSON은 [경도, 위도] 순서
+            lng, lat = coordinates[-1]
+            return (lat, lng)
+    except:
+        pass
+    
+    return (None, None)
+
+
 
 class RouteResponse(BaseModel):
     """경로 응답 모델"""
@@ -427,6 +449,11 @@ async def recommend_routes(
             if start_lat is None or start_lng is None:
                 continue
             
+            # 4-1-1. 종료점 좌표 추출 (GeoJSON 마지막 좌표)
+            end_lat, end_lng = extract_end_point(route_coords)
+            if end_lat is None or end_lng is None:
+                end_lat, end_lng = start_lat, start_lng
+            
             # 4-2. 사용자 위치와의 거리 계산 (Haversine)
             distance_from_user = calculate_distance(user_lat, user_lng, start_lat, start_lng)
             
@@ -489,14 +516,26 @@ async def recommend_routes(
             # 경로 이름 정리 (중복 및 Strava 정보 제거)
             cleaned_name = clean_route_name(route_name)
             
+            # 사용자 속도 기반 예상 시간 재계산 (Tobler's Hiking Function + speed_case2)
+            final_estimated_duration = est_duration  # 기본값: DB 저장값
+            if user_speed_kmh and user_speed_kmh > 0:
+                # DB의 estimated_duration은 이미 Tobler로 계산된 값
+                # 사용자 속도 비율만 적용
+                base_speed_kmh = 6.0 * math.exp(-3.5 * 0.05)  # 평지 기준 5.036 km/h
+                speed_ratio = user_speed_kmh / base_speed_kmh
+                
+                # 최종 시간 = DB 시간 / 속도 비율
+                # (빠르면 시간 감소, 느리면 시간 증가)
+                final_estimated_duration = int(est_duration / speed_ratio)
+            
             # 목표 거리/시간과의 차이 계산
             target_diff = 0
             if distance_km:
                 # 목표 거리와의 차이 (km)
                 target_diff = abs(float(dist_km) - distance_km)
             elif duration_minutes:
-                # 목표 시간과의 차이 (분)
-                target_diff = abs(est_duration - duration_minutes)
+                # 목표 시간과의 차이 (분) - 사용자 속도 반영된 값 사용
+                target_diff = abs(final_estimated_duration - duration_minutes)
             
             # 4-6. 결과 목록에 추가
             routes.append({
@@ -504,14 +543,19 @@ async def recommend_routes(
                 'route_name': cleaned_name,
                 'route_type': r_route_type,
                 'distance_km': float(dist_km),
-                'estimated_duration_minutes': est_duration,
+                'estimated_duration_minutes': final_estimated_duration,  # 사용자 속도 반영
                 'total_elevation_gain_m': float(elevation_gain) if elevation_gain else 0,
+                'total_elevation_loss_m': float(r[6]) if len(r) > 6 and r[6] else 0,
                 'difficulty_level': diff_level,
                 'avg_rating': float(avg_rating) if avg_rating else None,
                 'rating_count': rating_count,
                 'start_point': {
                     'lat': start_lat,
                     'lng': start_lng,
+                },
+                'end_point': {
+                    'lat': end_lat,
+                    'lng': end_lng,
                 },
                 'distance_from_user': round(distance_from_user, 2),
                 'description': description,

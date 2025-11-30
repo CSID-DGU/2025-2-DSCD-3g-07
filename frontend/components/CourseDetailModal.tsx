@@ -40,6 +40,7 @@ interface RouteDetailModalProps {
         longitude: number;
     } | null;
     kakaoJsKey: string;
+    onLogCourseUse?: (route: RouteDetailModalProps['route']) => void;
 }
 
 const RouteDetailModal: React.FC<RouteDetailModalProps> = ({
@@ -48,6 +49,7 @@ const RouteDetailModal: React.FC<RouteDetailModalProps> = ({
     route,
     currentLocation,
     kakaoJsKey,
+    onLogCourseUse,
 }) => {
     const [routeCoordinates, setRouteCoordinates] = useState<any>(null);
     const [loading, setLoading] = useState(false);
@@ -208,6 +210,16 @@ const RouteDetailModal: React.FC<RouteDetailModalProps> = ({
                             위도: {route.start_point.lat.toFixed(6)}, 경도: {route.start_point.lng.toFixed(6)}
                         </Text>
                     </View>
+
+                    {onLogCourseUse ? (
+                        <TouchableOpacity
+                            style={styles.logButton}
+                            onPress={() => onLogCourseUse(route)}
+                        >
+                            <MaterialIcons name="check-circle" size={20} color="#fff" />
+                            <Text style={styles.logButtonText}>이 코스 이용 기록 저장</Text>
+                        </TouchableOpacity>
+                    ) : null}
                 </ScrollView>
             </SafeAreaView>
         </Modal>
@@ -488,6 +500,22 @@ const styles = StyleSheet.create({
     placeholderText: {
         fontSize: 14,
         color: '#666',
+    },
+    logButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 8,
+        backgroundColor: PRIMARY_COLOR,
+        paddingVertical: 14,
+        borderRadius: 12,
+        marginTop: 8,
+        marginBottom: 24,
+    },
+    logButtonText: {
+        color: '#fff',
+        fontSize: 15,
+        fontWeight: '700',
     },
 });
 

@@ -1,6 +1,6 @@
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import * as Location from 'expo-location';
+import * as Lohttps://github.com/CSID-DGU/2025-2-DSCD-3g-07/pull/75/conflict?name=frontend%252Fapp%252F%2528tabs%2529%252Fcourse.tsx&ancestor_oid=fd13f5546585292116fe0ca68fc5c708aad2302b&base_oid=1b318cbe90a353d84a138968166363b79707a493&head_oid=e5b273317b8b48411b144dc260b9a92b0336488bcation from 'expo-location';
 import { useState, useEffect, useCallback } from 'react';
 import {
   View,
@@ -20,6 +20,8 @@ import { apiService } from '@/services/api';
 import { getRecommendedRoutes, GPXRouteRecommendation } from '@/services/gpxRouteService';
 import CourseDetailModal from '@/components/CourseDetailModal';
 import { searchPlaces, PlaceSearchResult, placeToCoordinates } from '@/services/placeSearchService';
+import { saveNavigationLog, type NavigationLogData } from '@/services/navigationLogService';
+import { useAuth } from '@/contexts/AuthContext';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const PRIMARY_COLOR = '#2C6DE7';
@@ -188,6 +190,42 @@ export default function CourseScreen() {
     setLocationSearchResults([]);
 
     console.log('✅ 위치 선택:', { name: displayName, coords });
+  };
+
+  const handleLogCourseUse = async (route: GPXRouteRecommendation) => {
+    if (!isAuthenticated || !user) {
+      Alert.alert('로그인 필요', '코스 이용 기록을 저장하려면 로그인해주세요.');
+      return;
+    }
+
+    const now = new Date();
+    const estimatedSeconds = Math.max(60, Math.round(route.estimated_duration_minutes * 60));
+    const distanceM = Math.max(1, Math.round(route.distance_km * 1000));
+
+    const logData: NavigationLogData = {
+      route_mode: 'walking',
+      start_location: route.route_name || '코스 시작',
+      end_location: route.route_name || '코스 완료',
+      start_lat: route.start_point.lat,
+      start_lon: route.start_point.lng,
+      end_lat: route.start_point.lat,
+      end_lon: route.start_point.lng,
+      total_distance_m: distanceM,
+      walking_distance_m: distanceM,
+      crosswalk_count: 0,
+      estimated_time_seconds: estimatedSeconds,
+      actual_time_seconds: estimatedSeconds,
+      started_at: new Date(now.getTime() - estimatedSeconds * 1000).toISOString(),
+      ended_at: now.toISOString(),
+      route_data: route,
+    };
+
+    try {
+      await saveNavigationLog(user.user_id, logData);
+      Alert.alert('저장 완료', '이 코스 이용 기록이 저장되었습니다.');
+    } catch (error) {
+      Alert.alert('저장 실패', error instanceof Error ? error.message : '알 수 없는 오류');
+    }
   };
 
   // 경로 검색
@@ -624,6 +662,7 @@ export default function CourseScreen() {
             route={selectedRoute}
             currentLocation={currentLocation}
             kakaoJsKey={KAKAO_JS_KEY}
+            onLogCourseUse={handleLogCourseUse}
           />
         )}
       </SafeAreaView>

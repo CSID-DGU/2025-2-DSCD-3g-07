@@ -296,6 +296,7 @@ export default function HomeScreen() {
   const [currentLocation, setCurrentLocation] = useState<CurrentLocation | null>(null);
   const [isTracking, setIsTracking] = useState(false);
   const [centerOnLocation, setCenterOnLocation] = useState(false);
+  const [trackingMode, setTrackingMode] = useState(false); // 실시간 추적 모드
 
   // 안내 시작/종료 상태
   const [isNavigating, setIsNavigating] = useState(false);
@@ -447,6 +448,7 @@ export default function HomeScreen() {
       // 추적 중지
       locationService.stopTracking();
       setIsTracking(false);
+      setTrackingMode(false); // 추적 모드 해제
       setCurrentLocation(null);
       Alert.alert('위치 추적 중지', '실시간 위치 추적이 중지되었습니다.');
     } else {
@@ -459,11 +461,15 @@ export default function HomeScreen() {
       if (success) {
         setIsTracking(true);
         setCenterOnLocation(true);  // 첫 번째는 중심 이동
+        setTrackingMode(true); // 추적 모드 활성화
 
-        // 1초 후 자동 중심 이동 해제 (사용자가 지도를 움직일 수 있도록)
+        // 1초 후 일회성 중심 이동 플래그 해제 (추적 모드는 유지)
         setTimeout(() => setCenterOnLocation(false), 1000);
 
-        Alert.alert('위치 추적 시작', '실시간 위치 추적이 시작되었습니다.');
+        Alert.alert(
+          '위치 추적 시작', 
+          '실시간 위치 추적이 시작되었습니다.\n\n• 5m 이상 이동 시 지도가 따라갑니다\n• 지도를 움직이면 추적이 일시 중지되고\n  3초 후 자동으로 다시 추적합니다'
+        );
       } else {
         Alert.alert('위치 추적 실패', '위치 권한을 확인해주세요.');
       }
@@ -698,6 +704,7 @@ export default function HomeScreen() {
       if (isTracking) {
         locationService.stopTracking();
         setIsTracking(false);
+        setTrackingMode(false); // 추적 모드 해제
         setCurrentLocation(null);
       }
 
@@ -718,6 +725,7 @@ export default function HomeScreen() {
         });
         setIsTracking(true);
         setCenterOnLocation(true);
+        setTrackingMode(true); // 추적 모드 활성화
         setTimeout(() => setCenterOnLocation(false), 1000);
       }
 
@@ -1101,6 +1109,7 @@ export default function HomeScreen() {
           routeMode={routeMode}
           currentLocation={currentLocation}
           centerOnCurrentLocation={centerOnLocation}
+          trackingMode={trackingMode}
           legs={routeInfo?.legs}
         />
       </View>

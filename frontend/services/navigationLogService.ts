@@ -5,6 +5,28 @@
  */
 
 import Config from '@/config';
+import { apiClient } from '@/utils/apiClient';
+
+const normalizeBaseUrl = async (): Promise<string> => {
+    const base = await Config.initializeApiUrl();
+    return base.endsWith('/') ? base.slice(0, -1) : base;
+};
+
+const buildUrl = async (path: string): Promise<string> => {
+    const normalized = path.startsWith('/') ? path : `/${path}`;
+    return `${await normalizeBaseUrl()}${normalized}`;
+};
+
+const toErrorMessage = (detail: any, fallback: string): string => {
+    if (!detail) return fallback;
+    if (typeof detail === 'string') return detail;
+    try {
+        const serialized = JSON.stringify(detail);
+        return serialized === '{}' ? fallback : serialized;
+    } catch {
+        return fallback;
+    }
+};
 
 export interface MovementSegment {
     start_time: string;
@@ -112,43 +134,20 @@ export async function saveNavigationLog(
     logData: NavigationLogData
 ): Promise<NavigationLogResponse> {
     try {
-        console.log('📤 네비게이션 로그 저장 시도:', {
-            url: `${Config.API_BASE_URL}/api/navigation/logs?user_id=${userId}`,
-            logData
-        });
+        const endpoint = `/api/navigation/logs?user_id=${userId}`;
+        console.log('[navLog] save request', { endpoint, logData });
 
-        const response = await fetch(`${Config.API_BASE_URL}/api/navigation/logs?user_id=${userId}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(logData),
-        });
+        const result = await apiClient.post<NavigationLogResponse>(endpoint, logData);
 
-        console.log('📥 응답 상태:', response.status, response.statusText);
-
-        if (!response.ok) {
-            const errorText = await response.text();
-            console.error('❌ 서버 에러 응답:', errorText);
-
-            try {
-                const error = JSON.parse(errorText);
-                throw new Error(error.detail || `네비게이션 로그 저장 실패 (${response.status})`);
-            } catch (parseError) {
-                throw new Error(`네비게이션 로그 저장 실패 (${response.status}): ${errorText}`);
-            }
-        }
-
-        const result = await response.json();
-        console.log('✅ 네비게이션 로그 저장 성공:', result);
-        return result as NavigationLogResponse;
+        console.log('[navLog] save success', result);
+        return result;
     } catch (error) {
-        console.error('❌ 네비게이션 로그 저장 오류:', {
+        console.error('[navLog] save failed', {
             error,
             message: error instanceof Error ? error.message : String(error),
-            stack: error instanceof Error ? error.stack : undefined
+            stack: error instanceof Error ? error.stack : undefined,
         });
-        throw error;
+        throw new Error(error instanceof Error ? error.message : 'Failed to save navigation log');
     }
 }
 
@@ -166,37 +165,31 @@ export async function getNavigationLogs(
     }
 ): Promise<{ total_count: number; logs: NavigationLogResponse[] }> {
     try {
-        const params = new URLSearchParams({
-            user_id: userId.toString(),
-        });
+        const params: Record<string, any> = { user_id: userId };
 
         if (options?.route_mode) {
-            params.append('route_mode', options.route_mode);
+            params.route_mode = options.route_mode;
         }
         if (options?.start_date) {
-            params.append('start_date', options.start_date.toISOString());
+            params.start_date = options.start_date.toISOString();
         }
         if (options?.end_date) {
-            params.append('end_date', options.end_date.toISOString());
+            params.end_date = options.end_date.toISOString();
         }
         if (options?.limit) {
-            params.append('limit', options.limit.toString());
+            params.limit = options.limit;
         }
         if (options?.offset) {
-            params.append('offset', options.offset.toString());
+            params.offset = options.offset;
         }
 
-        const response = await fetch(`${Config.API_BASE_URL}/api/navigation/logs?${params}`);
-
-        if (!response.ok) {
-            const error: any = await response.json();
-            throw new Error(error.detail || '네비게이션 로그 조회 실패');
-        }
-
-        return await response.json() as { total_count: number; logs: NavigationLogResponse[] };
+        return await apiClient.get<{ total_count: number; logs: NavigationLogResponse[] }>(
+            '/api/navigation/logs',
+            params,
+        );
     } catch (error) {
-        console.error('❌ 네비게이션 로그 조회 오류:', error);
-        throw error;
+        console.error('[navLog] list failed', error);
+        throw new Error(error instanceof Error ? error.message : 'Failed to fetch navigation logs');
     }
 }
 
@@ -208,19 +201,13 @@ export async function getNavigationLogDetail(
     userId: number
 ): Promise<NavigationLogResponse> {
     try {
-        const response = await fetch(
-            `${Config.API_BASE_URL}/api/navigation/logs/${logId}?user_id=${userId}`
+        return await apiClient.get<NavigationLogResponse>(
+            `/api/navigation/logs/${logId}`,
+            { user_id: userId },
         );
-
-        if (!response.ok) {
-            const error: any = await response.json();
-            throw new Error(error.detail || '네비게이션 로그 상세 조회 실패');
-        }
-
-        return await response.json() as NavigationLogResponse;
     } catch (error) {
-        console.error('❌ 네비게이션 로그 상세 조회 오류:', error);
-        throw error;
+        console.error('[navLog] detail failed', error);
+        throw new Error(error instanceof Error ? error.message : 'Failed to fetch navigation log detail');
     }
 }
 
@@ -232,19 +219,13 @@ export async function getNavigationStatistics(
     days: number = 30
 ): Promise<NavigationStatistics> {
     try {
-        const response = await fetch(
-            `${Config.API_BASE_URL}/api/navigation/logs/statistics/summary?user_id=${userId}&days=${days}`
+        return await apiClient.get<NavigationStatistics>(
+            '/api/navigation/logs/statistics/summary',
+            { user_id: userId, days },
         );
-
-        if (!response.ok) {
-            const error: any = await response.json();
-            throw new Error(error.detail || '네비게이션 통계 조회 실패');
-        }
-
-        return await response.json() as NavigationStatistics;
     } catch (error) {
-        console.error('❌ 네비게이션 통계 조회 오류:', error);
-        throw error;
+        console.error('[navLog] stats failed', error);
+        throw new Error(error instanceof Error ? error.message : 'Failed to fetch navigation log stats');
     }
 }
 
@@ -256,20 +237,25 @@ export async function deleteNavigationLog(
     userId: number
 ): Promise<void> {
     try {
-        const response = await fetch(
-            `${Config.API_BASE_URL}/api/navigation/logs/${logId}?user_id=${userId}`,
-            {
-                method: 'DELETE',
-            }
-        );
+        const url = await buildUrl(`/api/navigation/logs/${logId}?user_id=${userId}`);
+        const response = await fetch(url, { method: 'DELETE' });
 
         if (!response.ok) {
-            const error: any = await response.json();
-            throw new Error(error.detail || '네비게이션 로그 삭제 실패');
+            const raw = await response.text();
+            let message = toErrorMessage(raw, 'Failed to delete navigation log');
+
+            try {
+                const parsed = JSON.parse(raw);
+                message = toErrorMessage(parsed.detail ?? parsed.message ?? parsed, message);
+            } catch {
+                // keep parsed message fallback
+            }
+
+            throw new Error(message);
         }
     } catch (error) {
-        console.error('❌ 네비게이션 로그 삭제 오류:', error);
-        throw error;
+        console.error('[navLog] delete failed', error);
+        throw new Error(error instanceof Error ? error.message : 'Failed to delete navigation log');
     }
 }
 
@@ -361,8 +347,9 @@ export async function extractNavigationLogData(
 
     if (weatherData && startLat && startLon) {
         try {
-            console.log('🌤️ Weather save 시작:', {
-                url: `${Config.API_BASE_URL}/api/weather/save`,
+            const weatherSaveUrl = await buildUrl('/api/weather/save');
+            console.log('[navLog] Weather save request:', {
+                url: weatherSaveUrl,
                 data: {
                     latitude: startLat,
                     longitude: startLon,
@@ -372,7 +359,7 @@ export async function extractNavigationLogData(
                 }
             });
 
-            const weatherSaveResponse = await fetch(`${Config.API_BASE_URL}/api/weather/save`, {
+            const weatherSaveResponse = await fetch(weatherSaveUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -386,18 +373,18 @@ export async function extractNavigationLogData(
                 }),
             });
 
-            console.log('🌤️ Weather save 응답 상태:', weatherSaveResponse.status);
+            console.log('[navLog] Weather save response status:', weatherSaveResponse.status);
 
             if (weatherSaveResponse.ok) {
                 const savedWeather = await weatherSaveResponse.json() as { weather_id: number };
                 weatherId = savedWeather.weather_id;
-                console.log('☁️ 날씨 데이터 저장 완료:', { savedWeather, weatherId });
+                console.log('[navLog] Weather saved:', { savedWeather, weatherId });
             } else {
                 const errorText = await weatherSaveResponse.text();
-                console.error('❌ 날씨 저장 응답 실패:', { status: weatherSaveResponse.status, error: errorText });
+                console.error('[navLog] Weather save response error:', { status: weatherSaveResponse.status, error: errorText });
             }
         } catch (error) {
-            console.error('❌ 날씨 데이터 저장 실패:', error);
+            console.error('[navLog] Weather save failed:', error);
         }
     }
 

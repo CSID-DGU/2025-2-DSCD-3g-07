@@ -46,8 +46,8 @@ class LocationService {
       this.subscription = await Location.watchPositionAsync(
         {
           accuracy: Location.Accuracy.BestForNavigation, // 네비게이션용 최고 정확도
-          timeInterval: 500, // 0.5초마다 업데이트 (더 빠른 반응)
-          distanceInterval: 1, // 1m 이동 시 업데이트 (민감하게)
+          timeInterval: 1000, // 1초마다 업데이트
+          distanceInterval: 3, // 3m 이동 시 업데이트 (GPS 노이즈 필터링)
         },
         (location) => {
           const currentLocation: CurrentLocation = {

@@ -15,6 +15,7 @@ interface KakaoMapWithRouteProps {
   routeMode?: 'transit' | 'walking'; // 경로 모드 (대중교통 / 도보)
   currentLocation?: CurrentLocation | null; // 현재 위치 (실시간 추적)
   centerOnCurrentLocation?: boolean; // 현재 위치로 지도 중심 이동 여부
+  trackingMode?: boolean; // 실시간 추적 모드 (사용자 위치를 계속 따라감)
   legs?: Leg[]; // 구간 정보 (대중교통용)
 }
 
@@ -27,6 +28,7 @@ const html = (
   paths?: RoutePath[],
   routeMode?: 'transit' | 'walking',
   centerOnCurrentLocation?: boolean,
+  trackingMode?: boolean,
   legs?: Leg[]
 ) => `
 <!doctype html><html><head>
@@ -40,6 +42,13 @@ const html = (
     let currentLocationMarker = null;
     let accuracyCircle = null;
     let map = null;
+    let isTrackingMode = ${trackingMode || false}; // 실시간 추적 모드
+    let userInteracting = false; // 사용자가 지도를 조작 중인지
+    let resetTrackingTimer = null; // 자동 복귀 타이머
+    let lastMovedPosition = null; // 마지막으로 지도를 이동한 위치
+    const MIN_MOVE_DISTANCE = 5; // 최소 이동 거리 (미터) - GPS 노이즈 필터링
+    const TRACKING_ZOOM_LEVEL = 3; // 추적 모드 줌 레벨 (더 확대, 숫자가 작을수록 확대)
+    let originalZoomLevel = 5; // 원래 줌 레벨
     
     kakao.maps.load(function () {
       // 지도 중심 (출발지와 도착지 중간)
@@ -50,6 +59,42 @@ const html = (
       map = new kakao.maps.Map(document.getElementById('map'), {
         center,
         level: 5 // 줌 레벨
+      });
+
+      // 지도 드래그/줌 이벤트 리스너 (사용자 조작 감지)
+      kakao.maps.event.addListener(map, 'dragstart', function() {
+        if (isTrackingMode) {
+          userInteracting = true;
+          // 타이머가 있으면 취소
+          if (resetTrackingTimer) {
+            clearTimeout(resetTrackingTimer);
+            resetTrackingTimer = null;
+          }
+        }
+      });
+
+      kakao.maps.event.addListener(map, 'dragend', function() {
+        if (isTrackingMode && userInteracting) {
+          // 3초 후 자동으로 추적 모드 재개
+          resetTrackingTimer = setTimeout(function() {
+            userInteracting = false;
+            console.log('🔄 추적 모드 자동 복귀');
+          }, 3000); // 3초
+        }
+      });
+
+      // 줌 변경 시에도 동일하게 처리
+      kakao.maps.event.addListener(map, 'zoom_changed', function() {
+        if (isTrackingMode && !userInteracting) {
+          userInteracting = true;
+          if (resetTrackingTimer) {
+            clearTimeout(resetTrackingTimer);
+          }
+          resetTrackingTimer = setTimeout(function() {
+            userInteracting = false;
+            console.log('🔄 추적 모드 자동 복귀');
+          }, 3000);
+        }
       });
 
       // 출발지 마커 (카카오맵 스타일 - 파란색 핀)
@@ -272,6 +317,22 @@ const html = (
       `
       }
 
+      // 두 좌표 사이의 거리 계산 (미터)
+      function getDistance(lat1, lng1, lat2, lng2) {
+        const R = 6371e3; // 지구 반지름 (미터)
+        const φ1 = lat1 * Math.PI / 180;
+        const φ2 = lat2 * Math.PI / 180;
+        const Δφ = (lat2 - lat1) * Math.PI / 180;
+        const Δλ = (lng2 - lng1) * Math.PI / 180;
+        
+        const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
+                  Math.cos(φ1) * Math.cos(φ2) *
+                  Math.sin(Δλ/2) * Math.sin(Δλ/2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        
+        return R * c; // 미터 단위
+      }
+
       // 현재 위치 마커 생성 함수
       window.updateCurrentLocation = function(lat, lng, heading, accuracy) {
         // 기존 마커 제거
@@ -323,9 +384,64 @@ const html = (
           accuracyCircle.setMap(map);
         }
         
-        // 지도 중심 이동 (옵션)
+        // 지도 중심 이동 (일회성 또는 추적 모드)
         if (${centerOnCurrentLocation}) {
+          // 일회성 중심 이동
           map.setCenter(new kakao.maps.LatLng(lat, lng));
+          lastMovedPosition = { lat: lat, lng: lng };
+        } else if (isTrackingMode && !userInteracting) {
+          // 추적 모드: 실제로 의미있게 이동했을 때만 지도 이동
+          let shouldMove = false;
+          
+          if (!lastMovedPosition) {
+            // 첫 위치 업데이트
+            shouldMove = true;
+            // 추적 모드 시작 시 줌 레벨 확대
+            if (map.getLevel() !== TRACKING_ZOOM_LEVEL) {
+              map.setLevel(TRACKING_ZOOM_LEVEL);
+            }
+          } else {
+            // 이전 위치와의 거리 계산
+            const distance = getDistance(
+              lastMovedPosition.lat,
+              lastMovedPosition.lng,
+              lat,
+              lng
+            );
+            
+            // GPS 정확도가 좋고 (20m 이내), 실제로 MIN_MOVE_DISTANCE 이상 이동했을 때만
+            if (accuracy <= 20 && distance >= MIN_MOVE_DISTANCE) {
+              shouldMove = true;
+              console.log('📍 실제 이동 감지:', distance.toFixed(1) + 'm');
+            }
+          }
+          
+          if (shouldMove) {
+            map.panTo(new kakao.maps.LatLng(lat, lng));
+            lastMovedPosition = { lat: lat, lng: lng };
+          }
+        }
+      };
+
+      // 추적 모드 설정 함수
+      window.setTrackingMode = function(enabled) {
+        isTrackingMode = enabled;
+        userInteracting = false;
+        lastMovedPosition = null; // 추적 모드 변경 시 이전 위치 초기화
+        if (resetTrackingTimer) {
+          clearTimeout(resetTrackingTimer);
+          resetTrackingTimer = null;
+        }
+        
+        if (enabled) {
+          // 추적 모드 활성화: 현재 줌 레벨 저장하고 확대
+          originalZoomLevel = map.getLevel();
+          map.setLevel(TRACKING_ZOOM_LEVEL);
+          console.log('🎯 추적 모드 ON - 줌 레벨:', TRACKING_ZOOM_LEVEL);
+        } else {
+          // 추적 모드 비활성화: 원래 줌 레벨로 복구
+          map.setLevel(originalZoomLevel);
+          console.log('🎯 추적 모드 OFF - 원래 줌 레벨:', originalZoomLevel);
         }
       };
 
@@ -347,9 +463,24 @@ export default function KakaoMapWithRoute({
   routeMode = 'transit', // 기본값: 대중교통
   currentLocation,
   centerOnCurrentLocation = false,
+  trackingMode = false,
   legs,
 }: KakaoMapWithRouteProps) {
   const webViewRef = useRef<WebView>(null);
+
+  // 추적 모드 변경 시 WebView에 전달
+  useEffect(() => {
+    if (webViewRef.current) {
+      const script = `
+        if (window.setTrackingMode) {
+          window.setTrackingMode(${trackingMode});
+        }
+        true;
+      `;
+      
+      webViewRef.current.injectJavaScript(script);
+    }
+  }, [trackingMode]);
 
   // 현재 위치 업데이트 (useEffect)
   useEffect(() => {
@@ -390,6 +521,7 @@ export default function KakaoMapWithRoute({
             paths,
             routeMode,
             centerOnCurrentLocation,
+            trackingMode,
             legs
           ),
         }}

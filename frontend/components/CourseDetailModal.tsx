@@ -65,14 +65,14 @@ const RouteDetailModal: React.FC<RouteDetailModalProps> = ({
         try {
             setLoading(true);
             console.log('🔍 경로 상세 조회 시작:', route.route_id);
-            
+
             const detail = await getRouteDetail(route.route_id);
             console.log('✅ 경로 상세 응답:', {
                 hasRoute: !!detail.route,
                 hasCoordinates: !!detail.route?.route_coordinates,
                 coordinatesType: typeof detail.route?.route_coordinates,
             });
-            
+
             if (detail.route && detail.route.route_coordinates) {
                 console.log('📍 좌표 데이터 설정:', detail.route.route_coordinates);
                 setRouteCoordinates(detail.route.route_coordinates);
@@ -238,15 +238,15 @@ function generateMapHTML(
 ): string {
     // GeoJSON coordinates 추출
     let coordinates: number[][] = [];
-    
+
     try {
         let parsedCoords = routeCoordinates;
-        
+
         if (typeof routeCoordinates === 'string') {
             console.log('📝 문자열 좌표 파싱 중...');
             parsedCoords = JSON.parse(routeCoordinates);
         }
-        
+
         if (parsedCoords && parsedCoords.coordinates) {
             coordinates = parsedCoords.coordinates;
             console.log('✅ 좌표 추출 성공:', coordinates.length, '개');
@@ -510,7 +510,7 @@ const styles = StyleSheet.create({
         paddingVertical: 14,
         borderRadius: 12,
         marginTop: 8,
-        marginBottom: 24,
+        marginBottom: 80,
     },
     logButtonText: {
         color: '#fff',

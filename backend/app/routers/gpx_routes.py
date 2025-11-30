@@ -413,7 +413,7 @@ async def recommend_routes(
         base_query = """
         SELECT 
             route_id, route_name, route_type, distance_km,
-            estimated_duration_minutes, total_elevation_gain_m,
+            estimated_duration_minutes, total_elevation_gain_m, total_elevation_loss_m,
             difficulty_level, avg_rating, rating_count, route_coordinates,
             tags
         FROM routes
@@ -441,7 +441,7 @@ async def recommend_routes(
         routes = []
         
         for r in results:
-            route_id, route_name, r_route_type, dist_km, est_duration, elevation_gain, \
+            route_id, route_name, r_route_type, dist_km, est_duration, elevation_gain, elevation_loss, \
             diff_level, avg_rating, rating_count, route_coords, tags = r
             
             # 4-1. 시작점 좌표 추출
@@ -545,7 +545,7 @@ async def recommend_routes(
                 'distance_km': float(dist_km),
                 'estimated_duration_minutes': final_estimated_duration,  # 사용자 속도 반영
                 'total_elevation_gain_m': float(elevation_gain) if elevation_gain else 0,
-                'total_elevation_loss_m': float(r[6]) if len(r) > 6 and r[6] else 0,
+                'total_elevation_loss_m': float(elevation_loss) if elevation_loss else 0,
                 'difficulty_level': diff_level,
                 'avg_rating': float(avg_rating) if avg_rating else None,
                 'rating_count': rating_count,

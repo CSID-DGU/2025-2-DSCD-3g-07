@@ -164,7 +164,12 @@ class ApiService {
     try {
       const authToken = token || await AsyncStorage.getItem(TOKEN_KEY);
       if (!authToken) {
-        throw new Error('인증 토큰이 없습니다');
+        // 로그인하지 않은 경우 조용히 실패 응답 반환
+        return {
+          status: 0,
+          success: false,
+          error: 'No auth token',
+        };
       }
 
       const url = `${apiClient.getBaseUrl()}/api/profile/speed`;
@@ -184,6 +189,7 @@ class ApiService {
       return {
         status: response.status,
         data,
+        success: true,
       };
     } catch (error) {
       console.error('❌ Speed profile get failed:', error);

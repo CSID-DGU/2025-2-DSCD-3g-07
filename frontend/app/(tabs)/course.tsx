@@ -65,7 +65,7 @@ export default function CourseScreen() {
   const [loading, setLoading] = useState(false);
   const [selectedRoute, setSelectedRoute] = useState<GPXRouteRecommendation | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
-  
+
   // 장소 검색 상태
   const [locationSearchText, setLocationSearchText] = useState('');
   const [locationSearchResults, setLocationSearchResults] = useState<PlaceSearchResult[]>([]);
@@ -83,18 +83,18 @@ export default function CourseScreen() {
 
       if (result.status === 200 && result.data) {
         const slowWalkSpeed = result.data.speed_case2 ||
-          (result.data.speed_case1 * 0.8) ||
-          3.2;
+          (result.data.speed_case1 * 0.9) ||
+          4.0;
         setWalkingSpeed(slowWalkSpeed);
         console.log(`✅ 코스 추천 속도 (Case 2): ${slowWalkSpeed.toFixed(2)} km/h`);
       } else {
-        // 기본값: 3.2 km/h (느린 산책)
-        setWalkingSpeed(3.2);
-        console.log('⚠️ 속도 프로필 없음, 기본값 사용: 3.2 km/h');
+        // 기본값: 4.0 km/h
+        setWalkingSpeed(4.0);
+        console.log('⚠️ 속도 프로필 없음, 기본값 사용: 4.0 km/h');
       }
     } catch (error) {
       console.error('도보 속도 로드 실패:', error);
-      setWalkingSpeed(3.2);
+      setWalkingSpeed(4.0);
     }
   };  // 현재 위치 가져오기
   const fetchCurrentLocation = useCallback(async () => {
@@ -133,7 +133,7 @@ export default function CourseScreen() {
         address: detailedAddress,
         timestamp: Date.now(),
       });
-      
+
       setLocationSearchText(detailedAddress);
       setShowLocationResults(false);
 
@@ -145,11 +145,11 @@ export default function CourseScreen() {
       setLoadingLocation(false);
     }
   }, []);
-  
+
   // 장소 검색
   const handleLocationSearch = async (text: string) => {
     setLocationSearchText(text);
-    
+
     if (text.trim().length >= 2) {
       try {
         const results = await searchPlaces(
@@ -169,23 +169,23 @@ export default function CourseScreen() {
       setShowLocationResults(false);
     }
   };
-  
+
   // 장소 선택
   const handleSelectLocation = (place: PlaceSearchResult) => {
     const coords = placeToCoordinates(place);
     const displayName = place.place_name || place.address_name;
-    
+
     setCurrentLocation({
       latitude: coords.latitude,
       longitude: coords.longitude,
       address: displayName,
       timestamp: Date.now(),
     });
-    
+
     setLocationSearchText(displayName);
     setShowLocationResults(false);
     setLocationSearchResults([]);
-    
+
     console.log('✅ 위치 선택:', { name: displayName, coords });
   };
 
@@ -388,12 +388,12 @@ export default function CourseScreen() {
           {/* 현재 위치 설정 */}
           <View style={styles.locationSection}>
             <Text style={styles.inputLabel}>기준 위치</Text>
-            
+
             {/* 검색 입력 필드 */}
             <View style={styles.locationInputContainer}>
-              <MaterialIcons 
-                name="place" 
-                size={20} 
+              <MaterialIcons
+                name="place"
+                size={20}
                 color={currentLocation ? PRIMARY_COLOR : SECONDARY_TEXT}
                 style={styles.locationIcon}
               />
@@ -409,7 +409,7 @@ export default function CourseScreen() {
                   }
                 }}
               />
-              
+
               {/* 현재 위치 버튼 */}
               <TouchableOpacity
                 style={styles.currentLocationButton}
@@ -419,9 +419,9 @@ export default function CourseScreen() {
                 {loadingLocation ? (
                   <ActivityIndicator size="small" color={PRIMARY_COLOR} />
                 ) : (
-                  <MaterialIcons 
-                    name="my-location" 
-                    size={20} 
+                  <MaterialIcons
+                    name="my-location"
+                    size={20}
                     color={PRIMARY_COLOR}
                   />
                 )}

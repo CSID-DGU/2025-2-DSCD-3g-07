@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>영산강둔치 라스트 1km 구간</name>
+    <desc>Strava Segment ID: 19805209
+Distance: 1068.1m
+Avg Grade: -0.5%</desc>
+  </metadata>
+  <trk>
+    <name>영산강둔치 라스트 1km 구간</name>
+    <trkseg>
+      <trkpt lat="35.00934" lon="126.71739">
+      </trkpt>
+      <trkpt lat="35.0092" lon="126.71707">
+      </trkpt>
+      <trkpt lat="35.009" lon="126.71668">
+      </trkpt>
+      <trkpt lat="35.00877" lon="126.71632">
+      </trkpt>
+      <trkpt lat="35.00853" lon="126.71607">
+      </trkpt>
+      <trkpt lat="35.0079" lon="126.71552">
+      </trkpt>
+      <trkpt lat="35.0075" lon="126.71502">
+      </trkpt>
+      <trkpt lat="35.00674" lon="126.71394">
+      </trkpt>
+      <trkpt lat="35.00583" lon="126.71272">
+      </trkpt>
+      <trkpt lat="35.00528" lon="126.71208">
+      </trkpt>
+      <trkpt lat="35.00493" lon="126.71174">
+      </trkpt>
+      <trkpt lat="35.00466" lon="126.71143">
+      </trkpt>
+      <trkpt lat="35.0044" lon="126.7111">
+      </trkpt>
+      <trkpt lat="35.00396" lon="126.71044">
+      </trkpt>
+      <trkpt lat="35.00353" lon="126.70966">
+      </trkpt>
+      <trkpt lat="35.00332" lon="126.70933">
+      </trkpt>
+      <trkpt lat="35.00301" lon="126.7087">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

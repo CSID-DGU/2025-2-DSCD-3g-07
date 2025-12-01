@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>남해대교다</name>
+    <desc>Strava Segment ID: 34383675
+Distance: 638.2m
+Avg Grade: 1.1%</desc>
+  </metadata>
+  <trk>
+    <name>남해대교다</name>
+    <trkseg>
+      <trkpt lat="34.94768" lon="127.87235">
+      </trkpt>
+      <trkpt lat="34.94753" lon="127.87239">
+      </trkpt>
+      <trkpt lat="34.94735" lon="127.87241">
+      </trkpt>
+      <trkpt lat="34.9473" lon="127.87237">
+      </trkpt>
+      <trkpt lat="34.94716" lon="127.87237">
+      </trkpt>
+      <trkpt lat="34.94647" lon="127.87232">
+      </trkpt>
+      <trkpt lat="34.94588" lon="127.87223">
+      </trkpt>
+      <trkpt lat="34.94467" lon="127.87208">
+      </trkpt>
+      <trkpt lat="34.94421" lon="127.87205">
+      </trkpt>
+      <trkpt lat="34.94343" lon="127.87193">
+      </trkpt>
+      <trkpt lat="34.94253" lon="127.87182">
+      </trkpt>
+      <trkpt lat="34.94223" lon="127.87176">
+      </trkpt>
+      <trkpt lat="34.94188" lon="127.87172">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>서귀포 삼다체육공원 트랙</name>
+    <desc>Strava Segment ID: 22965659
+Distance: 355.3m
+Avg Grade: -0.2%</desc>
+  </metadata>
+  <trk>
+    <name>서귀포 삼다체육공원 트랙</name>
+    <trkseg>
+      <trkpt lat="33.25088" lon="126.51659">
+      </trkpt>
+      <trkpt lat="33.251" lon="126.51689">
+      </trkpt>
+      <trkpt lat="33.25105" lon="126.51693">
+      </trkpt>
+      <trkpt lat="33.25124" lon="126.51699">
+      </trkpt>
+      <trkpt lat="33.25141" lon="126.51703">
+      </trkpt>
+      <trkpt lat="33.25159" lon="126.51703">
+      </trkpt>
+      <trkpt lat="33.2517" lon="126.51698">
+      </trkpt>
+      <trkpt lat="33.25183" lon="126.51689">
+      </trkpt>
+      <trkpt lat="33.252" lon="126.51684">
+      </trkpt>
+      <trkpt lat="33.25198" lon="126.51645">
+      </trkpt>
+      <trkpt lat="33.25195" lon="126.51617">
+      </trkpt>
+      <trkpt lat="33.25143" lon="126.51616">
+      </trkpt>
+      <trkpt lat="33.25101" lon="126.51622">
+      </trkpt>
+      <trkpt lat="33.25092" lon="126.51642">
+      </trkpt>
+      <trkpt lat="33.2509" lon="126.51661">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

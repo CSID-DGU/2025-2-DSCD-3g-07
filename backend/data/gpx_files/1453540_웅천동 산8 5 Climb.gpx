@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>웅천동 산8 5 Climb</name>
+    <desc>Strava Segment ID: 1453540
+Distance: 1102.2m
+Avg Grade: 6.6%</desc>
+  </metadata>
+  <trk>
+    <name>웅천동 산8 5 Climb</name>
+    <trkseg>
+      <trkpt lat="35.11343" lon="128.72339">
+      </trkpt>
+      <trkpt lat="35.11379" lon="128.7218">
+      </trkpt>
+      <trkpt lat="35.11404" lon="128.72107">
+      </trkpt>
+      <trkpt lat="35.11442" lon="128.72043">
+      </trkpt>
+      <trkpt lat="35.11486" lon="128.71987">
+      </trkpt>
+      <trkpt lat="35.1154" lon="128.71945">
+      </trkpt>
+      <trkpt lat="35.11599" lon="128.71915">
+      </trkpt>
+      <trkpt lat="35.11662" lon="128.71892">
+      </trkpt>
+      <trkpt lat="35.11837" lon="128.7182">
+      </trkpt>
+      <trkpt lat="35.11895" lon="128.71795">
+      </trkpt>
+      <trkpt lat="35.11949" lon="128.71767">
+      </trkpt>
+      <trkpt lat="35.11991" lon="128.71724">
+      </trkpt>
+      <trkpt lat="35.1202" lon="128.71667">
+      </trkpt>
+      <trkpt lat="35.12045" lon="128.71608">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>김영관센터 - ROK Run - Left Track Loop Seogwipo</name>
+    <desc>Strava Segment ID: 37237882
+Distance: 389.0m
+Avg Grade: 0.3%</desc>
+  </metadata>
+  <trk>
+    <name>김영관센터 - ROK Run - Left Track Loop Seogwipo</name>
+    <trkseg>
+      <trkpt lat="33.23096" lon="126.48092">
+      </trkpt>
+      <trkpt lat="33.23061" lon="126.48077">
+      </trkpt>
+      <trkpt lat="33.23054" lon="126.48069">
+      </trkpt>
+      <trkpt lat="33.23048" lon="126.48053">
+      </trkpt>
+      <trkpt lat="33.23048" lon="126.48041">
+      </trkpt>
+      <trkpt lat="33.23053" lon="126.48023">
+      </trkpt>
+      <trkpt lat="33.23063" lon="126.48009">
+      </trkpt>
+      <trkpt lat="33.23077" lon="126.48002">
+      </trkpt>
+      <trkpt lat="33.23082" lon="126.48001">
+      </trkpt>
+      <trkpt lat="33.23091" lon="126.48003">
+      </trkpt>
+      <trkpt lat="33.2316" lon="126.48032">
+      </trkpt>
+      <trkpt lat="33.23172" lon="126.48042">
+      </trkpt>
+      <trkpt lat="33.23179" lon="126.48058">
+      </trkpt>
+      <trkpt lat="33.23179" lon="126.48075">
+      </trkpt>
+      <trkpt lat="33.23176" lon="126.48087">
+      </trkpt>
+      <trkpt lat="33.23166" lon="126.48101">
+      </trkpt>
+      <trkpt lat="33.23153" lon="126.48109">
+      </trkpt>
+      <trkpt lat="33.23148" lon="126.48111">
+      </trkpt>
+      <trkpt lat="33.23138" lon="126.48109">
+      </trkpt>
+      <trkpt lat="33.23097" lon="126.48094">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>한양터 디자인공원 200m 회복</name>
+    <desc>Strava Segment ID: 27191517
+Distance: 221.9m
+Avg Grade: -8.0%</desc>
+  </metadata>
+  <trk>
+    <name>한양터 디자인공원 200m 회복</name>
+    <trkseg>
+      <trkpt lat="35.32345" lon="128.99957">
+      </trkpt>
+      <trkpt lat="35.3234" lon="128.99959">
+      </trkpt>
+      <trkpt lat="35.32335" lon="128.9996">
+      </trkpt>
+      <trkpt lat="35.32314" lon="128.99955">
+      </trkpt>
+      <trkpt lat="35.32282" lon="128.99954">
+      </trkpt>
+      <trkpt lat="35.32267" lon="128.99957">
+      </trkpt>
+      <trkpt lat="35.3223" lon="128.99969">
+      </trkpt>
+      <trkpt lat="35.32201" lon="128.99968">
+      </trkpt>
+      <trkpt lat="35.32176" lon="128.99971">
+      </trkpt>
+      <trkpt lat="35.32149" lon="128.99983">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

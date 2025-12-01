@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>よかトピア通りから海沿いラン</name>
+    <desc>Strava Segment ID: 25606822
+Distance: 562.7m
+Avg Grade: 0.1%</desc>
+  </metadata>
+  <trk>
+    <name>よかトピア通りから海沿いラン</name>
+    <trkseg>
+      <trkpt lat="33.59366" lon="130.36665">
+      </trkpt>
+      <trkpt lat="33.59415" lon="130.36614">
+      </trkpt>
+      <trkpt lat="33.59473" lon="130.36547">
+      </trkpt>
+      <trkpt lat="33.59481" lon="130.36539">
+      </trkpt>
+      <trkpt lat="33.59495" lon="130.3653">
+      </trkpt>
+      <trkpt lat="33.59508" lon="130.36513">
+      </trkpt>
+      <trkpt lat="33.59521" lon="130.36486">
+      </trkpt>
+      <trkpt lat="33.59565" lon="130.36426">
+      </trkpt>
+      <trkpt lat="33.59581" lon="130.36407">
+      </trkpt>
+      <trkpt lat="33.59637" lon="130.36353">
+      </trkpt>
+      <trkpt lat="33.59654" lon="130.36334">
+      </trkpt>
+      <trkpt lat="33.59659" lon="130.36326">
+      </trkpt>
+      <trkpt lat="33.59675" lon="130.36308">
+      </trkpt>
+      <trkpt lat="33.59701" lon="130.36274">
+      </trkpt>
+      <trkpt lat="33.59726" lon="130.36239">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

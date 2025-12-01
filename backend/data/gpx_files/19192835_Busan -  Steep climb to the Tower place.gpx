@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>Busan - ▲ Steep climb to the Tower place</name>
+    <desc>Strava Segment ID: 19192835
+Distance: 134.3m
+Avg Grade: 26.2%</desc>
+  </metadata>
+  <trk>
+    <name>Busan - ▲ Steep climb to the Tower place</name>
+    <trkseg>
+      <trkpt lat="35.09863" lon="129.03349">
+      </trkpt>
+      <trkpt lat="35.09881" lon="129.03359">
+      </trkpt>
+      <trkpt lat="35.09899" lon="129.0336">
+      </trkpt>
+      <trkpt lat="35.09906" lon="129.03357">
+      </trkpt>
+      <trkpt lat="35.09916" lon="129.0336">
+      </trkpt>
+      <trkpt lat="35.09921" lon="129.03359">
+      </trkpt>
+      <trkpt lat="35.09932" lon="129.0336">
+      </trkpt>
+      <trkpt lat="35.09939" lon="129.03357">
+      </trkpt>
+      <trkpt lat="35.09949" lon="129.0335">
+      </trkpt>
+      <trkpt lat="35.0997" lon="129.03339">
+      </trkpt>
+      <trkpt lat="35.09975" lon="129.03338">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

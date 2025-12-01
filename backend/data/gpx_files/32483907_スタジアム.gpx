@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>スタジアム</name>
+    <desc>Strava Segment ID: 32483907
+Distance: 261.6m
+Avg Grade: -0.4%</desc>
+  </metadata>
+  <trk>
+    <name>スタジアム</name>
+    <trkseg>
+      <trkpt lat="33.37147" lon="130.51891">
+      </trkpt>
+      <trkpt lat="33.37181" lon="130.51932">
+      </trkpt>
+      <trkpt lat="33.37214" lon="130.51968">
+      </trkpt>
+      <trkpt lat="33.37224" lon="130.51981">
+      </trkpt>
+      <trkpt lat="33.37251" lon="130.52003">
+      </trkpt>
+      <trkpt lat="33.37265" lon="130.52016">
+      </trkpt>
+      <trkpt lat="33.37274" lon="130.52027">
+      </trkpt>
+      <trkpt lat="33.37287" lon="130.52038">
+      </trkpt>
+      <trkpt lat="33.3732" lon="130.5206">
+      </trkpt>
+      <trkpt lat="33.37329" lon="130.52069">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

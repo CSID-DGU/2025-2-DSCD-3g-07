@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>Downhill Dash</name>
+    <desc>Strava Segment ID: 10720708
+Distance: 1071.8m
+Avg Grade: -1.9%</desc>
+  </metadata>
+  <trk>
+    <name>Downhill Dash</name>
+    <trkseg>
+      <trkpt lat="35.10381" lon="128.81067">
+      </trkpt>
+      <trkpt lat="35.10365" lon="128.811">
+      </trkpt>
+      <trkpt lat="35.10355" lon="128.81124">
+      </trkpt>
+      <trkpt lat="35.1035" lon="128.81144">
+      </trkpt>
+      <trkpt lat="35.10339" lon="128.81187">
+      </trkpt>
+      <trkpt lat="35.10305" lon="128.81343">
+      </trkpt>
+      <trkpt lat="35.10298" lon="128.81391">
+      </trkpt>
+      <trkpt lat="35.10281" lon="128.81475">
+      </trkpt>
+      <trkpt lat="35.10267" lon="128.81533">
+      </trkpt>
+      <trkpt lat="35.10267" lon="128.8155">
+      </trkpt>
+      <trkpt lat="35.10257" lon="128.8159">
+      </trkpt>
+      <trkpt lat="35.10234" lon="128.81716">
+      </trkpt>
+      <trkpt lat="35.10218" lon="128.81783">
+      </trkpt>
+      <trkpt lat="35.10208" lon="128.81836">
+      </trkpt>
+      <trkpt lat="35.10203" lon="128.81855">
+      </trkpt>
+      <trkpt lat="35.10193" lon="128.81924">
+      </trkpt>
+      <trkpt lat="35.10183" lon="128.81964">
+      </trkpt>
+      <trkpt lat="35.1016" lon="128.82087">
+      </trkpt>
+      <trkpt lat="35.10152" lon="128.82149">
+      </trkpt>
+      <trkpt lat="35.1015" lon="128.82199">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

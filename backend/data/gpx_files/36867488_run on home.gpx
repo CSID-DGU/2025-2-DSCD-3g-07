@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>run on home</name>
+    <desc>Strava Segment ID: 36867488
+Distance: 431.0m
+Avg Grade: -0.5%</desc>
+  </metadata>
+  <trk>
+    <name>run on home</name>
+    <trkseg>
+      <trkpt lat="34.75906" lon="126.35487">
+      </trkpt>
+      <trkpt lat="34.75716" lon="126.35487">
+      </trkpt>
+      <trkpt lat="34.75716" lon="126.35511">
+      </trkpt>
+      <trkpt lat="34.75716" lon="126.35487">
+      </trkpt>
+      <trkpt lat="34.75557" lon="126.3549">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

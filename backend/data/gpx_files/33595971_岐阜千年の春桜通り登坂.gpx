@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>岐阜千年の春桜通り・登坂</name>
+    <desc>Strava Segment ID: 33595971
+Distance: 251.9m
+Avg Grade: 6.9%</desc>
+  </metadata>
+  <trk>
+    <name>岐阜千年の春桜通り・登坂</name>
+    <trkseg>
+      <trkpt lat="33.59625" lon="130.22525">
+      </trkpt>
+      <trkpt lat="33.59621" lon="130.22523">
+      </trkpt>
+      <trkpt lat="33.59621" lon="130.22519">
+      </trkpt>
+      <trkpt lat="33.59604" lon="130.22496">
+      </trkpt>
+      <trkpt lat="33.59581" lon="130.22441">
+      </trkpt>
+      <trkpt lat="33.59579" lon="130.22432">
+      </trkpt>
+      <trkpt lat="33.59571" lon="130.2242">
+      </trkpt>
+      <trkpt lat="33.59569" lon="130.22412">
+      </trkpt>
+      <trkpt lat="33.59562" lon="130.22406">
+      </trkpt>
+      <trkpt lat="33.59558" lon="130.22398">
+      </trkpt>
+      <trkpt lat="33.5956" lon="130.22361">
+      </trkpt>
+      <trkpt lat="33.5957" lon="130.22305">
+      </trkpt>
+      <trkpt lat="33.59569" lon="130.22287">
+      </trkpt>
+      <trkpt lat="33.59572" lon="130.22281">
+      </trkpt>
+      <trkpt lat="33.59574" lon="130.22269">
+      </trkpt>
+      <trkpt lat="33.59582" lon="130.22243">
+      </trkpt>
+      <trkpt lat="33.59585" lon="130.22239">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

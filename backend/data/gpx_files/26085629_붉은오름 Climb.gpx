@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>붉은오름 Climb</name>
+    <desc>Strava Segment ID: 26085629
+Distance: 373.8m
+Avg Grade: 28.2%</desc>
+  </metadata>
+  <trk>
+    <name>붉은오름 Climb</name>
+    <trkseg>
+      <trkpt lat="33.39984" lon="126.67655">
+      </trkpt>
+      <trkpt lat="33.39977" lon="126.67656">
+      </trkpt>
+      <trkpt lat="33.39973" lon="126.67662">
+      </trkpt>
+      <trkpt lat="33.39964" lon="126.67678">
+      </trkpt>
+      <trkpt lat="33.39956" lon="126.67682">
+      </trkpt>
+      <trkpt lat="33.39958" lon="126.67694">
+      </trkpt>
+      <trkpt lat="33.39968" lon="126.67718">
+      </trkpt>
+      <trkpt lat="33.39975" lon="126.67727">
+      </trkpt>
+      <trkpt lat="33.39966" lon="126.67733">
+      </trkpt>
+      <trkpt lat="33.39967" lon="126.67737">
+      </trkpt>
+      <trkpt lat="33.39958" lon="126.6775">
+      </trkpt>
+      <trkpt lat="33.39959" lon="126.67752">
+      </trkpt>
+      <trkpt lat="33.39955" lon="126.67756">
+      </trkpt>
+      <trkpt lat="33.39955" lon="126.67759">
+      </trkpt>
+      <trkpt lat="33.39948" lon="126.67761">
+      </trkpt>
+      <trkpt lat="33.39943" lon="126.67764">
+      </trkpt>
+      <trkpt lat="33.39942" lon="126.67768">
+      </trkpt>
+      <trkpt lat="33.39936" lon="126.6777">
+      </trkpt>
+      <trkpt lat="33.39931" lon="126.67773">
+      </trkpt>
+      <trkpt lat="33.39928" lon="126.67777">
+      </trkpt>
+      <trkpt lat="33.39926" lon="126.67785">
+      </trkpt>
+      <trkpt lat="33.39926" lon="126.67802">
+      </trkpt>
+      <trkpt lat="33.39924" lon="126.67806">
+      </trkpt>
+      <trkpt lat="33.39927" lon="126.67821">
+      </trkpt>
+      <trkpt lat="33.39925" lon="126.67826">
+      </trkpt>
+      <trkpt lat="33.39921" lon="126.67831">
+      </trkpt>
+      <trkpt lat="33.39907" lon="126.6784">
+      </trkpt>
+      <trkpt lat="33.3991" lon="126.6786">
+      </trkpt>
+      <trkpt lat="33.39909" lon="126.67879">
+      </trkpt>
+      <trkpt lat="33.39912" lon="126.67888">
+      </trkpt>
+      <trkpt lat="33.39919" lon="126.67893">
+      </trkpt>
+      <trkpt lat="33.39923" lon="126.67899">
+      </trkpt>
+      <trkpt lat="33.39936" lon="126.67903">
+      </trkpt>
+      <trkpt lat="33.39948" lon="126.67914">
+      </trkpt>
+      <trkpt lat="33.39953" lon="126.6792">
+      </trkpt>
+      <trkpt lat="33.39961" lon="126.67925">
+      </trkpt>
+      <trkpt lat="33.39974" lon="126.67945">
+      </trkpt>
+      <trkpt lat="33.39975" lon="126.67952">
+      </trkpt>
+      <trkpt lat="33.39979" lon="126.67954">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

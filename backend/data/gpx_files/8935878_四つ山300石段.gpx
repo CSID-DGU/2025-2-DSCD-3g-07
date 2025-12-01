@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>四つ山300石段</name>
+    <desc>Strava Segment ID: 8935878
+Distance: 146.3m
+Avg Grade: 32.7%</desc>
+  </metadata>
+  <trk>
+    <name>四つ山300石段</name>
+    <trkseg>
+      <trkpt lat="33.00012" lon="130.42747">
+      </trkpt>
+      <trkpt lat="33.00014" lon="130.42749">
+      </trkpt>
+      <trkpt lat="33.00022" lon="130.42751">
+      </trkpt>
+      <trkpt lat="33.00026" lon="130.42749">
+      </trkpt>
+      <trkpt lat="33.00031" lon="130.42744">
+      </trkpt>
+      <trkpt lat="33.00042" lon="130.42721">
+      </trkpt>
+      <trkpt lat="33.0005" lon="130.42713">
+      </trkpt>
+      <trkpt lat="33.00082" lon="130.42727">
+      </trkpt>
+      <trkpt lat="33.00098" lon="130.42724">
+      </trkpt>
+      <trkpt lat="33.00108" lon="130.4272">
+      </trkpt>
+      <trkpt lat="33.00111" lon="130.42716">
+      </trkpt>
+      <trkpt lat="33.0012" lon="130.42713">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

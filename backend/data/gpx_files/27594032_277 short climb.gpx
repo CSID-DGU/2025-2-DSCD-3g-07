@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>277 short climb </name>
+    <desc>Strava Segment ID: 27594032
+Distance: 546.1m
+Avg Grade: 2.3%</desc>
+  </metadata>
+  <trk>
+    <name>277 short climb </name>
+    <trkseg>
+      <trkpt lat="33.89298" lon="130.73668">
+      </trkpt>
+      <trkpt lat="33.89336" lon="130.73691">
+      </trkpt>
+      <trkpt lat="33.89355" lon="130.737">
+      </trkpt>
+      <trkpt lat="33.89373" lon="130.73705">
+      </trkpt>
+      <trkpt lat="33.89477" lon="130.73766">
+      </trkpt>
+      <trkpt lat="33.89532" lon="130.73795">
+      </trkpt>
+      <trkpt lat="33.8955" lon="130.73807">
+      </trkpt>
+      <trkpt lat="33.89548" lon="130.73809">
+      </trkpt>
+      <trkpt lat="33.89565" lon="130.7382">
+      </trkpt>
+      <trkpt lat="33.89617" lon="130.73848">
+      </trkpt>
+      <trkpt lat="33.89651" lon="130.73869">
+      </trkpt>
+      <trkpt lat="33.89717" lon="130.73914">
+      </trkpt>
+      <trkpt lat="33.89734" lon="130.73927">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

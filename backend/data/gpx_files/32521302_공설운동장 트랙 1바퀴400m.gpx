@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>공설운동장 트랙 1바퀴(400m)</name>
+    <desc>Strava Segment ID: 32521302
+Distance: 415.0m
+Avg Grade: 0.0%</desc>
+  </metadata>
+  <trk>
+    <name>공설운동장 트랙 1바퀴(400m)</name>
+    <trkseg>
+      <trkpt lat="35.30889" lon="128.71799">
+      </trkpt>
+      <trkpt lat="35.30869" lon="128.71798">
+      </trkpt>
+      <trkpt lat="35.3085" lon="128.718">
+      </trkpt>
+      <trkpt lat="35.30833" lon="128.71813">
+      </trkpt>
+      <trkpt lat="35.30825" lon="128.71833">
+      </trkpt>
+      <trkpt lat="35.30825" lon="128.71859">
+      </trkpt>
+      <trkpt lat="35.30837" lon="128.71878">
+      </trkpt>
+      <trkpt lat="35.30856" lon="128.71887">
+      </trkpt>
+      <trkpt lat="35.30877" lon="128.71888">
+      </trkpt>
+      <trkpt lat="35.30916" lon="128.71888">
+      </trkpt>
+      <trkpt lat="35.30937" lon="128.7189">
+      </trkpt>
+      <trkpt lat="35.30956" lon="128.71882">
+      </trkpt>
+      <trkpt lat="35.30969" lon="128.71864">
+      </trkpt>
+      <trkpt lat="35.30972" lon="128.71838">
+      </trkpt>
+      <trkpt lat="35.30962" lon="128.71815">
+      </trkpt>
+      <trkpt lat="35.30948" lon="128.71804">
+      </trkpt>
+      <trkpt lat="35.30941" lon="128.718">
+      </trkpt>
+      <trkpt lat="35.30896" lon="128.71793">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

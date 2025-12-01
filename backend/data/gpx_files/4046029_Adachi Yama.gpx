@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>Adachi Yama</name>
+    <desc>Strava Segment ID: 4046029
+Distance: 634.2m
+Avg Grade: 10.4%</desc>
+  </metadata>
+  <trk>
+    <name>Adachi Yama</name>
+    <trkseg>
+      <trkpt lat="33.85109" lon="130.90222">
+      </trkpt>
+      <trkpt lat="33.85099" lon="130.90243">
+      </trkpt>
+      <trkpt lat="33.85079" lon="130.90252">
+      </trkpt>
+      <trkpt lat="33.85057" lon="130.90257">
+      </trkpt>
+      <trkpt lat="33.85041" lon="130.90265">
+      </trkpt>
+      <trkpt lat="33.85014" lon="130.903">
+      </trkpt>
+      <trkpt lat="33.85005" lon="130.90332">
+      </trkpt>
+      <trkpt lat="33.85007" lon="130.9035">
+      </trkpt>
+      <trkpt lat="33.8502" lon="130.90371">
+      </trkpt>
+      <trkpt lat="33.85072" lon="130.90413">
+      </trkpt>
+      <trkpt lat="33.85085" lon="130.9042">
+      </trkpt>
+      <trkpt lat="33.85115" lon="130.9045">
+      </trkpt>
+      <trkpt lat="33.85145" lon="130.90471">
+      </trkpt>
+      <trkpt lat="33.85148" lon="130.90483">
+      </trkpt>
+      <trkpt lat="33.85147" lon="130.90486">
+      </trkpt>
+      <trkpt lat="33.85135" lon="130.90503">
+      </trkpt>
+      <trkpt lat="33.85126" lon="130.90528">
+      </trkpt>
+      <trkpt lat="33.85127" lon="130.90566">
+      </trkpt>
+      <trkpt lat="33.85131" lon="130.90588">
+      </trkpt>
+      <trkpt lat="33.8514" lon="130.9062">
+      </trkpt>
+      <trkpt lat="33.85178" lon="130.90664">
+      </trkpt>
+      <trkpt lat="33.8519" lon="130.90676">
+      </trkpt>
+      <trkpt lat="33.85217" lon="130.90693">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

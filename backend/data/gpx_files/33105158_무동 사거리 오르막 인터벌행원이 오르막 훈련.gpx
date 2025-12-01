@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>무동 사거리 오르막 인터벌(행원이 오르막 훈련)</name>
+    <desc>Strava Segment ID: 33105158
+Distance: 457.8m
+Avg Grade: 4.8%</desc>
+  </metadata>
+  <trk>
+    <name>무동 사거리 오르막 인터벌(행원이 오르막 훈련)</name>
+    <trkseg>
+      <trkpt lat="35.31635" lon="128.58515">
+      </trkpt>
+      <trkpt lat="35.31637" lon="128.58499">
+      </trkpt>
+      <trkpt lat="35.31639" lon="128.58439">
+      </trkpt>
+      <trkpt lat="35.31635" lon="128.58409">
+      </trkpt>
+      <trkpt lat="35.31637" lon="128.58379">
+      </trkpt>
+      <trkpt lat="35.31635" lon="128.58342">
+      </trkpt>
+      <trkpt lat="35.31631" lon="128.58313">
+      </trkpt>
+      <trkpt lat="35.31636" lon="128.58279">
+      </trkpt>
+      <trkpt lat="35.31634" lon="128.58237">
+      </trkpt>
+      <trkpt lat="35.31636" lon="128.58171">
+      </trkpt>
+      <trkpt lat="35.31634" lon="128.58108">
+      </trkpt>
+      <trkpt lat="35.31641" lon="128.58044">
+      </trkpt>
+      <trkpt lat="35.3164" lon="128.58015">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

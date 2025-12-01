@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>용원 주민운동장</name>
+    <desc>Strava Segment ID: 23849076
+Distance: 338.6m
+Avg Grade: -0.1%</desc>
+  </metadata>
+  <trk>
+    <name>용원 주민운동장</name>
+    <trkseg>
+      <trkpt lat="35.10643" lon="128.80292">
+      </trkpt>
+      <trkpt lat="35.10664" lon="128.80265">
+      </trkpt>
+      <trkpt lat="35.1068" lon="128.80235">
+      </trkpt>
+      <trkpt lat="35.10676" lon="128.80225">
+      </trkpt>
+      <trkpt lat="35.1062" lon="128.80172">
+      </trkpt>
+      <trkpt lat="35.10612" lon="128.80168">
+      </trkpt>
+      <trkpt lat="35.10605" lon="128.80177">
+      </trkpt>
+      <trkpt lat="35.10587" lon="128.80206">
+      </trkpt>
+      <trkpt lat="35.10573" lon="128.80222">
+      </trkpt>
+      <trkpt lat="35.10578" lon="128.80233">
+      </trkpt>
+      <trkpt lat="35.10586" lon="128.80241">
+      </trkpt>
+      <trkpt lat="35.106" lon="128.80259">
+      </trkpt>
+      <trkpt lat="35.10631" lon="128.80288">
+      </trkpt>
+      <trkpt lat="35.1064" lon="128.80292">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>어도오름 Climb</name>
+    <desc>Strava Segment ID: 26403238
+Distance: 310.9m
+Avg Grade: 15.3%</desc>
+  </metadata>
+  <trk>
+    <name>어도오름 Climb</name>
+    <trkseg>
+      <trkpt lat="33.42106" lon="126.3106">
+      </trkpt>
+      <trkpt lat="33.42109" lon="126.31054">
+      </trkpt>
+      <trkpt lat="33.42109" lon="126.31045">
+      </trkpt>
+      <trkpt lat="33.42096" lon="126.31025">
+      </trkpt>
+      <trkpt lat="33.42088" lon="126.31016">
+      </trkpt>
+      <trkpt lat="33.42083" lon="126.31005">
+      </trkpt>
+      <trkpt lat="33.4208" lon="126.30993">
+      </trkpt>
+      <trkpt lat="33.42067" lon="126.30965">
+      </trkpt>
+      <trkpt lat="33.42053" lon="126.30947">
+      </trkpt>
+      <trkpt lat="33.42045" lon="126.30941">
+      </trkpt>
+      <trkpt lat="33.42042" lon="126.30935">
+      </trkpt>
+      <trkpt lat="33.42016" lon="126.30911">
+      </trkpt>
+      <trkpt lat="33.42004" lon="126.30895">
+      </trkpt>
+      <trkpt lat="33.41997" lon="126.30893">
+      </trkpt>
+      <trkpt lat="33.41994" lon="126.30884">
+      </trkpt>
+      <trkpt lat="33.4199" lon="126.30863">
+      </trkpt>
+      <trkpt lat="33.41991" lon="126.30851">
+      </trkpt>
+      <trkpt lat="33.42008" lon="126.30832">
+      </trkpt>
+      <trkpt lat="33.42014" lon="126.3083">
+      </trkpt>
+      <trkpt lat="33.42039" lon="126.30816">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

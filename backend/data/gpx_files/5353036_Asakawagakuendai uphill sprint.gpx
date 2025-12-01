@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>Asakawagakuendai uphill sprint</name>
+    <desc>Strava Segment ID: 5353036
+Distance: 221.0m
+Avg Grade: 4.9%</desc>
+  </metadata>
+  <trk>
+    <name>Asakawagakuendai uphill sprint</name>
+    <trkseg>
+      <trkpt lat="33.88159" lon="130.7006">
+      </trkpt>
+      <trkpt lat="33.88183" lon="130.70087">
+      </trkpt>
+      <trkpt lat="33.88192" lon="130.701">
+      </trkpt>
+      <trkpt lat="33.88198" lon="130.70115">
+      </trkpt>
+      <trkpt lat="33.882" lon="130.70131">
+      </trkpt>
+      <trkpt lat="33.88197" lon="130.70171">
+      </trkpt>
+      <trkpt lat="33.88184" lon="130.70213">
+      </trkpt>
+      <trkpt lat="33.88181" lon="130.70244">
+      </trkpt>
+      <trkpt lat="33.88183" lon="130.70251">
+      </trkpt>
+      <trkpt lat="33.8819" lon="130.7026">
+      </trkpt>
+      <trkpt lat="33.88203" lon="130.70264">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

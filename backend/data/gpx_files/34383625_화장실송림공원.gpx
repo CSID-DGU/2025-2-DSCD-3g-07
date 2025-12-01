@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>화장실&gt;송림공원</name>
+    <desc>Strava Segment ID: 34383625
+Distance: 688.5m
+Avg Grade: 0.4%</desc>
+  </metadata>
+  <trk>
+    <name>화장실&gt;송림공원</name>
+    <trkseg>
+      <trkpt lat="35.06284" lon="127.74304">
+      </trkpt>
+      <trkpt lat="35.06283" lon="127.7431">
+      </trkpt>
+      <trkpt lat="35.06286" lon="127.74307">
+      </trkpt>
+      <trkpt lat="35.06269" lon="127.7433">
+      </trkpt>
+      <trkpt lat="35.06254" lon="127.74362">
+      </trkpt>
+      <trkpt lat="35.06225" lon="127.74411">
+      </trkpt>
+      <trkpt lat="35.06217" lon="127.74428">
+      </trkpt>
+      <trkpt lat="35.06182" lon="127.74488">
+      </trkpt>
+      <trkpt lat="35.06163" lon="127.74527">
+      </trkpt>
+      <trkpt lat="35.06151" lon="127.74547">
+      </trkpt>
+      <trkpt lat="35.0611" lon="127.74625">
+      </trkpt>
+      <trkpt lat="35.06092" lon="127.74656">
+      </trkpt>
+      <trkpt lat="35.0608" lon="127.74676">
+      </trkpt>
+      <trkpt lat="35.06067" lon="127.74691">
+      </trkpt>
+      <trkpt lat="35.06" lon="127.74754">
+      </trkpt>
+      <trkpt lat="35.05958" lon="127.74801">
+      </trkpt>
+      <trkpt lat="35.05951" lon="127.74812">
+      </trkpt>
+      <trkpt lat="35.05941" lon="127.74833">
+      </trkpt>
+      <trkpt lat="35.05919" lon="127.749">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

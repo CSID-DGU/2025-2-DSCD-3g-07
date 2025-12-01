@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>国道385号線 Climb</name>
+    <desc>Strava Segment ID: 4564633
+Distance: 315.5m
+Avg Grade: 13.3%</desc>
+  </metadata>
+  <trk>
+    <name>国道385号線 Climb</name>
+    <trkseg>
+      <trkpt lat="33.43395" lon="130.42203">
+      </trkpt>
+      <trkpt lat="33.434" lon="130.42187">
+      </trkpt>
+      <trkpt lat="33.43409" lon="130.42191">
+      </trkpt>
+      <trkpt lat="33.43407" lon="130.42185">
+      </trkpt>
+      <trkpt lat="33.43405" lon="130.42187">
+      </trkpt>
+      <trkpt lat="33.43407" lon="130.42187">
+      </trkpt>
+      <trkpt lat="33.43417" lon="130.42172">
+      </trkpt>
+      <trkpt lat="33.43425" lon="130.42156">
+      </trkpt>
+      <trkpt lat="33.43431" lon="130.42134">
+      </trkpt>
+      <trkpt lat="33.43437" lon="130.42121">
+      </trkpt>
+      <trkpt lat="33.43473" lon="130.42086">
+      </trkpt>
+      <trkpt lat="33.43486" lon="130.42065">
+      </trkpt>
+      <trkpt lat="33.43482" lon="130.4205">
+      </trkpt>
+      <trkpt lat="33.43466" lon="130.4204">
+      </trkpt>
+      <trkpt lat="33.43398" lon="130.42028">
+      </trkpt>
+      <trkpt lat="33.43383" lon="130.42022">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>Kashiikamomeo Bridge - South</name>
+    <desc>Strava Segment ID: 15105927
+Distance: 1094.8m
+Avg Grade: -0.4%</desc>
+  </metadata>
+  <trk>
+    <name>Kashiikamomeo Bridge - South</name>
+    <trkseg>
+      <trkpt lat="33.64904" lon="130.4134">
+      </trkpt>
+      <trkpt lat="33.64844" lon="130.41317">
+      </trkpt>
+      <trkpt lat="33.64816" lon="130.41297">
+      </trkpt>
+      <trkpt lat="33.64705" lon="130.41251">
+      </trkpt>
+      <trkpt lat="33.64612" lon="130.41214">
+      </trkpt>
+      <trkpt lat="33.64583" lon="130.41201">
+      </trkpt>
+      <trkpt lat="33.64541" lon="130.41186">
+      </trkpt>
+      <trkpt lat="33.64446" lon="130.41146">
+      </trkpt>
+      <trkpt lat="33.64334" lon="130.41104">
+      </trkpt>
+      <trkpt lat="33.64261" lon="130.41074">
+      </trkpt>
+      <trkpt lat="33.64217" lon="130.41059">
+      </trkpt>
+      <trkpt lat="33.63975" lon="130.40958">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

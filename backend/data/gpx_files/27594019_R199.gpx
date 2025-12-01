@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>R199</name>
+    <desc>Strava Segment ID: 27594019
+Distance: 434.3m
+Avg Grade: -0.1%</desc>
+  </metadata>
+  <trk>
+    <name>R199</name>
+    <trkseg>
+      <trkpt lat="33.8926" lon="130.74171">
+      </trkpt>
+      <trkpt lat="33.89269" lon="130.74051">
+      </trkpt>
+      <trkpt lat="33.89268" lon="130.74029">
+      </trkpt>
+      <trkpt lat="33.8927" lon="130.74005">
+      </trkpt>
+      <trkpt lat="33.89273" lon="130.73934">
+      </trkpt>
+      <trkpt lat="33.89271" lon="130.73911">
+      </trkpt>
+      <trkpt lat="33.89273" lon="130.73842">
+      </trkpt>
+      <trkpt lat="33.89269" lon="130.73795">
+      </trkpt>
+      <trkpt lat="33.89266" lon="130.73769">
+      </trkpt>
+      <trkpt lat="33.89265" lon="130.73745">
+      </trkpt>
+      <trkpt lat="33.8926" lon="130.73729">
+      </trkpt>
+      <trkpt lat="33.89265" lon="130.73705">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

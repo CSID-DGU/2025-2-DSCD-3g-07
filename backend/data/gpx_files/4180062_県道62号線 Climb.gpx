@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>県道62号線 Climb</name>
+    <desc>Strava Segment ID: 4180062
+Distance: 492.6m
+Avg Grade: 12.3%</desc>
+  </metadata>
+  <trk>
+    <name>県道62号線 Climb</name>
+    <trkseg>
+      <trkpt lat="33.84285" lon="130.81286">
+      </trkpt>
+      <trkpt lat="33.84285" lon="130.81275">
+      </trkpt>
+      <trkpt lat="33.84296" lon="130.81187">
+      </trkpt>
+      <trkpt lat="33.84297" lon="130.81152">
+      </trkpt>
+      <trkpt lat="33.84293" lon="130.8112">
+      </trkpt>
+      <trkpt lat="33.84281" lon="130.81088">
+      </trkpt>
+      <trkpt lat="33.8426" lon="130.81059">
+      </trkpt>
+      <trkpt lat="33.84253" lon="130.81051">
+      </trkpt>
+      <trkpt lat="33.84229" lon="130.81039">
+      </trkpt>
+      <trkpt lat="33.84212" lon="130.81033">
+      </trkpt>
+      <trkpt lat="33.8419" lon="130.81039">
+      </trkpt>
+      <trkpt lat="33.84159" lon="130.81062">
+      </trkpt>
+      <trkpt lat="33.8414" lon="130.81069">
+      </trkpt>
+      <trkpt lat="33.84079" lon="130.81069">
+      </trkpt>
+      <trkpt lat="33.84063" lon="130.81061">
+      </trkpt>
+      <trkpt lat="33.84042" lon="130.81034">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

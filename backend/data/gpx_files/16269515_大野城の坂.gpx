@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>大野城の坂</name>
+    <desc>Strava Segment ID: 16269515
+Distance: 566.8m
+Avg Grade: 3.2%</desc>
+  </metadata>
+  <trk>
+    <name>大野城の坂</name>
+    <trkseg>
+      <trkpt lat="33.535" lon="130.49222">
+      </trkpt>
+      <trkpt lat="33.53503" lon="130.49335">
+      </trkpt>
+      <trkpt lat="33.53509" lon="130.4936">
+      </trkpt>
+      <trkpt lat="33.53515" lon="130.49397">
+      </trkpt>
+      <trkpt lat="33.53508" lon="130.49421">
+      </trkpt>
+      <trkpt lat="33.53505" lon="130.49491">
+      </trkpt>
+      <trkpt lat="33.53508" lon="130.49535">
+      </trkpt>
+      <trkpt lat="33.53507" lon="130.49582">
+      </trkpt>
+      <trkpt lat="33.53504" lon="130.49606">
+      </trkpt>
+      <trkpt lat="33.53507" lon="130.49675">
+      </trkpt>
+      <trkpt lat="33.53511" lon="130.49696">
+      </trkpt>
+      <trkpt lat="33.53514" lon="130.49718">
+      </trkpt>
+      <trkpt lat="33.53507" lon="130.4974">
+      </trkpt>
+      <trkpt lat="33.53496" lon="130.4976">
+      </trkpt>
+      <trkpt lat="33.53493" lon="130.49761">
+      </trkpt>
+      <trkpt lat="33.53491" lon="130.49767">
+      </trkpt>
+      <trkpt lat="33.53483" lon="130.49776">
+      </trkpt>
+      <trkpt lat="33.53463" lon="130.49811">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

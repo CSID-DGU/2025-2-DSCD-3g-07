@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>Shilla sprint</name>
+    <desc>Strava Segment ID: 15054208
+Distance: 126.4m
+Avg Grade: 4.0%</desc>
+  </metadata>
+  <trk>
+    <name>Shilla sprint</name>
+    <trkseg>
+      <trkpt lat="33.24772" lon="126.40682">
+      </trkpt>
+      <trkpt lat="33.24771" lon="126.40681">
+      </trkpt>
+      <trkpt lat="33.24781" lon="126.40683">
+      </trkpt>
+      <trkpt lat="33.24819" lon="126.40702">
+      </trkpt>
+      <trkpt lat="33.24846" lon="126.40721">
+      </trkpt>
+      <trkpt lat="33.24873" lon="126.40736">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

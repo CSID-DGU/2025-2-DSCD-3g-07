@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>県道541号線 Climb</name>
+    <desc>Strava Segment ID: 5621382
+Distance: 317.0m
+Avg Grade: 16.8%</desc>
+  </metadata>
+  <trk>
+    <name>県道541号線 Climb</name>
+    <trkseg>
+      <trkpt lat="33.89433" lon="130.41559">
+      </trkpt>
+      <trkpt lat="33.89429" lon="130.41568">
+      </trkpt>
+      <trkpt lat="33.89424" lon="130.41575">
+      </trkpt>
+      <trkpt lat="33.89424" lon="130.41598">
+      </trkpt>
+      <trkpt lat="33.89421" lon="130.41613">
+      </trkpt>
+      <trkpt lat="33.89416" lon="130.41627">
+      </trkpt>
+      <trkpt lat="33.89415" lon="130.41642">
+      </trkpt>
+      <trkpt lat="33.89418" lon="130.41662">
+      </trkpt>
+      <trkpt lat="33.89416" lon="130.41665">
+      </trkpt>
+      <trkpt lat="33.89408" lon="130.4167">
+      </trkpt>
+      <trkpt lat="33.89411" lon="130.41732">
+      </trkpt>
+      <trkpt lat="33.89415" lon="130.41749">
+      </trkpt>
+      <trkpt lat="33.89419" lon="130.41756">
+      </trkpt>
+      <trkpt lat="33.89417" lon="130.41788">
+      </trkpt>
+      <trkpt lat="33.89405" lon="130.41825">
+      </trkpt>
+      <trkpt lat="33.89399" lon="130.41834">
+      </trkpt>
+      <trkpt lat="33.89397" lon="130.4185">
+      </trkpt>
+      <trkpt lat="33.89386" lon="130.41878">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

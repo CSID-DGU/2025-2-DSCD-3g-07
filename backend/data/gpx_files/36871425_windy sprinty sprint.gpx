@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>windy sprinty sprint</name>
+    <desc>Strava Segment ID: 36871425
+Distance: 318.9m
+Avg Grade: 1.7%</desc>
+  </metadata>
+  <trk>
+    <name>windy sprinty sprint</name>
+    <trkseg>
+      <trkpt lat="34.75647" lon="126.35489">
+      </trkpt>
+      <trkpt lat="34.75934" lon="126.35487">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

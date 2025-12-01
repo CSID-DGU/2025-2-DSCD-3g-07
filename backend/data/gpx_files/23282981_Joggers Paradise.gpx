@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>Jogger's Paradise</name>
+    <desc>Strava Segment ID: 23282981
+Distance: 791.0m
+Avg Grade: -0.1%</desc>
+  </metadata>
+  <trk>
+    <name>Jogger's Paradise</name>
+    <trkseg>
+      <trkpt lat="34.88387" lon="128.42317">
+      </trkpt>
+      <trkpt lat="34.88372" lon="128.42319">
+      </trkpt>
+      <trkpt lat="34.88331" lon="128.42329">
+      </trkpt>
+      <trkpt lat="34.88303" lon="128.42318">
+      </trkpt>
+      <trkpt lat="34.88262" lon="128.42314">
+      </trkpt>
+      <trkpt lat="34.8825" lon="128.42311">
+      </trkpt>
+      <trkpt lat="34.88236" lon="128.42305">
+      </trkpt>
+      <trkpt lat="34.88215" lon="128.42302">
+      </trkpt>
+      <trkpt lat="34.88188" lon="128.42297">
+      </trkpt>
+      <trkpt lat="34.88175" lon="128.42293">
+      </trkpt>
+      <trkpt lat="34.88159" lon="128.42281">
+      </trkpt>
+      <trkpt lat="34.88137" lon="128.42276">
+      </trkpt>
+      <trkpt lat="34.88107" lon="128.42278">
+      </trkpt>
+      <trkpt lat="34.88085" lon="128.42278">
+      </trkpt>
+      <trkpt lat="34.8807" lon="128.42275">
+      </trkpt>
+      <trkpt lat="34.8798" lon="128.42249">
+      </trkpt>
+      <trkpt lat="34.87947" lon="128.42243">
+      </trkpt>
+      <trkpt lat="34.879" lon="128.4224">
+      </trkpt>
+      <trkpt lat="34.87822" lon="128.42223">
+      </trkpt>
+      <trkpt lat="34.87762" lon="128.42214">
+      </trkpt>
+      <trkpt lat="34.87725" lon="128.42206">
+      </trkpt>
+      <trkpt lat="34.87691" lon="128.42193">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

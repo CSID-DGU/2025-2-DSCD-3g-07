@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>Hiranodai Climb</name>
+    <desc>Strava Segment ID: 3783739
+Distance: 459.7m
+Avg Grade: 14.1%</desc>
+  </metadata>
+  <trk>
+    <name>Hiranodai Climb</name>
+    <trkseg>
+      <trkpt lat="33.49572" lon="130.46284">
+      </trkpt>
+      <trkpt lat="33.49566" lon="130.46278">
+      </trkpt>
+      <trkpt lat="33.49554" lon="130.46258">
+      </trkpt>
+      <trkpt lat="33.49535" lon="130.4624">
+      </trkpt>
+      <trkpt lat="33.49516" lon="130.46234">
+      </trkpt>
+      <trkpt lat="33.4948" lon="130.46205">
+      </trkpt>
+      <trkpt lat="33.49445" lon="130.4619">
+      </trkpt>
+      <trkpt lat="33.4943" lon="130.4618">
+      </trkpt>
+      <trkpt lat="33.49413" lon="130.46174">
+      </trkpt>
+      <trkpt lat="33.49381" lon="130.46155">
+      </trkpt>
+      <trkpt lat="33.49367" lon="130.46145">
+      </trkpt>
+      <trkpt lat="33.49357" lon="130.46127">
+      </trkpt>
+      <trkpt lat="33.49347" lon="130.46094">
+      </trkpt>
+      <trkpt lat="33.49335" lon="130.46074">
+      </trkpt>
+      <trkpt lat="33.49328" lon="130.46069">
+      </trkpt>
+      <trkpt lat="33.4931" lon="130.46058">
+      </trkpt>
+      <trkpt lat="33.49297" lon="130.46053">
+      </trkpt>
+      <trkpt lat="33.49268" lon="130.46048">
+      </trkpt>
+      <trkpt lat="33.4926" lon="130.46042">
+      </trkpt>
+      <trkpt lat="33.49255" lon="130.46035">
+      </trkpt>
+      <trkpt lat="33.4924" lon="130.46023">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

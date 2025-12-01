@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>400m</name>
+    <desc>Strava Segment ID: 8893804
+Distance: 500.8m
+Avg Grade: -0.1%</desc>
+  </metadata>
+  <trk>
+    <name>400m</name>
+    <trkseg>
+      <trkpt lat="35.15158" lon="126.75959">
+      </trkpt>
+      <trkpt lat="35.15206" lon="126.75958">
+      </trkpt>
+      <trkpt lat="35.1522" lon="126.75957">
+      </trkpt>
+      <trkpt lat="35.15191" lon="126.75959">
+      </trkpt>
+      <trkpt lat="35.15153" lon="126.75959">
+      </trkpt>
+      <trkpt lat="35.15155" lon="126.75962">
+      </trkpt>
+      <trkpt lat="35.15247" lon="126.75956">
+      </trkpt>
+      <trkpt lat="35.15258" lon="126.75938">
+      </trkpt>
+      <trkpt lat="35.15254" lon="126.75892">
+      </trkpt>
+      <trkpt lat="35.15237" lon="126.7588">
+      </trkpt>
+      <trkpt lat="35.15225" lon="126.75883">
+      </trkpt>
+      <trkpt lat="35.15158" lon="126.75888">
+      </trkpt>
+      <trkpt lat="35.1515" lon="126.75908">
+      </trkpt>
+      <trkpt lat="35.15153" lon="126.75956">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

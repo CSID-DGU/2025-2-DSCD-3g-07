@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>Huis Ten Bosch Incline</name>
+    <desc>Strava Segment ID: 26653691
+Distance: 766.7m
+Avg Grade: 1.6%</desc>
+  </metadata>
+  <trk>
+    <name>Huis Ten Bosch Incline</name>
+    <trkseg>
+      <trkpt lat="33.09079" lon="129.78989">
+      </trkpt>
+      <trkpt lat="33.09083" lon="129.78953">
+      </trkpt>
+      <trkpt lat="33.09083" lon="129.7894">
+      </trkpt>
+      <trkpt lat="33.09095" lon="129.78854">
+      </trkpt>
+      <trkpt lat="33.09094" lon="129.78807">
+      </trkpt>
+      <trkpt lat="33.09086" lon="129.78772">
+      </trkpt>
+      <trkpt lat="33.09069" lon="129.7874">
+      </trkpt>
+      <trkpt lat="33.09054" lon="129.78721">
+      </trkpt>
+      <trkpt lat="33.08975" lon="129.7866">
+      </trkpt>
+      <trkpt lat="33.08968" lon="129.78652">
+      </trkpt>
+      <trkpt lat="33.08947" lon="129.78642">
+      </trkpt>
+      <trkpt lat="33.08939" lon="129.78635">
+      </trkpt>
+      <trkpt lat="33.08909" lon="129.78597">
+      </trkpt>
+      <trkpt lat="33.08888" lon="129.78559">
+      </trkpt>
+      <trkpt lat="33.08874" lon="129.78513">
+      </trkpt>
+      <trkpt lat="33.08871" lon="129.78478">
+      </trkpt>
+      <trkpt lat="33.0886" lon="129.78434">
+      </trkpt>
+      <trkpt lat="33.08854" lon="129.78386">
+      </trkpt>
+      <trkpt lat="33.08851" lon="129.78333">
+      </trkpt>
+      <trkpt lat="33.08846" lon="129.7831">
+      </trkpt>
+      <trkpt lat="33.08837" lon="129.78287">
+      </trkpt>
+      <trkpt lat="33.08827" lon="129.78268">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

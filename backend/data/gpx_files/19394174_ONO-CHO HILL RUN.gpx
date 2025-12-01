@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>ONO-CHO HILL RUN </name>
+    <desc>Strava Segment ID: 19394174
+Distance: 399.7m
+Avg Grade: 4.6%</desc>
+  </metadata>
+  <trk>
+    <name>ONO-CHO HILL RUN </name>
+    <trkseg>
+      <trkpt lat="33.18594" lon="129.68456">
+      </trkpt>
+      <trkpt lat="33.1862" lon="129.68483">
+      </trkpt>
+      <trkpt lat="33.18662" lon="129.68532">
+      </trkpt>
+      <trkpt lat="33.18673" lon="129.68542">
+      </trkpt>
+      <trkpt lat="33.18686" lon="129.68559">
+      </trkpt>
+      <trkpt lat="33.1869" lon="129.6856">
+      </trkpt>
+      <trkpt lat="33.18696" lon="129.68567">
+      </trkpt>
+      <trkpt lat="33.18707" lon="129.68574">
+      </trkpt>
+      <trkpt lat="33.18714" lon="129.68589">
+      </trkpt>
+      <trkpt lat="33.18726" lon="129.686">
+      </trkpt>
+      <trkpt lat="33.18733" lon="129.68615">
+      </trkpt>
+      <trkpt lat="33.18746" lon="129.68627">
+      </trkpt>
+      <trkpt lat="33.18752" lon="129.68636">
+      </trkpt>
+      <trkpt lat="33.18772" lon="129.68648">
+      </trkpt>
+      <trkpt lat="33.18793" lon="129.68667">
+      </trkpt>
+      <trkpt lat="33.18802" lon="129.68669">
+      </trkpt>
+      <trkpt lat="33.18818" lon="129.68677">
+      </trkpt>
+      <trkpt lat="33.18825" lon="129.68678">
+      </trkpt>
+      <trkpt lat="33.18842" lon="129.68685">
+      </trkpt>
+      <trkpt lat="33.1888" lon="129.68693">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

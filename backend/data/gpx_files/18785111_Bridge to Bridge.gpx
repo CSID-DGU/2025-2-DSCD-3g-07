@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>Bridge to Bridge</name>
+    <desc>Strava Segment ID: 18785111
+Distance: 894.3m
+Avg Grade: 0.1%</desc>
+  </metadata>
+  <trk>
+    <name>Bridge to Bridge</name>
+    <trkseg>
+      <trkpt lat="35.14074" lon="126.8298">
+      </trkpt>
+      <trkpt lat="35.14082" lon="126.82996">
+      </trkpt>
+      <trkpt lat="35.14116" lon="126.83009">
+      </trkpt>
+      <trkpt lat="35.14153" lon="126.83035">
+      </trkpt>
+      <trkpt lat="35.14191" lon="126.83051">
+      </trkpt>
+      <trkpt lat="35.14236" lon="126.83068">
+      </trkpt>
+      <trkpt lat="35.14289" lon="126.83081">
+      </trkpt>
+      <trkpt lat="35.14354" lon="126.83104">
+      </trkpt>
+      <trkpt lat="35.14374" lon="126.83104">
+      </trkpt>
+      <trkpt lat="35.14431" lon="126.83083">
+      </trkpt>
+      <trkpt lat="35.14453" lon="126.83079">
+      </trkpt>
+      <trkpt lat="35.14538" lon="126.83077">
+      </trkpt>
+      <trkpt lat="35.14652" lon="126.83065">
+      </trkpt>
+      <trkpt lat="35.14736" lon="126.83062">
+      </trkpt>
+      <trkpt lat="35.14765" lon="126.83064">
+      </trkpt>
+      <trkpt lat="35.14807" lon="126.83077">
+      </trkpt>
+      <trkpt lat="35.14834" lon="126.8309">
+      </trkpt>
+      <trkpt lat="35.14848" lon="126.83102">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

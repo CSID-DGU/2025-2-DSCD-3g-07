@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>up the hill</name>
+    <desc>Strava Segment ID: 36867518
+Distance: 293.8m
+Avg Grade: 3.3%</desc>
+  </metadata>
+  <trk>
+    <name>up the hill</name>
+    <trkseg>
+      <trkpt lat="34.75948" lon="126.36281">
+      </trkpt>
+      <trkpt lat="34.75948" lon="126.36354">
+      </trkpt>
+      <trkpt lat="34.75952" lon="126.36394">
+      </trkpt>
+      <trkpt lat="34.75963" lon="126.36432">
+      </trkpt>
+      <trkpt lat="34.75988" lon="126.36474">
+      </trkpt>
+      <trkpt lat="34.76051" lon="126.36548">
+      </trkpt>
+      <trkpt lat="34.76055" lon="126.36541">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

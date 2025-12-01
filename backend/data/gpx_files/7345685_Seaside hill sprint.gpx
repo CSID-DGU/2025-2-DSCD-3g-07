@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>Seaside hill sprint</name>
+    <desc>Strava Segment ID: 7345685
+Distance: 38.0m
+Avg Grade: 33.2%</desc>
+  </metadata>
+  <trk>
+    <name>Seaside hill sprint</name>
+    <trkseg>
+      <trkpt lat="33.54535" lon="126.67478">
+      </trkpt>
+      <trkpt lat="33.54569" lon="126.67475">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

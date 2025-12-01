@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>ジョギングフェスティバル上り坂</name>
+    <desc>Strava Segment ID: 33878129
+Distance: 268.5m
+Avg Grade: -4.4%</desc>
+  </metadata>
+  <trk>
+    <name>ジョギングフェスティバル上り坂</name>
+    <trkseg>
+      <trkpt lat="33.26321" lon="129.68196">
+      </trkpt>
+      <trkpt lat="33.26433" lon="129.6831">
+      </trkpt>
+      <trkpt lat="33.26469" lon="129.68349">
+      </trkpt>
+      <trkpt lat="33.26486" lon="129.68374">
+      </trkpt>
+      <trkpt lat="33.26498" lon="129.68393">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

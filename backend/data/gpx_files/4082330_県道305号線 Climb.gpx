@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>県道305号線 Climb</name>
+    <desc>Strava Segment ID: 4082330
+Distance: 754.8m
+Avg Grade: 11.6%</desc>
+  </metadata>
+  <trk>
+    <name>県道305号線 Climb</name>
+    <trkseg>
+      <trkpt lat="33.41546" lon="130.35508">
+      </trkpt>
+      <trkpt lat="33.41555" lon="130.35525">
+      </trkpt>
+      <trkpt lat="33.41571" lon="130.35528">
+      </trkpt>
+      <trkpt lat="33.41608" lon="130.3552">
+      </trkpt>
+      <trkpt lat="33.41665" lon="130.35512">
+      </trkpt>
+      <trkpt lat="33.41685" lon="130.35508">
+      </trkpt>
+      <trkpt lat="33.41709" lon="130.35513">
+      </trkpt>
+      <trkpt lat="33.41731" lon="130.35529">
+      </trkpt>
+      <trkpt lat="33.4175" lon="130.35558">
+      </trkpt>
+      <trkpt lat="33.41769" lon="130.35576">
+      </trkpt>
+      <trkpt lat="33.41778" lon="130.35582">
+      </trkpt>
+      <trkpt lat="33.41816" lon="130.35573">
+      </trkpt>
+      <trkpt lat="33.41838" lon="130.3558">
+      </trkpt>
+      <trkpt lat="33.41865" lon="130.35596">
+      </trkpt>
+      <trkpt lat="33.41878" lon="130.35617">
+      </trkpt>
+      <trkpt lat="33.41899" lon="130.3567">
+      </trkpt>
+      <trkpt lat="33.41916" lon="130.35698">
+      </trkpt>
+      <trkpt lat="33.41951" lon="130.35735">
+      </trkpt>
+      <trkpt lat="33.41986" lon="130.3576">
+      </trkpt>
+      <trkpt lat="33.42014" lon="130.35773">
+      </trkpt>
+      <trkpt lat="33.42045" lon="130.35782">
+      </trkpt>
+      <trkpt lat="33.42117" lon="130.35808">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>Haenam Track</name>
+    <desc>Strava Segment ID: 20568629
+Distance: 418.3m
+Avg Grade: -0.1%</desc>
+  </metadata>
+  <trk>
+    <name>Haenam Track</name>
+    <trkseg>
+      <trkpt lat="34.56893" lon="126.62295">
+      </trkpt>
+      <trkpt lat="34.56907" lon="126.62295">
+      </trkpt>
+      <trkpt lat="34.56924" lon="126.62289">
+      </trkpt>
+      <trkpt lat="34.56933" lon="126.62277">
+      </trkpt>
+      <trkpt lat="34.56936" lon="126.62265">
+      </trkpt>
+      <trkpt lat="34.56937" lon="126.62254">
+      </trkpt>
+      <trkpt lat="34.56934" lon="126.62238">
+      </trkpt>
+      <trkpt lat="34.56927" lon="126.62223">
+      </trkpt>
+      <trkpt lat="34.56919" lon="126.62216">
+      </trkpt>
+      <trkpt lat="34.5691" lon="126.62212">
+      </trkpt>
+      <trkpt lat="34.56832" lon="126.62189">
+      </trkpt>
+      <trkpt lat="34.56818" lon="126.6219">
+      </trkpt>
+      <trkpt lat="34.56809" lon="126.62195">
+      </trkpt>
+      <trkpt lat="34.56799" lon="126.62207">
+      </trkpt>
+      <trkpt lat="34.56794" lon="126.62217">
+      </trkpt>
+      <trkpt lat="34.56793" lon="126.62223">
+      </trkpt>
+      <trkpt lat="34.56794" lon="126.62248">
+      </trkpt>
+      <trkpt lat="34.568" lon="126.62262">
+      </trkpt>
+      <trkpt lat="34.56809" lon="126.6227">
+      </trkpt>
+      <trkpt lat="34.56824" lon="126.62278">
+      </trkpt>
+      <trkpt lat="34.56861" lon="126.62287">
+      </trkpt>
+      <trkpt lat="34.56885" lon="126.62295">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

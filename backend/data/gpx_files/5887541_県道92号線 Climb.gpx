@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>県道92号線 Climb</name>
+    <desc>Strava Segment ID: 5887541
+Distance: 421.8m
+Avg Grade: 9.6%</desc>
+  </metadata>
+  <trk>
+    <name>県道92号線 Climb</name>
+    <trkseg>
+      <trkpt lat="33.65688" lon="130.60246">
+      </trkpt>
+      <trkpt lat="33.65676" lon="130.6022">
+      </trkpt>
+      <trkpt lat="33.65674" lon="130.60207">
+      </trkpt>
+      <trkpt lat="33.65679" lon="130.60195">
+      </trkpt>
+      <trkpt lat="33.65684" lon="130.6019">
+      </trkpt>
+      <trkpt lat="33.65704" lon="130.6017">
+      </trkpt>
+      <trkpt lat="33.65728" lon="130.6016">
+      </trkpt>
+      <trkpt lat="33.65766" lon="130.60153">
+      </trkpt>
+      <trkpt lat="33.65787" lon="130.6014">
+      </trkpt>
+      <trkpt lat="33.65804" lon="130.6012">
+      </trkpt>
+      <trkpt lat="33.65823" lon="130.60071">
+      </trkpt>
+      <trkpt lat="33.65834" lon="130.6005">
+      </trkpt>
+      <trkpt lat="33.65855" lon="130.60026">
+      </trkpt>
+      <trkpt lat="33.65912" lon="130.59988">
+      </trkpt>
+      <trkpt lat="33.65932" lon="130.59964">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>Gwangju Park track</name>
+    <desc>Strava Segment ID: 22014029
+Distance: 375.5m
+Avg Grade: -0.1%</desc>
+  </metadata>
+  <trk>
+    <name>Gwangju Park track</name>
+    <trkseg>
+      <trkpt lat="35.15261" lon="126.83984">
+      </trkpt>
+      <trkpt lat="35.15244" lon="126.83989">
+      </trkpt>
+      <trkpt lat="35.15236" lon="126.83997">
+      </trkpt>
+      <trkpt lat="35.1523" lon="126.84006">
+      </trkpt>
+      <trkpt lat="35.15225" lon="126.84024">
+      </trkpt>
+      <trkpt lat="35.15224" lon="126.84035">
+      </trkpt>
+      <trkpt lat="35.15225" lon="126.84046">
+      </trkpt>
+      <trkpt lat="35.15231" lon="126.84059">
+      </trkpt>
+      <trkpt lat="35.15238" lon="126.84062">
+      </trkpt>
+      <trkpt lat="35.15254" lon="126.84067">
+      </trkpt>
+      <trkpt lat="35.1528" lon="126.84069">
+      </trkpt>
+      <trkpt lat="35.15322" lon="126.84067">
+      </trkpt>
+      <trkpt lat="35.15332" lon="126.84064">
+      </trkpt>
+      <trkpt lat="35.1534" lon="126.84058">
+      </trkpt>
+      <trkpt lat="35.1535" lon="126.84041">
+      </trkpt>
+      <trkpt lat="35.15354" lon="126.84024">
+      </trkpt>
+      <trkpt lat="35.15353" lon="126.8401">
+      </trkpt>
+      <trkpt lat="35.15349" lon="126.84001">
+      </trkpt>
+      <trkpt lat="35.15344" lon="126.83994">
+      </trkpt>
+      <trkpt lat="35.1533" lon="126.83987">
+      </trkpt>
+      <trkpt lat="35.15321" lon="126.83985">
+      </trkpt>
+      <trkpt lat="35.15262" lon="126.83984">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

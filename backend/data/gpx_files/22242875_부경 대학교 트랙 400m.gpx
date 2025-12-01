@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>부경 대학교 트랙 400m</name>
+    <desc>Strava Segment ID: 22242875
+Distance: 398.5m
+Avg Grade: 0.0%</desc>
+  </metadata>
+  <trk>
+    <name>부경 대학교 트랙 400m</name>
+    <trkseg>
+      <trkpt lat="35.13325" lon="129.10584">
+      </trkpt>
+      <trkpt lat="35.13319" lon="129.10585">
+      </trkpt>
+      <trkpt lat="35.13311" lon="129.1059">
+      </trkpt>
+      <trkpt lat="35.13259" lon="129.10584">
+      </trkpt>
+      <trkpt lat="35.1324" lon="129.10585">
+      </trkpt>
+      <trkpt lat="35.13235" lon="129.10587">
+      </trkpt>
+      <trkpt lat="35.13228" lon="129.10593">
+      </trkpt>
+      <trkpt lat="35.13222" lon="129.10601">
+      </trkpt>
+      <trkpt lat="35.13217" lon="129.10618">
+      </trkpt>
+      <trkpt lat="35.13212" lon="129.10621">
+      </trkpt>
+      <trkpt lat="35.13219" lon="129.10647">
+      </trkpt>
+      <trkpt lat="35.13224" lon="129.10656">
+      </trkpt>
+      <trkpt lat="35.13231" lon="129.10661">
+      </trkpt>
+      <trkpt lat="35.13245" lon="129.10664">
+      </trkpt>
+      <trkpt lat="35.13277" lon="129.10661">
+      </trkpt>
+      <trkpt lat="35.13323" lon="129.10662">
+      </trkpt>
+      <trkpt lat="35.13332" lon="129.1066">
+      </trkpt>
+      <trkpt lat="35.13339" lon="129.10656">
+      </trkpt>
+      <trkpt lat="35.13348" lon="129.10645">
+      </trkpt>
+      <trkpt lat="35.13351" lon="129.10636">
+      </trkpt>
+      <trkpt lat="35.13353" lon="129.10624">
+      </trkpt>
+      <trkpt lat="35.13352" lon="129.10602">
+      </trkpt>
+      <trkpt lat="35.13348" lon="129.1059">
+      </trkpt>
+      <trkpt lat="35.13338" lon="129.10583">
+      </trkpt>
+      <trkpt lat="35.13329" lon="129.1058">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

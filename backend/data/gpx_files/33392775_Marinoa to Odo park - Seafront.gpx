@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>Marinoa to Odo park - Seafront</name>
+    <desc>Strava Segment ID: 33392775
+Distance: 686.0m
+Avg Grade: -0.1%</desc>
+  </metadata>
+  <trk>
+    <name>Marinoa to Odo park - Seafront</name>
+    <trkseg>
+      <trkpt lat="33.59841" lon="130.32152">
+      </trkpt>
+      <trkpt lat="33.59842" lon="130.32133">
+      </trkpt>
+      <trkpt lat="33.59838" lon="130.32102">
+      </trkpt>
+      <trkpt lat="33.59835" lon="130.32011">
+      </trkpt>
+      <trkpt lat="33.59833" lon="130.31989">
+      </trkpt>
+      <trkpt lat="33.59833" lon="130.31969">
+      </trkpt>
+      <trkpt lat="33.5982" lon="130.31735">
+      </trkpt>
+      <trkpt lat="33.5982" lon="130.31708">
+      </trkpt>
+      <trkpt lat="33.59817" lon="130.31691">
+      </trkpt>
+      <trkpt lat="33.59815" lon="130.3163">
+      </trkpt>
+      <trkpt lat="33.59813" lon="130.31613">
+      </trkpt>
+      <trkpt lat="33.59812" lon="130.31554">
+      </trkpt>
+      <trkpt lat="33.59808" lon="130.31536">
+      </trkpt>
+      <trkpt lat="33.59806" lon="130.31508">
+      </trkpt>
+      <trkpt lat="33.59806" lon="130.31458">
+      </trkpt>
+      <trkpt lat="33.59808" lon="130.31439">
+      </trkpt>
+      <trkpt lat="33.59804" lon="130.31417">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

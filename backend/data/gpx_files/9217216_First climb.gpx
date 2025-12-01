@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>First climb</name>
+    <desc>Strava Segment ID: 9217216
+Distance: 454.7m
+Avg Grade: 11.8%</desc>
+  </metadata>
+  <trk>
+    <name>First climb</name>
+    <trkseg>
+      <trkpt lat="35.1041" lon="128.70135">
+      </trkpt>
+      <trkpt lat="35.10415" lon="128.7012">
+      </trkpt>
+      <trkpt lat="35.10418" lon="128.70097">
+      </trkpt>
+      <trkpt lat="35.10413" lon="128.70083">
+      </trkpt>
+      <trkpt lat="35.104" lon="128.70074">
+      </trkpt>
+      <trkpt lat="35.10381" lon="128.70065">
+      </trkpt>
+      <trkpt lat="35.10344" lon="128.70035">
+      </trkpt>
+      <trkpt lat="35.10331" lon="128.70031">
+      </trkpt>
+      <trkpt lat="35.10278" lon="128.7004">
+      </trkpt>
+      <trkpt lat="35.10217" lon="128.70062">
+      </trkpt>
+      <trkpt lat="35.10197" lon="128.70065">
+      </trkpt>
+      <trkpt lat="35.10184" lon="128.7006">
+      </trkpt>
+      <trkpt lat="35.10168" lon="128.70045">
+      </trkpt>
+      <trkpt lat="35.10162" lon="128.70035">
+      </trkpt>
+      <trkpt lat="35.10136" lon="128.69953">
+      </trkpt>
+      <trkpt lat="35.10134" lon="128.69937">
+      </trkpt>
+      <trkpt lat="35.10135" lon="128.69934">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>Bastard Hill, near STX</name>
+    <desc>Strava Segment ID: 9814518
+Distance: 664.8m
+Avg Grade: 8.8%</desc>
+  </metadata>
+  <trk>
+    <name>Bastard Hill, near STX</name>
+    <trkseg>
+      <trkpt lat="35.11426" lon="128.69924">
+      </trkpt>
+      <trkpt lat="35.11399" lon="128.69958">
+      </trkpt>
+      <trkpt lat="35.11376" lon="128.69994">
+      </trkpt>
+      <trkpt lat="35.11335" lon="128.70067">
+      </trkpt>
+      <trkpt lat="35.11316" lon="128.70095">
+      </trkpt>
+      <trkpt lat="35.11302" lon="128.70112">
+      </trkpt>
+      <trkpt lat="35.11257" lon="128.70154">
+      </trkpt>
+      <trkpt lat="35.11221" lon="128.70183">
+      </trkpt>
+      <trkpt lat="35.11199" lon="128.70199">
+      </trkpt>
+      <trkpt lat="35.11187" lon="128.70205">
+      </trkpt>
+      <trkpt lat="35.11124" lon="128.70225">
+      </trkpt>
+      <trkpt lat="35.11112" lon="128.70231">
+      </trkpt>
+      <trkpt lat="35.11102" lon="128.70238">
+      </trkpt>
+      <trkpt lat="35.11093" lon="128.70246">
+      </trkpt>
+      <trkpt lat="35.11071" lon="128.70269">
+      </trkpt>
+      <trkpt lat="35.11063" lon="128.70275">
+      </trkpt>
+      <trkpt lat="35.1105" lon="128.70283">
+      </trkpt>
+      <trkpt lat="35.11034" lon="128.70289">
+      </trkpt>
+      <trkpt lat="35.11014" lon="128.70292">
+      </trkpt>
+      <trkpt lat="35.10994" lon="128.703">
+      </trkpt>
+      <trkpt lat="35.10967" lon="128.70318">
+      </trkpt>
+      <trkpt lat="35.10954" lon="128.70334">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

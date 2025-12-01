@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>Tea Farm Uphill</name>
+    <desc>Strava Segment ID: 9978336
+Distance: 261.3m
+Avg Grade: 17.4%</desc>
+  </metadata>
+  <trk>
+    <name>Tea Farm Uphill</name>
+    <trkseg>
+      <trkpt lat="34.71756" lon="127.07936">
+      </trkpt>
+      <trkpt lat="34.71757" lon="127.0792">
+      </trkpt>
+      <trkpt lat="34.71753" lon="127.07893">
+      </trkpt>
+      <trkpt lat="34.71752" lon="127.0785">
+      </trkpt>
+      <trkpt lat="34.71755" lon="127.0784">
+      </trkpt>
+      <trkpt lat="34.71762" lon="127.07825">
+      </trkpt>
+      <trkpt lat="34.71766" lon="127.07791">
+      </trkpt>
+      <trkpt lat="34.71758" lon="127.07765">
+      </trkpt>
+      <trkpt lat="34.7176" lon="127.07742">
+      </trkpt>
+      <trkpt lat="34.7176" lon="127.07731">
+      </trkpt>
+      <trkpt lat="34.71761" lon="127.07723">
+      </trkpt>
+      <trkpt lat="34.71769" lon="127.07717">
+      </trkpt>
+      <trkpt lat="34.71771" lon="127.07704">
+      </trkpt>
+      <trkpt lat="34.71767" lon="127.07696">
+      </trkpt>
+      <trkpt lat="34.71756" lon="127.07682">
+      </trkpt>
+      <trkpt lat="34.71754" lon="127.07671">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

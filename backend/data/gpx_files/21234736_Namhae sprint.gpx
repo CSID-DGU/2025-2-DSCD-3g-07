@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>Namhae sprint</name>
+    <desc>Strava Segment ID: 21234736
+Distance: 435.8m
+Avg Grade: -0.3%</desc>
+  </metadata>
+  <trk>
+    <name>Namhae sprint</name>
+    <trkseg>
+      <trkpt lat="34.8475" lon="128.05986">
+      </trkpt>
+      <trkpt lat="34.84718" lon="128.0598">
+      </trkpt>
+      <trkpt lat="34.84695" lon="128.05983">
+      </trkpt>
+      <trkpt lat="34.84598" lon="128.06009">
+      </trkpt>
+      <trkpt lat="34.84554" lon="128.06022">
+      </trkpt>
+      <trkpt lat="34.84535" lon="128.06031">
+      </trkpt>
+      <trkpt lat="34.84505" lon="128.06049">
+      </trkpt>
+      <trkpt lat="34.84476" lon="128.06073">
+      </trkpt>
+      <trkpt lat="34.84442" lon="128.06108">
+      </trkpt>
+      <trkpt lat="34.84393" lon="128.06165">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

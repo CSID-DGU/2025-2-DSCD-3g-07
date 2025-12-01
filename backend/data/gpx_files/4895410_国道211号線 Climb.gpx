@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>国道211号線 Climb</name>
+    <desc>Strava Segment ID: 4895410
+Distance: 998.0m
+Avg Grade: 4.1%</desc>
+  </metadata>
+  <trk>
+    <name>国道211号線 Climb</name>
+    <trkseg>
+      <trkpt lat="33.47078" lon="130.81783">
+      </trkpt>
+      <trkpt lat="33.47138" lon="130.81677">
+      </trkpt>
+      <trkpt lat="33.47175" lon="130.8162">
+      </trkpt>
+      <trkpt lat="33.47195" lon="130.81602">
+      </trkpt>
+      <trkpt lat="33.47241" lon="130.81584">
+      </trkpt>
+      <trkpt lat="33.47287" lon="130.81569">
+      </trkpt>
+      <trkpt lat="33.47298" lon="130.81564">
+      </trkpt>
+      <trkpt lat="33.47321" lon="130.81543">
+      </trkpt>
+      <trkpt lat="33.47354" lon="130.81501">
+      </trkpt>
+      <trkpt lat="33.47399" lon="130.81448">
+      </trkpt>
+      <trkpt lat="33.47429" lon="130.81426">
+      </trkpt>
+      <trkpt lat="33.47689" lon="130.81264">
+      </trkpt>
+      <trkpt lat="33.47715" lon="130.81245">
+      </trkpt>
+      <trkpt lat="33.47745" lon="130.81201">
+      </trkpt>
+      <trkpt lat="33.47764" lon="130.81167">
+      </trkpt>
+      <trkpt lat="33.47772" lon="130.81149">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

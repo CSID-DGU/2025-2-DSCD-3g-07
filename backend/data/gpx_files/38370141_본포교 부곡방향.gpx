@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>본포교 부곡방향</name>
+    <desc>Strava Segment ID: 38370141
+Distance: 924.7m
+Avg Grade: -0.6%</desc>
+  </metadata>
+  <trk>
+    <name>본포교 부곡방향</name>
+    <trkseg>
+      <trkpt lat="35.37031" lon="128.64331">
+      </trkpt>
+      <trkpt lat="35.3704" lon="128.64332">
+      </trkpt>
+      <trkpt lat="35.37057" lon="128.64328">
+      </trkpt>
+      <trkpt lat="35.37085" lon="128.64327">
+      </trkpt>
+      <trkpt lat="35.37127" lon="128.64327">
+      </trkpt>
+      <trkpt lat="35.37135" lon="128.64325">
+      </trkpt>
+      <trkpt lat="35.37171" lon="128.64323">
+      </trkpt>
+      <trkpt lat="35.37177" lon="128.64321">
+      </trkpt>
+      <trkpt lat="35.37311" lon="128.64319">
+      </trkpt>
+      <trkpt lat="35.37379" lon="128.64314">
+      </trkpt>
+      <trkpt lat="35.37605" lon="128.64304">
+      </trkpt>
+      <trkpt lat="35.37622" lon="128.64304">
+      </trkpt>
+      <trkpt lat="35.37653" lon="128.64302">
+      </trkpt>
+      <trkpt lat="35.37798" lon="128.64295">
+      </trkpt>
+      <trkpt lat="35.3781" lon="128.64292">
+      </trkpt>
+      <trkpt lat="35.37838" lon="128.64294">
+      </trkpt>
+      <trkpt lat="35.37863" lon="128.64291">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

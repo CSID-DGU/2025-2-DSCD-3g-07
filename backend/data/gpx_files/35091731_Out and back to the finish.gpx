@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>Out and back to the finish</name>
+    <desc>Strava Segment ID: 35091731
+Distance: 319.5m
+Avg Grade: -0.1%</desc>
+  </metadata>
+  <trk>
+    <name>Out and back to the finish</name>
+    <trkseg>
+      <trkpt lat="35.0781" lon="129.0816">
+      </trkpt>
+      <trkpt lat="35.07785" lon="129.08177">
+      </trkpt>
+      <trkpt lat="35.07743" lon="129.08202">
+      </trkpt>
+      <trkpt lat="35.07709" lon="129.08225">
+      </trkpt>
+      <trkpt lat="35.07692" lon="129.08241">
+      </trkpt>
+      <trkpt lat="35.07683" lon="129.08245">
+      </trkpt>
+      <trkpt lat="35.07681" lon="129.08242">
+      </trkpt>
+      <trkpt lat="35.07681" lon="129.08238">
+      </trkpt>
+      <trkpt lat="35.07683" lon="129.08235">
+      </trkpt>
+      <trkpt lat="35.07713" lon="129.08216">
+      </trkpt>
+      <trkpt lat="35.07799" lon="129.08156">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

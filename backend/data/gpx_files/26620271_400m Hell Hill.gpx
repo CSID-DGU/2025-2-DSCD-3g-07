@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>400m Hell Hill</name>
+    <desc>Strava Segment ID: 26620271
+Distance: 350.6m
+Avg Grade: 11.1%</desc>
+  </metadata>
+  <trk>
+    <name>400m Hell Hill</name>
+    <trkseg>
+      <trkpt lat="35.1847" lon="129.04626">
+      </trkpt>
+      <trkpt lat="35.18481" lon="129.04641">
+      </trkpt>
+      <trkpt lat="35.18484" lon="129.04656">
+      </trkpt>
+      <trkpt lat="35.1849" lon="129.04665">
+      </trkpt>
+      <trkpt lat="35.18497" lon="129.04666">
+      </trkpt>
+      <trkpt lat="35.18522" lon="129.0466">
+      </trkpt>
+      <trkpt lat="35.18532" lon="129.04659">
+      </trkpt>
+      <trkpt lat="35.18544" lon="129.04654">
+      </trkpt>
+      <trkpt lat="35.1857" lon="129.04646">
+      </trkpt>
+      <trkpt lat="35.18581" lon="129.04639">
+      </trkpt>
+      <trkpt lat="35.18578" lon="129.04636">
+      </trkpt>
+      <trkpt lat="35.18559" lon="129.04635">
+      </trkpt>
+      <trkpt lat="35.18539" lon="129.0463">
+      </trkpt>
+      <trkpt lat="35.18525" lon="129.0462">
+      </trkpt>
+      <trkpt lat="35.18509" lon="129.0458">
+      </trkpt>
+      <trkpt lat="35.18507" lon="129.04556">
+      </trkpt>
+      <trkpt lat="35.18513" lon="129.04539">
+      </trkpt>
+      <trkpt lat="35.18518" lon="129.04532">
+      </trkpt>
+      <trkpt lat="35.18545" lon="129.04523">
+      </trkpt>
+      <trkpt lat="35.1856" lon="129.04523">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

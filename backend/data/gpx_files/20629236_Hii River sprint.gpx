@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>Hii River sprint</name>
+    <desc>Strava Segment ID: 20629236
+Distance: 146.6m
+Avg Grade: -0.4%</desc>
+  </metadata>
+  <trk>
+    <name>Hii River sprint</name>
+    <trkseg>
+      <trkpt lat="33.56011" lon="130.38051">
+      </trkpt>
+      <trkpt lat="33.55992" lon="130.38062">
+      </trkpt>
+      <trkpt lat="33.55977" lon="130.38073">
+      </trkpt>
+      <trkpt lat="33.55968" lon="130.38082">
+      </trkpt>
+      <trkpt lat="33.55935" lon="130.3813">
+      </trkpt>
+      <trkpt lat="33.55919" lon="130.3816">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

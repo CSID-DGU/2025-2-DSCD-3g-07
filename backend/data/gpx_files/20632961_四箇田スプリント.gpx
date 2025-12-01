@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>四箇田スプリント</name>
+    <desc>Strava Segment ID: 20632961
+Distance: 670.6m
+Avg Grade: 0.2%</desc>
+  </metadata>
+  <trk>
+    <name>四箇田スプリント</name>
+    <trkseg>
+      <trkpt lat="33.53256" lon="130.32956">
+      </trkpt>
+      <trkpt lat="33.53256" lon="130.33001">
+      </trkpt>
+      <trkpt lat="33.53259" lon="130.33023">
+      </trkpt>
+      <trkpt lat="33.53276" lon="130.33092">
+      </trkpt>
+      <trkpt lat="33.53291" lon="130.33159">
+      </trkpt>
+      <trkpt lat="33.53294" lon="130.33205">
+      </trkpt>
+      <trkpt lat="33.53304" lon="130.33299">
+      </trkpt>
+      <trkpt lat="33.53302" lon="130.33322">
+      </trkpt>
+      <trkpt lat="33.53305" lon="130.33345">
+      </trkpt>
+      <trkpt lat="33.5331" lon="130.33391">
+      </trkpt>
+      <trkpt lat="33.53324" lon="130.33436">
+      </trkpt>
+      <trkpt lat="33.53327" lon="130.33457">
+      </trkpt>
+      <trkpt lat="33.53332" lon="130.33527">
+      </trkpt>
+      <trkpt lat="33.53335" lon="130.33548">
+      </trkpt>
+      <trkpt lat="33.53338" lon="130.33595">
+      </trkpt>
+      <trkpt lat="33.53349" lon="130.33659">
+      </trkpt>
+      <trkpt lat="33.53347" lon="130.3367">
+      </trkpt>
+      <trkpt lat="33.53348" lon="130.33677">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

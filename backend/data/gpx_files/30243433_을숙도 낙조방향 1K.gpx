@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>을숙도 낙조방향 1K</name>
+    <desc>Strava Segment ID: 30243433
+Distance: 1049.7m
+Avg Grade: 0.0%</desc>
+  </metadata>
+  <trk>
+    <name>을숙도 낙조방향 1K</name>
+    <trkseg>
+      <trkpt lat="35.11964" lon="128.95055">
+      </trkpt>
+      <trkpt lat="35.11927" lon="128.94999">
+      </trkpt>
+      <trkpt lat="35.11849" lon="128.94908">
+      </trkpt>
+      <trkpt lat="35.11827" lon="128.9488">
+      </trkpt>
+      <trkpt lat="35.11748" lon="128.9479">
+      </trkpt>
+      <trkpt lat="35.11595" lon="128.9461">
+      </trkpt>
+      <trkpt lat="35.11551" lon="128.94561">
+      </trkpt>
+      <trkpt lat="35.11539" lon="128.94545">
+      </trkpt>
+      <trkpt lat="35.11493" lon="128.94495">
+      </trkpt>
+      <trkpt lat="35.11447" lon="128.9444">
+      </trkpt>
+      <trkpt lat="35.1131" lon="128.94285">
+      </trkpt>
+      <trkpt lat="35.11285" lon="128.94253">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

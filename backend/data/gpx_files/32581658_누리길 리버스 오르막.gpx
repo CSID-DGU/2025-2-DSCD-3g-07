@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>누리길 리버스 오르막</name>
+    <desc>Strava Segment ID: 32581658
+Distance: 327.0m
+Avg Grade: 10.9%</desc>
+  </metadata>
+  <trk>
+    <name>누리길 리버스 오르막</name>
+    <trkseg>
+      <trkpt lat="35.18283" lon="128.77922">
+      </trkpt>
+      <trkpt lat="35.18268" lon="128.77927">
+      </trkpt>
+      <trkpt lat="35.18258" lon="128.77935">
+      </trkpt>
+      <trkpt lat="35.18242" lon="128.77955">
+      </trkpt>
+      <trkpt lat="35.1823" lon="128.77964">
+      </trkpt>
+      <trkpt lat="35.18217" lon="128.77978">
+      </trkpt>
+      <trkpt lat="35.18212" lon="128.77982">
+      </trkpt>
+      <trkpt lat="35.18208" lon="128.77989">
+      </trkpt>
+      <trkpt lat="35.18203" lon="128.77991">
+      </trkpt>
+      <trkpt lat="35.18199" lon="128.77996">
+      </trkpt>
+      <trkpt lat="35.18193" lon="128.78009">
+      </trkpt>
+      <trkpt lat="35.18187" lon="128.78018">
+      </trkpt>
+      <trkpt lat="35.18177" lon="128.78028">
+      </trkpt>
+      <trkpt lat="35.18121" lon="128.78067">
+      </trkpt>
+      <trkpt lat="35.18114" lon="128.78076">
+      </trkpt>
+      <trkpt lat="35.18108" lon="128.78078">
+      </trkpt>
+      <trkpt lat="35.18105" lon="128.78082">
+      </trkpt>
+      <trkpt lat="35.18092" lon="128.78086">
+      </trkpt>
+      <trkpt lat="35.18053" lon="128.78082">
+      </trkpt>
+      <trkpt lat="35.18049" lon="128.78092">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

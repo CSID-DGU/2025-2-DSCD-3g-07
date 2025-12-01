@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>141 Incline</name>
+    <desc>Strava Segment ID: 27025309
+Distance: 447.8m
+Avg Grade: 5.0%</desc>
+  </metadata>
+  <trk>
+    <name>141 Incline</name>
+    <trkseg>
+      <trkpt lat="33.08562" lon="129.77616">
+      </trkpt>
+      <trkpt lat="33.08571" lon="129.77591">
+      </trkpt>
+      <trkpt lat="33.08582" lon="129.77572">
+      </trkpt>
+      <trkpt lat="33.08596" lon="129.77554">
+      </trkpt>
+      <trkpt lat="33.08622" lon="129.77531">
+      </trkpt>
+      <trkpt lat="33.0863" lon="129.7752">
+      </trkpt>
+      <trkpt lat="33.08667" lon="129.77449">
+      </trkpt>
+      <trkpt lat="33.08687" lon="129.77417">
+      </trkpt>
+      <trkpt lat="33.08702" lon="129.774">
+      </trkpt>
+      <trkpt lat="33.08738" lon="129.77365">
+      </trkpt>
+      <trkpt lat="33.08778" lon="129.77322">
+      </trkpt>
+      <trkpt lat="33.08805" lon="129.77297">
+      </trkpt>
+      <trkpt lat="33.08837" lon="129.77271">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

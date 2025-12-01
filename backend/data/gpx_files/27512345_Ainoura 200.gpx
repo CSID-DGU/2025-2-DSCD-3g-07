@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>Ainoura 200!!</name>
+    <desc>Strava Segment ID: 27512345
+Distance: 202.3m
+Avg Grade: 0.9%</desc>
+  </metadata>
+  <trk>
+    <name>Ainoura 200!!</name>
+    <trkseg>
+      <trkpt lat="33.21285" lon="129.7426">
+      </trkpt>
+      <trkpt lat="33.21295" lon="129.74317">
+      </trkpt>
+      <trkpt lat="33.21299" lon="129.74369">
+      </trkpt>
+      <trkpt lat="33.21298" lon="129.74376">
+      </trkpt>
+      <trkpt lat="33.21305" lon="129.74428">
+      </trkpt>
+      <trkpt lat="33.21314" lon="129.74474">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

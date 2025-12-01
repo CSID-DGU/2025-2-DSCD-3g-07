@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>Segment</name>
+    <desc>Strava Segment ID: 5808496
+Distance: 561.7m
+Avg Grade: 9.9%</desc>
+  </metadata>
+  <trk>
+    <name>Segment</name>
+    <trkseg>
+      <trkpt lat="34.63116" lon="128.23742">
+      </trkpt>
+      <trkpt lat="34.63099" lon="128.23749">
+      </trkpt>
+      <trkpt lat="34.63088" lon="128.23759">
+      </trkpt>
+      <trkpt lat="34.63079" lon="128.23771">
+      </trkpt>
+      <trkpt lat="34.63059" lon="128.23786">
+      </trkpt>
+      <trkpt lat="34.63052" lon="128.23801">
+      </trkpt>
+      <trkpt lat="34.63048" lon="128.23823">
+      </trkpt>
+      <trkpt lat="34.63041" lon="128.23833">
+      </trkpt>
+      <trkpt lat="34.63025" lon="128.23844">
+      </trkpt>
+      <trkpt lat="34.63009" lon="128.23852">
+      </trkpt>
+      <trkpt lat="34.62999" lon="128.23859">
+      </trkpt>
+      <trkpt lat="34.62995" lon="128.23865">
+      </trkpt>
+      <trkpt lat="34.62987" lon="128.23866">
+      </trkpt>
+      <trkpt lat="34.62976" lon="128.23874">
+      </trkpt>
+      <trkpt lat="34.62968" lon="128.23875">
+      </trkpt>
+      <trkpt lat="34.62961" lon="128.23879">
+      </trkpt>
+      <trkpt lat="34.62953" lon="128.23878">
+      </trkpt>
+      <trkpt lat="34.62942" lon="128.23883">
+      </trkpt>
+      <trkpt lat="34.6293" lon="128.23894">
+      </trkpt>
+      <trkpt lat="34.62918" lon="128.23897">
+      </trkpt>
+      <trkpt lat="34.62916" lon="128.23905">
+      </trkpt>
+      <trkpt lat="34.62906" lon="128.23908">
+      </trkpt>
+      <trkpt lat="34.62914" lon="128.23913">
+      </trkpt>
+      <trkpt lat="34.62911" lon="128.2391">
+      </trkpt>
+      <trkpt lat="34.62908" lon="128.23916">
+      </trkpt>
+      <trkpt lat="34.62915" lon="128.23913">
+      </trkpt>
+      <trkpt lat="34.62906" lon="128.23926">
+      </trkpt>
+      <trkpt lat="34.62899" lon="128.23947">
+      </trkpt>
+      <trkpt lat="34.62895" lon="128.2399">
+      </trkpt>
+      <trkpt lat="34.62888" lon="128.24003">
+      </trkpt>
+      <trkpt lat="34.62874" lon="128.24008">
+      </trkpt>
+      <trkpt lat="34.62838" lon="128.24008">
+      </trkpt>
+      <trkpt lat="34.62796" lon="128.24017">
+      </trkpt>
+      <trkpt lat="34.62778" lon="128.24025">
+      </trkpt>
+      <trkpt lat="34.62764" lon="128.24039">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

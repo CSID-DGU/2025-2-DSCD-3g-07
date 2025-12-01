@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>Oma Bamboo Grove</name>
+    <desc>Strava Segment ID: 4046030
+Distance: 438.3m
+Avg Grade: 9.5%</desc>
+  </metadata>
+  <trk>
+    <name>Oma Bamboo Grove</name>
+    <trkseg>
+      <trkpt lat="33.81239" lon="130.8343">
+      </trkpt>
+      <trkpt lat="33.81235" lon="130.83423">
+      </trkpt>
+      <trkpt lat="33.81244" lon="130.83425">
+      </trkpt>
+      <trkpt lat="33.813" lon="130.83445">
+      </trkpt>
+      <trkpt lat="33.81371" lon="130.83463">
+      </trkpt>
+      <trkpt lat="33.81418" lon="130.83478">
+      </trkpt>
+      <trkpt lat="33.81476" lon="130.83502">
+      </trkpt>
+      <trkpt lat="33.81488" lon="130.83505">
+      </trkpt>
+      <trkpt lat="33.81511" lon="130.83516">
+      </trkpt>
+      <trkpt lat="33.8152" lon="130.83517">
+      </trkpt>
+      <trkpt lat="33.8156" lon="130.83547">
+      </trkpt>
+      <trkpt lat="33.81605" lon="130.83572">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

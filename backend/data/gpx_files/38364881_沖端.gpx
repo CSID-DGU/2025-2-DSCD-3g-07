@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>沖端</name>
+    <desc>Strava Segment ID: 38364881
+Distance: 424.1m
+Avg Grade: -0.0%</desc>
+  </metadata>
+  <trk>
+    <name>沖端</name>
+    <trkseg>
+      <trkpt lat="33.1587" lon="130.39692">
+      </trkpt>
+      <trkpt lat="33.15866" lon="130.39606">
+      </trkpt>
+      <trkpt lat="33.15866" lon="130.3955">
+      </trkpt>
+      <trkpt lat="33.1587" lon="130.3953">
+      </trkpt>
+      <trkpt lat="33.15873" lon="130.39525">
+      </trkpt>
+      <trkpt lat="33.15887" lon="130.39512">
+      </trkpt>
+      <trkpt lat="33.15894" lon="130.39495">
+      </trkpt>
+      <trkpt lat="33.15895" lon="130.3949">
+      </trkpt>
+      <trkpt lat="33.15891" lon="130.39485">
+      </trkpt>
+      <trkpt lat="33.15879" lon="130.39486">
+      </trkpt>
+      <trkpt lat="33.15865" lon="130.39492">
+      </trkpt>
+      <trkpt lat="33.1586" lon="130.395">
+      </trkpt>
+      <trkpt lat="33.15856" lon="130.39513">
+      </trkpt>
+      <trkpt lat="33.15852" lon="130.39564">
+      </trkpt>
+      <trkpt lat="33.15856" lon="130.39635">
+      </trkpt>
+      <trkpt lat="33.15856" lon="130.3969">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

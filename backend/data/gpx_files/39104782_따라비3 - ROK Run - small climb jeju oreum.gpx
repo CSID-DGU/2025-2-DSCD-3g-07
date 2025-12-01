@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>따라비3 - ROK Run - small climb jeju oreum</name>
+    <desc>Strava Segment ID: 39104782
+Distance: 274.0m
+Avg Grade: 10.2%</desc>
+  </metadata>
+  <trk>
+    <name>따라비3 - ROK Run - small climb jeju oreum</name>
+    <trkseg>
+      <trkpt lat="33.38898" lon="126.75333">
+      </trkpt>
+      <trkpt lat="33.389" lon="126.75349">
+      </trkpt>
+      <trkpt lat="33.38896" lon="126.75376">
+      </trkpt>
+      <trkpt lat="33.3889" lon="126.75399">
+      </trkpt>
+      <trkpt lat="33.38886" lon="126.75417">
+      </trkpt>
+      <trkpt lat="33.38882" lon="126.75428">
+      </trkpt>
+      <trkpt lat="33.38882" lon="126.75437">
+      </trkpt>
+      <trkpt lat="33.38878" lon="126.75445">
+      </trkpt>
+      <trkpt lat="33.38874" lon="126.75468">
+      </trkpt>
+      <trkpt lat="33.38865" lon="126.75486">
+      </trkpt>
+      <trkpt lat="33.38861" lon="126.75489">
+      </trkpt>
+      <trkpt lat="33.38852" lon="126.75491">
+      </trkpt>
+      <trkpt lat="33.38808" lon="126.75491">
+      </trkpt>
+      <trkpt lat="33.38782" lon="126.75482">
+      </trkpt>
+      <trkpt lat="33.38767" lon="126.75473">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

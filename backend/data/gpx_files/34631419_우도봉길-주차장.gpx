@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>우도봉길-주차장</name>
+    <desc>Strava Segment ID: 34631419
+Distance: 418.0m
+Avg Grade: 6.9%</desc>
+  </metadata>
+  <trk>
+    <name>우도봉길-주차장</name>
+    <trkseg>
+      <trkpt lat="33.49618" lon="126.956">
+      </trkpt>
+      <trkpt lat="33.49595" lon="126.95639">
+      </trkpt>
+      <trkpt lat="33.49589" lon="126.95659">
+      </trkpt>
+      <trkpt lat="33.49582" lon="126.95676">
+      </trkpt>
+      <trkpt lat="33.49577" lon="126.95683">
+      </trkpt>
+      <trkpt lat="33.49563" lon="126.95699">
+      </trkpt>
+      <trkpt lat="33.49554" lon="126.95715">
+      </trkpt>
+      <trkpt lat="33.49545" lon="126.95724">
+      </trkpt>
+      <trkpt lat="33.49522" lon="126.95742">
+      </trkpt>
+      <trkpt lat="33.49519" lon="126.95751">
+      </trkpt>
+      <trkpt lat="33.49514" lon="126.95759">
+      </trkpt>
+      <trkpt lat="33.49497" lon="126.95776">
+      </trkpt>
+      <trkpt lat="33.49466" lon="126.95792">
+      </trkpt>
+      <trkpt lat="33.4944" lon="126.95806">
+      </trkpt>
+      <trkpt lat="33.49414" lon="126.95828">
+      </trkpt>
+      <trkpt lat="33.49404" lon="126.95843">
+      </trkpt>
+      <trkpt lat="33.49398" lon="126.95875">
+      </trkpt>
+      <trkpt lat="33.49371" lon="126.95915">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

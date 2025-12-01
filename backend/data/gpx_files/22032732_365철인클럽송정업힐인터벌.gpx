@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>[365철인클럽]송정업힐인터벌</name>
+    <desc>Strava Segment ID: 22032732
+Distance: 208.0m
+Avg Grade: 4.0%</desc>
+  </metadata>
+  <trk>
+    <name>[365철인클럽]송정업힐인터벌</name>
+    <trkseg>
+      <trkpt lat="35.19302" lon="129.20803">
+      </trkpt>
+      <trkpt lat="35.19294" lon="129.20831">
+      </trkpt>
+      <trkpt lat="35.19276" lon="129.2088">
+      </trkpt>
+      <trkpt lat="35.19236" lon="129.21006">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>国道495号線 Climb</name>
+    <desc>Strava Segment ID: 6146377
+Distance: 815.3m
+Avg Grade: 6.7%</desc>
+  </metadata>
+  <trk>
+    <name>国道495号線 Climb</name>
+    <trkseg>
+      <trkpt lat="33.85808" lon="130.56062">
+      </trkpt>
+      <trkpt lat="33.85825" lon="130.56104">
+      </trkpt>
+      <trkpt lat="33.85848" lon="130.56138">
+      </trkpt>
+      <trkpt lat="33.85952" lon="130.5626">
+      </trkpt>
+      <trkpt lat="33.85971" lon="130.56295">
+      </trkpt>
+      <trkpt lat="33.85979" lon="130.56327">
+      </trkpt>
+      <trkpt lat="33.85984" lon="130.56373">
+      </trkpt>
+      <trkpt lat="33.85989" lon="130.56555">
+      </trkpt>
+      <trkpt lat="33.85993" lon="130.56594">
+      </trkpt>
+      <trkpt lat="33.85998" lon="130.56609">
+      </trkpt>
+      <trkpt lat="33.86014" lon="130.56631">
+      </trkpt>
+      <trkpt lat="33.86047" lon="130.56653">
+      </trkpt>
+      <trkpt lat="33.86189" lon="130.56719">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

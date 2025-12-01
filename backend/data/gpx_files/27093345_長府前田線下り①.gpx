@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>長府前田線下り①</name>
+    <desc>Strava Segment ID: 27093345
+Distance: 992.5m
+Avg Grade: -2.6%</desc>
+  </metadata>
+  <trk>
+    <name>長府前田線下り①</name>
+    <trkseg>
+      <trkpt lat="33.98772" lon="130.97815">
+      </trkpt>
+      <trkpt lat="33.98751" lon="130.97807">
+      </trkpt>
+      <trkpt lat="33.98715" lon="130.97785">
+      </trkpt>
+      <trkpt lat="33.98548" lon="130.97712">
+      </trkpt>
+      <trkpt lat="33.98508" lon="130.9769">
+      </trkpt>
+      <trkpt lat="33.98431" lon="130.97641">
+      </trkpt>
+      <trkpt lat="33.983" lon="130.97561">
+      </trkpt>
+      <trkpt lat="33.98252" lon="130.97527">
+      </trkpt>
+      <trkpt lat="33.98218" lon="130.97506">
+      </trkpt>
+      <trkpt lat="33.98166" lon="130.97466">
+      </trkpt>
+      <trkpt lat="33.98088" lon="130.974">
+      </trkpt>
+      <trkpt lat="33.98033" lon="130.97366">
+      </trkpt>
+      <trkpt lat="33.97999" lon="130.97348">
+      </trkpt>
+      <trkpt lat="33.97989" lon="130.97339">
+      </trkpt>
+      <trkpt lat="33.97981" lon="130.97325">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>호포 1K TT</name>
+    <desc>Strava Segment ID: 34191609
+Distance: 970.2m
+Avg Grade: 0.2%</desc>
+  </metadata>
+  <trk>
+    <name>호포 1K TT</name>
+    <trkseg>
+      <trkpt lat="35.29036" lon="129.01181">
+      </trkpt>
+      <trkpt lat="35.29457" lon="129.01316">
+      </trkpt>
+      <trkpt lat="35.29456" lon="129.01312">
+      </trkpt>
+      <trkpt lat="35.29441" lon="129.01308">
+      </trkpt>
+      <trkpt lat="35.2939" lon="129.01289">
+      </trkpt>
+      <trkpt lat="35.29326" lon="129.01271">
+      </trkpt>
+      <trkpt lat="35.2915" lon="129.01214">
+      </trkpt>
+      <trkpt lat="35.29102" lon="129.012">
+      </trkpt>
+      <trkpt lat="35.29039" lon="129.01178">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

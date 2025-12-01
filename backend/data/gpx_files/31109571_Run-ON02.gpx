@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>Run-ON#02</name>
+    <desc>Strava Segment ID: 31109571
+Distance: 417.1m
+Avg Grade: -0.1%</desc>
+  </metadata>
+  <trk>
+    <name>Run-ON#02</name>
+    <trkseg>
+      <trkpt lat="35.13912" lon="128.67321">
+      </trkpt>
+      <trkpt lat="35.13924" lon="128.67343">
+      </trkpt>
+      <trkpt lat="35.13944" lon="128.67369">
+      </trkpt>
+      <trkpt lat="35.13959" lon="128.67393">
+      </trkpt>
+      <trkpt lat="35.13998" lon="128.67451">
+      </trkpt>
+      <trkpt lat="35.14016" lon="128.67484">
+      </trkpt>
+      <trkpt lat="35.1403" lon="128.67499">
+      </trkpt>
+      <trkpt lat="35.14066" lon="128.67504">
+      </trkpt>
+      <trkpt lat="35.14097" lon="128.67505">
+      </trkpt>
+      <trkpt lat="35.14161" lon="128.67513">
+      </trkpt>
+      <trkpt lat="35.1418" lon="128.67513">
+      </trkpt>
+      <trkpt lat="35.14198" lon="128.67515">
+      </trkpt>
+      <trkpt lat="35.14216" lon="128.6752">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

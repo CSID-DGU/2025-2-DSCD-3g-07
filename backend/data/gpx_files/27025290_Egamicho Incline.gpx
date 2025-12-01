@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>Egamicho Incline</name>
+    <desc>Strava Segment ID: 27025290
+Distance: 643.1m
+Avg Grade: 5.1%</desc>
+  </metadata>
+  <trk>
+    <name>Egamicho Incline</name>
+    <trkseg>
+      <trkpt lat="33.09832" lon="129.77081">
+      </trkpt>
+      <trkpt lat="33.09833" lon="129.77081">
+      </trkpt>
+      <trkpt lat="33.09827" lon="129.77086">
+      </trkpt>
+      <trkpt lat="33.09814" lon="129.77093">
+      </trkpt>
+      <trkpt lat="33.09795" lon="129.77101">
+      </trkpt>
+      <trkpt lat="33.09782" lon="129.77104">
+      </trkpt>
+      <trkpt lat="33.09767" lon="129.77105">
+      </trkpt>
+      <trkpt lat="33.09732" lon="129.77099">
+      </trkpt>
+      <trkpt lat="33.09709" lon="129.77102">
+      </trkpt>
+      <trkpt lat="33.09582" lon="129.77153">
+      </trkpt>
+      <trkpt lat="33.09558" lon="129.77165">
+      </trkpt>
+      <trkpt lat="33.09545" lon="129.77176">
+      </trkpt>
+      <trkpt lat="33.09538" lon="129.7719">
+      </trkpt>
+      <trkpt lat="33.09527" lon="129.77223">
+      </trkpt>
+      <trkpt lat="33.0952" lon="129.77252">
+      </trkpt>
+      <trkpt lat="33.09513" lon="129.77269">
+      </trkpt>
+      <trkpt lat="33.095" lon="129.77285">
+      </trkpt>
+      <trkpt lat="33.09486" lon="129.77291">
+      </trkpt>
+      <trkpt lat="33.09473" lon="129.77292">
+      </trkpt>
+      <trkpt lat="33.09454" lon="129.7729">
+      </trkpt>
+      <trkpt lat="33.09436" lon="129.77285">
+      </trkpt>
+      <trkpt lat="33.09428" lon="129.7728">
+      </trkpt>
+      <trkpt lat="33.09418" lon="129.77267">
+      </trkpt>
+      <trkpt lat="33.0941" lon="129.77255">
+      </trkpt>
+      <trkpt lat="33.09385" lon="129.77203">
+      </trkpt>
+      <trkpt lat="33.09378" lon="129.77192">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>실크로드얼리벙</name>
+    <desc>Strava Segment ID: 40334496
+Distance: 730.3m
+Avg Grade: -0.6%</desc>
+  </metadata>
+  <trk>
+    <name>실크로드얼리벙</name>
+    <trkseg>
+      <trkpt lat="34.98807" lon="127.49102">
+      </trkpt>
+      <trkpt lat="34.98798" lon="127.49072">
+      </trkpt>
+      <trkpt lat="34.98786" lon="127.49045">
+      </trkpt>
+      <trkpt lat="34.98752" lon="127.48989">
+      </trkpt>
+      <trkpt lat="34.98731" lon="127.48962">
+      </trkpt>
+      <trkpt lat="34.98666" lon="127.48931">
+      </trkpt>
+      <trkpt lat="34.98628" lon="127.48917">
+      </trkpt>
+      <trkpt lat="34.98597" lon="127.48904">
+      </trkpt>
+      <trkpt lat="34.98563" lon="127.48885">
+      </trkpt>
+      <trkpt lat="34.98508" lon="127.4886">
+      </trkpt>
+      <trkpt lat="34.98478" lon="127.4885">
+      </trkpt>
+      <trkpt lat="34.98449" lon="127.48836">
+      </trkpt>
+      <trkpt lat="34.98431" lon="127.48829">
+      </trkpt>
+      <trkpt lat="34.9842" lon="127.48828">
+      </trkpt>
+      <trkpt lat="34.98401" lon="127.48833">
+      </trkpt>
+      <trkpt lat="34.98387" lon="127.48839">
+      </trkpt>
+      <trkpt lat="34.98367" lon="127.48853">
+      </trkpt>
+      <trkpt lat="34.98334" lon="127.48892">
+      </trkpt>
+      <trkpt lat="34.98307" lon="127.48927">
+      </trkpt>
+      <trkpt lat="34.98274" lon="127.48964">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

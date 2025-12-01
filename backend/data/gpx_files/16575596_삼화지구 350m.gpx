@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>삼화지구 350m</name>
+    <desc>Strava Segment ID: 16575596
+Distance: 397.8m
+Avg Grade: 0.6%</desc>
+  </metadata>
+  <trk>
+    <name>삼화지구 350m</name>
+    <trkseg>
+      <trkpt lat="33.51933" lon="126.5811">
+      </trkpt>
+      <trkpt lat="33.51935" lon="126.58134">
+      </trkpt>
+      <trkpt lat="33.51934" lon="126.58208">
+      </trkpt>
+      <trkpt lat="33.51937" lon="126.5831">
+      </trkpt>
+      <trkpt lat="33.5195" lon="126.58537">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

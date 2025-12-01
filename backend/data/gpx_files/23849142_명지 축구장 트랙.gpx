@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>명지 축구장 트랙</name>
+    <desc>Strava Segment ID: 23849142
+Distance: 362.8m
+Avg Grade: 0.0%</desc>
+  </metadata>
+  <trk>
+    <name>명지 축구장 트랙</name>
+    <trkseg>
+      <trkpt lat="35.08828" lon="128.90417">
+      </trkpt>
+      <trkpt lat="35.08738" lon="128.90418">
+      </trkpt>
+      <trkpt lat="35.08732" lon="128.90423">
+      </trkpt>
+      <trkpt lat="35.0873" lon="128.90494">
+      </trkpt>
+      <trkpt lat="35.08733" lon="128.90499">
+      </trkpt>
+      <trkpt lat="35.08738" lon="128.90501">
+      </trkpt>
+      <trkpt lat="35.0883" lon="128.90497">
+      </trkpt>
+      <trkpt lat="35.08832" lon="128.90496">
+      </trkpt>
+      <trkpt lat="35.08835" lon="128.90487">
+      </trkpt>
+      <trkpt lat="35.08835" lon="128.90467">
+      </trkpt>
+      <trkpt lat="35.08833" lon="128.90422">
+      </trkpt>
+      <trkpt lat="35.08831" lon="128.90416">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

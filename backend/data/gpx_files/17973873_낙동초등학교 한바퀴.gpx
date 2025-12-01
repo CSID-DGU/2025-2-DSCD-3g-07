@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>낙동초등학교 한바퀴</name>
+    <desc>Strava Segment ID: 17973873
+Distance: 220.3m
+Avg Grade: 0.2%</desc>
+  </metadata>
+  <trk>
+    <name>낙동초등학교 한바퀴</name>
+    <trkseg>
+      <trkpt lat="35.10539" lon="128.97331">
+      </trkpt>
+      <trkpt lat="35.10563" lon="128.97294">
+      </trkpt>
+      <trkpt lat="35.10573" lon="128.97276">
+      </trkpt>
+      <trkpt lat="35.10548" lon="128.97254">
+      </trkpt>
+      <trkpt lat="35.10536" lon="128.97248">
+      </trkpt>
+      <trkpt lat="35.10503" lon="128.97301">
+      </trkpt>
+      <trkpt lat="35.10504" lon="128.97305">
+      </trkpt>
+      <trkpt lat="35.10509" lon="128.9731">
+      </trkpt>
+      <trkpt lat="35.10536" lon="128.97335">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

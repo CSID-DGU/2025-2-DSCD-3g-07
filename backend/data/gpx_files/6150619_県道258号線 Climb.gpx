@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>県道258号線 Climb</name>
+    <desc>Strava Segment ID: 6150619
+Distance: 374.9m
+Avg Grade: 11.4%</desc>
+  </metadata>
+  <trk>
+    <name>県道258号線 Climb</name>
+    <trkseg>
+      <trkpt lat="33.76692" lon="130.8407">
+      </trkpt>
+      <trkpt lat="33.76676" lon="130.8408">
+      </trkpt>
+      <trkpt lat="33.76654" lon="130.84102">
+      </trkpt>
+      <trkpt lat="33.76648" lon="130.84112">
+      </trkpt>
+      <trkpt lat="33.76634" lon="130.84125">
+      </trkpt>
+      <trkpt lat="33.76566" lon="130.84113">
+      </trkpt>
+      <trkpt lat="33.7655" lon="130.84109">
+      </trkpt>
+      <trkpt lat="33.76529" lon="130.84107">
+      </trkpt>
+      <trkpt lat="33.76508" lon="130.84101">
+      </trkpt>
+      <trkpt lat="33.76478" lon="130.84082">
+      </trkpt>
+      <trkpt lat="33.76457" lon="130.84066">
+      </trkpt>
+      <trkpt lat="33.76436" lon="130.84047">
+      </trkpt>
+      <trkpt lat="33.7642" lon="130.8404">
+      </trkpt>
+      <trkpt lat="33.76408" lon="130.84039">
+      </trkpt>
+      <trkpt lat="33.76384" lon="130.84044">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

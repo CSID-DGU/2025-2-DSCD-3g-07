@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>서귀고트랙</name>
+    <desc>Strava Segment ID: 26258754
+Distance: 396.1m
+Avg Grade: 0.4%</desc>
+  </metadata>
+  <trk>
+    <name>서귀고트랙</name>
+    <trkseg>
+      <trkpt lat="33.25708" lon="126.56132">
+      </trkpt>
+      <trkpt lat="33.25693" lon="126.56124">
+      </trkpt>
+      <trkpt lat="33.25679" lon="126.56126">
+      </trkpt>
+      <trkpt lat="33.25666" lon="126.5614">
+      </trkpt>
+      <trkpt lat="33.25659" lon="126.56159">
+      </trkpt>
+      <trkpt lat="33.25669" lon="126.56255">
+      </trkpt>
+      <trkpt lat="33.25675" lon="126.56279">
+      </trkpt>
+      <trkpt lat="33.25686" lon="126.56291">
+      </trkpt>
+      <trkpt lat="33.257" lon="126.56295">
+      </trkpt>
+      <trkpt lat="33.25717" lon="126.56289">
+      </trkpt>
+      <trkpt lat="33.25728" lon="126.56275">
+      </trkpt>
+      <trkpt lat="33.2573" lon="126.56267">
+      </trkpt>
+      <trkpt lat="33.25729" lon="126.56267">
+      </trkpt>
+      <trkpt lat="33.25729" lon="126.56256">
+      </trkpt>
+      <trkpt lat="33.25718" lon="126.56155">
+      </trkpt>
+      <trkpt lat="33.25711" lon="126.56134">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

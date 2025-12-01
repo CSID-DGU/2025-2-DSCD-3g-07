@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>The JJD Climb</name>
+    <desc>Strava Segment ID: 26617993
+Distance: 285.5m
+Avg Grade: 8.4%</desc>
+  </metadata>
+  <trk>
+    <name>The JJD Climb</name>
+    <trkseg>
+      <trkpt lat="35.2057" lon="128.07181">
+      </trkpt>
+      <trkpt lat="35.20593" lon="128.07144">
+      </trkpt>
+      <trkpt lat="35.20628" lon="128.07105">
+      </trkpt>
+      <trkpt lat="35.20639" lon="128.07097">
+      </trkpt>
+      <trkpt lat="35.20683" lon="128.07075">
+      </trkpt>
+      <trkpt lat="35.20714" lon="128.07049">
+      </trkpt>
+      <trkpt lat="35.20728" lon="128.07035">
+      </trkpt>
+      <trkpt lat="35.20761" lon="128.07012">
+      </trkpt>
+      <trkpt lat="35.20773" lon="128.06997">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

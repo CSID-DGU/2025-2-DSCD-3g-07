@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>Universiade Warm Up Track</name>
+    <desc>Strava Segment ID: 9982200
+Distance: 391.6m
+Avg Grade: -0.0%</desc>
+  </metadata>
+  <trk>
+    <name>Universiade Warm Up Track</name>
+    <trkseg>
+      <trkpt lat="35.1305" lon="126.87453">
+      </trkpt>
+      <trkpt lat="35.13034" lon="126.87464">
+      </trkpt>
+      <trkpt lat="35.13024" lon="126.87484">
+      </trkpt>
+      <trkpt lat="35.13024" lon="126.87507">
+      </trkpt>
+      <trkpt lat="35.13034" lon="126.87525">
+      </trkpt>
+      <trkpt lat="35.13052" lon="126.87534">
+      </trkpt>
+      <trkpt lat="35.13081" lon="126.87532">
+      </trkpt>
+      <trkpt lat="35.13131" lon="126.87531">
+      </trkpt>
+      <trkpt lat="35.13149" lon="126.87522">
+      </trkpt>
+      <trkpt lat="35.1316" lon="126.87503">
+      </trkpt>
+      <trkpt lat="35.1316" lon="126.8748">
+      </trkpt>
+      <trkpt lat="35.1315" lon="126.87461">
+      </trkpt>
+      <trkpt lat="35.13131" lon="126.87451">
+      </trkpt>
+      <trkpt lat="35.13116" lon="126.87451">
+      </trkpt>
+      <trkpt lat="35.13076" lon="126.87457">
+      </trkpt>
+      <trkpt lat="35.13051" lon="126.87457">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>GS25온천점-온천로타리</name>
+    <desc>Strava Segment ID: 38318076
+Distance: 650.7m
+Avg Grade: -0.4%</desc>
+  </metadata>
+  <trk>
+    <name>GS25온천점-온천로타리</name>
+    <trkseg>
+      <trkpt lat="35.35308" lon="128.61241">
+      </trkpt>
+      <trkpt lat="35.35294" lon="128.61231">
+      </trkpt>
+      <trkpt lat="35.35278" lon="128.6122">
+      </trkpt>
+      <trkpt lat="35.35207" lon="128.61166">
+      </trkpt>
+      <trkpt lat="35.35172" lon="128.61142">
+      </trkpt>
+      <trkpt lat="35.35126" lon="128.61107">
+      </trkpt>
+      <trkpt lat="35.35105" lon="128.61092">
+      </trkpt>
+      <trkpt lat="35.35066" lon="128.61062">
+      </trkpt>
+      <trkpt lat="35.3503" lon="128.6104">
+      </trkpt>
+      <trkpt lat="35.34986" lon="128.61028">
+      </trkpt>
+      <trkpt lat="35.3496" lon="128.61023">
+      </trkpt>
+      <trkpt lat="35.34941" lon="128.61017">
+      </trkpt>
+      <trkpt lat="35.34928" lon="128.61015">
+      </trkpt>
+      <trkpt lat="35.34897" lon="128.61016">
+      </trkpt>
+      <trkpt lat="35.34871" lon="128.61018">
+      </trkpt>
+      <trkpt lat="35.34841" lon="128.61025">
+      </trkpt>
+      <trkpt lat="35.34815" lon="128.61036">
+      </trkpt>
+      <trkpt lat="35.34788" lon="128.61043">
+      </trkpt>
+      <trkpt lat="35.34774" lon="128.61051">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

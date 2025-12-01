@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>延命公園登り　グラウンド側</name>
+    <desc>Strava Segment ID: 3303856
+Distance: 295.5m
+Avg Grade: 3.5%</desc>
+  </metadata>
+  <trk>
+    <name>延命公園登り　グラウンド側</name>
+    <trkseg>
+      <trkpt lat="33.01874" lon="130.44808">
+      </trkpt>
+      <trkpt lat="33.01856" lon="130.44801">
+      </trkpt>
+      <trkpt lat="33.01835" lon="130.448">
+      </trkpt>
+      <trkpt lat="33.01828" lon="130.44797">
+      </trkpt>
+      <trkpt lat="33.01827" lon="130.44794">
+      </trkpt>
+      <trkpt lat="33.01831" lon="130.44787">
+      </trkpt>
+      <trkpt lat="33.0184" lon="130.44779">
+      </trkpt>
+      <trkpt lat="33.01857" lon="130.44767">
+      </trkpt>
+      <trkpt lat="33.01859" lon="130.44758">
+      </trkpt>
+      <trkpt lat="33.0185" lon="130.44751">
+      </trkpt>
+      <trkpt lat="33.01838" lon="130.44732">
+      </trkpt>
+      <trkpt lat="33.01833" lon="130.44729">
+      </trkpt>
+      <trkpt lat="33.01828" lon="130.44727">
+      </trkpt>
+      <trkpt lat="33.01807" lon="130.44732">
+      </trkpt>
+      <trkpt lat="33.01799" lon="130.44728">
+      </trkpt>
+      <trkpt lat="33.01795" lon="130.44724">
+      </trkpt>
+      <trkpt lat="33.01794" lon="130.44715">
+      </trkpt>
+      <trkpt lat="33.01804" lon="130.44692">
+      </trkpt>
+      <trkpt lat="33.0181" lon="130.44662">
+      </trkpt>
+      <trkpt lat="33.01815" lon="130.44645">
+      </trkpt>
+      <trkpt lat="33.01816" lon="130.44634">
+      </trkpt>
+      <trkpt lat="33.01815" lon="130.44619">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

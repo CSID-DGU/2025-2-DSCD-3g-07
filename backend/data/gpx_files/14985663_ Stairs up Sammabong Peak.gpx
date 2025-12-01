@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name> Stairs up Sammabong Peak</name>
+    <desc>Strava Segment ID: 14985663
+Distance: 276.4m
+Avg Grade: 31.8%</desc>
+  </metadata>
+  <trk>
+    <name> Stairs up Sammabong Peak</name>
+    <trkseg>
+      <trkpt lat="33.24162" lon="126.54826">
+      </trkpt>
+      <trkpt lat="33.24183" lon="126.54829">
+      </trkpt>
+      <trkpt lat="33.24193" lon="126.54826">
+      </trkpt>
+      <trkpt lat="33.24203" lon="126.5482">
+      </trkpt>
+      <trkpt lat="33.24216" lon="126.54818">
+      </trkpt>
+      <trkpt lat="33.24226" lon="126.54812">
+      </trkpt>
+      <trkpt lat="33.24238" lon="126.54808">
+      </trkpt>
+      <trkpt lat="33.24245" lon="126.54799">
+      </trkpt>
+      <trkpt lat="33.24264" lon="126.54789">
+      </trkpt>
+      <trkpt lat="33.2429" lon="126.54785">
+      </trkpt>
+      <trkpt lat="33.24299" lon="126.54786">
+      </trkpt>
+      <trkpt lat="33.24315" lon="126.54784">
+      </trkpt>
+      <trkpt lat="33.24323" lon="126.54786">
+      </trkpt>
+      <trkpt lat="33.24333" lon="126.54782">
+      </trkpt>
+      <trkpt lat="33.24347" lon="126.54788">
+      </trkpt>
+      <trkpt lat="33.24348" lon="126.54782">
+      </trkpt>
+      <trkpt lat="33.24351" lon="126.5478">
+      </trkpt>
+      <trkpt lat="33.24356" lon="126.54781">
+      </trkpt>
+      <trkpt lat="33.24361" lon="126.54777">
+      </trkpt>
+      <trkpt lat="33.24367" lon="126.54775">
+      </trkpt>
+      <trkpt lat="33.24386" lon="126.5477">
+      </trkpt>
+      <trkpt lat="33.24392" lon="126.5477">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

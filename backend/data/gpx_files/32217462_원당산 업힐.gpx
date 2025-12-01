@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>원당산 업힐</name>
+    <desc>Strava Segment ID: 32217462
+Distance: 290.8m
+Avg Grade: 6.9%</desc>
+  </metadata>
+  <trk>
+    <name>원당산 업힐</name>
+    <trkseg>
+      <trkpt lat="35.19404" lon="126.82017">
+      </trkpt>
+      <trkpt lat="35.19354" lon="126.82026">
+      </trkpt>
+      <trkpt lat="35.19334" lon="126.82028">
+      </trkpt>
+      <trkpt lat="35.19302" lon="126.82044">
+      </trkpt>
+      <trkpt lat="35.19296" lon="126.8205">
+      </trkpt>
+      <trkpt lat="35.19281" lon="126.82077">
+      </trkpt>
+      <trkpt lat="35.19262" lon="126.82099">
+      </trkpt>
+      <trkpt lat="35.19247" lon="126.82112">
+      </trkpt>
+      <trkpt lat="35.19242" lon="126.82118">
+      </trkpt>
+      <trkpt lat="35.19242" lon="126.82121">
+      </trkpt>
+      <trkpt lat="35.19244" lon="126.82126">
+      </trkpt>
+      <trkpt lat="35.19256" lon="126.82127">
+      </trkpt>
+      <trkpt lat="35.19294" lon="126.82121">
+      </trkpt>
+      <trkpt lat="35.19299" lon="126.82119">
+      </trkpt>
+      <trkpt lat="35.19301" lon="126.82116">
+      </trkpt>
+      <trkpt lat="35.19299" lon="126.82116">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

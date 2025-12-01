@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>大川中央公園</name>
+    <desc>Strava Segment ID: 40456525
+Distance: 518.1m
+Avg Grade: 0.1%</desc>
+  </metadata>
+  <trk>
+    <name>大川中央公園</name>
+    <trkseg>
+      <trkpt lat="33.20269" lon="130.38564">
+      </trkpt>
+      <trkpt lat="33.2029" lon="130.38572">
+      </trkpt>
+      <trkpt lat="33.20306" lon="130.38585">
+      </trkpt>
+      <trkpt lat="33.20328" lon="130.386">
+      </trkpt>
+      <trkpt lat="33.20332" lon="130.38602">
+      </trkpt>
+      <trkpt lat="33.20334" lon="130.386">
+      </trkpt>
+      <trkpt lat="33.20337" lon="130.38596">
+      </trkpt>
+      <trkpt lat="33.2034" lon="130.38584">
+      </trkpt>
+      <trkpt lat="33.20367" lon="130.38535">
+      </trkpt>
+      <trkpt lat="33.20381" lon="130.38489">
+      </trkpt>
+      <trkpt lat="33.20409" lon="130.38432">
+      </trkpt>
+      <trkpt lat="33.2041" lon="130.38426">
+      </trkpt>
+      <trkpt lat="33.20407" lon="130.38424">
+      </trkpt>
+      <trkpt lat="33.20392" lon="130.3842">
+      </trkpt>
+      <trkpt lat="33.20355" lon="130.38391">
+      </trkpt>
+      <trkpt lat="33.20349" lon="130.38393">
+      </trkpt>
+      <trkpt lat="33.20341" lon="130.38414">
+      </trkpt>
+      <trkpt lat="33.20319" lon="130.38456">
+      </trkpt>
+      <trkpt lat="33.2031" lon="130.38479">
+      </trkpt>
+      <trkpt lat="33.2027" lon="130.38556">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

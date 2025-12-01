@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>Songak Rise</name>
+    <desc>Strava Segment ID: 28181241
+Distance: 1083.4m
+Avg Grade: 2.3%</desc>
+  </metadata>
+  <trk>
+    <name>Songak Rise</name>
+    <trkseg>
+      <trkpt lat="33.20068" lon="126.27727">
+      </trkpt>
+      <trkpt lat="33.20075" lon="126.27773">
+      </trkpt>
+      <trkpt lat="33.20084" lon="126.27853">
+      </trkpt>
+      <trkpt lat="33.20089" lon="126.27887">
+      </trkpt>
+      <trkpt lat="33.20104" lon="126.28019">
+      </trkpt>
+      <trkpt lat="33.20113" lon="126.28081">
+      </trkpt>
+      <trkpt lat="33.20129" lon="126.28172">
+      </trkpt>
+      <trkpt lat="33.20142" lon="126.28217">
+      </trkpt>
+      <trkpt lat="33.20146" lon="126.28226">
+      </trkpt>
+      <trkpt lat="33.20196" lon="126.28312">
+      </trkpt>
+      <trkpt lat="33.20238" lon="126.28392">
+      </trkpt>
+      <trkpt lat="33.20263" lon="126.28426">
+      </trkpt>
+      <trkpt lat="33.20285" lon="126.28465">
+      </trkpt>
+      <trkpt lat="33.20306" lon="126.28506">
+      </trkpt>
+      <trkpt lat="33.20353" lon="126.2858">
+      </trkpt>
+      <trkpt lat="33.20401" lon="126.28668">
+      </trkpt>
+      <trkpt lat="33.20411" lon="126.28689">
+      </trkpt>
+      <trkpt lat="33.20424" lon="126.28708">
+      </trkpt>
+      <trkpt lat="33.20441" lon="126.28772">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>신용가는길(1km)</name>
+    <desc>Strava Segment ID: 32521233
+Distance: 998.9m
+Avg Grade: 0.2%</desc>
+  </metadata>
+  <trk>
+    <name>신용가는길(1km)</name>
+    <trkseg>
+      <trkpt lat="35.30284" lon="128.74229">
+      </trkpt>
+      <trkpt lat="35.30281" lon="128.74255">
+      </trkpt>
+      <trkpt lat="35.30282" lon="128.74277">
+      </trkpt>
+      <trkpt lat="35.30272" lon="128.74395">
+      </trkpt>
+      <trkpt lat="35.30272" lon="128.74419">
+      </trkpt>
+      <trkpt lat="35.30266" lon="128.74466">
+      </trkpt>
+      <trkpt lat="35.30263" lon="128.74533">
+      </trkpt>
+      <trkpt lat="35.30256" lon="128.7458">
+      </trkpt>
+      <trkpt lat="35.30254" lon="128.74672">
+      </trkpt>
+      <trkpt lat="35.30251" lon="128.74695">
+      </trkpt>
+      <trkpt lat="35.30246" lon="128.74717">
+      </trkpt>
+      <trkpt lat="35.30245" lon="128.7474">
+      </trkpt>
+      <trkpt lat="35.3025" lon="128.7481">
+      </trkpt>
+      <trkpt lat="35.30247" lon="128.74903">
+      </trkpt>
+      <trkpt lat="35.30255" lon="128.74995">
+      </trkpt>
+      <trkpt lat="35.30256" lon="128.75065">
+      </trkpt>
+      <trkpt lat="35.3026" lon="128.75134">
+      </trkpt>
+      <trkpt lat="35.30262" lon="128.75229">
+      </trkpt>
+      <trkpt lat="35.30268" lon="128.753">
+      </trkpt>
+      <trkpt lat="35.30268" lon="128.75327">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>Nonaka hill</name>
+    <desc>Strava Segment ID: 27425689
+Distance: 407.6m
+Avg Grade: 1.8%</desc>
+  </metadata>
+  <trk>
+    <name>Nonaka hill</name>
+    <trkseg>
+      <trkpt lat="33.2134" lon="129.71328">
+      </trkpt>
+      <trkpt lat="33.21345" lon="129.71273">
+      </trkpt>
+      <trkpt lat="33.2135" lon="129.7125">
+      </trkpt>
+      <trkpt lat="33.2136" lon="129.71213">
+      </trkpt>
+      <trkpt lat="33.21364" lon="129.71188">
+      </trkpt>
+      <trkpt lat="33.21371" lon="129.71161">
+      </trkpt>
+      <trkpt lat="33.2138" lon="129.71134">
+      </trkpt>
+      <trkpt lat="33.21399" lon="129.71087">
+      </trkpt>
+      <trkpt lat="33.21411" lon="129.71063">
+      </trkpt>
+      <trkpt lat="33.21428" lon="129.71005">
+      </trkpt>
+      <trkpt lat="33.2143" lon="129.70979">
+      </trkpt>
+      <trkpt lat="33.21425" lon="129.7091">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

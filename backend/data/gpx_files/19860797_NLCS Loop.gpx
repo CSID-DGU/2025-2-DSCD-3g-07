@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>NLCS Loop</name>
+    <desc>Strava Segment ID: 19860797
+Distance: 419.0m
+Avg Grade: 0.0%</desc>
+  </metadata>
+  <trk>
+    <name>NLCS Loop</name>
+    <trkseg>
+      <trkpt lat="33.29731" lon="126.28543">
+      </trkpt>
+      <trkpt lat="33.29722" lon="126.28556">
+      </trkpt>
+      <trkpt lat="33.29701" lon="126.28578">
+      </trkpt>
+      <trkpt lat="33.29687" lon="126.286">
+      </trkpt>
+      <trkpt lat="33.29683" lon="126.28613">
+      </trkpt>
+      <trkpt lat="33.29685" lon="126.28634">
+      </trkpt>
+      <trkpt lat="33.29692" lon="126.2865">
+      </trkpt>
+      <trkpt lat="33.29707" lon="126.28661">
+      </trkpt>
+      <trkpt lat="33.29715" lon="126.28663">
+      </trkpt>
+      <trkpt lat="33.29723" lon="126.28662">
+      </trkpt>
+      <trkpt lat="33.29747" lon="126.28644">
+      </trkpt>
+      <trkpt lat="33.29768" lon="126.28618">
+      </trkpt>
+      <trkpt lat="33.29791" lon="126.28595">
+      </trkpt>
+      <trkpt lat="33.29804" lon="126.28575">
+      </trkpt>
+      <trkpt lat="33.29808" lon="126.28563">
+      </trkpt>
+      <trkpt lat="33.29809" lon="126.28547">
+      </trkpt>
+      <trkpt lat="33.29804" lon="126.28533">
+      </trkpt>
+      <trkpt lat="33.29793" lon="126.28522">
+      </trkpt>
+      <trkpt lat="33.2978" lon="126.28517">
+      </trkpt>
+      <trkpt lat="33.29767" lon="126.28517">
+      </trkpt>
+      <trkpt lat="33.29753" lon="126.28521">
+      </trkpt>
+      <trkpt lat="33.29731" lon="126.28547">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

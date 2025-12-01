@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>노형이편한세상 오르막 </name>
+    <desc>Strava Segment ID: 19041915
+Distance: 307.5m
+Avg Grade: 4.7%</desc>
+  </metadata>
+  <trk>
+    <name>노형이편한세상 오르막 </name>
+    <trkseg>
+      <trkpt lat="33.48547" lon="126.46668">
+      </trkpt>
+      <trkpt lat="33.48532" lon="126.46677">
+      </trkpt>
+      <trkpt lat="33.48522" lon="126.46687">
+      </trkpt>
+      <trkpt lat="33.48506" lon="126.46707">
+      </trkpt>
+      <trkpt lat="33.48488" lon="126.46738">
+      </trkpt>
+      <trkpt lat="33.48458" lon="126.46775">
+      </trkpt>
+      <trkpt lat="33.48445" lon="126.46789">
+      </trkpt>
+      <trkpt lat="33.48429" lon="126.468">
+      </trkpt>
+      <trkpt lat="33.48415" lon="126.46813">
+      </trkpt>
+      <trkpt lat="33.4841" lon="126.46821">
+      </trkpt>
+      <trkpt lat="33.484" lon="126.46829">
+      </trkpt>
+      <trkpt lat="33.48392" lon="126.46842">
+      </trkpt>
+      <trkpt lat="33.48359" lon="126.46879">
+      </trkpt>
+      <trkpt lat="33.4835" lon="126.46895">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

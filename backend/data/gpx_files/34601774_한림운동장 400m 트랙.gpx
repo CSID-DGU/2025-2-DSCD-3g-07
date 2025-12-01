@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>한림운동장 400m 트랙</name>
+    <desc>Strava Segment ID: 34601774
+Distance: 400.9m
+Avg Grade: 0.0%</desc>
+  </metadata>
+  <trk>
+    <name>한림운동장 400m 트랙</name>
+    <trkseg>
+      <trkpt lat="33.41009" lon="126.26875">
+      </trkpt>
+      <trkpt lat="33.41016" lon="126.26882">
+      </trkpt>
+      <trkpt lat="33.41028" lon="126.26889">
+      </trkpt>
+      <trkpt lat="33.41039" lon="126.26889">
+      </trkpt>
+      <trkpt lat="33.41053" lon="126.26883">
+      </trkpt>
+      <trkpt lat="33.4106" lon="126.26875">
+      </trkpt>
+      <trkpt lat="33.41066" lon="126.26864">
+      </trkpt>
+      <trkpt lat="33.41068" lon="126.26851">
+      </trkpt>
+      <trkpt lat="33.41068" lon="126.26839">
+      </trkpt>
+      <trkpt lat="33.4106" lon="126.26822">
+      </trkpt>
+      <trkpt lat="33.4101" lon="126.26751">
+      </trkpt>
+      <trkpt lat="33.40999" lon="126.26743">
+      </trkpt>
+      <trkpt lat="33.40992" lon="126.26741">
+      </trkpt>
+      <trkpt lat="33.40981" lon="126.26742">
+      </trkpt>
+      <trkpt lat="33.4097" lon="126.26747">
+      </trkpt>
+      <trkpt lat="33.4096" lon="126.26759">
+      </trkpt>
+      <trkpt lat="33.40955" lon="126.26773">
+      </trkpt>
+      <trkpt lat="33.40955" lon="126.26791">
+      </trkpt>
+      <trkpt lat="33.40957" lon="126.26799">
+      </trkpt>
+      <trkpt lat="33.40962" lon="126.26808">
+      </trkpt>
+      <trkpt lat="33.4101" lon="126.26876">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

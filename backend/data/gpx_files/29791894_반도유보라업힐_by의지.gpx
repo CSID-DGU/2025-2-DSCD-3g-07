@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>반도유보라업힐_by.의지</name>
+    <desc>Strava Segment ID: 29791894
+Distance: 476.7m
+Avg Grade: 3.2%</desc>
+  </metadata>
+  <trk>
+    <name>반도유보라업힐_by.의지</name>
+    <trkseg>
+      <trkpt lat="35.66379" lon="128.40432">
+      </trkpt>
+      <trkpt lat="35.66378" lon="128.40471">
+      </trkpt>
+      <trkpt lat="35.66372" lon="128.40522">
+      </trkpt>
+      <trkpt lat="35.66362" lon="128.40715">
+      </trkpt>
+      <trkpt lat="35.66365" lon="128.40779">
+      </trkpt>
+      <trkpt lat="35.66363" lon="128.40812">
+      </trkpt>
+      <trkpt lat="35.66366" lon="128.40847">
+      </trkpt>
+      <trkpt lat="35.66364" lon="128.40903">
+      </trkpt>
+      <trkpt lat="35.66365" lon="128.40925">
+      </trkpt>
+      <trkpt lat="35.66364" lon="128.40957">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

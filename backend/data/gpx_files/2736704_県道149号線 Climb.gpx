@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>県道149号線 Climb</name>
+    <desc>Strava Segment ID: 2736704
+Distance: 564.4m
+Avg Grade: 10.0%</desc>
+  </metadata>
+  <trk>
+    <name>県道149号線 Climb</name>
+    <trkseg>
+      <trkpt lat="33.13301" lon="129.70062">
+      </trkpt>
+      <trkpt lat="33.13322" lon="129.70088">
+      </trkpt>
+      <trkpt lat="33.13334" lon="129.70109">
+      </trkpt>
+      <trkpt lat="33.13334" lon="129.70116">
+      </trkpt>
+      <trkpt lat="33.13321" lon="129.70142">
+      </trkpt>
+      <trkpt lat="33.13309" lon="129.7015">
+      </trkpt>
+      <trkpt lat="33.13297" lon="129.7015">
+      </trkpt>
+      <trkpt lat="33.13287" lon="129.70143">
+      </trkpt>
+      <trkpt lat="33.13277" lon="129.70131">
+      </trkpt>
+      <trkpt lat="33.1325" lon="129.70063">
+      </trkpt>
+      <trkpt lat="33.13224" lon="129.70037">
+      </trkpt>
+      <trkpt lat="33.13197" lon="129.70023">
+      </trkpt>
+      <trkpt lat="33.13167" lon="129.70002">
+      </trkpt>
+      <trkpt lat="33.1316" lon="129.6999">
+      </trkpt>
+      <trkpt lat="33.13153" lon="129.69977">
+      </trkpt>
+      <trkpt lat="33.13125" lon="129.69908">
+      </trkpt>
+      <trkpt lat="33.13102" lon="129.69846">
+      </trkpt>
+      <trkpt lat="33.13093" lon="129.69816">
+      </trkpt>
+      <trkpt lat="33.13081" lon="129.6979">
+      </trkpt>
+      <trkpt lat="33.13077" lon="129.69777">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

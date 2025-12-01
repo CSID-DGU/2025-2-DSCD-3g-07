@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>Aju Dong Stadium Loop</name>
+    <desc>Strava Segment ID: 8417871
+Distance: 414.3m
+Avg Grade: -0.0%</desc>
+  </metadata>
+  <trk>
+    <name>Aju Dong Stadium Loop</name>
+    <trkseg>
+      <trkpt lat="34.86347" lon="128.69009">
+      </trkpt>
+      <trkpt lat="34.86325" lon="128.6896">
+      </trkpt>
+      <trkpt lat="34.86315" lon="128.68931">
+      </trkpt>
+      <trkpt lat="34.86301" lon="128.68903">
+      </trkpt>
+      <trkpt lat="34.86289" lon="128.68894">
+      </trkpt>
+      <trkpt lat="34.86279" lon="128.68891">
+      </trkpt>
+      <trkpt lat="34.86263" lon="128.68896">
+      </trkpt>
+      <trkpt lat="34.86251" lon="128.6891">
+      </trkpt>
+      <trkpt lat="34.86246" lon="128.68933">
+      </trkpt>
+      <trkpt lat="34.86251" lon="128.68955">
+      </trkpt>
+      <trkpt lat="34.86284" lon="128.69035">
+      </trkpt>
+      <trkpt lat="34.86293" lon="128.69051">
+      </trkpt>
+      <trkpt lat="34.86305" lon="128.69059">
+      </trkpt>
+      <trkpt lat="34.86322" lon="128.6906">
+      </trkpt>
+      <trkpt lat="34.86338" lon="128.6905">
+      </trkpt>
+      <trkpt lat="34.86347" lon="128.69032">
+      </trkpt>
+      <trkpt lat="34.86348" lon="128.69008">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>Power up the Hump</name>
+    <desc>Strava Segment ID: 17140585
+Distance: 444.6m
+Avg Grade: 2.3%</desc>
+  </metadata>
+  <trk>
+    <name>Power up the Hump</name>
+    <trkseg>
+      <trkpt lat="34.88216" lon="128.63036">
+      </trkpt>
+      <trkpt lat="34.88198" lon="128.63055">
+      </trkpt>
+      <trkpt lat="34.88158" lon="128.63084">
+      </trkpt>
+      <trkpt lat="34.88146" lon="128.63098">
+      </trkpt>
+      <trkpt lat="34.88138" lon="128.63112">
+      </trkpt>
+      <trkpt lat="34.88133" lon="128.63116">
+      </trkpt>
+      <trkpt lat="34.88101" lon="128.63129">
+      </trkpt>
+      <trkpt lat="34.88078" lon="128.63142">
+      </trkpt>
+      <trkpt lat="34.88067" lon="128.63145">
+      </trkpt>
+      <trkpt lat="34.88055" lon="128.63155">
+      </trkpt>
+      <trkpt lat="34.88042" lon="128.63161">
+      </trkpt>
+      <trkpt lat="34.88029" lon="128.6317">
+      </trkpt>
+      <trkpt lat="34.8802" lon="128.63181">
+      </trkpt>
+      <trkpt lat="34.88015" lon="128.63191">
+      </trkpt>
+      <trkpt lat="34.88007" lon="128.63203">
+      </trkpt>
+      <trkpt lat="34.87989" lon="128.63233">
+      </trkpt>
+      <trkpt lat="34.87984" lon="128.63238">
+      </trkpt>
+      <trkpt lat="34.87954" lon="128.63251">
+      </trkpt>
+      <trkpt lat="34.87941" lon="128.63266">
+      </trkpt>
+      <trkpt lat="34.87937" lon="128.63277">
+      </trkpt>
+      <trkpt lat="34.87924" lon="128.63288">
+      </trkpt>
+      <trkpt lat="34.87911" lon="128.63304">
+      </trkpt>
+      <trkpt lat="34.879" lon="128.63311">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>새별오름 Climb</name>
+    <desc>Strava Segment ID: 24797237
+Distance: 365.6m
+Avg Grade: 20.8%</desc>
+  </metadata>
+  <trk>
+    <name>새별오름 Climb</name>
+    <trkseg>
+      <trkpt lat="33.36362" lon="126.35799">
+      </trkpt>
+      <trkpt lat="33.36369" lon="126.35783">
+      </trkpt>
+      <trkpt lat="33.36379" lon="126.35742">
+      </trkpt>
+      <trkpt lat="33.36384" lon="126.35714">
+      </trkpt>
+      <trkpt lat="33.36389" lon="126.35699">
+      </trkpt>
+      <trkpt lat="33.36398" lon="126.35631">
+      </trkpt>
+      <trkpt lat="33.36402" lon="126.35612">
+      </trkpt>
+      <trkpt lat="33.36407" lon="126.35603">
+      </trkpt>
+      <trkpt lat="33.36437" lon="126.35593">
+      </trkpt>
+      <trkpt lat="33.36452" lon="126.35586">
+      </trkpt>
+      <trkpt lat="33.36457" lon="126.35587">
+      </trkpt>
+      <trkpt lat="33.36475" lon="126.35578">
+      </trkpt>
+      <trkpt lat="33.36492" lon="126.35573">
+      </trkpt>
+      <trkpt lat="33.36516" lon="126.35572">
+      </trkpt>
+      <trkpt lat="33.36531" lon="126.35579">
+      </trkpt>
+      <trkpt lat="33.36545" lon="126.3558">
+      </trkpt>
+      <trkpt lat="33.36551" lon="126.35584">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

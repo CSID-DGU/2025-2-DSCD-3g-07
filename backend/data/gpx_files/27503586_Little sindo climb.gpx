@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>Little sindo climb</name>
+    <desc>Strava Segment ID: 27503586
+Distance: 102.2m
+Avg Grade: 21.8%</desc>
+  </metadata>
+  <trk>
+    <name>Little sindo climb</name>
+    <trkseg>
+      <trkpt lat="33.27939" lon="126.19409">
+      </trkpt>
+      <trkpt lat="33.27938" lon="126.19412">
+      </trkpt>
+      <trkpt lat="33.27956" lon="126.19427">
+      </trkpt>
+      <trkpt lat="33.2797" lon="126.19443">
+      </trkpt>
+      <trkpt lat="33.28003" lon="126.19459">
+      </trkpt>
+      <trkpt lat="33.28009" lon="126.1947">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

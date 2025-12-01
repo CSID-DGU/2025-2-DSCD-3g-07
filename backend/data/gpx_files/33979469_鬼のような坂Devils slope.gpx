@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>鬼のような坂…Devil's slope</name>
+    <desc>Strava Segment ID: 33979469
+Distance: 343.8m
+Avg Grade: 5.8%</desc>
+  </metadata>
+  <trk>
+    <name>鬼のような坂…Devil's slope</name>
+    <trkseg>
+      <trkpt lat="33.15535" lon="129.87906">
+      </trkpt>
+      <trkpt lat="33.15562" lon="129.87937">
+      </trkpt>
+      <trkpt lat="33.15574" lon="129.87946">
+      </trkpt>
+      <trkpt lat="33.1558" lon="129.87949">
+      </trkpt>
+      <trkpt lat="33.15596" lon="129.87961">
+      </trkpt>
+      <trkpt lat="33.15615" lon="129.87969">
+      </trkpt>
+      <trkpt lat="33.1564" lon="129.87974">
+      </trkpt>
+      <trkpt lat="33.15674" lon="129.87973">
+      </trkpt>
+      <trkpt lat="33.15713" lon="129.87961">
+      </trkpt>
+      <trkpt lat="33.15798" lon="129.8794">
+      </trkpt>
+      <trkpt lat="33.15812" lon="129.87935">
+      </trkpt>
+      <trkpt lat="33.1582" lon="129.87934">
+      </trkpt>
+      <trkpt lat="33.15819" lon="129.87938">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

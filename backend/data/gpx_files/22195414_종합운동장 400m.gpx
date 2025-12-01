@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>종합운동장 400m</name>
+    <desc>Strava Segment ID: 22195414
+Distance: 454.3m
+Avg Grade: 0.0%</desc>
+  </metadata>
+  <trk>
+    <name>종합운동장 400m</name>
+    <trkseg>
+      <trkpt lat="33.49687" lon="126.51402">
+      </trkpt>
+      <trkpt lat="33.4974" lon="126.51426">
+      </trkpt>
+      <trkpt lat="33.49759" lon="126.51428">
+      </trkpt>
+      <trkpt lat="33.49776" lon="126.51419">
+      </trkpt>
+      <trkpt lat="33.49788" lon="126.514">
+      </trkpt>
+      <trkpt lat="33.49791" lon="126.51385">
+      </trkpt>
+      <trkpt lat="33.49788" lon="126.51361">
+      </trkpt>
+      <trkpt lat="33.49777" lon="126.51343">
+      </trkpt>
+      <trkpt lat="33.49761" lon="126.51331">
+      </trkpt>
+      <trkpt lat="33.49691" lon="126.51298">
+      </trkpt>
+      <trkpt lat="33.49672" lon="126.51297">
+      </trkpt>
+      <trkpt lat="33.49656" lon="126.51306">
+      </trkpt>
+      <trkpt lat="33.49645" lon="126.51324">
+      </trkpt>
+      <trkpt lat="33.4964" lon="126.51345">
+      </trkpt>
+      <trkpt lat="33.49642" lon="126.51367">
+      </trkpt>
+      <trkpt lat="33.49653" lon="126.51387">
+      </trkpt>
+      <trkpt lat="33.4967" lon="126.51398">
+      </trkpt>
+      <trkpt lat="33.49686" lon="126.51404">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

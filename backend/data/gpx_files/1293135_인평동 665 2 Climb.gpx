@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>인평동 665 2 Climb</name>
+    <desc>Strava Segment ID: 1293135
+Distance: 671.8m
+Avg Grade: 7.0%</desc>
+  </metadata>
+  <trk>
+    <name>인평동 665 2 Climb</name>
+    <trkseg>
+      <trkpt lat="34.84108" lon="128.39694">
+      </trkpt>
+      <trkpt lat="34.84129" lon="128.39666">
+      </trkpt>
+      <trkpt lat="34.84245" lon="128.39543">
+      </trkpt>
+      <trkpt lat="34.84298" lon="128.39482">
+      </trkpt>
+      <trkpt lat="34.84385" lon="128.39393">
+      </trkpt>
+      <trkpt lat="34.84405" lon="128.39361">
+      </trkpt>
+      <trkpt lat="34.84407" lon="128.3935">
+      </trkpt>
+      <trkpt lat="34.84406" lon="128.39338">
+      </trkpt>
+      <trkpt lat="34.84387" lon="128.39284">
+      </trkpt>
+      <trkpt lat="34.8438" lon="128.39242">
+      </trkpt>
+      <trkpt lat="34.84378" lon="128.3913">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

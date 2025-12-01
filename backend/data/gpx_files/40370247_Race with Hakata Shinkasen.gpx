@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>Race with Hakata Shinkasen </name>
+    <desc>Strava Segment ID: 40370247
+Distance: 450.7m
+Avg Grade: -0.2%</desc>
+  </metadata>
+  <trk>
+    <name>Race with Hakata Shinkasen </name>
+    <trkseg>
+      <trkpt lat="33.57956" lon="130.4212">
+      </trkpt>
+      <trkpt lat="33.57971" lon="130.42115">
+      </trkpt>
+      <trkpt lat="33.58" lon="130.421">
+      </trkpt>
+      <trkpt lat="33.58018" lon="130.42088">
+      </trkpt>
+      <trkpt lat="33.58033" lon="130.42082">
+      </trkpt>
+      <trkpt lat="33.58039" lon="130.42077">
+      </trkpt>
+      <trkpt lat="33.58053" lon="130.42071">
+      </trkpt>
+      <trkpt lat="33.58098" lon="130.42055">
+      </trkpt>
+      <trkpt lat="33.58117" lon="130.4205">
+      </trkpt>
+      <trkpt lat="33.58133" lon="130.42043">
+      </trkpt>
+      <trkpt lat="33.58172" lon="130.42031">
+      </trkpt>
+      <trkpt lat="33.58188" lon="130.42023">
+      </trkpt>
+      <trkpt lat="33.5825" lon="130.42014">
+      </trkpt>
+      <trkpt lat="33.58274" lon="130.42009">
+      </trkpt>
+      <trkpt lat="33.58287" lon="130.42009">
+      </trkpt>
+      <trkpt lat="33.58295" lon="130.42007">
+      </trkpt>
+      <trkpt lat="33.58329" lon="130.42003">
+      </trkpt>
+      <trkpt lat="33.58346" lon="130.42007">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

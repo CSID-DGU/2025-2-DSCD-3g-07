@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>Uphill shorty</name>
+    <desc>Strava Segment ID: 16437576
+Distance: 300.5m
+Avg Grade: 6.9%</desc>
+  </metadata>
+  <trk>
+    <name>Uphill shorty</name>
+    <trkseg>
+      <trkpt lat="35.22769" lon="128.65793">
+      </trkpt>
+      <trkpt lat="35.22785" lon="128.65803">
+      </trkpt>
+      <trkpt lat="35.22806" lon="128.65823">
+      </trkpt>
+      <trkpt lat="35.22821" lon="128.65831">
+      </trkpt>
+      <trkpt lat="35.22832" lon="128.65841">
+      </trkpt>
+      <trkpt lat="35.22884" lon="128.65874">
+      </trkpt>
+      <trkpt lat="35.22916" lon="128.65891">
+      </trkpt>
+      <trkpt lat="35.22954" lon="128.65925">
+      </trkpt>
+      <trkpt lat="35.22995" lon="128.65952">
+      </trkpt>
+      <trkpt lat="35.23003" lon="128.65955">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

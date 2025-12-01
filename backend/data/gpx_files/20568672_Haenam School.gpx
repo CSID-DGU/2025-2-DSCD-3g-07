@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>Haenam School</name>
+    <desc>Strava Segment ID: 20568672
+Distance: 360.2m
+Avg Grade: 0.0%</desc>
+  </metadata>
+  <trk>
+    <name>Haenam School</name>
+    <trkseg>
+      <trkpt lat="34.56885" lon="126.60448">
+      </trkpt>
+      <trkpt lat="34.56893" lon="126.60513">
+      </trkpt>
+      <trkpt lat="34.56895" lon="126.60552">
+      </trkpt>
+      <trkpt lat="34.569" lon="126.60555">
+      </trkpt>
+      <trkpt lat="34.56929" lon="126.60547">
+      </trkpt>
+      <trkpt lat="34.56956" lon="126.60543">
+      </trkpt>
+      <trkpt lat="34.5696" lon="126.60537">
+      </trkpt>
+      <trkpt lat="34.56961" lon="126.60527">
+      </trkpt>
+      <trkpt lat="34.56955" lon="126.60448">
+      </trkpt>
+      <trkpt lat="34.56952" lon="126.60434">
+      </trkpt>
+      <trkpt lat="34.56949" lon="126.60427">
+      </trkpt>
+      <trkpt lat="34.56942" lon="126.60425">
+      </trkpt>
+      <trkpt lat="34.56894" lon="126.60432">
+      </trkpt>
+      <trkpt lat="34.56888" lon="126.60437">
+      </trkpt>
+      <trkpt lat="34.56886" lon="126.60445">
+      </trkpt>
+      <trkpt lat="34.56887" lon="126.60451">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

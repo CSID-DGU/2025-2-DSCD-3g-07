@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>율하천 오르막 1km</name>
+    <desc>Strava Segment ID: 40002252
+Distance: 1023.6m
+Avg Grade: 3.8%</desc>
+  </metadata>
+  <trk>
+    <name>율하천 오르막 1km</name>
+    <trkseg>
+      <trkpt lat="35.17562" lon="128.80016">
+      </trkpt>
+      <trkpt lat="35.17574" lon="128.79971">
+      </trkpt>
+      <trkpt lat="35.17578" lon="128.7995">
+      </trkpt>
+      <trkpt lat="35.17586" lon="128.79857">
+      </trkpt>
+      <trkpt lat="35.17594" lon="128.7981">
+      </trkpt>
+      <trkpt lat="35.176" lon="128.79786">
+      </trkpt>
+      <trkpt lat="35.17608" lon="128.79694">
+      </trkpt>
+      <trkpt lat="35.17613" lon="128.796">
+      </trkpt>
+      <trkpt lat="35.17613" lon="128.79529">
+      </trkpt>
+      <trkpt lat="35.1761" lon="128.79482">
+      </trkpt>
+      <trkpt lat="35.17608" lon="128.79364">
+      </trkpt>
+      <trkpt lat="35.17611" lon="128.79294">
+      </trkpt>
+      <trkpt lat="35.17611" lon="128.79229">
+      </trkpt>
+      <trkpt lat="35.17609" lon="128.79205">
+      </trkpt>
+      <trkpt lat="35.1761" lon="128.79159">
+      </trkpt>
+      <trkpt lat="35.17608" lon="128.79062">
+      </trkpt>
+      <trkpt lat="35.17603" lon="128.78993">
+      </trkpt>
+      <trkpt lat="35.17605" lon="128.78947">
+      </trkpt>
+      <trkpt lat="35.17604" lon="128.78899">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>막판 spurt</name>
+    <desc>Strava Segment ID: 34383610
+Distance: 485.0m
+Avg Grade: 0.8%</desc>
+  </metadata>
+  <trk>
+    <name>막판 spurt</name>
+    <trkseg>
+      <trkpt lat="35.06337" lon="127.74993">
+      </trkpt>
+      <trkpt lat="35.06337" lon="127.74975">
+      </trkpt>
+      <trkpt lat="35.06338" lon="127.74973">
+      </trkpt>
+      <trkpt lat="35.06378" lon="127.74955">
+      </trkpt>
+      <trkpt lat="35.06437" lon="127.74941">
+      </trkpt>
+      <trkpt lat="35.06498" lon="127.74925">
+      </trkpt>
+      <trkpt lat="35.06528" lon="127.74921">
+      </trkpt>
+      <trkpt lat="35.06555" lon="127.7492">
+      </trkpt>
+      <trkpt lat="35.06608" lon="127.74925">
+      </trkpt>
+      <trkpt lat="35.06646" lon="127.74934">
+      </trkpt>
+      <trkpt lat="35.06673" lon="127.74942">
+      </trkpt>
+      <trkpt lat="35.06721" lon="127.74963">
+      </trkpt>
+      <trkpt lat="35.06744" lon="127.74978">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

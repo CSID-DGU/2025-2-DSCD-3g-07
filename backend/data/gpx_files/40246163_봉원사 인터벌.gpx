@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>봉원사 인터벌 </name>
+    <desc>Strava Segment ID: 40246163
+Distance: 502.8m
+Avg Grade: 3.4%</desc>
+  </metadata>
+  <trk>
+    <name>봉원사 인터벌 </name>
+    <trkseg>
+      <trkpt lat="35.14646" lon="128.55242">
+      </trkpt>
+      <trkpt lat="35.14633" lon="128.55206">
+      </trkpt>
+      <trkpt lat="35.14626" lon="128.55182">
+      </trkpt>
+      <trkpt lat="35.14613" lon="128.55097">
+      </trkpt>
+      <trkpt lat="35.14611" lon="128.55033">
+      </trkpt>
+      <trkpt lat="35.14615" lon="128.54975">
+      </trkpt>
+      <trkpt lat="35.14621" lon="128.54933">
+      </trkpt>
+      <trkpt lat="35.1464" lon="128.54856">
+      </trkpt>
+      <trkpt lat="35.1465" lon="128.54833">
+      </trkpt>
+      <trkpt lat="35.14659" lon="128.54805">
+      </trkpt>
+      <trkpt lat="35.14668" lon="128.54784">
+      </trkpt>
+      <trkpt lat="35.14702" lon="128.54724">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

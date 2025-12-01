@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>okitapark300</name>
+    <desc>Strava Segment ID: 35005348
+Distance: 301.8m
+Avg Grade: 0.8%</desc>
+  </metadata>
+  <trk>
+    <name>okitapark300</name>
+    <trkseg>
+      <trkpt lat="33.7114" lon="130.44999">
+      </trkpt>
+      <trkpt lat="33.71135" lon="130.45016">
+      </trkpt>
+      <trkpt lat="33.7113" lon="130.45038">
+      </trkpt>
+      <trkpt lat="33.71097" lon="130.45108">
+      </trkpt>
+      <trkpt lat="33.71081" lon="130.45149">
+      </trkpt>
+      <trkpt lat="33.71019" lon="130.4529">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

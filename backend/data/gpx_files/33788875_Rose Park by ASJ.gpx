@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>Rose Park by ASJ</name>
+    <desc>Strava Segment ID: 33788875
+Distance: 427.8m
+Avg Grade: 0.2%</desc>
+  </metadata>
+  <trk>
+    <name>Rose Park by ASJ</name>
+    <trkseg>
+      <trkpt lat="35.20805" lon="128.69027">
+      </trkpt>
+      <trkpt lat="35.20806" lon="128.69014">
+      </trkpt>
+      <trkpt lat="35.20803" lon="128.69008">
+      </trkpt>
+      <trkpt lat="35.20749" lon="128.68953">
+      </trkpt>
+      <trkpt lat="35.20742" lon="128.68948">
+      </trkpt>
+      <trkpt lat="35.20739" lon="128.68949">
+      </trkpt>
+      <trkpt lat="35.20702" lon="128.69022">
+      </trkpt>
+      <trkpt lat="35.20688" lon="128.6904">
+      </trkpt>
+      <trkpt lat="35.20687" lon="128.69054">
+      </trkpt>
+      <trkpt lat="35.20695" lon="128.69073">
+      </trkpt>
+      <trkpt lat="35.20703" lon="128.69083">
+      </trkpt>
+      <trkpt lat="35.20727" lon="128.69107">
+      </trkpt>
+      <trkpt lat="35.20736" lon="128.69113">
+      </trkpt>
+      <trkpt lat="35.20747" lon="128.69116">
+      </trkpt>
+      <trkpt lat="35.20758" lon="128.69109">
+      </trkpt>
+      <trkpt lat="35.20771" lon="128.69093">
+      </trkpt>
+      <trkpt lat="35.20781" lon="128.69074">
+      </trkpt>
+      <trkpt lat="35.20791" lon="128.69046">
+      </trkpt>
+      <trkpt lat="35.20801" lon="128.69036">
+      </trkpt>
+      <trkpt lat="35.20809" lon="128.6902">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

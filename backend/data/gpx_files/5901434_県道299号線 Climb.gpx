@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>県道299号線 Climb</name>
+    <desc>Strava Segment ID: 5901434
+Distance: 486.8m
+Avg Grade: 9.8%</desc>
+  </metadata>
+  <trk>
+    <name>県道299号線 Climb</name>
+    <trkseg>
+      <trkpt lat="33.44016" lon="130.25552">
+      </trkpt>
+      <trkpt lat="33.44037" lon="130.2546">
+      </trkpt>
+      <trkpt lat="33.44057" lon="130.25382">
+      </trkpt>
+      <trkpt lat="33.44063" lon="130.25348">
+      </trkpt>
+      <trkpt lat="33.44074" lon="130.25265">
+      </trkpt>
+      <trkpt lat="33.44073" lon="130.25236">
+      </trkpt>
+      <trkpt lat="33.44068" lon="130.2521">
+      </trkpt>
+      <trkpt lat="33.44034" lon="130.25129">
+      </trkpt>
+      <trkpt lat="33.44027" lon="130.25099">
+      </trkpt>
+      <trkpt lat="33.44028" lon="130.25068">
+      </trkpt>
+      <trkpt lat="33.44031" lon="130.25049">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

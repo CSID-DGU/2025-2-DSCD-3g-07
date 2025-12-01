@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>배메산 정상 트레일런(배메런)</name>
+    <desc>Strava Segment ID: 24709804
+Distance: 239.2m
+Avg Grade: 0.5%</desc>
+  </metadata>
+  <trk>
+    <name>배메산 정상 트레일런(배메런)</name>
+    <trkseg>
+      <trkpt lat="35.0157" lon="126.79094">
+      </trkpt>
+      <trkpt lat="35.01632" lon="126.79106">
+      </trkpt>
+      <trkpt lat="35.01639" lon="126.79108">
+      </trkpt>
+      <trkpt lat="35.0167" lon="126.79127">
+      </trkpt>
+      <trkpt lat="35.01678" lon="126.79122">
+      </trkpt>
+      <trkpt lat="35.01679" lon="126.7912">
+      </trkpt>
+      <trkpt lat="35.01677" lon="126.79113">
+      </trkpt>
+      <trkpt lat="35.01655" lon="126.79088">
+      </trkpt>
+      <trkpt lat="35.01654" lon="126.79085">
+      </trkpt>
+      <trkpt lat="35.01657" lon="126.79073">
+      </trkpt>
+      <trkpt lat="35.01662" lon="126.79071">
+      </trkpt>
+      <trkpt lat="35.01664" lon="126.79072">
+      </trkpt>
+      <trkpt lat="35.01674" lon="126.79077">
+      </trkpt>
+      <trkpt lat="35.01682" lon="126.79083">
+      </trkpt>
+      <trkpt lat="35.01688" lon="126.79085">
+      </trkpt>
+      <trkpt lat="35.01703" lon="126.79083">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

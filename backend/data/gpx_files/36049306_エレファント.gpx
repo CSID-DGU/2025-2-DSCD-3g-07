@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>エレファント</name>
+    <desc>Strava Segment ID: 36049306
+Distance: 551.0m
+Avg Grade: 0.1%</desc>
+  </metadata>
+  <trk>
+    <name>エレファント</name>
+    <trkseg>
+      <trkpt lat="33.06888" lon="129.85915">
+      </trkpt>
+      <trkpt lat="33.06928" lon="129.85908">
+      </trkpt>
+      <trkpt lat="33.06989" lon="129.85905">
+      </trkpt>
+      <trkpt lat="33.07047" lon="129.85895">
+      </trkpt>
+      <trkpt lat="33.07086" lon="129.85893">
+      </trkpt>
+      <trkpt lat="33.07125" lon="129.85897">
+      </trkpt>
+      <trkpt lat="33.07145" lon="129.85904">
+      </trkpt>
+      <trkpt lat="33.07163" lon="129.85916">
+      </trkpt>
+      <trkpt lat="33.07177" lon="129.8593">
+      </trkpt>
+      <trkpt lat="33.07189" lon="129.8595">
+      </trkpt>
+      <trkpt lat="33.07192" lon="129.85972">
+      </trkpt>
+      <trkpt lat="33.07197" lon="129.85996">
+      </trkpt>
+      <trkpt lat="33.07217" lon="129.8606">
+      </trkpt>
+      <trkpt lat="33.07243" lon="129.86151">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

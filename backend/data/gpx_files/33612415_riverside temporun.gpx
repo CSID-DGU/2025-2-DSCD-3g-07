@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>riverside temporun</name>
+    <desc>Strava Segment ID: 33612415
+Distance: 346.5m
+Avg Grade: 0.2%</desc>
+  </metadata>
+  <trk>
+    <name>riverside temporun</name>
+    <trkseg>
+      <trkpt lat="35.1742" lon="128.14255">
+      </trkpt>
+      <trkpt lat="35.17512" lon="128.1426">
+      </trkpt>
+      <trkpt lat="35.17542" lon="128.14265">
+      </trkpt>
+      <trkpt lat="35.17587" lon="128.14266">
+      </trkpt>
+      <trkpt lat="35.17653" lon="128.14273">
+      </trkpt>
+      <trkpt lat="35.17689" lon="128.14275">
+      </trkpt>
+      <trkpt lat="35.17711" lon="128.14278">
+      </trkpt>
+      <trkpt lat="35.17732" lon="128.14279">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>전남대 평생교육원 (국동)</name>
+    <desc>Strava Segment ID: 37620354
+Distance: 361.9m
+Avg Grade: 0.2%</desc>
+  </metadata>
+  <trk>
+    <name>전남대 평생교육원 (국동)</name>
+    <trkseg>
+      <trkpt lat="34.72862" lon="127.71765">
+      </trkpt>
+      <trkpt lat="34.72854" lon="127.71765">
+      </trkpt>
+      <trkpt lat="34.7285" lon="127.7177">
+      </trkpt>
+      <trkpt lat="34.72838" lon="127.71799">
+      </trkpt>
+      <trkpt lat="34.72822" lon="127.71827">
+      </trkpt>
+      <trkpt lat="34.72821" lon="127.71833">
+      </trkpt>
+      <trkpt lat="34.72824" lon="127.71838">
+      </trkpt>
+      <trkpt lat="34.72867" lon="127.71867">
+      </trkpt>
+      <trkpt lat="34.72896" lon="127.7189">
+      </trkpt>
+      <trkpt lat="34.72903" lon="127.71891">
+      </trkpt>
+      <trkpt lat="34.72907" lon="127.71887">
+      </trkpt>
+      <trkpt lat="34.72923" lon="127.71853">
+      </trkpt>
+      <trkpt lat="34.72933" lon="127.71835">
+      </trkpt>
+      <trkpt lat="34.72936" lon="127.71826">
+      </trkpt>
+      <trkpt lat="34.72935" lon="127.71819">
+      </trkpt>
+      <trkpt lat="34.72931" lon="127.71814">
+      </trkpt>
+      <trkpt lat="34.72912" lon="127.71804">
+      </trkpt>
+      <trkpt lat="34.7286" lon="127.71765">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

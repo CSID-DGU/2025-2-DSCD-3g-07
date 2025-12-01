@@ -1904,7 +1904,7 @@ export default function HomeScreen() {
                   routeInfo.slopeAnalysis.crosswalk_count > 0 &&
                   typeof routeInfo.slopeAnalysis.crosswalk_wait_time === "number" &&
                   routeInfo.slopeAnalysis.crosswalk_wait_time > 0 &&
-                  typeof routeInfo.slopeAnalysis.total_adjusted_walk_time === "number" && (
+                  typeof routeInfo.slopeAnalysis.total_time_with_crosswalk === "number" && (
                     <View style={styles.crosswalkFinalTimeContainer}>
                       <Text style={styles.crosswalkFinalTimeTitle}>
                         (참고용)횡단보도 포함 보정 시간
@@ -1914,9 +1914,9 @@ export default function HomeScreen() {
                           // 대중교통: 보행시간 + 대중교통 탑승시간
                           // 도보: 보행시간만
                           const finalTime = routeMode === 'transit'
-                            ? routeInfo.slopeAnalysis.total_adjusted_walk_time +
+                            ? routeInfo.slopeAnalysis.total_time_with_crosswalk +
                             (routeInfo.totalTime - routeInfo.totalWalkTime)
-                            : routeInfo.slopeAnalysis.total_adjusted_walk_time;
+                            : routeInfo.slopeAnalysis.total_time_with_crosswalk;
                           return `${Math.floor(finalTime / 60)}분 ${finalTime % 60}초`;
                         })()}
                       </Text>

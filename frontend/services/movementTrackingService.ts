@@ -13,7 +13,8 @@ import type { MovementSegment } from './navigationLogService';
 
 const SPEED_THRESHOLD_MIN = 0.3; // m/s (1.08 km/h) - 이하면 정지로 간주
 const SPEED_THRESHOLD_MAX = 4.5; // m/s (16.2 km/h) - 이상이면 차량으로 간주
-const MIN_PAUSE_DURATION = 5; // 초 - 최소 정지 시간
+const MIN_PAUSE_DURATION = 5; // 초 - pausedTime에 기록되는 최소 정지 시간
+const STATE_CHANGE_HYSTERESIS = 3; // 초 - 상태 전환을 위한 히스테리시스 시간 (노이즈 방지)
 
 // 가속도 패턴 분석용 상수
 const ACCEL_STATIONARY_THRESHOLD = 0.15; // 정지 상태
@@ -27,6 +28,10 @@ interface CurrentSegment {
     status: 'walking' | 'paused';
     distanceM: number;
     startLocation?: Location.LocationObject;
+    pendingStatusChange?: {
+        newStatus: 'walking' | 'paused';
+        since: Date;
+    };
 }
 
 interface AccelReading {
@@ -39,6 +44,7 @@ interface AccelReading {
 
 class MovementTrackingService {
     private isTracking = false;
+    private isPaused = false; // 🆕 일시정지 상태
     private currentSegment: CurrentSegment | null = null;
     private segments: MovementSegment[] = [];
     private lastLocation: Location.LocationObject | null = null;
@@ -48,6 +54,14 @@ class MovementTrackingService {
     // 가속도계 데이터 버퍼 (패턴 분석용)
     private accelBuffer: AccelReading[] = [];
     private currentAccelReading: AccelReading | null = null;
+
+    // 추적 시작/종료 시각 (시간 동기화용)
+    private trackingStartTime: Date | null = null;
+    private trackingEndTime: Date | null = null;
+
+    // 이전 GPS 속도 (null 처리용)
+    private lastGpsSpeed: number = 0;
+    private lastLocationTime: number = 0;
 
     /**
      * 추적 시작
@@ -65,6 +79,8 @@ class MovementTrackingService {
             this.lastLocation = null;
             this.accelBuffer = [];
             this.currentAccelReading = null;
+            this.trackingStartTime = new Date();
+            this.trackingEndTime = null;
 
             // GPS 위치 추적 시작
             this.locationSubscription = await Location.watchPositionAsync(
@@ -136,7 +152,9 @@ class MovementTrackingService {
             this.accelSubscription = null;
         }
 
+        this.trackingEndTime = new Date();
         this.isTracking = false;
+        this.currentSegment = null; // 명시적으로 null 설정
         console.log('✅ 움직임 추적 종료');
     }
 
@@ -144,17 +162,48 @@ class MovementTrackingService {
      * GPS 위치 업데이트 핸들러
      */
     private onLocationUpdate(location: Location.LocationObject): void {
+        // GPS 속도 처리 (null 대비)
+        let gpsSpeed = location.coords.speed;
+
+        // GPS 속도가 null이면 거리/시간 기반 속도 계산 또는 이전 속도 사용
+        if (gpsSpeed === null || gpsSpeed === undefined) {
+            if (this.lastLocation && this.lastLocationTime > 0) {
+                const distance = this.calculateDistance(
+                    this.lastLocation.coords.latitude,
+                    this.lastLocation.coords.longitude,
+                    location.coords.latitude,
+                    location.coords.longitude
+                );
+                const timeDelta = (Date.now() - this.lastLocationTime) / 1000; // 초
+                if (timeDelta > 0 && timeDelta < 5) { // 5초 이내
+                    gpsSpeed = distance / timeDelta; // m/s
+                } else {
+                    gpsSpeed = this.lastGpsSpeed; // 이전 속도 사용
+                }
+            } else {
+                gpsSpeed = this.lastGpsSpeed; // 이전 속도 사용
+            }
+        }
+
+        // 유효한 GPS 속도 저장
+        if (gpsSpeed !== null && gpsSpeed !== undefined && gpsSpeed >= 0) {
+            this.lastGpsSpeed = gpsSpeed;
+        }
+        this.lastLocationTime = Date.now();
+
+        // 일시정지 중이면 무시
+        if (this.isPaused) {
+            return;
+        }
+
         if (!this.currentSegment) {
             return;
         }
 
-        // GPS 속도 (m/s)
-        const gpsSpeed = location.coords.speed || 0;
-
         // 가속도계 패턴 분석
         const activityType = this.analyzeActivityType(gpsSpeed);
 
-        // 하이브리드 판단
+        // 하이브리드 판단 (차량은 정지로 취급하여 대기 시간에 포함)
         const isMoving = activityType === 'walking' || activityType === 'running';
 
         // 거리 계산 (이전 위치가 있고, 걷기/뛰기 상태일 때만)
@@ -171,23 +220,38 @@ class MovementTrackingService {
 
         this.lastLocation = location;
 
-        // 상태 전환 판단
-        if (isMoving && this.currentSegment.status === 'paused') {
-            // 정지 → 걷기
-            const pauseDuration = this.getCurrentSegmentDuration();
+        // 상태 전환 판단 (히스테리시스 적용)
+        const desiredStatus = isMoving ? 'walking' : 'paused';
 
-            // 5초 이상 정지했을 때만 구간 분리
-            if (pauseDuration >= MIN_PAUSE_DURATION) {
-                this.finishCurrentSegment();
-                this.startNewSegment('walking');
+        if (desiredStatus !== this.currentSegment.status) {
+            // 상태 변경 필요
+            if (!this.currentSegment.pendingStatusChange) {
+                // 상태 변경 대기 시작
+                this.currentSegment.pendingStatusChange = {
+                    newStatus: desiredStatus,
+                    since: new Date(),
+                };
+            } else if (this.currentSegment.pendingStatusChange.newStatus === desiredStatus) {
+                // 같은 방향으로 상태 변경 대기 중
+                const waitedSeconds = Math.floor(
+                    (Date.now() - this.currentSegment.pendingStatusChange.since.getTime()) / 1000
+                );
+
+                if (waitedSeconds >= STATE_CHANGE_HYSTERESIS) {
+                    // 충분히 대기했으므로 상태 전환
+                    this.finishCurrentSegment();
+                    this.startNewSegment(desiredStatus);
+                }
             } else {
-                // 5초 미만이면 그냥 걷기로 변경 (구간 분리 없음)
-                this.currentSegment.status = 'walking';
+                // 다른 방향으로 바뀜 (노이즈) - 대기 리셋
+                this.currentSegment.pendingStatusChange = {
+                    newStatus: desiredStatus,
+                    since: new Date(),
+                };
             }
-        } else if (!isMoving && this.currentSegment.status === 'walking') {
-            // 걷기 → 정지
-            this.finishCurrentSegment();
-            this.startNewSegment('paused');
+        } else {
+            // 현재 상태 유지 - 대기 취소
+            this.currentSegment.pendingStatusChange = undefined;
         }
     }
 
@@ -227,6 +291,8 @@ class MovementTrackingService {
             return;
         }
 
+        // paused 구간도 모두 기록 (5초 미만 포함)
+
         const avgSpeed = durationSeconds > 0
             ? this.currentSegment.distanceM / durationSeconds
             : 0;
@@ -259,20 +325,56 @@ class MovementTrackingService {
      * 활동 유형 분석 (GPS + 가속도계 패턴)
      */
     private analyzeActivityType(gpsSpeed: number): 'stationary' | 'walking' | 'running' | 'vehicle' {
-        // 1. GPS 속도로 1차 필터링
+        // 가속도계 데이터 먼저 확인 (GPS보다 신뢰도 높음)
+        const hasAccelData = this.currentAccelReading && this.accelBuffer.length >= 5;
+
+        if (hasAccelData) {
+            const accelVariance = this.calculateAccelVariance();
+            const isPeriodic = this.detectPeriodicPattern();
+            const avgAccelMagnitude = this.getAverageAccelMagnitude();
+
+            // 가속도계로 명확한 움직임 감지 시 GPS 속도 무시
+            if (isPeriodic && avgAccelMagnitude >= ACCEL_WALKING_MIN) {
+                // 주기적 움직임 = 걷기/뛰기
+                if (avgAccelMagnitude > ACCEL_RUNNING_MIN) {
+                    return 'running';
+                }
+                if (avgAccelMagnitude <= ACCEL_WALKING_MAX) {
+                    return 'walking';
+                }
+            }
+
+            // 명확한 정지 상태
+            if (accelVariance < ACCEL_STATIONARY_THRESHOLD) {
+                return 'stationary';
+            }
+        }
+
+        // 1. GPS 속도로 1차 필터링 (극단적인 경우)
         if (gpsSpeed < SPEED_THRESHOLD_MIN) {
             // 매우 느림 → 가속도계로 미세 움직임 체크
             const accelVariance = this.calculateAccelVariance();
             return accelVariance < ACCEL_STATIONARY_THRESHOLD ? 'stationary' : 'walking';
         }
 
+        // 🆕 빠른 속도(> 16.2 km/h)도 가속도계로 걷기 패턴 확인
         if (gpsSpeed > SPEED_THRESHOLD_MAX) {
-            // 너무 빠름 → 차량
+            // 가속도계로 걷기 패턴 재확인 (GPS 튐일 수 있음)
+            if (hasAccelData) {
+                const isPeriodic = this.detectPeriodicPattern();
+                const avgAccelMagnitude = this.getAverageAccelMagnitude();
+
+                // 명확한 걷기/뛰기 패턴이면 GPS 무시
+                if (isPeriodic && avgAccelMagnitude >= ACCEL_WALKING_MIN && avgAccelMagnitude <= ACCEL_WALKING_MAX * 1.5) {
+                    return avgAccelMagnitude > ACCEL_RUNNING_MIN ? 'running' : 'walking';
+                }
+            }
+            // 가속도계로 걷기 패턴이 감지 안 되면 차량
             return 'vehicle';
         }
 
-        // 2. 보행 속도 범위 (0.3 ~ 2.5 m/s) → 가속도 패턴으로 세부 분석
-        if (!this.currentAccelReading || this.accelBuffer.length < 5) {
+        // 2. 보행 속도 범위 (0.3 ~ 4.5 m/s) → 가속도 패턴으로 세부 분석
+        if (!hasAccelData) {
             // 데이터 부족 시 GPS 속도로만 판단
             return gpsSpeed > 1.5 ? 'running' : 'walking';
         }
@@ -412,41 +514,17 @@ class MovementTrackingService {
         pauseCount: number;
         segments: MovementSegment[];
     } {
-        // 진행 중인 구간이 있으면 현재 시점까지의 임시 구간 생성
-        let allSegments = [...this.segments];
-        if (this.currentSegment) {
-            const now = new Date();
-            const currentDuration = Math.floor(
-                (now.getTime() - this.currentSegment.startTime.getTime()) / 1000
-            );
-
-            // 현재 진행 중인 구간을 임시로 추가 (1초 이상이고, walking이면 0.5m 이상일 때만)
-            if (currentDuration >= 1) {
-                if (this.currentSegment.status === 'paused' || this.currentSegment.distanceM >= 0.5) {
-                    const avgSpeed = currentDuration > 0
-                        ? this.currentSegment.distanceM / currentDuration
-                        : 0;
-
-                    allSegments.push({
-                        start_time: this.currentSegment.startTime.toISOString(),
-                        end_time: now.toISOString(),
-                        distance_m: Math.round(this.currentSegment.distanceM * 100) / 100,
-                        duration_seconds: currentDuration,
-                        avg_speed_ms: Math.round(avgSpeed * 100) / 100,
-                        status: this.currentSegment.status,
-                    });
-                }
-            }
-        }
+        // 이미 종료된 구간만 사용 (중복 방지)
+        const allSegments = [...this.segments];
 
         const walkingSegments = allSegments.filter(s => s.status === 'walking');
         const pausedSegments = allSegments.filter(s => s.status === 'paused');
 
-        const activeWalkingTime = walkingSegments.reduce(
+        let activeWalkingTime = walkingSegments.reduce(
             (sum, s) => sum + s.duration_seconds,
             0
         );
-        const pausedTime = pausedSegments.reduce(
+        let pausedTime = pausedSegments.reduce(
             (sum, s) => sum + s.duration_seconds,
             0
         );
@@ -454,6 +532,36 @@ class MovementTrackingService {
             (sum, s) => sum + s.distance_m,
             0
         );
+
+        // 시간 동기화: 실제 총 시간과 구간 합계 차이를 마지막 상태에 추가
+        if (this.trackingStartTime && this.trackingEndTime) {
+            const actualTotalSeconds = Math.floor(
+                (this.trackingEndTime.getTime() - this.trackingStartTime.getTime()) / 1000
+            );
+            const measuredTotalSeconds = activeWalkingTime + pausedTime;
+            const lostSeconds = actualTotalSeconds - measuredTotalSeconds;
+
+            if (lostSeconds > 0) {
+                // 손실 시간을 마지막 구간의 상태에 추가
+                if (allSegments.length > 0) {
+                    const lastSegment = allSegments[allSegments.length - 1];
+                    if (lastSegment && lastSegment.status === 'walking') {
+                        activeWalkingTime += lostSeconds;
+                        console.log(`🔄 시간 동기화: ${lostSeconds}초 손실 → 걷기에 추가`);
+                    } else {
+                        pausedTime += lostSeconds;
+                        console.log(`🔄 시간 동기화: ${lostSeconds}초 손실 → 정지에 추가`);
+                    }
+                } else {
+                    // 구간이 없으면 걷기로 간주
+                    activeWalkingTime += lostSeconds;
+                    console.log(`🔄 시간 동기화: ${lostSeconds}초 손실 → 걷기에 추가 (구간 없음)`);
+                }
+                console.log(`   측정: ${measuredTotalSeconds}초, 실제: ${actualTotalSeconds}초, 보정 후: ${activeWalkingTime + pausedTime}초`);
+            } else if (lostSeconds < 0) {
+                console.warn(`⚠️ 측정 시간이 실제보다 ${-lostSeconds}초 더 많음 (비정상)`);
+            }
+        }
 
         const realSpeed = activeWalkingTime > 0
             ? totalDistance / activeWalkingTime
@@ -494,6 +602,58 @@ class MovementTrackingService {
      */
     getIsTracking(): boolean {
         return this.isTracking;
+    }
+
+    /**
+     * 🆕 추적 일시정지 (대중교통 탑승 시)
+     */
+    pauseTracking(): void {
+        if (!this.isTracking) {
+            console.warn('⚠️ 추적 중이 아닙니다.');
+            return;
+        }
+
+        if (this.isPaused) {
+            console.warn('⚠️ 이미 일시정지 상태입니다.');
+            return;
+        }
+
+        // 현재 구간 종료
+        if (this.currentSegment) {
+            this.finishCurrentSegment();
+        }
+
+        this.isPaused = true;
+        console.log('⏸️ 움직임 추적 일시정지 (대중교통 탑승)');
+    }
+
+    /**
+     * 🆕 추적 재개 (도보 구간 시작 시)
+     */
+    resumeTracking(): void {
+        if (!this.isTracking) {
+            console.warn('⚠️ 추적 중이 아닙니다.');
+            return;
+        }
+
+        if (!this.isPaused) {
+            console.warn('⚠️ 일시정지 상태가 아닙니다.');
+            return;
+        }
+
+        this.isPaused = false;
+
+        // 새로운 걷기 구간 시작
+        this.startNewSegment('walking');
+
+        console.log('▶️ 움직임 추적 재개 (도보 구간 시작)');
+    }
+
+    /**
+     * 🆕 일시정지 상태 확인
+     */
+    getIsPaused(): boolean {
+        return this.isPaused;
     }
 }
 

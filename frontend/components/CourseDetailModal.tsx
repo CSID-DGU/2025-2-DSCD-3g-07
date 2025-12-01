@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
     View,
     Text,
@@ -9,6 +9,7 @@ import {
     ScrollView,
     SafeAreaView,
     ActivityIndicator,
+    PanResponder,
 } from 'react-native';
 import { WebView } from 'react-native-webview';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
@@ -53,6 +54,19 @@ const RouteDetailModal: React.FC<RouteDetailModalProps> = ({
 }) => {
     const [routeCoordinates, setRouteCoordinates] = useState<any>(null);
     const [loading, setLoading] = useState(false);
+    const [isMapExpanded, setIsMapExpanded] = useState(false);
+
+    const panResponder = useMemo(() =>
+        PanResponder.create({
+            onMoveShouldSetPanResponder: (_, gesture) => Math.abs(gesture.dy) > 10,
+            onPanResponderRelease: (_, gesture) => {
+                if (gesture.dy < -30) {
+                    setIsMapExpanded(true);
+                } else if (gesture.dy > 30) {
+                    setIsMapExpanded(false);
+                }
+            },
+        }), []);
 
     // 모달이 열릴 때 경로 상세 정보 가져오기
     useEffect(() => {
@@ -135,7 +149,10 @@ const RouteDetailModal: React.FC<RouteDetailModalProps> = ({
                 </View>
 
                 {/* 지도 */}
-                <View style={styles.mapContainer}>
+                <View style={[
+                    styles.mapContainer,
+                    { height: isMapExpanded ? SCREEN_HEIGHT * 0.68 : SCREEN_HEIGHT * 0.4 }
+                ]}>
                     {loading ? (
                         <View style={styles.loadingContainer}>
                             <ActivityIndicator size="large" color={PRIMARY_COLOR} />
@@ -165,10 +182,43 @@ const RouteDetailModal: React.FC<RouteDetailModalProps> = ({
                             <Text style={styles.loadingText}>지도를 불러올 수 없습니다</Text>
                         </View>
                     )}
+
+                    {routeCoordinates && (
+                        <View style={styles.mapLegend} pointerEvents="none">
+                            <View style={styles.legendItem}>
+                                <View style={[styles.legendDot, { backgroundColor: '#F9A825' }]} />
+                                <Text style={styles.legendLabel}>시작</Text>
+                            </View>
+                            <View style={styles.legendItem}>
+                                <View style={[styles.legendDot, { backgroundColor: '#EA4335' }]} />
+                                <Text style={styles.legendLabel}>도착</Text>
+                            </View>
+                            <View style={styles.legendItem}>
+                                <View style={[styles.legendDot, { backgroundColor: '#34C759' }]} />
+                                <Text style={styles.legendLabel}>내 위치</Text>
+                            </View>
+                            <View style={styles.legendItem}>
+                                <View style={[styles.legendLine, { backgroundColor: '#2C6DE7' }]} />
+                                <Text style={styles.legendLabel}>경로</Text>
+                            </View>
+                        </View>
+                    )}
                 </View>
 
                 {/* 정보 */}
-                <ScrollView style={styles.infoContainer}>
+                <ScrollView
+                    style={styles.infoContainer}
+                    contentContainerStyle={{ paddingBottom: 40 }}
+                >
+                    <TouchableOpacity
+                        activeOpacity={0.7}
+                        onPress={() => setIsMapExpanded((prev) => !prev)}
+                        {...panResponder.panHandlers}
+                    >
+                        <View style={styles.dragHandle}>
+                            <View style={styles.dragHandleBar} />
+                        </View>
+                    </TouchableOpacity>
                     <View style={styles.statsGrid}>
                         <View style={styles.statBox}>
                             <MaterialIcons name="straighten" size={24} color={PRIMARY_COLOR} />
@@ -205,10 +255,34 @@ const RouteDetailModal: React.FC<RouteDetailModalProps> = ({
                     )}
 
                     <View style={styles.locationBox}>
-                        <Text style={styles.locationTitle}>시작 위치</Text>
-                        <Text style={styles.locationText}>
-                            위도: {route.start_point.lat.toFixed(6)}, 경도: {route.start_point.lng.toFixed(6)}
-                        </Text>
+                        <Text style={styles.locationTitle}>위치 안내</Text>
+
+                        <View style={styles.locationRow}>
+                            <View style={[styles.legendDot, { backgroundColor: '#F9A825' }]} />
+                            <View style={styles.locationRowTexts}>
+                                <Text style={styles.locationRowLabel}>시작 위치</Text>
+                                <Text style={styles.locationText}>
+                                    위도: {route.start_point.lat.toFixed(6)}, 경도: {route.start_point.lng.toFixed(6)}
+                                </Text>
+                            </View>
+                        </View>
+
+                        {currentLocation ? (
+                            <View style={styles.locationRow}>
+                                <View style={[styles.legendDot, { backgroundColor: '#34C759' }]} />
+                                <View style={styles.locationRowTexts}>
+                                    <Text style={styles.locationRowLabel}>내 현재 위치</Text>
+                                    <Text style={styles.locationText}>
+                                        위도: {currentLocation.latitude.toFixed(6)}, 경도: {currentLocation.longitude.toFixed(6)}
+                                    </Text>
+                                    <Text style={styles.locationSubText}>
+                                        시작점까지 {route.distance_from_user ? `${route.distance_from_user.toFixed(1)}km` : '-'} 거리
+                                    </Text>
+                                </View>
+                            </View>
+                        ) : (
+                            <Text style={styles.locationSubText}>내 위치 정보가 설정되지 않았습니다.</Text>
+                        )}
                     </View>
 
                     {onLogCourseUse ? (
@@ -300,14 +374,75 @@ function generateMapHTML(
         level: 5
       });
 
-      // 1️⃣ GPX 경로 그리기 (녹색 라인)
+      const createCircleMarker = (lat, lng, color, size = 28, stroke = '#FFFFFF', strokeWidth = 3) => {
+        const svg = \`<svg xmlns="http://www.w3.org/2000/svg" width="\${size}" height="\${size}" viewBox="0 0 \${size} \${size}">
+          <circle cx="\${size / 2}" cy="\${size / 2}" r="\${size / 2 - strokeWidth}" fill="\${color}" stroke="\${stroke}" stroke-width="\${strokeWidth}"/>
+          <circle cx="\${size / 2}" cy="\${size / 2}" r="\${size / 2 - strokeWidth - 4}" fill="white"/>
+        </svg>\`;
+
+        return new kakao.maps.Marker({
+          position: new kakao.maps.LatLng(lat, lng),
+          map: map,
+          image: new kakao.maps.MarkerImage(
+            'data:image/svg+xml;base64,' + btoa(svg),
+            new kakao.maps.Size(size, size),
+            { offset: new kakao.maps.Point(size / 2, size / 2) }
+          ),
+          zIndex: 10,
+        });
+      };
+
+    const createLabelOverlay = (lat, lng, label, color) => {
+        const content = document.createElement('div');
+        content.style.cssText = [
+          'transform: translate(-50%, -78%);',
+          'display: flex;',
+          'align-items: center;',
+          'gap: 4px;',
+          'padding: 4px 6px;',
+          'background: rgba(255,255,255,0.95);',
+          'border: 1px solid #E5E7EB;',
+          'border-radius: 6px;',
+          'box-shadow: 0 2px 6px rgba(0,0,0,0.12);',
+          'font-size: 10px;',
+          'font-weight: 700;',
+          'color: #111827;',
+          'white-space: nowrap;',
+        ].join('');
+
+        const dot = document.createElement('span');
+        dot.style.cssText = [
+          'display: inline-flex;',
+          'width: 12px;',
+          'height: 12px;',
+          'border-radius: 6px;',
+          'background: ' + color + ';',
+          'border: 2px solid white;',
+          'box-shadow: 0 0 0 1px #d1d5db;',
+        ].join('');
+
+        const text = document.createElement('span');
+        text.innerText = label;
+        content.appendChild(dot);
+        content.appendChild(text);
+
+        return new kakao.maps.CustomOverlay({
+          position: new kakao.maps.LatLng(lat, lng),
+          content,
+          xAnchor: 0.5,
+          yAnchor: 1.0,
+          zIndex: 20,
+        });
+      };
+
+      // 1️⃣ GPX 경로 그리기 (파란 라인)
       if (pathCoords.length > 0) {
         const linePath = pathCoords.map(coord => new kakao.maps.LatLng(coord.lat, coord.lng));
         
         const polyline = new kakao.maps.Polyline({
           path: linePath,
-          strokeWeight: 5,
-          strokeColor: '#34C759',
+          strokeWeight: 4,
+          strokeColor: '#2C6DE7',
           strokeOpacity: 0.8,
           strokeStyle: 'solid'
         });
@@ -326,42 +461,24 @@ function generateMapHTML(
         map.setBounds(bounds);
       }
 
-      // 2️⃣ 시작점 마커 (파란색)
+      // 2️⃣ 시작점 마커 (노란색)
       if (pathCoords.length > 0) {
         const startCoord = pathCoords[0];
-        new kakao.maps.Marker({
-          position: new kakao.maps.LatLng(startCoord.lat, startCoord.lng),
-          map: map,
-          image: new kakao.maps.MarkerImage(
-            'data:image/svg+xml;base64,' + btoa('<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 36 36"><circle cx="18" cy="18" r="16" fill="%234285F4" stroke="white" stroke-width="3"/><circle cx="18" cy="18" r="8" fill="white"/></svg>'),
-            new kakao.maps.Size(36, 36)
-          )
-        });
+        createCircleMarker(startCoord.lat, startCoord.lng, '#F9A825');
+        createLabelOverlay(startCoord.lat, startCoord.lng, '시작', '#F9A825').setMap(map);
       }
 
       // 3️⃣ 종료점 마커 (빨간색)
       if (pathCoords.length > 1) {
         const endCoord = pathCoords[pathCoords.length - 1];
-        new kakao.maps.Marker({
-          position: new kakao.maps.LatLng(endCoord.lat, endCoord.lng),
-          map: map,
-          image: new kakao.maps.MarkerImage(
-            'data:image/svg+xml;base64,' + btoa('<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 36 36"><circle cx="18" cy="18" r="16" fill="%23EA4335" stroke="white" stroke-width="3"/><circle cx="18" cy="18" r="8" fill="white"/></svg>'),
-            new kakao.maps.Size(36, 36)
-          )
-        });
+        createCircleMarker(endCoord.lat, endCoord.lng, '#EA4335');
+        createLabelOverlay(endCoord.lat, endCoord.lng, '도착', '#EA4335').setMap(map);
       }
 
       // 4️⃣ 현재 위치 마커 (녹색)
       ${currentLocation ? `
-      new kakao.maps.Marker({
-        position: new kakao.maps.LatLng(${currentLocation.latitude}, ${currentLocation.longitude}),
-        map: map,
-        image: new kakao.maps.MarkerImage(
-          'data:image/svg+xml;base64,' + btoa('<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="16" r="14" fill="%2334C759" stroke="white" stroke-width="3"/><circle cx="16" cy="16" r="6" fill="white"/></svg>'),
-          new kakao.maps.Size(32, 32)
-        )
-      });
+      createCircleMarker(${currentLocation.latitude}, ${currentLocation.longitude}, '#34C759', 32, '#FFFFFF', 3);
+      createLabelOverlay(${currentLocation.latitude}, ${currentLocation.longitude}, '내 위치', '#34C759').setMap(map);
       ` : ''}
       
       console.log('✅ 지도 렌더링 완료');
@@ -413,6 +530,8 @@ const styles = StyleSheet.create({
     mapContainer: {
         height: SCREEN_HEIGHT * 0.4,
         backgroundColor: '#f0f0f0',
+        position: 'relative',
+        overflow: 'hidden',
     },
     map: {
         flex: 1,
@@ -427,6 +546,39 @@ const styles = StyleSheet.create({
         marginTop: 12,
         fontSize: 14,
         color: SECONDARY_TEXT,
+    },
+    mapLegend: {
+        position: 'absolute',
+        top: 12,
+        right: 12,
+        flexDirection: 'row',
+        backgroundColor: 'rgba(255,255,255,0.9)',
+        paddingHorizontal: 10,
+        paddingVertical: 8,
+        borderRadius: 12,
+        gap: 10,
+        borderWidth: 1,
+        borderColor: '#E6E9F2',
+    },
+    legendItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 6,
+    },
+    legendDot: {
+        width: 12,
+        height: 12,
+        borderRadius: 6,
+    },
+    legendLine: {
+        width: 18,
+        height: 4,
+        borderRadius: 4,
+    },
+    legendLabel: {
+        fontSize: 12,
+        color: '#1A1F2E',
+        fontWeight: '600',
     },
     infoContainer: {
         flex: 1,
@@ -491,6 +643,25 @@ const styles = StyleSheet.create({
         fontSize: 12,
         color: SECONDARY_TEXT,
     },
+    locationRow: {
+        flexDirection: 'row',
+        alignItems: 'flex-start',
+        gap: 10,
+        marginTop: 10,
+    },
+    locationRowTexts: {
+        flex: 1,
+        gap: 2,
+    },
+    locationRowLabel: {
+        fontSize: 13,
+        fontWeight: '700',
+        color: '#1A1F2E',
+    },
+    locationSubText: {
+        fontSize: 12,
+        color: SECONDARY_TEXT,
+    },
     mapPlaceholder: {
         flex: 1,
         justifyContent: 'center',
@@ -500,6 +671,16 @@ const styles = StyleSheet.create({
     placeholderText: {
         fontSize: 14,
         color: '#666',
+    },
+    dragHandle: {
+        alignItems: 'center',
+        paddingVertical: 8,
+    },
+    dragHandleBar: {
+        width: 50,
+        height: 5,
+        borderRadius: 3,
+        backgroundColor: '#D1D5DB',
     },
     logButton: {
         flexDirection: 'row',

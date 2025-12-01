@@ -12,6 +12,7 @@ sys.path.append(str(Path(__file__).parent.parent))
 
 from app.database import SessionLocal
 from app.utils.gpx_loader import GPXLoader
+from sqlalchemy import text
 
 
 def load_all_gpx_files(gpx_directory: str, segment_length: int = 100):
@@ -48,7 +49,7 @@ def load_all_gpx_files(gpx_directory: str, segment_length: int = 100):
             try:
                 # 중복 체크: external_id로 이미 있는지 확인
                 filename = gpx_file.stem  # 확장자 제외한 파일명
-                check_query = "SELECT COUNT(*) FROM routes WHERE external_id = :external_id"
+                check_query = text("SELECT COUNT(*) FROM routes WHERE external_id = :external_id")
                 result_check = db.execute(check_query, {'external_id': filename}).fetchone()
                 
                 if result_check[0] > 0:

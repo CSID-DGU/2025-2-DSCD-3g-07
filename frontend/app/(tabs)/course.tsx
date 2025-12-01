@@ -63,6 +63,7 @@ export default function CourseScreen() {
   const [searchMode, setSearchMode] = useState<SearchMode>('walking');
   const [distanceValue, setDistanceValue] = useState(''); // 목표 거리 입력값
   const [timeValue, setTimeValue] = useState(''); // 목표 시간 입력값
+  const [timeSpeedMode, setTimeSpeedMode] = useState<'walking' | 'running'>('walking'); // 시간 모드 시 이동 방식
   const [currentLocation, setCurrentLocation] = useState<CurrentLocation | null>(null);
   const [loadingLocation, setLoadingLocation] = useState(false);
   const [walkingSpeed, setWalkingSpeed] = useState<number | null>(null); // km/h
@@ -242,6 +243,16 @@ export default function CourseScreen() {
     }
   };
 
+  const getActiveSpeed = () => {
+    if (searchMode === 'running') {
+      return RUNNING_SPEED;
+    }
+    if (searchMode === 'walking') {
+      return walkingSpeed || 4.0;
+    }
+    return timeSpeedMode === 'running' ? RUNNING_SPEED : (walkingSpeed || 4.0);
+  };
+
   // 경로 검색
   const searchRoutes = async () => {
     const inputValue = searchMode === 'time' ? timeValue : distanceValue;
@@ -256,7 +267,7 @@ export default function CourseScreen() {
       return;
     }
 
-    if (!walkingSpeed && searchMode === 'walking') {
+    if (!walkingSpeed && (searchMode === 'walking' || (searchMode === 'time' && timeSpeedMode === 'walking'))) {
       Alert.alert('알림', '사용자 속도 정보를 불러오는 중입니다.');
       return;
     }
@@ -271,7 +282,7 @@ export default function CourseScreen() {
       }
 
       // 모드에 따라 속도 결정
-      const currentSpeed = searchMode === 'running' ? RUNNING_SPEED : (walkingSpeed || 4.0);
+      const currentSpeed = getActiveSpeed();
 
       console.log('🔍 경로 검색:', {
         searchMode,
@@ -358,7 +369,10 @@ export default function CourseScreen() {
                 styles.modeButton,
                 searchMode === 'walking' && styles.modeButtonActive,
               ]}
-              onPress={() => setSearchMode('walking')}
+              onPress={() => {
+                setTimeSpeedMode('walking');
+                setSearchMode('walking');
+              }}
             >
               <MaterialIcons
                 name="directions-walk"
@@ -385,7 +399,10 @@ export default function CourseScreen() {
                 styles.modeButton,
                 searchMode === 'running' && styles.modeButtonActive,
               ]}
-              onPress={() => setSearchMode('running')}
+              onPress={() => {
+                setTimeSpeedMode('running');
+                setSearchMode('running');
+              }}
             >
               <MaterialIcons
                 name="directions-run"
@@ -449,14 +466,83 @@ export default function CourseScreen() {
               </Text>
             </View>
 
+            {searchMode === 'time' && (
+              <View style={styles.timeModeContainer}>
+                <Text style={styles.timeModeLabel}>이동 방식</Text>
+                <View style={styles.timeModeButtons}>
+                  <TouchableOpacity
+                    style={[
+                      styles.timeModeButton,
+                      timeSpeedMode === 'walking' && styles.timeModeButtonActive,
+                    ]}
+                    onPress={() => setTimeSpeedMode('walking')}
+                  >
+                    <MaterialIcons
+                      name="directions-walk"
+                      size={18}
+                      color={timeSpeedMode === 'walking' ? 'white' : SECONDARY_TEXT}
+                    />
+                    <Text
+                      style={[
+                        styles.timeModeButtonText,
+                        timeSpeedMode === 'walking' && styles.timeModeButtonTextActive,
+                      ]}
+                    >
+                      걷기
+                    </Text>
+                    {walkingSpeed && (
+                      <Text
+                        style={[
+                          styles.timeModeSpeedText,
+                          timeSpeedMode === 'walking' && styles.timeModeButtonTextActive,
+                        ]}
+                      >
+                        {walkingSpeed.toFixed(1)}km/h
+                      </Text>
+                    )}
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={[
+                      styles.timeModeButton,
+                      timeSpeedMode === 'running' && styles.timeModeButtonActive,
+                    ]}
+                    onPress={() => setTimeSpeedMode('running')}
+                  >
+                    <MaterialIcons
+                      name="directions-run"
+                      size={18}
+                      color={timeSpeedMode === 'running' ? 'white' : SECONDARY_TEXT}
+                    />
+                    <Text
+                      style={[
+                        styles.timeModeButtonText,
+                        timeSpeedMode === 'running' && styles.timeModeButtonTextActive,
+                      ]}
+                    >
+                      달리기
+                    </Text>
+                    <Text
+                      style={[
+                        styles.timeModeSpeedText,
+                        timeSpeedMode === 'running' && styles.timeModeButtonTextActive,
+                      ]}
+                    >
+                      {RUNNING_SPEED.toFixed(1)}km/h
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            )}
+
             {/* 예상 정보 */}
             {((searchMode !== 'time' && distanceValue) || (searchMode === 'time' && timeValue)) && (
               <View style={styles.estimationBox}>
                 <Ionicons name="information-circle" size={16} color={PRIMARY_COLOR} />
                 <Text style={styles.estimationText}>
                   {searchMode === 'time'
-                    ? `약 ${((parseFloat(timeValue) / 60) * (walkingSpeed || 4.0)).toFixed(1)}km 이동 예상`
-                    : `약 ${Math.round((parseFloat(distanceValue) / (searchMode === 'running' ? RUNNING_SPEED : (walkingSpeed || 4.0))) * 60)}분 소요 예상`
+                    ? `약 ${((parseFloat(timeValue) / 60) * getActiveSpeed()).toFixed(1)}km 이동 예상`
+                    : `약 ${Math.round((parseFloat(distanceValue) / getActiveSpeed()) * 60)}분 소요 예상`
                   }
                 </Text>
               </View>
@@ -779,6 +865,46 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: SECONDARY_TEXT,
     marginLeft: 8,
+  },
+  timeModeContainer: {
+    marginTop: 12,
+    gap: 8,
+  },
+  timeModeLabel: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: SECONDARY_TEXT,
+  },
+  timeModeButtons: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  timeModeButton: {
+    flex: 1,
+    backgroundColor: LIGHT_BACKGROUND,
+    borderRadius: 12,
+    paddingVertical: 12,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: BORDER_COLOR,
+  },
+  timeModeButtonActive: {
+    backgroundColor: PRIMARY_COLOR,
+    borderColor: PRIMARY_COLOR,
+  },
+  timeModeButtonText: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: SECONDARY_TEXT,
+  },
+  timeModeButtonTextActive: {
+    color: 'white',
+  },
+  timeModeSpeedText: {
+    marginTop: 2,
+    fontSize: 12,
+    fontWeight: '600',
+    color: SECONDARY_TEXT,
   },
   estimationBox: {
     flexDirection: 'row',

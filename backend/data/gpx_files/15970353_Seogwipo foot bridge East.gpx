@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>Seogwipo foot bridge East</name>
+    <desc>Strava Segment ID: 15970353
+Distance: 199.3m
+Avg Grade: 4.2%</desc>
+  </metadata>
+  <trk>
+    <name>Seogwipo foot bridge East</name>
+    <trkseg>
+      <trkpt lat="33.23868" lon="126.55886">
+      </trkpt>
+      <trkpt lat="33.23825" lon="126.55921">
+      </trkpt>
+      <trkpt lat="33.23816" lon="126.55929">
+      </trkpt>
+      <trkpt lat="33.23801" lon="126.55938">
+      </trkpt>
+      <trkpt lat="33.23786" lon="126.55952">
+      </trkpt>
+      <trkpt lat="33.2375" lon="126.55973">
+      </trkpt>
+      <trkpt lat="33.23725" lon="126.55992">
+      </trkpt>
+      <trkpt lat="33.23716" lon="126.55997">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

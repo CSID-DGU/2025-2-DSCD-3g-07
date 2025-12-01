@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>도원체육공원 400m (스탠드 스타트)</name>
+    <desc>Strava Segment ID: 12076630
+Distance: 404.3m
+Avg Grade: 0.1%</desc>
+  </metadata>
+  <trk>
+    <name>도원체육공원 400m (스탠드 스타트)</name>
+    <trkseg>
+      <trkpt lat="37.13338" lon="126.93005">
+      </trkpt>
+      <trkpt lat="37.13389" lon="126.93008">
+      </trkpt>
+      <trkpt lat="37.13396" lon="126.93006">
+      </trkpt>
+      <trkpt lat="37.13405" lon="126.93">
+      </trkpt>
+      <trkpt lat="37.13412" lon="126.92986">
+      </trkpt>
+      <trkpt lat="37.13414" lon="126.92969">
+      </trkpt>
+      <trkpt lat="37.13409" lon="126.92952">
+      </trkpt>
+      <trkpt lat="37.134" lon="126.92938">
+      </trkpt>
+      <trkpt lat="37.1339" lon="126.92932">
+      </trkpt>
+      <trkpt lat="37.13382" lon="126.9293">
+      </trkpt>
+      <trkpt lat="37.133" lon="126.92928">
+      </trkpt>
+      <trkpt lat="37.13285" lon="126.92931">
+      </trkpt>
+      <trkpt lat="37.13276" lon="126.92938">
+      </trkpt>
+      <trkpt lat="37.13268" lon="126.92952">
+      </trkpt>
+      <trkpt lat="37.13266" lon="126.9297">
+      </trkpt>
+      <trkpt lat="37.13269" lon="126.92987">
+      </trkpt>
+      <trkpt lat="37.13275" lon="126.92997">
+      </trkpt>
+      <trkpt lat="37.13285" lon="126.93005">
+      </trkpt>
+      <trkpt lat="37.13295" lon="126.93008">
+      </trkpt>
+      <trkpt lat="37.13333" lon="126.93008">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>River Bridges</name>
+    <desc>Strava Segment ID: 6369526
+Distance: 873.9m
+Avg Grade: 0.0%</desc>
+  </metadata>
+  <trk>
+    <name>River Bridges</name>
+    <trkseg>
+      <trkpt lat="35.22434" lon="128.63751">
+      </trkpt>
+      <trkpt lat="35.22497" lon="128.63809">
+      </trkpt>
+      <trkpt lat="35.22572" lon="128.63874">
+      </trkpt>
+      <trkpt lat="35.22669" lon="128.63966">
+      </trkpt>
+      <trkpt lat="35.22738" lon="128.64024">
+      </trkpt>
+      <trkpt lat="35.22908" lon="128.64176">
+      </trkpt>
+      <trkpt lat="35.23035" lon="128.64295">
+      </trkpt>
+      <trkpt lat="35.23065" lon="128.64322">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

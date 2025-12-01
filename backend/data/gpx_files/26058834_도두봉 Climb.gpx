@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>도두봉 Climb</name>
+    <desc>Strava Segment ID: 26058834
+Distance: 202.7m
+Avg Grade: 22.3%</desc>
+  </metadata>
+  <trk>
+    <name>도두봉 Climb</name>
+    <trkseg>
+      <trkpt lat="33.50627" lon="126.46893">
+      </trkpt>
+      <trkpt lat="33.50643" lon="126.46894">
+      </trkpt>
+      <trkpt lat="33.5066" lon="126.4689">
+      </trkpt>
+      <trkpt lat="33.50664" lon="126.46885">
+      </trkpt>
+      <trkpt lat="33.50666" lon="126.46866">
+      </trkpt>
+      <trkpt lat="33.50677" lon="126.46855">
+      </trkpt>
+      <trkpt lat="33.50705" lon="126.46854">
+      </trkpt>
+      <trkpt lat="33.50735" lon="126.46863">
+      </trkpt>
+      <trkpt lat="33.50747" lon="126.46858">
+      </trkpt>
+      <trkpt lat="33.50755" lon="126.46851">
+      </trkpt>
+      <trkpt lat="33.50766" lon="126.46845">
+      </trkpt>
+      <trkpt lat="33.50779" lon="126.46849">
+      </trkpt>
+      <trkpt lat="33.50786" lon="126.46848">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

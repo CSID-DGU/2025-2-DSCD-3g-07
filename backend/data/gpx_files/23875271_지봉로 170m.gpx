@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>지봉로 170m</name>
+    <desc>Strava Segment ID: 23875271
+Distance: 177.1m
+Avg Grade: 3.4%</desc>
+  </metadata>
+  <trk>
+    <name>지봉로 170m</name>
+    <trkseg>
+      <trkpt lat="34.94628" lon="127.53299">
+      </trkpt>
+      <trkpt lat="34.94638" lon="127.533">
+      </trkpt>
+      <trkpt lat="34.94645" lon="127.53299">
+      </trkpt>
+      <trkpt lat="34.94659" lon="127.53294">
+      </trkpt>
+      <trkpt lat="34.94671" lon="127.53285">
+      </trkpt>
+      <trkpt lat="34.94687" lon="127.53282">
+      </trkpt>
+      <trkpt lat="34.94702" lon="127.53288">
+      </trkpt>
+      <trkpt lat="34.94714" lon="127.53291">
+      </trkpt>
+      <trkpt lat="34.94722" lon="127.5329">
+      </trkpt>
+      <trkpt lat="34.94733" lon="127.53287">
+      </trkpt>
+      <trkpt lat="34.94743" lon="127.53287">
+      </trkpt>
+      <trkpt lat="34.94764" lon="127.53279">
+      </trkpt>
+      <trkpt lat="34.94771" lon="127.53279">
+      </trkpt>
+      <trkpt lat="34.9478" lon="127.53283">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

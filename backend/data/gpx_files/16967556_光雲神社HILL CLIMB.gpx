@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>光雲神社HILL CLIMB</name>
+    <desc>Strava Segment ID: 16967556
+Distance: 301.9m
+Avg Grade: 7.0%</desc>
+  </metadata>
+  <trk>
+    <name>光雲神社HILL CLIMB</name>
+    <trkseg>
+      <trkpt lat="33.59464" lon="130.37607">
+      </trkpt>
+      <trkpt lat="33.59475" lon="130.37611">
+      </trkpt>
+      <trkpt lat="33.59504" lon="130.37614">
+      </trkpt>
+      <trkpt lat="33.59524" lon="130.37619">
+      </trkpt>
+      <trkpt lat="33.59559" lon="130.3762">
+      </trkpt>
+      <trkpt lat="33.59595" lon="130.37626">
+      </trkpt>
+      <trkpt lat="33.59614" lon="130.37633">
+      </trkpt>
+      <trkpt lat="33.59653" lon="130.37635">
+      </trkpt>
+      <trkpt lat="33.59668" lon="130.37638">
+      </trkpt>
+      <trkpt lat="33.59671" lon="130.37638">
+      </trkpt>
+      <trkpt lat="33.59683" lon="130.37643">
+      </trkpt>
+      <trkpt lat="33.59722" lon="130.37646">
+      </trkpt>
+      <trkpt lat="33.59733" lon="130.37645">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

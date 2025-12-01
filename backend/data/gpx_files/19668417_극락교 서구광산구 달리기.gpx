@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>극락교 서구&gt;광산구 달리기</name>
+    <desc>Strava Segment ID: 19668417
+Distance: 295.0m
+Avg Grade: -0.5%</desc>
+  </metadata>
+  <trk>
+    <name>극락교 서구&gt;광산구 달리기</name>
+    <trkseg>
+      <trkpt lat="35.14079" lon="126.82978">
+      </trkpt>
+      <trkpt lat="35.14085" lon="126.82952">
+      </trkpt>
+      <trkpt lat="35.14103" lon="126.82905">
+      </trkpt>
+      <trkpt lat="35.14116" lon="126.82866">
+      </trkpt>
+      <trkpt lat="35.1413" lon="126.82811">
+      </trkpt>
+      <trkpt lat="35.1415" lon="126.82758">
+      </trkpt>
+      <trkpt lat="35.14158" lon="126.82716">
+      </trkpt>
+      <trkpt lat="35.14175" lon="126.82678">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

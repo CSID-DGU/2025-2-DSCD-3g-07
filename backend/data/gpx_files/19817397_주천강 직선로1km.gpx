@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>주천강 직선로(1km)</name>
+    <desc>Strava Segment ID: 19817397
+Distance: 988.9m
+Avg Grade: -0.1%</desc>
+  </metadata>
+  <trk>
+    <name>주천강 직선로(1km)</name>
+    <trkseg>
+      <trkpt lat="35.31384" lon="128.72752">
+      </trkpt>
+      <trkpt lat="35.31374" lon="128.72729">
+      </trkpt>
+      <trkpt lat="35.3135" lon="128.72664">
+      </trkpt>
+      <trkpt lat="35.31329" lon="128.72596">
+      </trkpt>
+      <trkpt lat="35.31248" lon="128.72357">
+      </trkpt>
+      <trkpt lat="35.31235" lon="128.72314">
+      </trkpt>
+      <trkpt lat="35.31219" lon="128.72271">
+      </trkpt>
+      <trkpt lat="35.31193" lon="128.72185">
+      </trkpt>
+      <trkpt lat="35.31169" lon="128.72119">
+      </trkpt>
+      <trkpt lat="35.31141" lon="128.7203">
+      </trkpt>
+      <trkpt lat="35.31055" lon="128.71791">
+      </trkpt>
+      <trkpt lat="35.31049" lon="128.7177">
+      </trkpt>
+      <trkpt lat="35.31044" lon="128.71746">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

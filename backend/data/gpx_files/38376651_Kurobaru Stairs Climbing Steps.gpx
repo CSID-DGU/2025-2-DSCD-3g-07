@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>Kurobaru Stairs Climbing Steps</name>
+    <desc>Strava Segment ID: 38376651
+Distance: 251.0m
+Avg Grade: 13.7%</desc>
+  </metadata>
+  <trk>
+    <name>Kurobaru Stairs Climbing Steps</name>
+    <trkseg>
+      <trkpt lat="33.86261" lon="130.89952">
+      </trkpt>
+      <trkpt lat="33.86247" lon="130.90033">
+      </trkpt>
+      <trkpt lat="33.86242" lon="130.90045">
+      </trkpt>
+      <trkpt lat="33.86229" lon="130.90069">
+      </trkpt>
+      <trkpt lat="33.86222" lon="130.90096">
+      </trkpt>
+      <trkpt lat="33.86218" lon="130.90116">
+      </trkpt>
+      <trkpt lat="33.86222" lon="130.90151">
+      </trkpt>
+      <trkpt lat="33.86237" lon="130.90207">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

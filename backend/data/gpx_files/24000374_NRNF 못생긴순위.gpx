@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>NRNF 못생긴순위</name>
+    <desc>Strava Segment ID: 24000374
+Distance: 785.7m
+Avg Grade: -0.1%</desc>
+  </metadata>
+  <trk>
+    <name>NRNF 못생긴순위</name>
+    <trkseg>
+      <trkpt lat="35.16405" lon="128.05725">
+      </trkpt>
+      <trkpt lat="35.16486" lon="128.05866">
+      </trkpt>
+      <trkpt lat="35.16524" lon="128.05943">
+      </trkpt>
+      <trkpt lat="35.1655" lon="128.05991">
+      </trkpt>
+      <trkpt lat="35.16563" lon="128.06011">
+      </trkpt>
+      <trkpt lat="35.16604" lon="128.06084">
+      </trkpt>
+      <trkpt lat="35.16624" lon="128.06115">
+      </trkpt>
+      <trkpt lat="35.16668" lon="128.06192">
+      </trkpt>
+      <trkpt lat="35.16695" lon="128.06234">
+      </trkpt>
+      <trkpt lat="35.16719" lon="128.06279">
+      </trkpt>
+      <trkpt lat="35.1681" lon="128.06431">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

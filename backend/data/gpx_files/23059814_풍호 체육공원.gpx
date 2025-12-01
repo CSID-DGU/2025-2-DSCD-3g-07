@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>풍호 체육공원</name>
+    <desc>Strava Segment ID: 23059814
+Distance: 344.7m
+Avg Grade: -0.2%</desc>
+  </metadata>
+  <trk>
+    <name>풍호 체육공원</name>
+    <trkseg>
+      <trkpt lat="35.13578" lon="128.7127">
+      </trkpt>
+      <trkpt lat="35.13547" lon="128.71301">
+      </trkpt>
+      <trkpt lat="35.13542" lon="128.71311">
+      </trkpt>
+      <trkpt lat="35.13541" lon="128.71317">
+      </trkpt>
+      <trkpt lat="35.13562" lon="128.71351">
+      </trkpt>
+      <trkpt lat="35.13575" lon="128.71379">
+      </trkpt>
+      <trkpt lat="35.13592" lon="128.71402">
+      </trkpt>
+      <trkpt lat="35.13598" lon="128.71408">
+      </trkpt>
+      <trkpt lat="35.136" lon="128.71407">
+      </trkpt>
+      <trkpt lat="35.13642" lon="128.71365">
+      </trkpt>
+      <trkpt lat="35.13645" lon="128.71357">
+      </trkpt>
+      <trkpt lat="35.13638" lon="128.71346">
+      </trkpt>
+      <trkpt lat="35.13624" lon="128.71329">
+      </trkpt>
+      <trkpt lat="35.13613" lon="128.7131">
+      </trkpt>
+      <trkpt lat="35.13602" lon="128.71298">
+      </trkpt>
+      <trkpt lat="35.13594" lon="128.71282">
+      </trkpt>
+      <trkpt lat="35.13584" lon="128.7127">
+      </trkpt>
+      <trkpt lat="35.13581" lon="128.7127">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

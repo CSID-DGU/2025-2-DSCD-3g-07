@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>NRNF The Ugly Hill!</name>
+    <desc>Strava Segment ID: 24281141
+Distance: 187.5m
+Avg Grade: 11.9%</desc>
+  </metadata>
+  <trk>
+    <name>NRNF The Ugly Hill!</name>
+    <trkseg>
+      <trkpt lat="35.13898" lon="128.0535">
+      </trkpt>
+      <trkpt lat="35.13895" lon="128.05338">
+      </trkpt>
+      <trkpt lat="35.13885" lon="128.05271">
+      </trkpt>
+      <trkpt lat="35.13883" lon="128.05211">
+      </trkpt>
+      <trkpt lat="35.13879" lon="128.05201">
+      </trkpt>
+      <trkpt lat="35.13876" lon="128.0517">
+      </trkpt>
+      <trkpt lat="35.13869" lon="128.05148">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

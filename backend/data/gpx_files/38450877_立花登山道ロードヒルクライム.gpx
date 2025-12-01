@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>立花登山道ロード　ヒルクライム</name>
+    <desc>Strava Segment ID: 38450877
+Distance: 265.9m
+Avg Grade: 18.6%</desc>
+  </metadata>
+  <trk>
+    <name>立花登山道ロード　ヒルクライム</name>
+    <trkseg>
+      <trkpt lat="33.68517" lon="130.47238">
+      </trkpt>
+      <trkpt lat="33.6851" lon="130.47212">
+      </trkpt>
+      <trkpt lat="33.68497" lon="130.47193">
+      </trkpt>
+      <trkpt lat="33.68491" lon="130.47191">
+      </trkpt>
+      <trkpt lat="33.68471" lon="130.47189">
+      </trkpt>
+      <trkpt lat="33.68465" lon="130.47187">
+      </trkpt>
+      <trkpt lat="33.68448" lon="130.47173">
+      </trkpt>
+      <trkpt lat="33.68437" lon="130.47171">
+      </trkpt>
+      <trkpt lat="33.68421" lon="130.47162">
+      </trkpt>
+      <trkpt lat="33.68415" lon="130.47162">
+      </trkpt>
+      <trkpt lat="33.68398" lon="130.47156">
+      </trkpt>
+      <trkpt lat="33.68392" lon="130.47149">
+      </trkpt>
+      <trkpt lat="33.68388" lon="130.47138">
+      </trkpt>
+      <trkpt lat="33.68379" lon="130.47122">
+      </trkpt>
+      <trkpt lat="33.68363" lon="130.47113">
+      </trkpt>
+      <trkpt lat="33.6835" lon="130.47102">
+      </trkpt>
+      <trkpt lat="33.68336" lon="130.47096">
+      </trkpt>
+      <trkpt lat="33.68331" lon="130.47089">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>노형로 400m / 노형119-서울주유소</name>
+    <desc>Strava Segment ID: 16575513
+Distance: 425.8m
+Avg Grade: 2.6%</desc>
+  </metadata>
+  <trk>
+    <name>노형로 400m / 노형119-서울주유소</name>
+    <trkseg>
+      <trkpt lat="33.48062" lon="126.47188">
+      </trkpt>
+      <trkpt lat="33.48038" lon="126.47163">
+      </trkpt>
+      <trkpt lat="33.48017" lon="126.47131">
+      </trkpt>
+      <trkpt lat="33.47994" lon="126.47104">
+      </trkpt>
+      <trkpt lat="33.4798" lon="126.47079">
+      </trkpt>
+      <trkpt lat="33.47963" lon="126.47059">
+      </trkpt>
+      <trkpt lat="33.47952" lon="126.4704">
+      </trkpt>
+      <trkpt lat="33.47931" lon="126.47012">
+      </trkpt>
+      <trkpt lat="33.47906" lon="126.46968">
+      </trkpt>
+      <trkpt lat="33.47887" lon="126.46924">
+      </trkpt>
+      <trkpt lat="33.47875" lon="126.46901">
+      </trkpt>
+      <trkpt lat="33.47871" lon="126.46889">
+      </trkpt>
+      <trkpt lat="33.47857" lon="126.46861">
+      </trkpt>
+      <trkpt lat="33.47841" lon="126.4682">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

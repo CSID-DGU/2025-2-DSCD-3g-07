@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>송정동 산86 6 Climb</name>
+    <desc>Strava Segment ID: 900180
+Distance: 894.6m
+Avg Grade: 8.3%</desc>
+  </metadata>
+  <trk>
+    <name>송정동 산86 6 Climb</name>
+    <trkseg>
+      <trkpt lat="35.18097" lon="129.19881">
+      </trkpt>
+      <trkpt lat="35.18037" lon="129.1973">
+      </trkpt>
+      <trkpt lat="35.18026" lon="129.19693">
+      </trkpt>
+      <trkpt lat="35.1801" lon="129.19659">
+      </trkpt>
+      <trkpt lat="35.1799" lon="129.19625">
+      </trkpt>
+      <trkpt lat="35.17937" lon="129.1954">
+      </trkpt>
+      <trkpt lat="35.17927" lon="129.19519">
+      </trkpt>
+      <trkpt lat="35.17906" lon="129.19453">
+      </trkpt>
+      <trkpt lat="35.17879" lon="129.19327">
+      </trkpt>
+      <trkpt lat="35.17866" lon="129.19302">
+      </trkpt>
+      <trkpt lat="35.17849" lon="129.19287">
+      </trkpt>
+      <trkpt lat="35.17825" lon="129.19283">
+      </trkpt>
+      <trkpt lat="35.17819" lon="129.19284">
+      </trkpt>
+      <trkpt lat="35.17795" lon="129.19297">
+      </trkpt>
+      <trkpt lat="35.17766" lon="129.19323">
+      </trkpt>
+      <trkpt lat="35.17744" lon="129.19334">
+      </trkpt>
+      <trkpt lat="35.17733" lon="129.19342">
+      </trkpt>
+      <trkpt lat="35.17724" lon="129.19351">
+      </trkpt>
+      <trkpt lat="35.17707" lon="129.19363">
+      </trkpt>
+      <trkpt lat="35.17687" lon="129.19381">
+      </trkpt>
+      <trkpt lat="35.17651" lon="129.19423">
+      </trkpt>
+      <trkpt lat="35.17643" lon="129.19429">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

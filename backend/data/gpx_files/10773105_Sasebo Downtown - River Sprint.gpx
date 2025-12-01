@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>Sasebo Downtown - River Sprint</name>
+    <desc>Strava Segment ID: 10773105
+Distance: 719.2m
+Avg Grade: -0.1%</desc>
+  </metadata>
+  <trk>
+    <name>Sasebo Downtown - River Sprint</name>
+    <trkseg>
+      <trkpt lat="33.16848" lon="129.71878">
+      </trkpt>
+      <trkpt lat="33.16866" lon="129.71882">
+      </trkpt>
+      <trkpt lat="33.16888" lon="129.71886">
+      </trkpt>
+      <trkpt lat="33.1695" lon="129.71886">
+      </trkpt>
+      <trkpt lat="33.17031" lon="129.71892">
+      </trkpt>
+      <trkpt lat="33.17056" lon="129.71896">
+      </trkpt>
+      <trkpt lat="33.17074" lon="129.71903">
+      </trkpt>
+      <trkpt lat="33.17092" lon="129.71903">
+      </trkpt>
+      <trkpt lat="33.17107" lon="129.71886">
+      </trkpt>
+      <trkpt lat="33.17122" lon="129.71874">
+      </trkpt>
+      <trkpt lat="33.17155" lon="129.71849">
+      </trkpt>
+      <trkpt lat="33.1717" lon="129.7184">
+      </trkpt>
+      <trkpt lat="33.17203" lon="129.71812">
+      </trkpt>
+      <trkpt lat="33.17238" lon="129.71786">
+      </trkpt>
+      <trkpt lat="33.1727" lon="129.71756">
+      </trkpt>
+      <trkpt lat="33.17304" lon="129.71729">
+      </trkpt>
+      <trkpt lat="33.17336" lon="129.71699">
+      </trkpt>
+      <trkpt lat="33.17366" lon="129.71667">
+      </trkpt>
+      <trkpt lat="33.174" lon="129.71637">
+      </trkpt>
+      <trkpt lat="33.17415" lon="129.71622">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>곰두리체육센터 뒷길</name>
+    <desc>Strava Segment ID: 32469355
+Distance: 250.2m
+Avg Grade: -1.4%</desc>
+  </metadata>
+  <trk>
+    <name>곰두리체육센터 뒷길</name>
+    <trkseg>
+      <trkpt lat="35.25278" lon="128.63632">
+      </trkpt>
+      <trkpt lat="35.2529" lon="128.63623">
+      </trkpt>
+      <trkpt lat="35.25313" lon="128.63596">
+      </trkpt>
+      <trkpt lat="35.25324" lon="128.63586">
+      </trkpt>
+      <trkpt lat="35.25378" lon="128.6354">
+      </trkpt>
+      <trkpt lat="35.25402" lon="128.63522">
+      </trkpt>
+      <trkpt lat="35.25426" lon="128.63498">
+      </trkpt>
+      <trkpt lat="35.25437" lon="128.63466">
+      </trkpt>
+      <trkpt lat="35.25443" lon="128.63453">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>Segment</name>
+    <desc>Strava Segment ID: 5529214
+Distance: 364.9m
+Avg Grade: 12.2%</desc>
+  </metadata>
+  <trk>
+    <name>Segment</name>
+    <trkseg>
+      <trkpt lat="34.73623" lon="128.64903">
+      </trkpt>
+      <trkpt lat="34.73619" lon="128.64925">
+      </trkpt>
+      <trkpt lat="34.73623" lon="128.64986">
+      </trkpt>
+      <trkpt lat="34.73656" lon="128.65034">
+      </trkpt>
+      <trkpt lat="34.7372" lon="128.65112">
+      </trkpt>
+      <trkpt lat="34.73728" lon="128.65119">
+      </trkpt>
+      <trkpt lat="34.73752" lon="128.65133">
+      </trkpt>
+      <trkpt lat="34.73772" lon="128.65132">
+      </trkpt>
+      <trkpt lat="34.73811" lon="128.65103">
+      </trkpt>
+      <trkpt lat="34.73822" lon="128.6509">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

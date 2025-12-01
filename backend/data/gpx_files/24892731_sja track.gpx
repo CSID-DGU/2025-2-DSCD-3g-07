@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>sja track</name>
+    <desc>Strava Segment ID: 24892731
+Distance: 432.3m
+Avg Grade: -0.0%</desc>
+  </metadata>
+  <trk>
+    <name>sja track</name>
+    <trkseg>
+      <trkpt lat="33.28364" lon="126.28323">
+      </trkpt>
+      <trkpt lat="33.28367" lon="126.28295">
+      </trkpt>
+      <trkpt lat="33.2836" lon="126.28274">
+      </trkpt>
+      <trkpt lat="33.28317" lon="126.28197">
+      </trkpt>
+      <trkpt lat="33.28302" lon="126.28179">
+      </trkpt>
+      <trkpt lat="33.28282" lon="126.28173">
+      </trkpt>
+      <trkpt lat="33.28265" lon="126.28182">
+      </trkpt>
+      <trkpt lat="33.28253" lon="126.282">
+      </trkpt>
+      <trkpt lat="33.2825" lon="126.28223">
+      </trkpt>
+      <trkpt lat="33.28255" lon="126.28246">
+      </trkpt>
+      <trkpt lat="33.28287" lon="126.28306">
+      </trkpt>
+      <trkpt lat="33.28299" lon="126.28324">
+      </trkpt>
+      <trkpt lat="33.28314" lon="126.28338">
+      </trkpt>
+      <trkpt lat="33.28332" lon="126.28341">
+      </trkpt>
+      <trkpt lat="33.28343" lon="126.28337">
+      </trkpt>
+      <trkpt lat="33.28361" lon="126.28324">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

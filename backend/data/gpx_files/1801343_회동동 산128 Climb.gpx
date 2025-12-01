@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>회동동 산128 Climb</name>
+    <desc>Strava Segment ID: 1801343
+Distance: 1383.2m
+Avg Grade: 11.4%</desc>
+  </metadata>
+  <trk>
+    <name>회동동 산128 Climb</name>
+    <trkseg>
+      <trkpt lat="35.26274" lon="129.15035">
+      </trkpt>
+      <trkpt lat="35.26183" lon="129.14996">
+      </trkpt>
+      <trkpt lat="35.26129" lon="129.14994">
+      </trkpt>
+      <trkpt lat="35.26085" lon="129.15017">
+      </trkpt>
+      <trkpt lat="35.26033" lon="129.15024">
+      </trkpt>
+      <trkpt lat="35.25895" lon="129.14992">
+      </trkpt>
+      <trkpt lat="35.25853" lon="129.14968">
+      </trkpt>
+      <trkpt lat="35.25809" lon="129.14947">
+      </trkpt>
+      <trkpt lat="35.25718" lon="129.14914">
+      </trkpt>
+      <trkpt lat="35.2568" lon="129.14872">
+      </trkpt>
+      <trkpt lat="35.25657" lon="129.14822">
+      </trkpt>
+      <trkpt lat="35.25628" lon="129.1478">
+      </trkpt>
+      <trkpt lat="35.25602" lon="129.14729">
+      </trkpt>
+      <trkpt lat="35.25581" lon="129.14679">
+      </trkpt>
+      <trkpt lat="35.25556" lon="129.14628">
+      </trkpt>
+      <trkpt lat="35.2553" lon="129.14578">
+      </trkpt>
+      <trkpt lat="35.255" lon="129.1453">
+      </trkpt>
+      <trkpt lat="35.25463" lon="129.14494">
+      </trkpt>
+      <trkpt lat="35.25429" lon="129.14455">
+      </trkpt>
+      <trkpt lat="35.25398" lon="129.14411">
+      </trkpt>
+      <trkpt lat="35.25377" lon="129.14362">
+      </trkpt>
+      <trkpt lat="35.25311" lon="129.14283">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>South Park</name>
+    <desc>Strava Segment ID: 19714084
+Distance: 535.9m
+Avg Grade: -0.1%</desc>
+  </metadata>
+  <trk>
+    <name>South Park</name>
+    <trkseg>
+      <trkpt lat="35.21646" lon="128.67604">
+      </trkpt>
+      <trkpt lat="35.21665" lon="128.67603">
+      </trkpt>
+      <trkpt lat="35.21679" lon="128.67587">
+      </trkpt>
+      <trkpt lat="35.21687" lon="128.67568">
+      </trkpt>
+      <trkpt lat="35.21717" lon="128.67537">
+      </trkpt>
+      <trkpt lat="35.21725" lon="128.67518">
+      </trkpt>
+      <trkpt lat="35.21712" lon="128.67501">
+      </trkpt>
+      <trkpt lat="35.21676" lon="128.67477">
+      </trkpt>
+      <trkpt lat="35.21627" lon="128.6744">
+      </trkpt>
+      <trkpt lat="35.21609" lon="128.6743">
+      </trkpt>
+      <trkpt lat="35.21592" lon="128.67434">
+      </trkpt>
+      <trkpt lat="35.21571" lon="128.6747">
+      </trkpt>
+      <trkpt lat="35.21557" lon="128.67486">
+      </trkpt>
+      <trkpt lat="35.21549" lon="128.67509">
+      </trkpt>
+      <trkpt lat="35.21557" lon="128.6753">
+      </trkpt>
+      <trkpt lat="35.21588" lon="128.67556">
+      </trkpt>
+      <trkpt lat="35.21607" lon="128.67564">
+      </trkpt>
+      <trkpt lat="35.21635" lon="128.67595">
+      </trkpt>
+      <trkpt lat="35.21653" lon="128.67603">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

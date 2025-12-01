@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>白石</name>
+    <desc>Strava Segment ID: 21458171
+Distance: 815.7m
+Avg Grade: -2.5%</desc>
+  </metadata>
+  <trk>
+    <name>白石</name>
+    <trkseg>
+      <trkpt lat="33.05938" lon="129.8496">
+      </trkpt>
+      <trkpt lat="33.05947" lon="129.84981">
+      </trkpt>
+      <trkpt lat="33.05969" lon="129.8502">
+      </trkpt>
+      <trkpt lat="33.05978" lon="129.85039">
+      </trkpt>
+      <trkpt lat="33.06058" lon="129.8518">
+      </trkpt>
+      <trkpt lat="33.06089" lon="129.8524">
+      </trkpt>
+      <trkpt lat="33.06097" lon="129.8526">
+      </trkpt>
+      <trkpt lat="33.06136" lon="129.85314">
+      </trkpt>
+      <trkpt lat="33.06148" lon="129.85329">
+      </trkpt>
+      <trkpt lat="33.06165" lon="129.8534">
+      </trkpt>
+      <trkpt lat="33.06203" lon="129.85359">
+      </trkpt>
+      <trkpt lat="33.06241" lon="129.85371">
+      </trkpt>
+      <trkpt lat="33.06331" lon="129.85411">
+      </trkpt>
+      <trkpt lat="33.06367" lon="129.85426">
+      </trkpt>
+      <trkpt lat="33.06382" lon="129.85442">
+      </trkpt>
+      <trkpt lat="33.06384" lon="129.85451">
+      </trkpt>
+      <trkpt lat="33.06476" lon="129.85487">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

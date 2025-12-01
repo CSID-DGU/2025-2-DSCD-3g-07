@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>Odo Park small loop</name>
+    <desc>Strava Segment ID: 33306732
+Distance: 644.1m
+Avg Grade: -0.1%</desc>
+  </metadata>
+  <trk>
+    <name>Odo Park small loop</name>
+    <trkseg>
+      <trkpt lat="33.5967" lon="130.31433">
+      </trkpt>
+      <trkpt lat="33.59767" lon="130.31425">
+      </trkpt>
+      <trkpt lat="33.59774" lon="130.3142">
+      </trkpt>
+      <trkpt lat="33.59777" lon="130.31412">
+      </trkpt>
+      <trkpt lat="33.59777" lon="130.31406">
+      </trkpt>
+      <trkpt lat="33.59771" lon="130.31324">
+      </trkpt>
+      <trkpt lat="33.59767" lon="130.313">
+      </trkpt>
+      <trkpt lat="33.59755" lon="130.31271">
+      </trkpt>
+      <trkpt lat="33.59747" lon="130.3126">
+      </trkpt>
+      <trkpt lat="33.5973" lon="130.31243">
+      </trkpt>
+      <trkpt lat="33.59703" lon="130.31231">
+      </trkpt>
+      <trkpt lat="33.59658" lon="130.31214">
+      </trkpt>
+      <trkpt lat="33.5965" lon="130.31214">
+      </trkpt>
+      <trkpt lat="33.59638" lon="130.31217">
+      </trkpt>
+      <trkpt lat="33.59631" lon="130.31223">
+      </trkpt>
+      <trkpt lat="33.59627" lon="130.31231">
+      </trkpt>
+      <trkpt lat="33.59625" lon="130.31241">
+      </trkpt>
+      <trkpt lat="33.59626" lon="130.31291">
+      </trkpt>
+      <trkpt lat="33.59631" lon="130.3135">
+      </trkpt>
+      <trkpt lat="33.59636" lon="130.31381">
+      </trkpt>
+      <trkpt lat="33.59648" lon="130.31424">
+      </trkpt>
+      <trkpt lat="33.59655" lon="130.31434">
+      </trkpt>
+      <trkpt lat="33.59658" lon="130.31436">
+      </trkpt>
+      <trkpt lat="33.59678" lon="130.31436">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

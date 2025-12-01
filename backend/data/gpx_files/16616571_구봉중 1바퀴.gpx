@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>구봉중 1바퀴</name>
+    <desc>Strava Segment ID: 16616571
+Distance: 320.3m
+Avg Grade: 0.0%</desc>
+  </metadata>
+  <trk>
+    <name>구봉중 1바퀴</name>
+    <trkseg>
+      <trkpt lat="34.73195" lon="127.71471">
+      </trkpt>
+      <trkpt lat="34.73165" lon="127.71451">
+      </trkpt>
+      <trkpt lat="34.73144" lon="127.7144">
+      </trkpt>
+      <trkpt lat="34.7313" lon="127.71434">
+      </trkpt>
+      <trkpt lat="34.73125" lon="127.71434">
+      </trkpt>
+      <trkpt lat="34.73123" lon="127.71436">
+      </trkpt>
+      <trkpt lat="34.73117" lon="127.71457">
+      </trkpt>
+      <trkpt lat="34.73107" lon="127.71479">
+      </trkpt>
+      <trkpt lat="34.73105" lon="127.71488">
+      </trkpt>
+      <trkpt lat="34.73111" lon="127.71494">
+      </trkpt>
+      <trkpt lat="34.7313" lon="127.71503">
+      </trkpt>
+      <trkpt lat="34.73157" lon="127.71522">
+      </trkpt>
+      <trkpt lat="34.73179" lon="127.71535">
+      </trkpt>
+      <trkpt lat="34.73186" lon="127.71538">
+      </trkpt>
+      <trkpt lat="34.7319" lon="127.71533">
+      </trkpt>
+      <trkpt lat="34.73195" lon="127.71514">
+      </trkpt>
+      <trkpt lat="34.7321" lon="127.71482">
+      </trkpt>
+      <trkpt lat="34.73206" lon="127.71476">
+      </trkpt>
+      <trkpt lat="34.73195" lon="127.7147">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

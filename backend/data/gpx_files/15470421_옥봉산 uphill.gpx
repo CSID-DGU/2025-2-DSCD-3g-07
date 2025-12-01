@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>옥봉산 uphill</name>
+    <desc>Strava Segment ID: 15470421
+Distance: 382.3m
+Avg Grade: 23.8%</desc>
+  </metadata>
+  <trk>
+    <name>옥봉산 uphill</name>
+    <trkseg>
+      <trkpt lat="35.20711" lon="129.11005">
+      </trkpt>
+      <trkpt lat="35.20719" lon="129.11007">
+      </trkpt>
+      <trkpt lat="35.20724" lon="129.11009">
+      </trkpt>
+      <trkpt lat="35.20734" lon="129.11011">
+      </trkpt>
+      <trkpt lat="35.2074" lon="129.11018">
+      </trkpt>
+      <trkpt lat="35.20745" lon="129.11023">
+      </trkpt>
+      <trkpt lat="35.20748" lon="129.11033">
+      </trkpt>
+      <trkpt lat="35.20754" lon="129.11044">
+      </trkpt>
+      <trkpt lat="35.20757" lon="129.11047">
+      </trkpt>
+      <trkpt lat="35.2076" lon="129.11058">
+      </trkpt>
+      <trkpt lat="35.20768" lon="129.1107">
+      </trkpt>
+      <trkpt lat="35.20771" lon="129.11074">
+      </trkpt>
+      <trkpt lat="35.20784" lon="129.11078">
+      </trkpt>
+      <trkpt lat="35.20791" lon="129.11082">
+      </trkpt>
+      <trkpt lat="35.20795" lon="129.11082">
+      </trkpt>
+      <trkpt lat="35.20811" lon="129.11067">
+      </trkpt>
+      <trkpt lat="35.20838" lon="129.11032">
+      </trkpt>
+      <trkpt lat="35.20845" lon="129.11029">
+      </trkpt>
+      <trkpt lat="35.20871" lon="129.11029">
+      </trkpt>
+      <trkpt lat="35.20885" lon="129.11027">
+      </trkpt>
+      <trkpt lat="35.2092" lon="129.11035">
+      </trkpt>
+      <trkpt lat="35.20928" lon="129.11035">
+      </trkpt>
+      <trkpt lat="35.20956" lon="129.11026">
+      </trkpt>
+      <trkpt lat="35.20976" lon="129.11022">
+      </trkpt>
+      <trkpt lat="35.20983" lon="129.11026">
+      </trkpt>
+      <trkpt lat="35.20986" lon="129.11029">
+      </trkpt>
+      <trkpt lat="35.2099" lon="129.1103">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

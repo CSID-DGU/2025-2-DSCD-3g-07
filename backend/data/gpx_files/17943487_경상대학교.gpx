@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>경상대학교</name>
+    <desc>Strava Segment ID: 17943487
+Distance: 399.9m
+Avg Grade: -0.1%</desc>
+  </metadata>
+  <trk>
+    <name>경상대학교</name>
+    <trkseg>
+      <trkpt lat="35.15443" lon="128.10395">
+      </trkpt>
+      <trkpt lat="35.15435" lon="128.10395">
+      </trkpt>
+      <trkpt lat="35.15421" lon="128.10399">
+      </trkpt>
+      <trkpt lat="35.15417" lon="128.10402">
+      </trkpt>
+      <trkpt lat="35.1541" lon="128.10411">
+      </trkpt>
+      <trkpt lat="35.15405" lon="128.10422">
+      </trkpt>
+      <trkpt lat="35.15402" lon="128.10436">
+      </trkpt>
+      <trkpt lat="35.15403" lon="128.10449">
+      </trkpt>
+      <trkpt lat="35.15409" lon="128.10464">
+      </trkpt>
+      <trkpt lat="35.1542" lon="128.10473">
+      </trkpt>
+      <trkpt lat="35.15508" lon="128.1049">
+      </trkpt>
+      <trkpt lat="35.15515" lon="128.1049">
+      </trkpt>
+      <trkpt lat="35.15524" lon="128.10487">
+      </trkpt>
+      <trkpt lat="35.15537" lon="128.10474">
+      </trkpt>
+      <trkpt lat="35.15544" lon="128.10455">
+      </trkpt>
+      <trkpt lat="35.15544" lon="128.10446">
+      </trkpt>
+      <trkpt lat="35.15542" lon="128.10437">
+      </trkpt>
+      <trkpt lat="35.15534" lon="128.10423">
+      </trkpt>
+      <trkpt lat="35.15518" lon="128.10412">
+      </trkpt>
+      <trkpt lat="35.15497" lon="128.10408">
+      </trkpt>
+      <trkpt lat="35.15443" lon="128.10395">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

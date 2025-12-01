@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>Haemji Hustle</name>
+    <desc>Strava Segment ID: 40228645
+Distance: 542.8m
+Avg Grade: -1.0%</desc>
+  </metadata>
+  <trk>
+    <name>Haemji Hustle</name>
+    <trkseg>
+      <trkpt lat="35.33637" lon="129.30638">
+      </trkpt>
+      <trkpt lat="35.33651" lon="129.30626">
+      </trkpt>
+      <trkpt lat="35.33666" lon="129.3061">
+      </trkpt>
+      <trkpt lat="35.33707" lon="129.30579">
+      </trkpt>
+      <trkpt lat="35.33746" lon="129.30545">
+      </trkpt>
+      <trkpt lat="35.33776" lon="129.30523">
+      </trkpt>
+      <trkpt lat="35.33781" lon="129.30517">
+      </trkpt>
+      <trkpt lat="35.33853" lon="129.30466">
+      </trkpt>
+      <trkpt lat="35.33924" lon="129.30409">
+      </trkpt>
+      <trkpt lat="35.33933" lon="129.30405">
+      </trkpt>
+      <trkpt lat="35.33956" lon="129.30386">
+      </trkpt>
+      <trkpt lat="35.33962" lon="129.30383">
+      </trkpt>
+      <trkpt lat="35.33995" lon="129.30353">
+      </trkpt>
+      <trkpt lat="35.34017" lon="129.30336">
+      </trkpt>
+      <trkpt lat="35.34043" lon="129.30307">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

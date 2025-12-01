@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>DGIST sign to stop</name>
+    <desc>Strava Segment ID: 15849279
+Distance: 234.6m
+Avg Grade: 7.2%</desc>
+  </metadata>
+  <trk>
+    <name>DGIST sign to stop</name>
+    <trkseg>
+      <trkpt lat="35.70155" lon="128.45866">
+      </trkpt>
+      <trkpt lat="35.70219" lon="128.45836">
+      </trkpt>
+      <trkpt lat="35.70305" lon="128.45802">
+      </trkpt>
+      <trkpt lat="35.70331" lon="128.45807">
+      </trkpt>
+      <trkpt lat="35.70343" lon="128.45814">
+      </trkpt>
+      <trkpt lat="35.70349" lon="128.45811">
+      </trkpt>
+      <trkpt lat="35.70353" lon="128.45805">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

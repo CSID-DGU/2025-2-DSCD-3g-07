@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>柳川警察署前</name>
+    <desc>Strava Segment ID: 15948368
+Distance: 503.2m
+Avg Grade: 0.3%</desc>
+  </metadata>
+  <trk>
+    <name>柳川警察署前</name>
+    <trkseg>
+      <trkpt lat="33.15869" lon="130.41201">
+      </trkpt>
+      <trkpt lat="33.1586" lon="130.41281">
+      </trkpt>
+      <trkpt lat="33.15856" lon="130.41332">
+      </trkpt>
+      <trkpt lat="33.15846" lon="130.41406">
+      </trkpt>
+      <trkpt lat="33.15839" lon="130.41436">
+      </trkpt>
+      <trkpt lat="33.15831" lon="130.41481">
+      </trkpt>
+      <trkpt lat="33.15816" lon="130.41536">
+      </trkpt>
+      <trkpt lat="33.1581" lon="130.41574">
+      </trkpt>
+      <trkpt lat="33.15794" lon="130.41633">
+      </trkpt>
+      <trkpt lat="33.1579" lon="130.41669">
+      </trkpt>
+      <trkpt lat="33.15774" lon="130.41727">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

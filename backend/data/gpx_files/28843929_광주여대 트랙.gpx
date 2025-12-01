@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>광주여대 트랙</name>
+    <desc>Strava Segment ID: 28843929
+Distance: 349.5m
+Avg Grade: 0.1%</desc>
+  </metadata>
+  <trk>
+    <name>광주여대 트랙</name>
+    <trkseg>
+      <trkpt lat="35.16332" lon="126.79838">
+      </trkpt>
+      <trkpt lat="35.16328" lon="126.7984">
+      </trkpt>
+      <trkpt lat="35.16295" lon="126.79843">
+      </trkpt>
+      <trkpt lat="35.16281" lon="126.79849">
+      </trkpt>
+      <trkpt lat="35.16279" lon="126.79851">
+      </trkpt>
+      <trkpt lat="35.16276" lon="126.79857">
+      </trkpt>
+      <trkpt lat="35.16276" lon="126.79893">
+      </trkpt>
+      <trkpt lat="35.16277" lon="126.799">
+      </trkpt>
+      <trkpt lat="35.16282" lon="126.79908">
+      </trkpt>
+      <trkpt lat="35.16295" lon="126.79913">
+      </trkpt>
+      <trkpt lat="35.16335" lon="126.79909">
+      </trkpt>
+      <trkpt lat="35.16371" lon="126.79908">
+      </trkpt>
+      <trkpt lat="35.16386" lon="126.79903">
+      </trkpt>
+      <trkpt lat="35.16391" lon="126.79891">
+      </trkpt>
+      <trkpt lat="35.16389" lon="126.79872">
+      </trkpt>
+      <trkpt lat="35.16386" lon="126.79853">
+      </trkpt>
+      <trkpt lat="35.16379" lon="126.79837">
+      </trkpt>
+      <trkpt lat="35.16367" lon="126.79833">
+      </trkpt>
+      <trkpt lat="35.16334" lon="126.79835">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

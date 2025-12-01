@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>상예동 1563 Climb</name>
+    <desc>Strava Segment ID: 1293150
+Distance: 1310.9m
+Avg Grade: 4.2%</desc>
+  </metadata>
+  <trk>
+    <name>상예동 1563 Climb</name>
+    <trkseg>
+      <trkpt lat="33.25872" lon="126.40442">
+      </trkpt>
+      <trkpt lat="33.2591" lon="126.40344">
+      </trkpt>
+      <trkpt lat="33.25926" lon="126.40306">
+      </trkpt>
+      <trkpt lat="33.25937" lon="126.40286">
+      </trkpt>
+      <trkpt lat="33.25964" lon="126.40252">
+      </trkpt>
+      <trkpt lat="33.2598" lon="126.40237">
+      </trkpt>
+      <trkpt lat="33.26003" lon="126.4022">
+      </trkpt>
+      <trkpt lat="33.2616" lon="126.40123">
+      </trkpt>
+      <trkpt lat="33.26175" lon="126.40112">
+      </trkpt>
+      <trkpt lat="33.26203" lon="126.40084">
+      </trkpt>
+      <trkpt lat="33.26212" lon="126.4007">
+      </trkpt>
+      <trkpt lat="33.26237" lon="126.40005">
+      </trkpt>
+      <trkpt lat="33.26251" lon="126.39945">
+      </trkpt>
+      <trkpt lat="33.26293" lon="126.39795">
+      </trkpt>
+      <trkpt lat="33.263" lon="126.39765">
+      </trkpt>
+      <trkpt lat="33.26315" lon="126.39713">
+      </trkpt>
+      <trkpt lat="33.26362" lon="126.39531">
+      </trkpt>
+      <trkpt lat="33.26431" lon="126.39278">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

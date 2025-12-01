@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>별도봉 오름구간</name>
+    <desc>Strava Segment ID: 19011746
+Distance: 265.2m
+Avg Grade: 29.5%</desc>
+  </metadata>
+  <trk>
+    <name>별도봉 오름구간</name>
+    <trkseg>
+      <trkpt lat="33.51977" lon="126.55562">
+      </trkpt>
+      <trkpt lat="33.51966" lon="126.5554">
+      </trkpt>
+      <trkpt lat="33.51964" lon="126.55532">
+      </trkpt>
+      <trkpt lat="33.51968" lon="126.55495">
+      </trkpt>
+      <trkpt lat="33.51964" lon="126.5548">
+      </trkpt>
+      <trkpt lat="33.51966" lon="126.55474">
+      </trkpt>
+      <trkpt lat="33.51969" lon="126.55455">
+      </trkpt>
+      <trkpt lat="33.51965" lon="126.55448">
+      </trkpt>
+      <trkpt lat="33.51964" lon="126.55433">
+      </trkpt>
+      <trkpt lat="33.51961" lon="126.55434">
+      </trkpt>
+      <trkpt lat="33.51958" lon="126.55411">
+      </trkpt>
+      <trkpt lat="33.51952" lon="126.55393">
+      </trkpt>
+      <trkpt lat="33.51942" lon="126.55374">
+      </trkpt>
+      <trkpt lat="33.51927" lon="126.5536">
+      </trkpt>
+      <trkpt lat="33.51925" lon="126.55356">
+      </trkpt>
+      <trkpt lat="33.51924" lon="126.55346">
+      </trkpt>
+      <trkpt lat="33.51918" lon="126.55336">
+      </trkpt>
+      <trkpt lat="33.51918" lon="126.55331">
+      </trkpt>
+      <trkpt lat="33.51923" lon="126.55317">
+      </trkpt>
+      <trkpt lat="33.51922" lon="126.55314">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

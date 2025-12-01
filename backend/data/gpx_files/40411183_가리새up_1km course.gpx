@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>가리새up_1km course </name>
+    <desc>Strava Segment ID: 40411183
+Distance: 1017.6m
+Avg Grade: 0.2%</desc>
+  </metadata>
+  <trk>
+    <name>가리새up_1km course </name>
+    <trkseg>
+      <trkpt lat="35.1396" lon="128.89048">
+      </trkpt>
+      <trkpt lat="35.14017" lon="128.89002">
+      </trkpt>
+      <trkpt lat="35.14067" lon="128.88958">
+      </trkpt>
+      <trkpt lat="35.14102" lon="128.88932">
+      </trkpt>
+      <trkpt lat="35.14165" lon="128.88881">
+      </trkpt>
+      <trkpt lat="35.14203" lon="128.88848">
+      </trkpt>
+      <trkpt lat="35.14217" lon="128.88838">
+      </trkpt>
+      <trkpt lat="35.14232" lon="128.88825">
+      </trkpt>
+      <trkpt lat="35.14249" lon="128.88814">
+      </trkpt>
+      <trkpt lat="35.14275" lon="128.88793">
+      </trkpt>
+      <trkpt lat="35.14298" lon="128.88776">
+      </trkpt>
+      <trkpt lat="35.14321" lon="128.88757">
+      </trkpt>
+      <trkpt lat="35.14367" lon="128.88724">
+      </trkpt>
+      <trkpt lat="35.14412" lon="128.88696">
+      </trkpt>
+      <trkpt lat="35.14456" lon="128.88671">
+      </trkpt>
+      <trkpt lat="35.14497" lon="128.88651">
+      </trkpt>
+      <trkpt lat="35.14535" lon="128.88636">
+      </trkpt>
+      <trkpt lat="35.14629" lon="128.88612">
+      </trkpt>
+      <trkpt lat="35.14701" lon="128.88605">
+      </trkpt>
+      <trkpt lat="35.1475" lon="128.88605">
+      </trkpt>
+      <trkpt lat="35.14779" lon="128.88606">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>Round About to Fire Station</name>
+    <desc>Strava Segment ID: 30482567
+Distance: 992.3m
+Avg Grade: 0.1%</desc>
+  </metadata>
+  <trk>
+    <name>Round About to Fire Station</name>
+    <trkseg>
+      <trkpt lat="33.27815" lon="126.26367">
+      </trkpt>
+      <trkpt lat="33.27826" lon="126.26375">
+      </trkpt>
+      <trkpt lat="33.2783" lon="126.26398">
+      </trkpt>
+      <trkpt lat="33.27818" lon="126.26414">
+      </trkpt>
+      <trkpt lat="33.27805" lon="126.26429">
+      </trkpt>
+      <trkpt lat="33.27797" lon="126.2645">
+      </trkpt>
+      <trkpt lat="33.27755" lon="126.26674">
+      </trkpt>
+      <trkpt lat="33.27742" lon="126.26761">
+      </trkpt>
+      <trkpt lat="33.27741" lon="126.26783">
+      </trkpt>
+      <trkpt lat="33.27743" lon="126.26851">
+      </trkpt>
+      <trkpt lat="33.27741" lon="126.26943">
+      </trkpt>
+      <trkpt lat="33.27744" lon="126.27061">
+      </trkpt>
+      <trkpt lat="33.27748" lon="126.27084">
+      </trkpt>
+      <trkpt lat="33.27755" lon="126.27104">
+      </trkpt>
+      <trkpt lat="33.278" lon="126.27193">
+      </trkpt>
+      <trkpt lat="33.27842" lon="126.27273">
+      </trkpt>
+      <trkpt lat="33.27844" lon="126.27285">
+      </trkpt>
+      <trkpt lat="33.27858" lon="126.27327">
+      </trkpt>
+      <trkpt lat="33.27868" lon="126.27346">
+      </trkpt>
+      <trkpt lat="33.27878" lon="126.27356">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

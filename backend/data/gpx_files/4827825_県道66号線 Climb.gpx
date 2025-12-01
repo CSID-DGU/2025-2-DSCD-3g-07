@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>県道66号線 Climb</name>
+    <desc>Strava Segment ID: 4827825
+Distance: 619.8m
+Avg Grade: 12.0%</desc>
+  </metadata>
+  <trk>
+    <name>県道66号線 Climb</name>
+    <trkseg>
+      <trkpt lat="33.50105" lon="130.67064">
+      </trkpt>
+      <trkpt lat="33.50112" lon="130.67074">
+      </trkpt>
+      <trkpt lat="33.50118" lon="130.67091">
+      </trkpt>
+      <trkpt lat="33.50127" lon="130.67133">
+      </trkpt>
+      <trkpt lat="33.50126" lon="130.67153">
+      </trkpt>
+      <trkpt lat="33.50119" lon="130.67189">
+      </trkpt>
+      <trkpt lat="33.50111" lon="130.67211">
+      </trkpt>
+      <trkpt lat="33.50093" lon="130.6729">
+      </trkpt>
+      <trkpt lat="33.50072" lon="130.67362">
+      </trkpt>
+      <trkpt lat="33.50047" lon="130.67419">
+      </trkpt>
+      <trkpt lat="33.50019" lon="130.67465">
+      </trkpt>
+      <trkpt lat="33.49991" lon="130.67506">
+      </trkpt>
+      <trkpt lat="33.49962" lon="130.67541">
+      </trkpt>
+      <trkpt lat="33.4992" lon="130.67603">
+      </trkpt>
+      <trkpt lat="33.49908" lon="130.67625">
+      </trkpt>
+      <trkpt lat="33.49904" lon="130.67648">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>Yagiyama By-pass Climb</name>
+    <desc>Strava Segment ID: 4721425
+Distance: 852.1m
+Avg Grade: 5.8%</desc>
+  </metadata>
+  <trk>
+    <name>Yagiyama By-pass Climb</name>
+    <trkseg>
+      <trkpt lat="33.61198" lon="130.58358">
+      </trkpt>
+      <trkpt lat="33.61166" lon="130.58366">
+      </trkpt>
+      <trkpt lat="33.61084" lon="130.58373">
+      </trkpt>
+      <trkpt lat="33.61061" lon="130.58368">
+      </trkpt>
+      <trkpt lat="33.6097" lon="130.58313">
+      </trkpt>
+      <trkpt lat="33.60962" lon="130.58305">
+      </trkpt>
+      <trkpt lat="33.60933" lon="130.58271">
+      </trkpt>
+      <trkpt lat="33.60846" lon="130.58211">
+      </trkpt>
+      <trkpt lat="33.60837" lon="130.58196">
+      </trkpt>
+      <trkpt lat="33.60834" lon="130.58175">
+      </trkpt>
+      <trkpt lat="33.60832" lon="130.58081">
+      </trkpt>
+      <trkpt lat="33.60823" lon="130.58065">
+      </trkpt>
+      <trkpt lat="33.60816" lon="130.5806">
+      </trkpt>
+      <trkpt lat="33.60806" lon="130.5805">
+      </trkpt>
+      <trkpt lat="33.60784" lon="130.58022">
+      </trkpt>
+      <trkpt lat="33.60773" lon="130.58015">
+      </trkpt>
+      <trkpt lat="33.60758" lon="130.58009">
+      </trkpt>
+      <trkpt lat="33.60738" lon="130.57992">
+      </trkpt>
+      <trkpt lat="33.60724" lon="130.57982">
+      </trkpt>
+      <trkpt lat="33.60706" lon="130.57955">
+      </trkpt>
+      <trkpt lat="33.607" lon="130.57936">
+      </trkpt>
+      <trkpt lat="33.60689" lon="130.57891">
+      </trkpt>
+      <trkpt lat="33.60669" lon="130.5785">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

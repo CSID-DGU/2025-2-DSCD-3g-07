@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>船津～原万田スプリント</name>
+    <desc>Strava Segment ID: 20723495
+Distance: 497.3m
+Avg Grade: 0.2%</desc>
+  </metadata>
+  <trk>
+    <name>船津～原万田スプリント</name>
+    <trkseg>
+      <trkpt lat="33.00622" lon="130.4388">
+      </trkpt>
+      <trkpt lat="33.00604" lon="130.43878">
+      </trkpt>
+      <trkpt lat="33.00571" lon="130.43882">
+      </trkpt>
+      <trkpt lat="33.00534" lon="130.43881">
+      </trkpt>
+      <trkpt lat="33.00515" lon="130.43882">
+      </trkpt>
+      <trkpt lat="33.00489" lon="130.43876">
+      </trkpt>
+      <trkpt lat="33.00467" lon="130.43878">
+      </trkpt>
+      <trkpt lat="33.00448" lon="130.43874">
+      </trkpt>
+      <trkpt lat="33.00344" lon="130.43878">
+      </trkpt>
+      <trkpt lat="33.00326" lon="130.43875">
+      </trkpt>
+      <trkpt lat="33.00277" lon="130.43874">
+      </trkpt>
+      <trkpt lat="33.00259" lon="130.43869">
+      </trkpt>
+      <trkpt lat="33.00203" lon="130.43875">
+      </trkpt>
+      <trkpt lat="33.00177" lon="130.43875">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

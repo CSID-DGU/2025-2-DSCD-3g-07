@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>첨단 오르막</name>
+    <desc>Strava Segment ID: 34263812
+Distance: 479.2m
+Avg Grade: 7.1%</desc>
+  </metadata>
+  <trk>
+    <name>첨단 오르막</name>
+    <trkseg>
+      <trkpt lat="33.46748" lon="126.56966">
+      </trkpt>
+      <trkpt lat="33.46692" lon="126.56956">
+      </trkpt>
+      <trkpt lat="33.46672" lon="126.56955">
+      </trkpt>
+      <trkpt lat="33.46651" lon="126.5695">
+      </trkpt>
+      <trkpt lat="33.46625" lon="126.56947">
+      </trkpt>
+      <trkpt lat="33.46588" lon="126.56939">
+      </trkpt>
+      <trkpt lat="33.46557" lon="126.56937">
+      </trkpt>
+      <trkpt lat="33.46521" lon="126.56932">
+      </trkpt>
+      <trkpt lat="33.46472" lon="126.56933">
+      </trkpt>
+      <trkpt lat="33.46417" lon="126.56927">
+      </trkpt>
+      <trkpt lat="33.46372" lon="126.56924">
+      </trkpt>
+      <trkpt lat="33.46318" lon="126.56924">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

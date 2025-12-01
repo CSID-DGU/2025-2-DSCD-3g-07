@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>합성초등학교 1회전</name>
+    <desc>Strava Segment ID: 33064817
+Distance: 252.9m
+Avg Grade: 0.0%</desc>
+  </metadata>
+  <trk>
+    <name>합성초등학교 1회전</name>
+    <trkseg>
+      <trkpt lat="35.24219" lon="128.58234">
+      </trkpt>
+      <trkpt lat="35.24219" lon="128.58251">
+      </trkpt>
+      <trkpt lat="35.24222" lon="128.58257">
+      </trkpt>
+      <trkpt lat="35.24228" lon="128.58258">
+      </trkpt>
+      <trkpt lat="35.24264" lon="128.58248">
+      </trkpt>
+      <trkpt lat="35.24266" lon="128.58241">
+      </trkpt>
+      <trkpt lat="35.24266" lon="128.58226">
+      </trkpt>
+      <trkpt lat="35.24263" lon="128.58174">
+      </trkpt>
+      <trkpt lat="35.2426" lon="128.58167">
+      </trkpt>
+      <trkpt lat="35.24258" lon="128.58165">
+      </trkpt>
+      <trkpt lat="35.24246" lon="128.58166">
+      </trkpt>
+      <trkpt lat="35.24223" lon="128.5817">
+      </trkpt>
+      <trkpt lat="35.24215" lon="128.58173">
+      </trkpt>
+      <trkpt lat="35.24219" lon="128.58234">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>원동면 영포리 산116 Climb</name>
+    <desc>Strava Segment ID: 2642999
+Distance: 4341.6m
+Avg Grade: 4.4%</desc>
+  </metadata>
+  <trk>
+    <name>원동면 영포리 산116 Climb</name>
+    <trkseg>
+      <trkpt lat="35.40631" lon="128.93322">
+      </trkpt>
+      <trkpt lat="35.41143" lon="128.93479">
+      </trkpt>
+      <trkpt lat="35.41191" lon="128.93464">
+      </trkpt>
+      <trkpt lat="35.41656" lon="128.93758">
+      </trkpt>
+      <trkpt lat="35.41754" lon="128.93872">
+      </trkpt>
+      <trkpt lat="35.41923" lon="128.93923">
+      </trkpt>
+      <trkpt lat="35.41991" lon="128.93953">
+      </trkpt>
+      <trkpt lat="35.42271" lon="128.94215">
+      </trkpt>
+      <trkpt lat="35.42432" lon="128.94475">
+      </trkpt>
+      <trkpt lat="35.42502" lon="128.94528">
+      </trkpt>
+      <trkpt lat="35.42784" lon="128.94676">
+      </trkpt>
+      <trkpt lat="35.42969" lon="128.94835">
+      </trkpt>
+      <trkpt lat="35.43186" lon="128.94925">
+      </trkpt>
+      <trkpt lat="35.43378" lon="128.95106">
+      </trkpt>
+      <trkpt lat="35.43658" lon="128.95301">
+      </trkpt>
+      <trkpt lat="35.4388" lon="128.957">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

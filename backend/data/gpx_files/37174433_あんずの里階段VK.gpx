@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>あんずの里　階段VK</name>
+    <desc>Strava Segment ID: 37174433
+Distance: 282.0m
+Avg Grade: 16.0%</desc>
+  </metadata>
+  <trk>
+    <name>あんずの里　階段VK</name>
+    <trkseg>
+      <trkpt lat="33.83039" lon="130.4922">
+      </trkpt>
+      <trkpt lat="33.83038" lon="130.49238">
+      </trkpt>
+      <trkpt lat="33.83033" lon="130.49258">
+      </trkpt>
+      <trkpt lat="33.83036" lon="130.49274">
+      </trkpt>
+      <trkpt lat="33.83038" lon="130.49316">
+      </trkpt>
+      <trkpt lat="33.83042" lon="130.49346">
+      </trkpt>
+      <trkpt lat="33.8304" lon="130.49397">
+      </trkpt>
+      <trkpt lat="33.83036" lon="130.49409">
+      </trkpt>
+      <trkpt lat="33.83038" lon="130.49425">
+      </trkpt>
+      <trkpt lat="33.83044" lon="130.49456">
+      </trkpt>
+      <trkpt lat="33.83039" lon="130.49482">
+      </trkpt>
+      <trkpt lat="33.8304" lon="130.49495">
+      </trkpt>
+      <trkpt lat="33.83042" lon="130.49508">
+      </trkpt>
+      <trkpt lat="33.83047" lon="130.49515">
+      </trkpt>
+      <trkpt lat="33.83047" lon="130.49519">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

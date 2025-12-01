@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>Olle 7 Red Trail - East</name>
+    <desc>Strava Segment ID: 15579591
+Distance: 821.6m
+Avg Grade: 0.3%</desc>
+  </metadata>
+  <trk>
+    <name>Olle 7 Red Trail - East</name>
+    <trkseg>
+      <trkpt lat="33.23113" lon="126.5059">
+      </trkpt>
+      <trkpt lat="33.23092" lon="126.50632">
+      </trkpt>
+      <trkpt lat="33.23084" lon="126.50662">
+      </trkpt>
+      <trkpt lat="33.23082" lon="126.50743">
+      </trkpt>
+      <trkpt lat="33.23084" lon="126.50768">
+      </trkpt>
+      <trkpt lat="33.23081" lon="126.50798">
+      </trkpt>
+      <trkpt lat="33.23083" lon="126.50814">
+      </trkpt>
+      <trkpt lat="33.23089" lon="126.50825">
+      </trkpt>
+      <trkpt lat="33.2311" lon="126.50853">
+      </trkpt>
+      <trkpt lat="33.23129" lon="126.50883">
+      </trkpt>
+      <trkpt lat="33.23219" lon="126.51034">
+      </trkpt>
+      <trkpt lat="33.23259" lon="126.51098">
+      </trkpt>
+      <trkpt lat="33.23279" lon="126.51138">
+      </trkpt>
+      <trkpt lat="33.23297" lon="126.51161">
+      </trkpt>
+      <trkpt lat="33.23299" lon="126.51178">
+      </trkpt>
+      <trkpt lat="33.23296" lon="126.51226">
+      </trkpt>
+      <trkpt lat="33.23302" lon="126.51246">
+      </trkpt>
+      <trkpt lat="33.23309" lon="126.51255">
+      </trkpt>
+      <trkpt lat="33.23324" lon="126.51267">
+      </trkpt>
+      <trkpt lat="33.23342" lon="126.51287">
+      </trkpt>
+      <trkpt lat="33.23377" lon="126.51314">
+      </trkpt>
+      <trkpt lat="33.23388" lon="126.51326">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>学園通り田尻-北原</name>
+    <desc>Strava Segment ID: 26357757
+Distance: 1067.8m
+Avg Grade: 0.2%</desc>
+  </metadata>
+  <trk>
+    <name>学園通り田尻-北原</name>
+    <trkseg>
+      <trkpt lat="33.58765" lon="130.24646">
+      </trkpt>
+      <trkpt lat="33.58746" lon="130.24686">
+      </trkpt>
+      <trkpt lat="33.58713" lon="130.24747">
+      </trkpt>
+      <trkpt lat="33.58676" lon="130.24804">
+      </trkpt>
+      <trkpt lat="33.58595" lon="130.24907">
+      </trkpt>
+      <trkpt lat="33.58532" lon="130.24975">
+      </trkpt>
+      <trkpt lat="33.58503" lon="130.25002">
+      </trkpt>
+      <trkpt lat="33.58456" lon="130.25042">
+      </trkpt>
+      <trkpt lat="33.58316" lon="130.25149">
+      </trkpt>
+      <trkpt lat="33.58294" lon="130.25169">
+      </trkpt>
+      <trkpt lat="33.582" lon="130.25239">
+      </trkpt>
+      <trkpt lat="33.58157" lon="130.25277">
+      </trkpt>
+      <trkpt lat="33.58059" lon="130.25357">
+      </trkpt>
+      <trkpt lat="33.58033" lon="130.25376">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

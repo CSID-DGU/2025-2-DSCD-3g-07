@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>Ebitsu Kinder Climb</name>
+    <desc>Strava Segment ID: 18511760
+Distance: 360.3m
+Avg Grade: 4.8%</desc>
+  </metadata>
+  <trk>
+    <name>Ebitsu Kinder Climb</name>
+    <trkseg>
+      <trkpt lat="33.84684" lon="130.61471">
+      </trkpt>
+      <trkpt lat="33.84646" lon="130.61506">
+      </trkpt>
+      <trkpt lat="33.84542" lon="130.61578">
+      </trkpt>
+      <trkpt lat="33.84457" lon="130.61628">
+      </trkpt>
+      <trkpt lat="33.84426" lon="130.61648">
+      </trkpt>
+      <trkpt lat="33.84401" lon="130.61661">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

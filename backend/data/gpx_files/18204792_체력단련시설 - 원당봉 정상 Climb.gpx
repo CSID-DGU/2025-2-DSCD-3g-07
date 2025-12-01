@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>체력단련시설 - 원당봉 정상 Climb</name>
+    <desc>Strava Segment ID: 18204792
+Distance: 251.2m
+Avg Grade: 25.9%</desc>
+  </metadata>
+  <trk>
+    <name>체력단련시설 - 원당봉 정상 Climb</name>
+    <trkseg>
+      <trkpt lat="33.527" lon="126.5988">
+      </trkpt>
+      <trkpt lat="33.52698" lon="126.59911">
+      </trkpt>
+      <trkpt lat="33.52694" lon="126.5992">
+      </trkpt>
+      <trkpt lat="33.52691" lon="126.59947">
+      </trkpt>
+      <trkpt lat="33.52688" lon="126.59954">
+      </trkpt>
+      <trkpt lat="33.5268" lon="126.59962">
+      </trkpt>
+      <trkpt lat="33.52664" lon="126.59965">
+      </trkpt>
+      <trkpt lat="33.52659" lon="126.59968">
+      </trkpt>
+      <trkpt lat="33.52652" lon="126.5997">
+      </trkpt>
+      <trkpt lat="33.52647" lon="126.59973">
+      </trkpt>
+      <trkpt lat="33.52622" lon="126.59976">
+      </trkpt>
+      <trkpt lat="33.52588" lon="126.59989">
+      </trkpt>
+      <trkpt lat="33.52564" lon="126.59986">
+      </trkpt>
+      <trkpt lat="33.52555" lon="126.59983">
+      </trkpt>
+      <trkpt lat="33.52542" lon="126.59974">
+      </trkpt>
+      <trkpt lat="33.52535" lon="126.59972">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

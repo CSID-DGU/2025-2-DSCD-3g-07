@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>下本山交差点～本山トンネル</name>
+    <desc>Strava Segment ID: 33739750
+Distance: 827.1m
+Avg Grade: 3.0%</desc>
+  </metadata>
+  <trk>
+    <name>下本山交差点～本山トンネル</name>
+    <trkseg>
+      <trkpt lat="33.2051" lon="129.67865">
+      </trkpt>
+      <trkpt lat="33.20503" lon="129.67818">
+      </trkpt>
+      <trkpt lat="33.20499" lon="129.67742">
+      </trkpt>
+      <trkpt lat="33.205" lon="129.67677">
+      </trkpt>
+      <trkpt lat="33.20508" lon="129.67626">
+      </trkpt>
+      <trkpt lat="33.20527" lon="129.67554">
+      </trkpt>
+      <trkpt lat="33.20547" lon="129.675">
+      </trkpt>
+      <trkpt lat="33.20578" lon="129.67439">
+      </trkpt>
+      <trkpt lat="33.20609" lon="129.67398">
+      </trkpt>
+      <trkpt lat="33.2062" lon="129.67393">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

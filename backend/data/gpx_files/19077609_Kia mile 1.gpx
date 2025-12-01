@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>Kia mile 1</name>
+    <desc>Strava Segment ID: 19077609
+Distance: 1215.5m
+Avg Grade: 0.2%</desc>
+  </metadata>
+  <trk>
+    <name>Kia mile 1</name>
+    <trkseg>
+      <trkpt lat="35.16617" lon="126.8637">
+      </trkpt>
+      <trkpt lat="35.1662" lon="126.86376">
+      </trkpt>
+      <trkpt lat="35.1662" lon="126.8638">
+      </trkpt>
+      <trkpt lat="35.16617" lon="126.86472">
+      </trkpt>
+      <trkpt lat="35.16616" lon="126.86655">
+      </trkpt>
+      <trkpt lat="35.16612" lon="126.86704">
+      </trkpt>
+      <trkpt lat="35.16612" lon="126.86768">
+      </trkpt>
+      <trkpt lat="35.1661" lon="126.8681">
+      </trkpt>
+      <trkpt lat="35.1661" lon="126.86943">
+      </trkpt>
+      <trkpt lat="35.16603" lon="126.87019">
+      </trkpt>
+      <trkpt lat="35.16603" lon="126.87063">
+      </trkpt>
+      <trkpt lat="35.16599" lon="126.8711">
+      </trkpt>
+      <trkpt lat="35.16599" lon="126.87167">
+      </trkpt>
+      <trkpt lat="35.16596" lon="126.87229">
+      </trkpt>
+      <trkpt lat="35.16598" lon="126.87299">
+      </trkpt>
+      <trkpt lat="35.16595" lon="126.87332">
+      </trkpt>
+      <trkpt lat="35.16593" lon="126.87412">
+      </trkpt>
+      <trkpt lat="35.16586" lon="126.87553">
+      </trkpt>
+      <trkpt lat="35.16584" lon="126.876">
+      </trkpt>
+      <trkpt lat="35.16586" lon="126.87613">
+      </trkpt>
+      <trkpt lat="35.16585" lon="126.87641">
+      </trkpt>
+      <trkpt lat="35.16581" lon="126.877">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>園 loop</name>
+    <desc>Strava Segment ID: 15965181
+Distance: 417.4m
+Avg Grade: -0.1%</desc>
+  </metadata>
+  <trk>
+    <name>園 loop</name>
+    <trkseg>
+      <trkpt lat="33.89043" lon="130.88486">
+      </trkpt>
+      <trkpt lat="33.89096" lon="130.88509">
+      </trkpt>
+      <trkpt lat="33.89115" lon="130.88513">
+      </trkpt>
+      <trkpt lat="33.89152" lon="130.88524">
+      </trkpt>
+      <trkpt lat="33.89171" lon="130.88527">
+      </trkpt>
+      <trkpt lat="33.89177" lon="130.88521">
+      </trkpt>
+      <trkpt lat="33.8917" lon="130.88497">
+      </trkpt>
+      <trkpt lat="33.8916" lon="130.88477">
+      </trkpt>
+      <trkpt lat="33.89069" lon="130.8844">
+      </trkpt>
+      <trkpt lat="33.89051" lon="130.88437">
+      </trkpt>
+      <trkpt lat="33.89033" lon="130.88438">
+      </trkpt>
+      <trkpt lat="33.89024" lon="130.88479">
+      </trkpt>
+      <trkpt lat="33.89026" lon="130.88482">
+      </trkpt>
+      <trkpt lat="33.89044" lon="130.88488">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

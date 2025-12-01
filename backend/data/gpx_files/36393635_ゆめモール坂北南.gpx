@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>ゆめモール坂（北→南）</name>
+    <desc>Strava Segment ID: 36393635
+Distance: 644.9m
+Avg Grade: 0.2%</desc>
+  </metadata>
+  <trk>
+    <name>ゆめモール坂（北→南）</name>
+    <trkseg>
+      <trkpt lat="33.16223" lon="130.4226">
+      </trkpt>
+      <trkpt lat="33.16198" lon="130.42259">
+      </trkpt>
+      <trkpt lat="33.16146" lon="130.42249">
+      </trkpt>
+      <trkpt lat="33.16127" lon="130.42248">
+      </trkpt>
+      <trkpt lat="33.16112" lon="130.42244">
+      </trkpt>
+      <trkpt lat="33.16102" lon="130.42246">
+      </trkpt>
+      <trkpt lat="33.16088" lon="130.4224">
+      </trkpt>
+      <trkpt lat="33.16072" lon="130.42243">
+      </trkpt>
+      <trkpt lat="33.1605" lon="130.4224">
+      </trkpt>
+      <trkpt lat="33.16038" lon="130.42241">
+      </trkpt>
+      <trkpt lat="33.16006" lon="130.42235">
+      </trkpt>
+      <trkpt lat="33.16002" lon="130.42235">
+      </trkpt>
+      <trkpt lat="33.15998" lon="130.42234">
+      </trkpt>
+      <trkpt lat="33.15894" lon="130.42222">
+      </trkpt>
+      <trkpt lat="33.15812" lon="130.42209">
+      </trkpt>
+      <trkpt lat="33.15745" lon="130.42205">
+      </trkpt>
+      <trkpt lat="33.15645" lon="130.42189">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

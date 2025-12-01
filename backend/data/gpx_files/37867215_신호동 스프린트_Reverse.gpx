@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>신호동 스프린트_Reverse</name>
+    <desc>Strava Segment ID: 37867215
+Distance: 773.0m
+Avg Grade: 0.1%</desc>
+  </metadata>
+  <trk>
+    <name>신호동 스프린트_Reverse</name>
+    <trkseg>
+      <trkpt lat="35.08061" lon="128.87249">
+      </trkpt>
+      <trkpt lat="35.08036" lon="128.8738">
+      </trkpt>
+      <trkpt lat="35.0803" lon="128.8743">
+      </trkpt>
+      <trkpt lat="35.08031" lon="128.8744">
+      </trkpt>
+      <trkpt lat="35.08033" lon="128.8745">
+      </trkpt>
+      <trkpt lat="35.08042" lon="128.87469">
+      </trkpt>
+      <trkpt lat="35.08046" lon="128.87481">
+      </trkpt>
+      <trkpt lat="35.08046" lon="128.87502">
+      </trkpt>
+      <trkpt lat="35.08035" lon="128.87581">
+      </trkpt>
+      <trkpt lat="35.08024" lon="128.87648">
+      </trkpt>
+      <trkpt lat="35.08006" lon="128.87735">
+      </trkpt>
+      <trkpt lat="35.07987" lon="128.87847">
+      </trkpt>
+      <trkpt lat="35.07984" lon="128.87885">
+      </trkpt>
+      <trkpt lat="35.07969" lon="128.88001">
+      </trkpt>
+      <trkpt lat="35.07966" lon="128.88047">
+      </trkpt>
+      <trkpt lat="35.07966" lon="128.8808">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

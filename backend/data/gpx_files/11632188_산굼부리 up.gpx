@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>산굼부리 up</name>
+    <desc>Strava Segment ID: 11632188
+Distance: 310.1m
+Avg Grade: 6.6%</desc>
+  </metadata>
+  <trk>
+    <name>산굼부리 up</name>
+    <trkseg>
+      <trkpt lat="33.43207" lon="126.68892">
+      </trkpt>
+      <trkpt lat="33.43207" lon="126.68912">
+      </trkpt>
+      <trkpt lat="33.43204" lon="126.6894">
+      </trkpt>
+      <trkpt lat="33.43199" lon="126.68954">
+      </trkpt>
+      <trkpt lat="33.43183" lon="126.68983">
+      </trkpt>
+      <trkpt lat="33.43171" lon="126.68993">
+      </trkpt>
+      <trkpt lat="33.43143" lon="126.6903">
+      </trkpt>
+      <trkpt lat="33.43138" lon="126.69041">
+      </trkpt>
+      <trkpt lat="33.43137" lon="126.69053">
+      </trkpt>
+      <trkpt lat="33.43148" lon="126.69066">
+      </trkpt>
+      <trkpt lat="33.43168" lon="126.69075">
+      </trkpt>
+      <trkpt lat="33.43185" lon="126.6908">
+      </trkpt>
+      <trkpt lat="33.43208" lon="126.69079">
+      </trkpt>
+      <trkpt lat="33.43237" lon="126.6907">
+      </trkpt>
+      <trkpt lat="33.43249" lon="126.69069">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

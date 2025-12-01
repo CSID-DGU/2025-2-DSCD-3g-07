@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>일주서로(판포) 500m / 판포포구-판포상동입구</name>
+    <desc>Strava Segment ID: 16635446
+Distance: 598.2m
+Avg Grade: 0.2%</desc>
+  </metadata>
+  <trk>
+    <name>일주서로(판포) 500m / 판포포구-판포상동입구</name>
+    <trkseg>
+      <trkpt lat="33.36427" lon="126.19906">
+      </trkpt>
+      <trkpt lat="33.36445" lon="126.19959">
+      </trkpt>
+      <trkpt lat="33.36451" lon="126.19971">
+      </trkpt>
+      <trkpt lat="33.36458" lon="126.2">
+      </trkpt>
+      <trkpt lat="33.36469" lon="126.20018">
+      </trkpt>
+      <trkpt lat="33.36482" lon="126.20044">
+      </trkpt>
+      <trkpt lat="33.36494" lon="126.20062">
+      </trkpt>
+      <trkpt lat="33.36517" lon="126.20089">
+      </trkpt>
+      <trkpt lat="33.36585" lon="126.20194">
+      </trkpt>
+      <trkpt lat="33.36608" lon="126.20225">
+      </trkpt>
+      <trkpt lat="33.36661" lon="126.20306">
+      </trkpt>
+      <trkpt lat="33.36678" lon="126.20327">
+      </trkpt>
+      <trkpt lat="33.36704" lon="126.20368">
+      </trkpt>
+      <trkpt lat="33.36731" lon="126.20405">
+      </trkpt>
+      <trkpt lat="33.36739" lon="126.20418">
+      </trkpt>
+      <trkpt lat="33.3674" lon="126.20422">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

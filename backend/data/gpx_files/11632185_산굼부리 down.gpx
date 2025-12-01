@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>산굼부리 down</name>
+    <desc>Strava Segment ID: 11632185
+Distance: 327.9m
+Avg Grade: -6.7%</desc>
+  </metadata>
+  <trk>
+    <name>산굼부리 down</name>
+    <trkseg>
+      <trkpt lat="33.43249" lon="126.69071">
+      </trkpt>
+      <trkpt lat="33.43225" lon="126.69073">
+      </trkpt>
+      <trkpt lat="33.43187" lon="126.69082">
+      </trkpt>
+      <trkpt lat="33.43162" lon="126.69075">
+      </trkpt>
+      <trkpt lat="33.43141" lon="126.69062">
+      </trkpt>
+      <trkpt lat="33.43132" lon="126.69048">
+      </trkpt>
+      <trkpt lat="33.43134" lon="126.69038">
+      </trkpt>
+      <trkpt lat="33.43139" lon="126.69029">
+      </trkpt>
+      <trkpt lat="33.43162" lon="126.68999">
+      </trkpt>
+      <trkpt lat="33.43188" lon="126.68969">
+      </trkpt>
+      <trkpt lat="33.43194" lon="126.68958">
+      </trkpt>
+      <trkpt lat="33.4321" lon="126.68898">
+      </trkpt>
+      <trkpt lat="33.43209" lon="126.68891">
+      </trkpt>
+      <trkpt lat="33.43205" lon="126.6888">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

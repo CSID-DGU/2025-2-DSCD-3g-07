@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>제주대학교 트렉 1LAP</name>
+    <desc>Strava Segment ID: 22532931
+Distance: 411.0m
+Avg Grade: -0.7%</desc>
+  </metadata>
+  <trk>
+    <name>제주대학교 트렉 1LAP</name>
+    <trkseg>
+      <trkpt lat="33.45552" lon="126.55903">
+      </trkpt>
+      <trkpt lat="33.45526" lon="126.55908">
+      </trkpt>
+      <trkpt lat="33.45497" lon="126.55908">
+      </trkpt>
+      <trkpt lat="33.45482" lon="126.55915">
+      </trkpt>
+      <trkpt lat="33.45476" lon="126.55921">
+      </trkpt>
+      <trkpt lat="33.45472" lon="126.5593">
+      </trkpt>
+      <trkpt lat="33.45471" lon="126.55955">
+      </trkpt>
+      <trkpt lat="33.45481" lon="126.55978">
+      </trkpt>
+      <trkpt lat="33.45483" lon="126.5598">
+      </trkpt>
+      <trkpt lat="33.455" lon="126.55987">
+      </trkpt>
+      <trkpt lat="33.45525" lon="126.55987">
+      </trkpt>
+      <trkpt lat="33.45575" lon="126.55989">
+      </trkpt>
+      <trkpt lat="33.45584" lon="126.55988">
+      </trkpt>
+      <trkpt lat="33.45601" lon="126.55981">
+      </trkpt>
+      <trkpt lat="33.45605" lon="126.55976">
+      </trkpt>
+      <trkpt lat="33.45611" lon="126.55963">
+      </trkpt>
+      <trkpt lat="33.45614" lon="126.55949">
+      </trkpt>
+      <trkpt lat="33.45613" lon="126.55937">
+      </trkpt>
+      <trkpt lat="33.45604" lon="126.55918">
+      </trkpt>
+      <trkpt lat="33.45591" lon="126.55907">
+      </trkpt>
+      <trkpt lat="33.45588" lon="126.55906">
+      </trkpt>
+      <trkpt lat="33.45565" lon="126.55904">
+      </trkpt>
+      <trkpt lat="33.4555" lon="126.55905">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

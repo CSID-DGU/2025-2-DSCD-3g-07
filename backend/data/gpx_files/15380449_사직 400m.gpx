@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>사직 400m</name>
+    <desc>Strava Segment ID: 15380449
+Distance: 422.0m
+Avg Grade: 0.0%</desc>
+  </metadata>
+  <trk>
+    <name>사직 400m</name>
+    <trkseg>
+      <trkpt lat="35.18919" lon="129.05541">
+      </trkpt>
+      <trkpt lat="35.18909" lon="129.05542">
+      </trkpt>
+      <trkpt lat="35.18901" lon="129.05549">
+      </trkpt>
+      <trkpt lat="35.18893" lon="129.05564">
+      </trkpt>
+      <trkpt lat="35.18891" lon="129.05578">
+      </trkpt>
+      <trkpt lat="35.18893" lon="129.056">
+      </trkpt>
+      <trkpt lat="35.18898" lon="129.05611">
+      </trkpt>
+      <trkpt lat="35.18905" lon="129.0562">
+      </trkpt>
+      <trkpt lat="35.18919" lon="129.05627">
+      </trkpt>
+      <trkpt lat="35.18929" lon="129.05626">
+      </trkpt>
+      <trkpt lat="35.19009" lon="129.05601">
+      </trkpt>
+      <trkpt lat="35.19024" lon="129.0559">
+      </trkpt>
+      <trkpt lat="35.1903" lon="129.0558">
+      </trkpt>
+      <trkpt lat="35.19034" lon="129.05569">
+      </trkpt>
+      <trkpt lat="35.19036" lon="129.05556">
+      </trkpt>
+      <trkpt lat="35.19035" lon="129.05551">
+      </trkpt>
+      <trkpt lat="35.19026" lon="129.05534">
+      </trkpt>
+      <trkpt lat="35.19015" lon="129.05524">
+      </trkpt>
+      <trkpt lat="35.18998" lon="129.05516">
+      </trkpt>
+      <trkpt lat="35.18987" lon="129.05517">
+      </trkpt>
+      <trkpt lat="35.18958" lon="129.05528">
+      </trkpt>
+      <trkpt lat="35.1892" lon="129.05537">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

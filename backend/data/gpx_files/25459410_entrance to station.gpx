@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>entrance to station</name>
+    <desc>Strava Segment ID: 25459410
+Distance: 692.1m
+Avg Grade: 0.2%</desc>
+  </metadata>
+  <trk>
+    <name>entrance to station</name>
+    <trkseg>
+      <trkpt lat="35.09195" lon="128.92315">
+      </trkpt>
+      <trkpt lat="35.09208" lon="128.92358">
+      </trkpt>
+      <trkpt lat="35.09222" lon="128.92392">
+      </trkpt>
+      <trkpt lat="35.09236" lon="128.92422">
+      </trkpt>
+      <trkpt lat="35.09266" lon="128.92474">
+      </trkpt>
+      <trkpt lat="35.09296" lon="128.92514">
+      </trkpt>
+      <trkpt lat="35.09347" lon="128.92571">
+      </trkpt>
+      <trkpt lat="35.09378" lon="128.92589">
+      </trkpt>
+      <trkpt lat="35.09402" lon="128.92599">
+      </trkpt>
+      <trkpt lat="35.09434" lon="128.92616">
+      </trkpt>
+      <trkpt lat="35.0945" lon="128.9262">
+      </trkpt>
+      <trkpt lat="35.09459" lon="128.92625">
+      </trkpt>
+      <trkpt lat="35.09465" lon="128.92626">
+      </trkpt>
+      <trkpt lat="35.09497" lon="128.92639">
+      </trkpt>
+      <trkpt lat="35.0951" lon="128.9264">
+      </trkpt>
+      <trkpt lat="35.09516" lon="128.92643">
+      </trkpt>
+      <trkpt lat="35.09555" lon="128.92652">
+      </trkpt>
+      <trkpt lat="35.09565" lon="128.92657">
+      </trkpt>
+      <trkpt lat="35.09571" lon="128.92658">
+      </trkpt>
+      <trkpt lat="35.09617" lon="128.92676">
+      </trkpt>
+      <trkpt lat="35.09635" lon="128.9268">
+      </trkpt>
+      <trkpt lat="35.09651" lon="128.92686">
+      </trkpt>
+      <trkpt lat="35.09685" lon="128.92694">
+      </trkpt>
+      <trkpt lat="35.09688" lon="128.92697">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

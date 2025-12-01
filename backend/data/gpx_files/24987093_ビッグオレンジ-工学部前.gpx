@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>ビッグオレンジ-工学部前</name>
+    <desc>Strava Segment ID: 24987093
+Distance: 625.4m
+Avg Grade: 3.8%</desc>
+  </metadata>
+  <trk>
+    <name>ビッグオレンジ-工学部前</name>
+    <trkseg>
+      <trkpt lat="33.59809" lon="130.22347">
+      </trkpt>
+      <trkpt lat="33.59803" lon="130.22326">
+      </trkpt>
+      <trkpt lat="33.59751" lon="130.22204">
+      </trkpt>
+      <trkpt lat="33.59745" lon="130.22182">
+      </trkpt>
+      <trkpt lat="33.59737" lon="130.22128">
+      </trkpt>
+      <trkpt lat="33.59734" lon="130.22074">
+      </trkpt>
+      <trkpt lat="33.59736" lon="130.22046">
+      </trkpt>
+      <trkpt lat="33.59747" lon="130.2198">
+      </trkpt>
+      <trkpt lat="33.59749" lon="130.21944">
+      </trkpt>
+      <trkpt lat="33.59748" lon="130.21908">
+      </trkpt>
+      <trkpt lat="33.59745" lon="130.21884">
+      </trkpt>
+      <trkpt lat="33.59732" lon="130.21822">
+      </trkpt>
+      <trkpt lat="33.59719" lon="130.21777">
+      </trkpt>
+      <trkpt lat="33.597" lon="130.21734">
+      </trkpt>
+      <trkpt lat="33.59683" lon="130.21704">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

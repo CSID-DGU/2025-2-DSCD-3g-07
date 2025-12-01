@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>Haesong-ro Uphill</name>
+    <desc>Strava Segment ID: 33241648
+Distance: 374.8m
+Avg Grade: 4.1%</desc>
+  </metadata>
+  <trk>
+    <name>Haesong-ro Uphill</name>
+    <trkseg>
+      <trkpt lat="35.26466" lon="129.23211">
+      </trkpt>
+      <trkpt lat="35.26469" lon="129.23196">
+      </trkpt>
+      <trkpt lat="35.26485" lon="129.23148">
+      </trkpt>
+      <trkpt lat="35.26507" lon="129.23093">
+      </trkpt>
+      <trkpt lat="35.26535" lon="129.22984">
+      </trkpt>
+      <trkpt lat="35.26551" lon="129.22934">
+      </trkpt>
+      <trkpt lat="35.26566" lon="129.22873">
+      </trkpt>
+      <trkpt lat="35.26581" lon="129.22825">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

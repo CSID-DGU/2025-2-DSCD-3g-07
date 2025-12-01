@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>사라봉입구 200m</name>
+    <desc>Strava Segment ID: 13881791
+Distance: 253.2m
+Avg Grade: 5.5%</desc>
+  </metadata>
+  <trk>
+    <name>사라봉입구 200m</name>
+    <trkseg>
+      <trkpt lat="33.5163" lon="126.54758">
+      </trkpt>
+      <trkpt lat="33.51649" lon="126.5475">
+      </trkpt>
+      <trkpt lat="33.51674" lon="126.54735">
+      </trkpt>
+      <trkpt lat="33.51733" lon="126.5471">
+      </trkpt>
+      <trkpt lat="33.51761" lon="126.54696">
+      </trkpt>
+      <trkpt lat="33.51783" lon="126.54689">
+      </trkpt>
+      <trkpt lat="33.51801" lon="126.54689">
+      </trkpt>
+      <trkpt lat="33.5182" lon="126.54695">
+      </trkpt>
+      <trkpt lat="33.51844" lon="126.54708">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

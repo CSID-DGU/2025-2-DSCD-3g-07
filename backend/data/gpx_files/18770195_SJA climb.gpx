@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>SJA climb</name>
+    <desc>Strava Segment ID: 18770195
+Distance: 278.0m
+Avg Grade: 4.2%</desc>
+  </metadata>
+  <trk>
+    <name>SJA climb</name>
+    <trkseg>
+      <trkpt lat="33.28351" lon="126.28053">
+      </trkpt>
+      <trkpt lat="33.2836" lon="126.28068">
+      </trkpt>
+      <trkpt lat="33.28373" lon="126.28095">
+      </trkpt>
+      <trkpt lat="33.2839" lon="126.28123">
+      </trkpt>
+      <trkpt lat="33.28394" lon="126.28131">
+      </trkpt>
+      <trkpt lat="33.28402" lon="126.28158">
+      </trkpt>
+      <trkpt lat="33.28432" lon="126.28216">
+      </trkpt>
+      <trkpt lat="33.2846" lon="126.2824">
+      </trkpt>
+      <trkpt lat="33.2847" lon="126.28251">
+      </trkpt>
+      <trkpt lat="33.28488" lon="126.28276">
+      </trkpt>
+      <trkpt lat="33.28496" lon="126.2829">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

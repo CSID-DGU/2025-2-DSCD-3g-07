@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>Rollerblade lap</name>
+    <desc>Strava Segment ID: 15142093
+Distance: 235.1m
+Avg Grade: 0.2%</desc>
+  </metadata>
+  <trk>
+    <name>Rollerblade lap</name>
+    <trkseg>
+      <trkpt lat="35.69842" lon="128.46509">
+      </trkpt>
+      <trkpt lat="35.69836" lon="128.46521">
+      </trkpt>
+      <trkpt lat="35.69834" lon="128.46542">
+      </trkpt>
+      <trkpt lat="35.69838" lon="128.46555">
+      </trkpt>
+      <trkpt lat="35.69844" lon="128.46564">
+      </trkpt>
+      <trkpt lat="35.69859" lon="128.46572">
+      </trkpt>
+      <trkpt lat="35.69889" lon="128.46571">
+      </trkpt>
+      <trkpt lat="35.69898" lon="128.46566">
+      </trkpt>
+      <trkpt lat="35.699" lon="128.46558">
+      </trkpt>
+      <trkpt lat="35.69903" lon="128.46556">
+      </trkpt>
+      <trkpt lat="35.69908" lon="128.46546">
+      </trkpt>
+      <trkpt lat="35.69908" lon="128.4654">
+      </trkpt>
+      <trkpt lat="35.69905" lon="128.46521">
+      </trkpt>
+      <trkpt lat="35.69898" lon="128.46509">
+      </trkpt>
+      <trkpt lat="35.69893" lon="128.46505">
+      </trkpt>
+      <trkpt lat="35.69882" lon="128.46503">
+      </trkpt>
+      <trkpt lat="35.69858" lon="128.46501">
+      </trkpt>
+      <trkpt lat="35.69846" lon="128.46504">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

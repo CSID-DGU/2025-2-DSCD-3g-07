@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>国道263号線 Climb</name>
+    <desc>Strava Segment ID: 5865335
+Distance: 531.5m
+Avg Grade: 8.5%</desc>
+  </metadata>
+  <trk>
+    <name>国道263号線 Climb</name>
+    <trkseg>
+      <trkpt lat="33.49885" lon="130.29842">
+      </trkpt>
+      <trkpt lat="33.49891" lon="130.29817">
+      </trkpt>
+      <trkpt lat="33.49892" lon="130.29798">
+      </trkpt>
+      <trkpt lat="33.4989" lon="130.29779">
+      </trkpt>
+      <trkpt lat="33.49874" lon="130.29741">
+      </trkpt>
+      <trkpt lat="33.49865" lon="130.29727">
+      </trkpt>
+      <trkpt lat="33.49832" lon="130.29703">
+      </trkpt>
+      <trkpt lat="33.49798" lon="130.29688">
+      </trkpt>
+      <trkpt lat="33.49643" lon="130.29646">
+      </trkpt>
+      <trkpt lat="33.49617" lon="130.29644">
+      </trkpt>
+      <trkpt lat="33.49546" lon="130.29644">
+      </trkpt>
+      <trkpt lat="33.49522" lon="130.29639">
+      </trkpt>
+      <trkpt lat="33.49504" lon="130.29628">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

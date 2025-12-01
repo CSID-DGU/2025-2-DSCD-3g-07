@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>진옥자전거캠프-장산(중봉-깔딱계단)(JOBC)</name>
+    <desc>Strava Segment ID: 22294890
+Distance: 109.3m
+Avg Grade: 22.0%</desc>
+  </metadata>
+  <trk>
+    <name>진옥자전거캠프-장산(중봉-깔딱계단)(JOBC)</name>
+    <trkseg>
+      <trkpt lat="35.18664" lon="129.15018">
+      </trkpt>
+      <trkpt lat="35.18667" lon="129.15012">
+      </trkpt>
+      <trkpt lat="35.18682" lon="129.15008">
+      </trkpt>
+      <trkpt lat="35.18687" lon="129.15004">
+      </trkpt>
+      <trkpt lat="35.1869" lon="129.14996">
+      </trkpt>
+      <trkpt lat="35.18693" lon="129.14984">
+      </trkpt>
+      <trkpt lat="35.18697" lon="129.14979">
+      </trkpt>
+      <trkpt lat="35.187" lon="129.14977">
+      </trkpt>
+      <trkpt lat="35.18707" lon="129.14978">
+      </trkpt>
+      <trkpt lat="35.18716" lon="129.14966">
+      </trkpt>
+      <trkpt lat="35.18722" lon="129.14963">
+      </trkpt>
+      <trkpt lat="35.18727" lon="129.14962">
+      </trkpt>
+      <trkpt lat="35.18728" lon="129.14947">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

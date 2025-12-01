@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>송정동 산87 1 Climb</name>
+    <desc>Strava Segment ID: 900176
+Distance: 465.4m
+Avg Grade: 9.8%</desc>
+  </metadata>
+  <trk>
+    <name>송정동 산87 1 Climb</name>
+    <trkseg>
+      <trkpt lat="35.16478" lon="129.1872">
+      </trkpt>
+      <trkpt lat="35.16483" lon="129.18735">
+      </trkpt>
+      <trkpt lat="35.16489" lon="129.18744">
+      </trkpt>
+      <trkpt lat="35.16503" lon="129.18762">
+      </trkpt>
+      <trkpt lat="35.16534" lon="129.18795">
+      </trkpt>
+      <trkpt lat="35.16548" lon="129.18815">
+      </trkpt>
+      <trkpt lat="35.16553" lon="129.18837">
+      </trkpt>
+      <trkpt lat="35.16545" lon="129.18895">
+      </trkpt>
+      <trkpt lat="35.16545" lon="129.18918">
+      </trkpt>
+      <trkpt lat="35.16553" lon="129.18974">
+      </trkpt>
+      <trkpt lat="35.1655" lon="129.19003">
+      </trkpt>
+      <trkpt lat="35.16533" lon="129.19062">
+      </trkpt>
+      <trkpt lat="35.16538" lon="129.19087">
+      </trkpt>
+      <trkpt lat="35.16545" lon="129.19099">
+      </trkpt>
+      <trkpt lat="35.16577" lon="129.19127">
+      </trkpt>
+      <trkpt lat="35.16609" lon="129.19148">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

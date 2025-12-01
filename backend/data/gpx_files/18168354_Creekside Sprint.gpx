@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>Creekside Sprint</name>
+    <desc>Strava Segment ID: 18168354
+Distance: 859.8m
+Avg Grade: -0.3%</desc>
+  </metadata>
+  <trk>
+    <name>Creekside Sprint</name>
+    <trkseg>
+      <trkpt lat="35.16772" lon="128.14216">
+      </trkpt>
+      <trkpt lat="35.16793" lon="128.14201">
+      </trkpt>
+      <trkpt lat="35.16831" lon="128.14188">
+      </trkpt>
+      <trkpt lat="35.16849" lon="128.14184">
+      </trkpt>
+      <trkpt lat="35.1689" lon="128.14178">
+      </trkpt>
+      <trkpt lat="35.1693" lon="128.14177">
+      </trkpt>
+      <trkpt lat="35.1695" lon="128.14179">
+      </trkpt>
+      <trkpt lat="35.16988" lon="128.14184">
+      </trkpt>
+      <trkpt lat="35.17046" lon="128.14201">
+      </trkpt>
+      <trkpt lat="35.17083" lon="128.14208">
+      </trkpt>
+      <trkpt lat="35.17101" lon="128.14213">
+      </trkpt>
+      <trkpt lat="35.17157" lon="128.14226">
+      </trkpt>
+      <trkpt lat="35.17254" lon="128.14239">
+      </trkpt>
+      <trkpt lat="35.17348" lon="128.14253">
+      </trkpt>
+      <trkpt lat="35.17387" lon="128.14253">
+      </trkpt>
+      <trkpt lat="35.17483" lon="128.14261">
+      </trkpt>
+      <trkpt lat="35.17501" lon="128.1427">
+      </trkpt>
+      <trkpt lat="35.17535" lon="128.14293">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

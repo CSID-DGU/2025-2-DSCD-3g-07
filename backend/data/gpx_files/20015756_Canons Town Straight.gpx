@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>Canons Town Straight</name>
+    <desc>Strava Segment ID: 20015756
+Distance: 141.0m
+Avg Grade: 1.7%</desc>
+  </metadata>
+  <trk>
+    <name>Canons Town Straight</name>
+    <trkseg>
+      <trkpt lat="33.29567" lon="126.29184">
+      </trkpt>
+      <trkpt lat="33.29573" lon="126.29162">
+      </trkpt>
+      <trkpt lat="33.29574" lon="126.29138">
+      </trkpt>
+      <trkpt lat="33.29573" lon="126.2911">
+      </trkpt>
+      <trkpt lat="33.29577" lon="126.29093">
+      </trkpt>
+      <trkpt lat="33.29579" lon="126.29058">
+      </trkpt>
+      <trkpt lat="33.29583" lon="126.29036">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

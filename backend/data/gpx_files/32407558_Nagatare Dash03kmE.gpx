@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>Nagatare Dash!0.3km(E→)</name>
+    <desc>Strava Segment ID: 32407558
+Distance: 308.8m
+Avg Grade: 0.8%</desc>
+  </metadata>
+  <trk>
+    <name>Nagatare Dash!0.3km(E→)</name>
+    <trkseg>
+      <trkpt lat="33.58058" lon="130.28214">
+      </trkpt>
+      <trkpt lat="33.58064" lon="130.28177">
+      </trkpt>
+      <trkpt lat="33.58076" lon="130.28026">
+      </trkpt>
+      <trkpt lat="33.58083" lon="130.27982">
+      </trkpt>
+      <trkpt lat="33.581" lon="130.27886">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

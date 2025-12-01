@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>下関北バイパス</name>
+    <desc>Strava Segment ID: 40450267
+Distance: 1704.0m
+Avg Grade: -1.1%</desc>
+  </metadata>
+  <trk>
+    <name>下関北バイパス</name>
+    <trkseg>
+      <trkpt lat="33.99434" lon="130.91676">
+      </trkpt>
+      <trkpt lat="33.99583" lon="130.91692">
+      </trkpt>
+      <trkpt lat="33.99659" lon="130.91695">
+      </trkpt>
+      <trkpt lat="33.99735" lon="130.9169">
+      </trkpt>
+      <trkpt lat="33.99774" lon="130.91685">
+      </trkpt>
+      <trkpt lat="33.99814" lon="130.91675">
+      </trkpt>
+      <trkpt lat="33.99849" lon="130.9167">
+      </trkpt>
+      <trkpt lat="33.99867" lon="130.91665">
+      </trkpt>
+      <trkpt lat="33.99905" lon="130.91651">
+      </trkpt>
+      <trkpt lat="33.99977" lon="130.9162">
+      </trkpt>
+      <trkpt lat="34.00031" lon="130.91593">
+      </trkpt>
+      <trkpt lat="34.00065" lon="130.91578">
+      </trkpt>
+      <trkpt lat="34.00135" lon="130.91541">
+      </trkpt>
+      <trkpt lat="34.00209" lon="130.91511">
+      </trkpt>
+      <trkpt lat="34.00267" lon="130.91493">
+      </trkpt>
+      <trkpt lat="34.00326" lon="130.91482">
+      </trkpt>
+      <trkpt lat="34.00344" lon="130.91481">
+      </trkpt>
+      <trkpt lat="34.00422" lon="130.91481">
+      </trkpt>
+      <trkpt lat="34.00442" lon="130.91485">
+      </trkpt>
+      <trkpt lat="34.00516" lon="130.91506">
+      </trkpt>
+      <trkpt lat="34.00701" lon="130.91568">
+      </trkpt>
+      <trkpt lat="34.00738" lon="130.91578">
+      </trkpt>
+      <trkpt lat="34.00795" lon="130.91596">
+      </trkpt>
+      <trkpt lat="34.00851" lon="130.91613">
+      </trkpt>
+      <trkpt lat="34.00926" lon="130.91631">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>県道30号線 Climb</name>
+    <desc>Strava Segment ID: 5942424
+Distance: 1167.3m
+Avg Grade: 5.3%</desc>
+  </metadata>
+  <trk>
+    <name>県道30号線 Climb</name>
+    <trkseg>
+      <trkpt lat="33.681" lon="130.66506">
+      </trkpt>
+      <trkpt lat="33.6823" lon="130.66291">
+      </trkpt>
+      <trkpt lat="33.68271" lon="130.6623">
+      </trkpt>
+      <trkpt lat="33.68285" lon="130.66211">
+      </trkpt>
+      <trkpt lat="33.68315" lon="130.66178">
+      </trkpt>
+      <trkpt lat="33.68363" lon="130.66132">
+      </trkpt>
+      <trkpt lat="33.68466" lon="130.66049">
+      </trkpt>
+      <trkpt lat="33.68523" lon="130.66012">
+      </trkpt>
+      <trkpt lat="33.68572" lon="130.65987">
+      </trkpt>
+      <trkpt lat="33.68638" lon="130.65963">
+      </trkpt>
+      <trkpt lat="33.68737" lon="130.65935">
+      </trkpt>
+      <trkpt lat="33.68807" lon="130.6591">
+      </trkpt>
+      <trkpt lat="33.68854" lon="130.65884">
+      </trkpt>
+      <trkpt lat="33.68894" lon="130.65852">
+      </trkpt>
+      <trkpt lat="33.68934" lon="130.65806">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>진주 보조 경기장</name>
+    <desc>Strava Segment ID: 20027980
+Distance: 406.9m
+Avg Grade: 21.3%</desc>
+  </metadata>
+  <trk>
+    <name>진주 보조 경기장</name>
+    <trkseg>
+      <trkpt lat="35.18366" lon="128.13308">
+      </trkpt>
+      <trkpt lat="35.18358" lon="128.13311">
+      </trkpt>
+      <trkpt lat="35.18349" lon="128.13317">
+      </trkpt>
+      <trkpt lat="35.1834" lon="128.13334">
+      </trkpt>
+      <trkpt lat="35.18337" lon="128.13346">
+      </trkpt>
+      <trkpt lat="35.18338" lon="128.13359">
+      </trkpt>
+      <trkpt lat="35.18341" lon="128.13371">
+      </trkpt>
+      <trkpt lat="35.1835" lon="128.13385">
+      </trkpt>
+      <trkpt lat="35.18359" lon="128.13392">
+      </trkpt>
+      <trkpt lat="35.18363" lon="128.13394">
+      </trkpt>
+      <trkpt lat="35.18373" lon="128.13395">
+      </trkpt>
+      <trkpt lat="35.18446" lon="128.13379">
+      </trkpt>
+      <trkpt lat="35.18456" lon="128.13376">
+      </trkpt>
+      <trkpt lat="35.18464" lon="128.1337">
+      </trkpt>
+      <trkpt lat="35.18471" lon="128.1336">
+      </trkpt>
+      <trkpt lat="35.18475" lon="128.13349">
+      </trkpt>
+      <trkpt lat="35.18478" lon="128.13337">
+      </trkpt>
+      <trkpt lat="35.18477" lon="128.13325">
+      </trkpt>
+      <trkpt lat="35.18473" lon="128.13312">
+      </trkpt>
+      <trkpt lat="35.18466" lon="128.13302">
+      </trkpt>
+      <trkpt lat="35.18457" lon="128.13295">
+      </trkpt>
+      <trkpt lat="35.18447" lon="128.1329">
+      </trkpt>
+      <trkpt lat="35.18437" lon="128.1329">
+      </trkpt>
+      <trkpt lat="35.18367" lon="128.13308">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

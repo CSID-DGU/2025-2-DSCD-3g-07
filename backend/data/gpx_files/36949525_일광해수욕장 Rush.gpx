@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>일광해수욕장 Rush!</name>
+    <desc>Strava Segment ID: 36949525
+Distance: 350.6m
+Avg Grade: -0.1%</desc>
+  </metadata>
+  <trk>
+    <name>일광해수욕장 Rush!</name>
+    <trkseg>
+      <trkpt lat="35.26483" lon="129.23571">
+      </trkpt>
+      <trkpt lat="35.26454" lon="129.23516">
+      </trkpt>
+      <trkpt lat="35.26413" lon="129.23471">
+      </trkpt>
+      <trkpt lat="35.26375" lon="129.23443">
+      </trkpt>
+      <trkpt lat="35.26316" lon="129.23392">
+      </trkpt>
+      <trkpt lat="35.26299" lon="129.23384">
+      </trkpt>
+      <trkpt lat="35.26283" lon="129.2338">
+      </trkpt>
+      <trkpt lat="35.26268" lon="129.23372">
+      </trkpt>
+      <trkpt lat="35.2623" lon="129.23362">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

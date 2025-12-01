@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>남항대교 런 (영도-송도)</name>
+    <desc>Strava Segment ID: 18325785
+Distance: 1005.5m
+Avg Grade: 0.1%</desc>
+  </metadata>
+  <trk>
+    <name>남항대교 런 (영도-송도)</name>
+    <trkseg>
+      <trkpt lat="35.08166" lon="129.03779">
+      </trkpt>
+      <trkpt lat="35.0816" lon="129.03763">
+      </trkpt>
+      <trkpt lat="35.08151" lon="129.03747">
+      </trkpt>
+      <trkpt lat="35.08142" lon="129.03721">
+      </trkpt>
+      <trkpt lat="35.08127" lon="129.03653">
+      </trkpt>
+      <trkpt lat="35.08117" lon="129.03622">
+      </trkpt>
+      <trkpt lat="35.081" lon="129.03534">
+      </trkpt>
+      <trkpt lat="35.08086" lon="129.03485">
+      </trkpt>
+      <trkpt lat="35.0808" lon="129.03449">
+      </trkpt>
+      <trkpt lat="35.08055" lon="129.03342">
+      </trkpt>
+      <trkpt lat="35.08028" lon="129.0321">
+      </trkpt>
+      <trkpt lat="35.08003" lon="129.03105">
+      </trkpt>
+      <trkpt lat="35.07992" lon="129.0305">
+      </trkpt>
+      <trkpt lat="35.0797" lon="129.02955">
+      </trkpt>
+      <trkpt lat="35.07965" lon="129.02924">
+      </trkpt>
+      <trkpt lat="35.0795" lon="129.0287">
+      </trkpt>
+      <trkpt lat="35.07938" lon="129.02813">
+      </trkpt>
+      <trkpt lat="35.07936" lon="129.02799">
+      </trkpt>
+      <trkpt lat="35.07931" lon="129.02781">
+      </trkpt>
+      <trkpt lat="35.07918" lon="129.02723">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

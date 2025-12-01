@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>Ready Set Goshima Line!</name>
+    <desc>Strava Segment ID: 40370238
+Distance: 478.8m
+Avg Grade: 0.1%</desc>
+  </metadata>
+  <trk>
+    <name>Ready Set Goshima Line!</name>
+    <trkseg>
+      <trkpt lat="33.58349" lon="130.42005">
+      </trkpt>
+      <trkpt lat="33.58329" lon="130.42002">
+      </trkpt>
+      <trkpt lat="33.58306" lon="130.42005">
+      </trkpt>
+      <trkpt lat="33.5827" lon="130.42006">
+      </trkpt>
+      <trkpt lat="33.58223" lon="130.42013">
+      </trkpt>
+      <trkpt lat="33.58205" lon="130.42022">
+      </trkpt>
+      <trkpt lat="33.58192" lon="130.42024">
+      </trkpt>
+      <trkpt lat="33.58186" lon="130.42029">
+      </trkpt>
+      <trkpt lat="33.58165" lon="130.42032">
+      </trkpt>
+      <trkpt lat="33.58135" lon="130.42041">
+      </trkpt>
+      <trkpt lat="33.58126" lon="130.42042">
+      </trkpt>
+      <trkpt lat="33.58115" lon="130.42046">
+      </trkpt>
+      <trkpt lat="33.5811" lon="130.4205">
+      </trkpt>
+      <trkpt lat="33.58061" lon="130.42065">
+      </trkpt>
+      <trkpt lat="33.58023" lon="130.42084">
+      </trkpt>
+      <trkpt lat="33.58004" lon="130.42097">
+      </trkpt>
+      <trkpt lat="33.57993" lon="130.42102">
+      </trkpt>
+      <trkpt lat="33.57959" lon="130.42117">
+      </trkpt>
+      <trkpt lat="33.57939" lon="130.42123">
+      </trkpt>
+      <trkpt lat="33.57934" lon="130.42125">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

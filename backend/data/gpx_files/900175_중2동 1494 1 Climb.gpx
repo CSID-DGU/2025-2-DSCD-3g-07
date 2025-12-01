@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>중2동 1494 1 Climb</name>
+    <desc>Strava Segment ID: 900175
+Distance: 780.6m
+Avg Grade: 9.7%</desc>
+  </metadata>
+  <trk>
+    <name>중2동 1494 1 Climb</name>
+    <trkseg>
+      <trkpt lat="35.15753" lon="129.17578">
+      </trkpt>
+      <trkpt lat="35.15634" lon="129.17759">
+      </trkpt>
+      <trkpt lat="35.15626" lon="129.17777">
+      </trkpt>
+      <trkpt lat="35.15624" lon="129.17799">
+      </trkpt>
+      <trkpt lat="35.15633" lon="129.17859">
+      </trkpt>
+      <trkpt lat="35.15669" lon="129.18029">
+      </trkpt>
+      <trkpt lat="35.15696" lon="129.18141">
+      </trkpt>
+      <trkpt lat="35.15708" lon="129.18176">
+      </trkpt>
+      <trkpt lat="35.15725" lon="129.18197">
+      </trkpt>
+      <trkpt lat="35.15753" lon="129.18224">
+      </trkpt>
+      <trkpt lat="35.15778" lon="129.18238">
+      </trkpt>
+      <trkpt lat="35.15838" lon="129.18276">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

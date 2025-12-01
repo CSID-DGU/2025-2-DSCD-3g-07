@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>학리 메인 업힐</name>
+    <desc>Strava Segment ID: 36942273
+Distance: 429.5m
+Avg Grade: 2.9%</desc>
+  </metadata>
+  <trk>
+    <name>학리 메인 업힐</name>
+    <trkseg>
+      <trkpt lat="35.25961" lon="129.24378">
+      </trkpt>
+      <trkpt lat="35.25936" lon="129.24357">
+      </trkpt>
+      <trkpt lat="35.25919" lon="129.24327">
+      </trkpt>
+      <trkpt lat="35.25904" lon="129.24282">
+      </trkpt>
+      <trkpt lat="35.25893" lon="129.2422">
+      </trkpt>
+      <trkpt lat="35.25885" lon="129.24196">
+      </trkpt>
+      <trkpt lat="35.25878" lon="129.24181">
+      </trkpt>
+      <trkpt lat="35.25871" lon="129.24173">
+      </trkpt>
+      <trkpt lat="35.2586" lon="129.24163">
+      </trkpt>
+      <trkpt lat="35.2583" lon="129.2415">
+      </trkpt>
+      <trkpt lat="35.25811" lon="129.24134">
+      </trkpt>
+      <trkpt lat="35.25806" lon="129.24126">
+      </trkpt>
+      <trkpt lat="35.25781" lon="129.24065">
+      </trkpt>
+      <trkpt lat="35.25766" lon="129.24035">
+      </trkpt>
+      <trkpt lat="35.25756" lon="129.24025">
+      </trkpt>
+      <trkpt lat="35.25749" lon="129.24023">
+      </trkpt>
+      <trkpt lat="35.25743" lon="129.24019">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

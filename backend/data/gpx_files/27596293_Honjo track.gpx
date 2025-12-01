@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>Honjo track</name>
+    <desc>Strava Segment ID: 27596293
+Distance: 399.0m
+Avg Grade: -0.1%</desc>
+  </metadata>
+  <trk>
+    <name>Honjo track</name>
+    <trkseg>
+      <trkpt lat="33.88993" lon="130.73138">
+      </trkpt>
+      <trkpt lat="33.88989" lon="130.73139">
+      </trkpt>
+      <trkpt lat="33.88974" lon="130.73156">
+      </trkpt>
+      <trkpt lat="33.8897" lon="130.7318">
+      </trkpt>
+      <trkpt lat="33.88983" lon="130.73206">
+      </trkpt>
+      <trkpt lat="33.89002" lon="130.73215">
+      </trkpt>
+      <trkpt lat="33.89015" lon="130.73214">
+      </trkpt>
+      <trkpt lat="33.89094" lon="130.73191">
+      </trkpt>
+      <trkpt lat="33.89108" lon="130.73175">
+      </trkpt>
+      <trkpt lat="33.89112" lon="130.73153">
+      </trkpt>
+      <trkpt lat="33.89102" lon="130.73132">
+      </trkpt>
+      <trkpt lat="33.89095" lon="130.73125">
+      </trkpt>
+      <trkpt lat="33.89075" lon="130.73119">
+      </trkpt>
+      <trkpt lat="33.88991" lon="130.7314">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

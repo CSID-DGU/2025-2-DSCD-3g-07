@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>Weather Station Climb</name>
+    <desc>Strava Segment ID: 28412487
+Distance: 435.0m
+Avg Grade: 11.1%</desc>
+  </metadata>
+  <trk>
+    <name>Weather Station Climb</name>
+    <trkseg>
+      <trkpt lat="33.29161" lon="126.16552">
+      </trkpt>
+      <trkpt lat="33.29179" lon="126.16538">
+      </trkpt>
+      <trkpt lat="33.29214" lon="126.16519">
+      </trkpt>
+      <trkpt lat="33.29221" lon="126.1651">
+      </trkpt>
+      <trkpt lat="33.29236" lon="126.16481">
+      </trkpt>
+      <trkpt lat="33.29249" lon="126.16464">
+      </trkpt>
+      <trkpt lat="33.29249" lon="126.16442">
+      </trkpt>
+      <trkpt lat="33.29251" lon="126.16421">
+      </trkpt>
+      <trkpt lat="33.29258" lon="126.164">
+      </trkpt>
+      <trkpt lat="33.29267" lon="126.16384">
+      </trkpt>
+      <trkpt lat="33.29284" lon="126.16366">
+      </trkpt>
+      <trkpt lat="33.29307" lon="126.16331">
+      </trkpt>
+      <trkpt lat="33.29325" lon="126.16305">
+      </trkpt>
+      <trkpt lat="33.29329" lon="126.16302">
+      </trkpt>
+      <trkpt lat="33.29341" lon="126.16306">
+      </trkpt>
+      <trkpt lat="33.29368" lon="126.16335">
+      </trkpt>
+      <trkpt lat="33.29388" lon="126.16352">
+      </trkpt>
+      <trkpt lat="33.29402" lon="126.16356">
+      </trkpt>
+      <trkpt lat="33.2941" lon="126.16341">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

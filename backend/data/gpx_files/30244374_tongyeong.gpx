@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>tongyeong</name>
+    <desc>Strava Segment ID: 30244374
+Distance: 449.6m
+Avg Grade: 1.2%</desc>
+  </metadata>
+  <trk>
+    <name>tongyeong</name>
+    <trkseg>
+      <trkpt lat="34.82471" lon="128.44022">
+      </trkpt>
+      <trkpt lat="34.82458" lon="128.44004">
+      </trkpt>
+      <trkpt lat="34.82443" lon="128.43992">
+      </trkpt>
+      <trkpt lat="34.82424" lon="128.43984">
+      </trkpt>
+      <trkpt lat="34.82404" lon="128.43982">
+      </trkpt>
+      <trkpt lat="34.82384" lon="128.43985">
+      </trkpt>
+      <trkpt lat="34.82359" lon="128.43992">
+      </trkpt>
+      <trkpt lat="34.82333" lon="128.43992">
+      </trkpt>
+      <trkpt lat="34.82326" lon="128.43995">
+      </trkpt>
+      <trkpt lat="34.82299" lon="128.44013">
+      </trkpt>
+      <trkpt lat="34.82291" lon="128.44016">
+      </trkpt>
+      <trkpt lat="34.82273" lon="128.44017">
+      </trkpt>
+      <trkpt lat="34.8225" lon="128.44023">
+      </trkpt>
+      <trkpt lat="34.82225" lon="128.44037">
+      </trkpt>
+      <trkpt lat="34.82204" lon="128.44045">
+      </trkpt>
+      <trkpt lat="34.82193" lon="128.44045">
+      </trkpt>
+      <trkpt lat="34.8218" lon="128.4404">
+      </trkpt>
+      <trkpt lat="34.82172" lon="128.44039">
+      </trkpt>
+      <trkpt lat="34.82165" lon="128.44042">
+      </trkpt>
+      <trkpt lat="34.82154" lon="128.44055">
+      </trkpt>
+      <trkpt lat="34.82143" lon="128.44087">
+      </trkpt>
+      <trkpt lat="34.82136" lon="128.44114">
+      </trkpt>
+      <trkpt lat="34.82131" lon="128.44126">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

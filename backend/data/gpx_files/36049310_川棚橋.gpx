@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>川棚橋</name>
+    <desc>Strava Segment ID: 36049310
+Distance: 374.4m
+Avg Grade: -0.0%</desc>
+  </metadata>
+  <trk>
+    <name>川棚橋</name>
+    <trkseg>
+      <trkpt lat="33.07236" lon="129.86208">
+      </trkpt>
+      <trkpt lat="33.07178" lon="129.8623">
+      </trkpt>
+      <trkpt lat="33.0714" lon="129.8625">
+      </trkpt>
+      <trkpt lat="33.07103" lon="129.86267">
+      </trkpt>
+      <trkpt lat="33.07087" lon="129.86282">
+      </trkpt>
+      <trkpt lat="33.07068" lon="129.86287">
+      </trkpt>
+      <trkpt lat="33.0699" lon="129.86294">
+      </trkpt>
+      <trkpt lat="33.06914" lon="129.86303">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

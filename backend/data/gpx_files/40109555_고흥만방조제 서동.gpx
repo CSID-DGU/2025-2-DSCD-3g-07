@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>고흥만방조제, 서&gt;동</name>
+    <desc>Strava Segment ID: 40109555
+Distance: 2501.9m
+Avg Grade: 0.0%</desc>
+  </metadata>
+  <trk>
+    <name>고흥만방조제, 서&gt;동</name>
+    <trkseg>
+      <trkpt lat="34.64818" lon="127.20101">
+      </trkpt>
+      <trkpt lat="34.649" lon="127.20453">
+      </trkpt>
+      <trkpt lat="34.64925" lon="127.20552">
+      </trkpt>
+      <trkpt lat="34.64961" lon="127.20721">
+      </trkpt>
+      <trkpt lat="34.65207" lon="127.21776">
+      </trkpt>
+      <trkpt lat="34.65348" lon="127.22393">
+      </trkpt>
+      <trkpt lat="34.65389" lon="127.22562">
+      </trkpt>
+      <trkpt lat="34.65408" lon="127.22654">
+      </trkpt>
+      <trkpt lat="34.65427" lon="127.22734">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

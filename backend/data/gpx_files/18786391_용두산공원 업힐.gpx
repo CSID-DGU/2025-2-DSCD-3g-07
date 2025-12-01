@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>용두산공원 업힐</name>
+    <desc>Strava Segment ID: 18786391
+Distance: 224.3m
+Avg Grade: 7.4%</desc>
+  </metadata>
+  <trk>
+    <name>용두산공원 업힐</name>
+    <trkseg>
+      <trkpt lat="35.10034" lon="129.03203">
+      </trkpt>
+      <trkpt lat="35.10078" lon="129.03183">
+      </trkpt>
+      <trkpt lat="35.10097" lon="129.03184">
+      </trkpt>
+      <trkpt lat="35.10107" lon="129.03192">
+      </trkpt>
+      <trkpt lat="35.10119" lon="129.03199">
+      </trkpt>
+      <trkpt lat="35.10137" lon="129.03222">
+      </trkpt>
+      <trkpt lat="35.10143" lon="129.03236">
+      </trkpt>
+      <trkpt lat="35.10146" lon="129.03252">
+      </trkpt>
+      <trkpt lat="35.10143" lon="129.03264">
+      </trkpt>
+      <trkpt lat="35.10141" lon="129.0327">
+      </trkpt>
+      <trkpt lat="35.10131" lon="129.03276">
+      </trkpt>
+      <trkpt lat="35.10119" lon="129.03277">
+      </trkpt>
+      <trkpt lat="35.10113" lon="129.03274">
+      </trkpt>
+      <trkpt lat="35.10101" lon="129.03273">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>Cosmos sprint</name>
+    <desc>Strava Segment ID: 21681583
+Distance: 272.8m
+Avg Grade: 0.3%</desc>
+  </metadata>
+  <trk>
+    <name>Cosmos sprint</name>
+    <trkseg>
+      <trkpt lat="33.17384" lon="129.6716">
+      </trkpt>
+      <trkpt lat="33.17343" lon="129.67208">
+      </trkpt>
+      <trkpt lat="33.17332" lon="129.67225">
+      </trkpt>
+      <trkpt lat="33.17322" lon="129.67243">
+      </trkpt>
+      <trkpt lat="33.17305" lon="129.67255">
+      </trkpt>
+      <trkpt lat="33.17285" lon="129.67264">
+      </trkpt>
+      <trkpt lat="33.1727" lon="129.67278">
+      </trkpt>
+      <trkpt lat="33.17233" lon="129.6733">
+      </trkpt>
+      <trkpt lat="33.17209" lon="129.67365">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

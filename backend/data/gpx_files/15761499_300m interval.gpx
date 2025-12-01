@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>300m interval</name>
+    <desc>Strava Segment ID: 15761499
+Distance: 258.6m
+Avg Grade: 3.7%</desc>
+  </metadata>
+  <trk>
+    <name>300m interval</name>
+    <trkseg>
+      <trkpt lat="33.17424" lon="129.67043">
+      </trkpt>
+      <trkpt lat="33.17412" lon="129.67041">
+      </trkpt>
+      <trkpt lat="33.17398" lon="129.67031">
+      </trkpt>
+      <trkpt lat="33.17384" lon="129.67022">
+      </trkpt>
+      <trkpt lat="33.17351" lon="129.67006">
+      </trkpt>
+      <trkpt lat="33.1733" lon="129.66992">
+      </trkpt>
+      <trkpt lat="33.17311" lon="129.66971">
+      </trkpt>
+      <trkpt lat="33.17304" lon="129.66958">
+      </trkpt>
+      <trkpt lat="33.17293" lon="129.66925">
+      </trkpt>
+      <trkpt lat="33.17286" lon="129.66873">
+      </trkpt>
+      <trkpt lat="33.17287" lon="129.66855">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

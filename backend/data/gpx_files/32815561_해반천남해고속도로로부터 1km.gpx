@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>해반천(남해고속도로로부터 1km)</name>
+    <desc>Strava Segment ID: 32815561
+Distance: 1003.3m
+Avg Grade: -0.0%</desc>
+  </metadata>
+  <trk>
+    <name>해반천(남해고속도로로부터 1km)</name>
+    <trkseg>
+      <trkpt lat="35.21119" lon="128.8768">
+      </trkpt>
+      <trkpt lat="35.20954" lon="128.87695">
+      </trkpt>
+      <trkpt lat="35.20873" lon="128.87697">
+      </trkpt>
+      <trkpt lat="35.20854" lon="128.87693">
+      </trkpt>
+      <trkpt lat="35.20835" lon="128.87686">
+      </trkpt>
+      <trkpt lat="35.20817" lon="128.87676">
+      </trkpt>
+      <trkpt lat="35.20714" lon="128.87593">
+      </trkpt>
+      <trkpt lat="35.20661" lon="128.87555">
+      </trkpt>
+      <trkpt lat="35.20629" lon="128.87525">
+      </trkpt>
+      <trkpt lat="35.20532" lon="128.87448">
+      </trkpt>
+      <trkpt lat="35.20517" lon="128.87432">
+      </trkpt>
+      <trkpt lat="35.20448" lon="128.87346">
+      </trkpt>
+      <trkpt lat="35.20352" lon="128.87222">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

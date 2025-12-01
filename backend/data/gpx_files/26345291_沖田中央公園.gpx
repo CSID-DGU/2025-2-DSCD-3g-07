@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>沖田中央公園</name>
+    <desc>Strava Segment ID: 26345291
+Distance: 793.1m
+Avg Grade: -0.4%</desc>
+  </metadata>
+  <trk>
+    <name>沖田中央公園</name>
+    <trkseg>
+      <trkpt lat="33.71053" lon="130.45298">
+      </trkpt>
+      <trkpt lat="33.71103" lon="130.45204">
+      </trkpt>
+      <trkpt lat="33.71133" lon="130.45136">
+      </trkpt>
+      <trkpt lat="33.71147" lon="130.45089">
+      </trkpt>
+      <trkpt lat="33.71169" lon="130.45034">
+      </trkpt>
+      <trkpt lat="33.71171" lon="130.45016">
+      </trkpt>
+      <trkpt lat="33.71162" lon="130.45004">
+      </trkpt>
+      <trkpt lat="33.71132" lon="130.44984">
+      </trkpt>
+      <trkpt lat="33.7111" lon="130.44972">
+      </trkpt>
+      <trkpt lat="33.71094" lon="130.44972">
+      </trkpt>
+      <trkpt lat="33.7109" lon="130.44976">
+      </trkpt>
+      <trkpt lat="33.71071" lon="130.45017">
+      </trkpt>
+      <trkpt lat="33.71027" lon="130.45101">
+      </trkpt>
+      <trkpt lat="33.71003" lon="130.45167">
+      </trkpt>
+      <trkpt lat="33.70971" lon="130.45243">
+      </trkpt>
+      <trkpt lat="33.70966" lon="130.45261">
+      </trkpt>
+      <trkpt lat="33.7097" lon="130.45269">
+      </trkpt>
+      <trkpt lat="33.70979" lon="130.45277">
+      </trkpt>
+      <trkpt lat="33.7102" lon="130.45308">
+      </trkpt>
+      <trkpt lat="33.71038" lon="130.45319">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

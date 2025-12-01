@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>일고 400m 트랙</name>
+    <desc>Strava Segment ID: 20260673
+Distance: 427.8m
+Avg Grade: -0.1%</desc>
+  </metadata>
+  <trk>
+    <name>일고 400m 트랙</name>
+    <trkseg>
+      <trkpt lat="33.4803" lon="126.479">
+      </trkpt>
+      <trkpt lat="33.48028" lon="126.47992">
+      </trkpt>
+      <trkpt lat="33.48029" lon="126.48013">
+      </trkpt>
+      <trkpt lat="33.48036" lon="126.48028">
+      </trkpt>
+      <trkpt lat="33.48046" lon="126.48038">
+      </trkpt>
+      <trkpt lat="33.48065" lon="126.48044">
+      </trkpt>
+      <trkpt lat="33.48076" lon="126.48042">
+      </trkpt>
+      <trkpt lat="33.48086" lon="126.48038">
+      </trkpt>
+      <trkpt lat="33.4809" lon="126.48034">
+      </trkpt>
+      <trkpt lat="33.48101" lon="126.48018">
+      </trkpt>
+      <trkpt lat="33.48104" lon="126.48004">
+      </trkpt>
+      <trkpt lat="33.48103" lon="126.47964">
+      </trkpt>
+      <trkpt lat="33.48104" lon="126.47909">
+      </trkpt>
+      <trkpt lat="33.48101" lon="126.47893">
+      </trkpt>
+      <trkpt lat="33.48092" lon="126.4788">
+      </trkpt>
+      <trkpt lat="33.48079" lon="126.47871">
+      </trkpt>
+      <trkpt lat="33.48065" lon="126.47868">
+      </trkpt>
+      <trkpt lat="33.48049" lon="126.47872">
+      </trkpt>
+      <trkpt lat="33.48035" lon="126.47887">
+      </trkpt>
+      <trkpt lat="33.48029" lon="126.47903">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

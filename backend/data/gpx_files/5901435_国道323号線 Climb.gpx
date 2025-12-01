@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>国道323号線 Climb</name>
+    <desc>Strava Segment ID: 5901435
+Distance: 313.3m
+Avg Grade: 24.5%</desc>
+  </metadata>
+  <trk>
+    <name>国道323号線 Climb</name>
+    <trkseg>
+      <trkpt lat="33.40752" lon="130.2136">
+      </trkpt>
+      <trkpt lat="33.40738" lon="130.21311">
+      </trkpt>
+      <trkpt lat="33.40738" lon="130.21299">
+      </trkpt>
+      <trkpt lat="33.40741" lon="130.21303">
+      </trkpt>
+      <trkpt lat="33.40741" lon="130.21307">
+      </trkpt>
+      <trkpt lat="33.40733" lon="130.21294">
+      </trkpt>
+      <trkpt lat="33.4071" lon="130.21225">
+      </trkpt>
+      <trkpt lat="33.40697" lon="130.21214">
+      </trkpt>
+      <trkpt lat="33.40694" lon="130.21213">
+      </trkpt>
+      <trkpt lat="33.40688" lon="130.21206">
+      </trkpt>
+      <trkpt lat="33.40691" lon="130.21205">
+      </trkpt>
+      <trkpt lat="33.40693" lon="130.21201">
+      </trkpt>
+      <trkpt lat="33.40702" lon="130.21211">
+      </trkpt>
+      <trkpt lat="33.40701" lon="130.2121">
+      </trkpt>
+      <trkpt lat="33.40704" lon="130.21211">
+      </trkpt>
+      <trkpt lat="33.40703" lon="130.21205">
+      </trkpt>
+      <trkpt lat="33.40696" lon="130.21203">
+      </trkpt>
+      <trkpt lat="33.40684" lon="130.21182">
+      </trkpt>
+      <trkpt lat="33.40668" lon="130.21172">
+      </trkpt>
+      <trkpt lat="33.40664" lon="130.21173">
+      </trkpt>
+      <trkpt lat="33.40624" lon="130.21188">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

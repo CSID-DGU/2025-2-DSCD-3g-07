@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>山口ソフトボール場</name>
+    <desc>Strava Segment ID: 16104332
+Distance: 497.9m
+Avg Grade: 8.2%</desc>
+  </metadata>
+  <trk>
+    <name>山口ソフトボール場</name>
+    <trkseg>
+      <trkpt lat="33.46258" lon="130.50515">
+      </trkpt>
+      <trkpt lat="33.46347" lon="130.5048">
+      </trkpt>
+      <trkpt lat="33.46366" lon="130.50479">
+      </trkpt>
+      <trkpt lat="33.46387" lon="130.50486">
+      </trkpt>
+      <trkpt lat="33.46403" lon="130.50498">
+      </trkpt>
+      <trkpt lat="33.46422" lon="130.50503">
+      </trkpt>
+      <trkpt lat="33.46441" lon="130.50496">
+      </trkpt>
+      <trkpt lat="33.4646" lon="130.50495">
+      </trkpt>
+      <trkpt lat="33.46498" lon="130.50499">
+      </trkpt>
+      <trkpt lat="33.46517" lon="130.50491">
+      </trkpt>
+      <trkpt lat="33.46534" lon="130.50476">
+      </trkpt>
+      <trkpt lat="33.46547" lon="130.50458">
+      </trkpt>
+      <trkpt lat="33.46559" lon="130.50439">
+      </trkpt>
+      <trkpt lat="33.46572" lon="130.50423">
+      </trkpt>
+      <trkpt lat="33.4659" lon="130.50415">
+      </trkpt>
+      <trkpt lat="33.46609" lon="130.50408">
+      </trkpt>
+      <trkpt lat="33.46627" lon="130.50409">
+      </trkpt>
+      <trkpt lat="33.46647" lon="130.50416">
+      </trkpt>
+      <trkpt lat="33.46663" lon="130.50429">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

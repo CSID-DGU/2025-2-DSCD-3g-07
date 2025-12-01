@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>県道329号線 Climb</name>
+    <desc>Strava Segment ID: 4709221
+Distance: 309.1m
+Avg Grade: 21.2%</desc>
+  </metadata>
+  <trk>
+    <name>県道329号線 Climb</name>
+    <trkseg>
+      <trkpt lat="33.42081" lon="130.47141">
+      </trkpt>
+      <trkpt lat="33.42102" lon="130.47147">
+      </trkpt>
+      <trkpt lat="33.42121" lon="130.47158">
+      </trkpt>
+      <trkpt lat="33.42134" lon="130.47157">
+      </trkpt>
+      <trkpt lat="33.42191" lon="130.47119">
+      </trkpt>
+      <trkpt lat="33.42203" lon="130.47127">
+      </trkpt>
+      <trkpt lat="33.42205" lon="130.4713">
+      </trkpt>
+      <trkpt lat="33.42214" lon="130.4715">
+      </trkpt>
+      <trkpt lat="33.42217" lon="130.47171">
+      </trkpt>
+      <trkpt lat="33.42218" lon="130.47193">
+      </trkpt>
+      <trkpt lat="33.42229" lon="130.47206">
+      </trkpt>
+      <trkpt lat="33.42238" lon="130.47198">
+      </trkpt>
+      <trkpt lat="33.42234" lon="130.47189">
+      </trkpt>
+      <trkpt lat="33.42231" lon="130.47177">
+      </trkpt>
+      <trkpt lat="33.42233" lon="130.4713">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

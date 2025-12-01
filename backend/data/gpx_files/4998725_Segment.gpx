@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>Segment</name>
+    <desc>Strava Segment ID: 4998725
+Distance: 664.2m
+Avg Grade: 10.5%</desc>
+  </metadata>
+  <trk>
+    <name>Segment</name>
+    <trkseg>
+      <trkpt lat="35.76999" lon="128.55188">
+      </trkpt>
+      <trkpt lat="35.77021" lon="128.55203">
+      </trkpt>
+      <trkpt lat="35.77044" lon="128.55216">
+      </trkpt>
+      <trkpt lat="35.77062" lon="128.55216">
+      </trkpt>
+      <trkpt lat="35.77078" lon="128.55221">
+      </trkpt>
+      <trkpt lat="35.77095" lon="128.55237">
+      </trkpt>
+      <trkpt lat="35.77152" lon="128.55257">
+      </trkpt>
+      <trkpt lat="35.77169" lon="128.55292">
+      </trkpt>
+      <trkpt lat="35.77161" lon="128.55327">
+      </trkpt>
+      <trkpt lat="35.77144" lon="128.55357">
+      </trkpt>
+      <trkpt lat="35.77132" lon="128.55372">
+      </trkpt>
+      <trkpt lat="35.77128" lon="128.55388">
+      </trkpt>
+      <trkpt lat="35.77132" lon="128.55422">
+      </trkpt>
+      <trkpt lat="35.77129" lon="128.55446">
+      </trkpt>
+      <trkpt lat="35.77124" lon="128.55465">
+      </trkpt>
+      <trkpt lat="35.77124" lon="128.55481">
+      </trkpt>
+      <trkpt lat="35.77149" lon="128.55518">
+      </trkpt>
+      <trkpt lat="35.77166" lon="128.55553">
+      </trkpt>
+      <trkpt lat="35.77181" lon="128.55569">
+      </trkpt>
+      <trkpt lat="35.77216" lon="128.55599">
+      </trkpt>
+      <trkpt lat="35.77236" lon="128.55622">
+      </trkpt>
+      <trkpt lat="35.77254" lon="128.55635">
+      </trkpt>
+      <trkpt lat="35.77277" lon="128.55644">
+      </trkpt>
+      <trkpt lat="35.77289" lon="128.55643">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>室見が丘ヒルクライム５００</name>
+    <desc>Strava Segment ID: 29802036
+Distance: 498.7m
+Avg Grade: 7.1%</desc>
+  </metadata>
+  <trk>
+    <name>室見が丘ヒルクライム５００</name>
+    <trkseg>
+      <trkpt lat="33.51927" lon="130.32359">
+      </trkpt>
+      <trkpt lat="33.51919" lon="130.3234">
+      </trkpt>
+      <trkpt lat="33.51915" lon="130.32322">
+      </trkpt>
+      <trkpt lat="33.51916" lon="130.32283">
+      </trkpt>
+      <trkpt lat="33.51905" lon="130.32256">
+      </trkpt>
+      <trkpt lat="33.51908" lon="130.32228">
+      </trkpt>
+      <trkpt lat="33.51914" lon="130.3219">
+      </trkpt>
+      <trkpt lat="33.51909" lon="130.32169">
+      </trkpt>
+      <trkpt lat="33.51909" lon="130.32152">
+      </trkpt>
+      <trkpt lat="33.51896" lon="130.3211">
+      </trkpt>
+      <trkpt lat="33.51891" lon="130.32097">
+      </trkpt>
+      <trkpt lat="33.5189" lon="130.32069">
+      </trkpt>
+      <trkpt lat="33.51878" lon="130.32022">
+      </trkpt>
+      <trkpt lat="33.51874" lon="130.32">
+      </trkpt>
+      <trkpt lat="33.51857" lon="130.31939">
+      </trkpt>
+      <trkpt lat="33.51858" lon="130.31925">
+      </trkpt>
+      <trkpt lat="33.51857" lon="130.31913">
+      </trkpt>
+      <trkpt lat="33.5185" lon="130.31887">
+      </trkpt>
+      <trkpt lat="33.5185" lon="130.31871">
+      </trkpt>
+      <trkpt lat="33.51843" lon="130.31844">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

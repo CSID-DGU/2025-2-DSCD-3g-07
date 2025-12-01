@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>Up to the dam.</name>
+    <desc>Strava Segment ID: 22653331
+Distance: 355.6m
+Avg Grade: 11.4%</desc>
+  </metadata>
+  <trk>
+    <name>Up to the dam.</name>
+    <trkseg>
+      <trkpt lat="35.16143" lon="128.03781">
+      </trkpt>
+      <trkpt lat="35.16106" lon="128.0376">
+      </trkpt>
+      <trkpt lat="35.16089" lon="128.03744">
+      </trkpt>
+      <trkpt lat="35.16071" lon="128.03734">
+      </trkpt>
+      <trkpt lat="35.16052" lon="128.03702">
+      </trkpt>
+      <trkpt lat="35.16051" lon="128.03693">
+      </trkpt>
+      <trkpt lat="35.1606" lon="128.03669">
+      </trkpt>
+      <trkpt lat="35.1608" lon="128.03635">
+      </trkpt>
+      <trkpt lat="35.16096" lon="128.03595">
+      </trkpt>
+      <trkpt lat="35.16099" lon="128.03582">
+      </trkpt>
+      <trkpt lat="35.16098" lon="128.03572">
+      </trkpt>
+      <trkpt lat="35.16099" lon="128.03551">
+      </trkpt>
+      <trkpt lat="35.161" lon="128.03546">
+      </trkpt>
+      <trkpt lat="35.16132" lon="128.03492">
+      </trkpt>
+      <trkpt lat="35.16138" lon="128.03484">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

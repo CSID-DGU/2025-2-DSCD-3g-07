@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>디자인공원 오르막구간</name>
+    <desc>Strava Segment ID: 33298820
+Distance: 440.2m
+Avg Grade: 1.6%</desc>
+  </metadata>
+  <trk>
+    <name>디자인공원 오르막구간</name>
+    <trkseg>
+      <trkpt lat="35.32274" lon="128.99744">
+      </trkpt>
+      <trkpt lat="35.32279" lon="128.99744">
+      </trkpt>
+      <trkpt lat="35.32286" lon="128.99753">
+      </trkpt>
+      <trkpt lat="35.32293" lon="128.99757">
+      </trkpt>
+      <trkpt lat="35.32296" lon="128.99757">
+      </trkpt>
+      <trkpt lat="35.32301" lon="128.99762">
+      </trkpt>
+      <trkpt lat="35.32312" lon="128.99768">
+      </trkpt>
+      <trkpt lat="35.3232" lon="128.99781">
+      </trkpt>
+      <trkpt lat="35.32324" lon="128.99783">
+      </trkpt>
+      <trkpt lat="35.32336" lon="128.99794">
+      </trkpt>
+      <trkpt lat="35.32347" lon="128.99811">
+      </trkpt>
+      <trkpt lat="35.3237" lon="128.9984">
+      </trkpt>
+      <trkpt lat="35.3238" lon="128.99847">
+      </trkpt>
+      <trkpt lat="35.32389" lon="128.99858">
+      </trkpt>
+      <trkpt lat="35.32404" lon="128.99879">
+      </trkpt>
+      <trkpt lat="35.32411" lon="128.99887">
+      </trkpt>
+      <trkpt lat="35.32427" lon="128.99911">
+      </trkpt>
+      <trkpt lat="35.32462" lon="128.9995">
+      </trkpt>
+      <trkpt lat="35.3248" lon="128.99966">
+      </trkpt>
+      <trkpt lat="35.32491" lon="128.99982">
+      </trkpt>
+      <trkpt lat="35.32497" lon="128.99986">
+      </trkpt>
+      <trkpt lat="35.325" lon="128.9999">
+      </trkpt>
+      <trkpt lat="35.32502" lon="128.9999">
+      </trkpt>
+      <trkpt lat="35.32504" lon="128.99992">
+      </trkpt>
+      <trkpt lat="35.32517" lon="129.00012">
+      </trkpt>
+      <trkpt lat="35.32531" lon="129.00027">
+      </trkpt>
+      <trkpt lat="35.32554" lon="129.00063">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

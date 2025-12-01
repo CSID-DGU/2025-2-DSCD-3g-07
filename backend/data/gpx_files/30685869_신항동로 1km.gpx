@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>신항동로 1km </name>
+    <desc>Strava Segment ID: 30685869
+Distance: 989.4m
+Avg Grade: 0.5%</desc>
+  </metadata>
+  <trk>
+    <name>신항동로 1km </name>
+    <trkseg>
+      <trkpt lat="35.09076" lon="128.81791">
+      </trkpt>
+      <trkpt lat="35.09078" lon="128.81763">
+      </trkpt>
+      <trkpt lat="35.09075" lon="128.81751">
+      </trkpt>
+      <trkpt lat="35.09076" lon="128.81738">
+      </trkpt>
+      <trkpt lat="35.09072" lon="128.81723">
+      </trkpt>
+      <trkpt lat="35.09072" lon="128.81627">
+      </trkpt>
+      <trkpt lat="35.09069" lon="128.81527">
+      </trkpt>
+      <trkpt lat="35.0907" lon="128.81443">
+      </trkpt>
+      <trkpt lat="35.09066" lon="128.81351">
+      </trkpt>
+      <trkpt lat="35.09066" lon="128.81263">
+      </trkpt>
+      <trkpt lat="35.09061" lon="128.81213">
+      </trkpt>
+      <trkpt lat="35.09054" lon="128.81174">
+      </trkpt>
+      <trkpt lat="35.09019" lon="128.81097">
+      </trkpt>
+      <trkpt lat="35.08973" lon="128.80977">
+      </trkpt>
+      <trkpt lat="35.08949" lon="128.80925">
+      </trkpt>
+      <trkpt lat="35.08932" lon="128.80878">
+      </trkpt>
+      <trkpt lat="35.08927" lon="128.80836">
+      </trkpt>
+      <trkpt lat="35.08927" lon="128.80809">
+      </trkpt>
+      <trkpt lat="35.08929" lon="128.80782">
+      </trkpt>
+      <trkpt lat="35.08936" lon="128.80745">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

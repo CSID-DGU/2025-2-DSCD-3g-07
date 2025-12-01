@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>[러닝] 라마다프라자 -&gt; 탑동광장</name>
+    <desc>Strava Segment ID: 28834252
+Distance: 931.5m
+Avg Grade: 0.2%</desc>
+  </metadata>
+  <trk>
+    <name>[러닝] 라마다프라자 -&gt; 탑동광장</name>
+    <trkseg>
+      <trkpt lat="33.51937" lon="126.51808">
+      </trkpt>
+      <trkpt lat="33.51928" lon="126.51863">
+      </trkpt>
+      <trkpt lat="33.51923" lon="126.51928">
+      </trkpt>
+      <trkpt lat="33.51906" lon="126.51995">
+      </trkpt>
+      <trkpt lat="33.51881" lon="126.52197">
+      </trkpt>
+      <trkpt lat="33.51865" lon="126.52284">
+      </trkpt>
+      <trkpt lat="33.51862" lon="126.52306">
+      </trkpt>
+      <trkpt lat="33.51862" lon="126.52352">
+      </trkpt>
+      <trkpt lat="33.5186" lon="126.52375">
+      </trkpt>
+      <trkpt lat="33.51852" lon="126.52433">
+      </trkpt>
+      <trkpt lat="33.51839" lon="126.52506">
+      </trkpt>
+      <trkpt lat="33.51819" lon="126.52649">
+      </trkpt>
+      <trkpt lat="33.51813" lon="126.52679">
+      </trkpt>
+      <trkpt lat="33.51808" lon="126.52751">
+      </trkpt>
+      <trkpt lat="33.51799" lon="126.52795">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

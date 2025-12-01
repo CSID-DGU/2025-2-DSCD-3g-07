@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>교대트랙</name>
+    <desc>Strava Segment ID: 26726401
+Distance: 328.2m
+Avg Grade: 0.1%</desc>
+  </metadata>
+  <trk>
+    <name>교대트랙</name>
+    <trkseg>
+      <trkpt lat="35.18686" lon="128.06706">
+      </trkpt>
+      <trkpt lat="35.18695" lon="128.06701">
+      </trkpt>
+      <trkpt lat="35.18721" lon="128.06692">
+      </trkpt>
+      <trkpt lat="35.18731" lon="128.06686">
+      </trkpt>
+      <trkpt lat="35.18734" lon="128.06673">
+      </trkpt>
+      <trkpt lat="35.18721" lon="128.06639">
+      </trkpt>
+      <trkpt lat="35.18703" lon="128.06575">
+      </trkpt>
+      <trkpt lat="35.18695" lon="128.06571">
+      </trkpt>
+      <trkpt lat="35.18684" lon="128.06572">
+      </trkpt>
+      <trkpt lat="35.18667" lon="128.06578">
+      </trkpt>
+      <trkpt lat="35.18661" lon="128.06589">
+      </trkpt>
+      <trkpt lat="35.1866" lon="128.06603">
+      </trkpt>
+      <trkpt lat="35.18664" lon="128.06614">
+      </trkpt>
+      <trkpt lat="35.18672" lon="128.0665">
+      </trkpt>
+      <trkpt lat="35.18686" lon="128.06684">
+      </trkpt>
+      <trkpt lat="35.18688" lon="128.06707">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

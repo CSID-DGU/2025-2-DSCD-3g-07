@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>화북 800m</name>
+    <desc>Strava Segment ID: 15018041
+Distance: 799.3m
+Avg Grade: -0.7%</desc>
+  </metadata>
+  <trk>
+    <name>화북 800m</name>
+    <trkseg>
+      <trkpt lat="33.52046" lon="126.57262">
+      </trkpt>
+      <trkpt lat="33.5206" lon="126.57294">
+      </trkpt>
+      <trkpt lat="33.52077" lon="126.57339">
+      </trkpt>
+      <trkpt lat="33.52097" lon="126.57404">
+      </trkpt>
+      <trkpt lat="33.52123" lon="126.57477">
+      </trkpt>
+      <trkpt lat="33.52136" lon="126.57536">
+      </trkpt>
+      <trkpt lat="33.52143" lon="126.57583">
+      </trkpt>
+      <trkpt lat="33.52149" lon="126.57657">
+      </trkpt>
+      <trkpt lat="33.52149" lon="126.57692">
+      </trkpt>
+      <trkpt lat="33.52147" lon="126.57731">
+      </trkpt>
+      <trkpt lat="33.5215" lon="126.57817">
+      </trkpt>
+      <trkpt lat="33.52151" lon="126.57944">
+      </trkpt>
+      <trkpt lat="33.52149" lon="126.58013">
+      </trkpt>
+      <trkpt lat="33.5214" lon="126.58098">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>Higashihama Bridge - North</name>
+    <desc>Strava Segment ID: 15761708
+Distance: 605.4m
+Avg Grade: -0.5%</desc>
+  </metadata>
+  <trk>
+    <name>Higashihama Bridge - North</name>
+    <trkseg>
+      <trkpt lat="33.61579" lon="130.41115">
+      </trkpt>
+      <trkpt lat="33.61602" lon="130.41123">
+      </trkpt>
+      <trkpt lat="33.61613" lon="130.41123">
+      </trkpt>
+      <trkpt lat="33.61658" lon="130.41118">
+      </trkpt>
+      <trkpt lat="33.61676" lon="130.4112">
+      </trkpt>
+      <trkpt lat="33.61693" lon="130.41125">
+      </trkpt>
+      <trkpt lat="33.61793" lon="130.41163">
+      </trkpt>
+      <trkpt lat="33.62005" lon="130.41239">
+      </trkpt>
+      <trkpt lat="33.62048" lon="130.41261">
+      </trkpt>
+      <trkpt lat="33.62095" lon="130.41296">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

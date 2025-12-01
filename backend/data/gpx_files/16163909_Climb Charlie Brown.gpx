@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>Climb Charlie Brown</name>
+    <desc>Strava Segment ID: 16163909
+Distance: 424.5m
+Avg Grade: 7.7%</desc>
+  </metadata>
+  <trk>
+    <name>Climb Charlie Brown</name>
+    <trkseg>
+      <trkpt lat="35.68567" lon="128.48464">
+      </trkpt>
+      <trkpt lat="35.68549" lon="128.48481">
+      </trkpt>
+      <trkpt lat="35.6854" lon="128.48507">
+      </trkpt>
+      <trkpt lat="35.68528" lon="128.48563">
+      </trkpt>
+      <trkpt lat="35.68527" lon="128.48587">
+      </trkpt>
+      <trkpt lat="35.68532" lon="128.48605">
+      </trkpt>
+      <trkpt lat="35.68577" lon="128.48673">
+      </trkpt>
+      <trkpt lat="35.68582" lon="128.48687">
+      </trkpt>
+      <trkpt lat="35.68586" lon="128.48702">
+      </trkpt>
+      <trkpt lat="35.6859" lon="128.48731">
+      </trkpt>
+      <trkpt lat="35.68596" lon="128.48825">
+      </trkpt>
+      <trkpt lat="35.68595" lon="128.48839">
+      </trkpt>
+      <trkpt lat="35.68589" lon="128.48859">
+      </trkpt>
+      <trkpt lat="35.68571" lon="128.48899">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

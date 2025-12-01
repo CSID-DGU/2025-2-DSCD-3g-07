@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>코재-노고단대피소</name>
+    <desc>Strava Segment ID: 28227424
+Distance: 535.1m
+Avg Grade: 15.2%</desc>
+  </metadata>
+  <trk>
+    <name>코재-노고단대피소</name>
+    <trkseg>
+      <trkpt lat="35.29609" lon="127.52055">
+      </trkpt>
+      <trkpt lat="35.29603" lon="127.52091">
+      </trkpt>
+      <trkpt lat="35.2959" lon="127.52125">
+      </trkpt>
+      <trkpt lat="35.29574" lon="127.52157">
+      </trkpt>
+      <trkpt lat="35.29564" lon="127.52191">
+      </trkpt>
+      <trkpt lat="35.29561" lon="127.52231">
+      </trkpt>
+      <trkpt lat="35.2956" lon="127.52267">
+      </trkpt>
+      <trkpt lat="35.29555" lon="127.52304">
+      </trkpt>
+      <trkpt lat="35.29552" lon="127.52342">
+      </trkpt>
+      <trkpt lat="35.29565" lon="127.52374">
+      </trkpt>
+      <trkpt lat="35.29596" lon="127.52371">
+      </trkpt>
+      <trkpt lat="35.29614" lon="127.52394">
+      </trkpt>
+      <trkpt lat="35.29642" lon="127.52457">
+      </trkpt>
+      <trkpt lat="35.29645" lon="127.52495">
+      </trkpt>
+      <trkpt lat="35.29632" lon="127.52567">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>[화랑달] 화명운동장 1lap (675m)</name>
+    <desc>Strava Segment ID: 10730499
+Distance: 649.5m
+Avg Grade: -0.0%</desc>
+  </metadata>
+  <trk>
+    <name>[화랑달] 화명운동장 1lap (675m)</name>
+    <trkseg>
+      <trkpt lat="35.24087" lon="129.00669">
+      </trkpt>
+      <trkpt lat="35.24101" lon="129.00597">
+      </trkpt>
+      <trkpt lat="35.2411" lon="129.00531">
+      </trkpt>
+      <trkpt lat="35.24101" lon="129.00524">
+      </trkpt>
+      <trkpt lat="35.24084" lon="129.00518">
+      </trkpt>
+      <trkpt lat="35.23944" lon="129.00481">
+      </trkpt>
+      <trkpt lat="35.23941" lon="129.00488">
+      </trkpt>
+      <trkpt lat="35.23926" lon="129.00556">
+      </trkpt>
+      <trkpt lat="35.23921" lon="129.00608">
+      </trkpt>
+      <trkpt lat="35.2392" lon="129.00632">
+      </trkpt>
+      <trkpt lat="35.23922" lon="129.00635">
+      </trkpt>
+      <trkpt lat="35.23983" lon="129.00652">
+      </trkpt>
+      <trkpt lat="35.24075" lon="129.00672">
+      </trkpt>
+      <trkpt lat="35.24083" lon="129.00669">
+      </trkpt>
+      <trkpt lat="35.24084" lon="129.00666">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

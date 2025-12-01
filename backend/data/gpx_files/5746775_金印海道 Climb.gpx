@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>金印海道 Climb</name>
+    <desc>Strava Segment ID: 5746775
+Distance: 512.7m
+Avg Grade: 11.9%</desc>
+  </metadata>
+  <trk>
+    <name>金印海道 Climb</name>
+    <trkseg>
+      <trkpt lat="33.67975" lon="130.30416">
+      </trkpt>
+      <trkpt lat="33.67933" lon="130.30413">
+      </trkpt>
+      <trkpt lat="33.67888" lon="130.30418">
+      </trkpt>
+      <trkpt lat="33.67865" lon="130.30427">
+      </trkpt>
+      <trkpt lat="33.67841" lon="130.30439">
+      </trkpt>
+      <trkpt lat="33.67813" lon="130.30464">
+      </trkpt>
+      <trkpt lat="33.67737" lon="130.30556">
+      </trkpt>
+      <trkpt lat="33.67721" lon="130.30567">
+      </trkpt>
+      <trkpt lat="33.67693" lon="130.30578">
+      </trkpt>
+      <trkpt lat="33.67681" lon="130.30581">
+      </trkpt>
+      <trkpt lat="33.6766" lon="130.3059">
+      </trkpt>
+      <trkpt lat="33.67645" lon="130.30595">
+      </trkpt>
+      <trkpt lat="33.6763" lon="130.30595">
+      </trkpt>
+      <trkpt lat="33.6762" lon="130.30592">
+      </trkpt>
+      <trkpt lat="33.67615" lon="130.30592">
+      </trkpt>
+      <trkpt lat="33.6758" lon="130.30605">
+      </trkpt>
+      <trkpt lat="33.67563" lon="130.30609">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

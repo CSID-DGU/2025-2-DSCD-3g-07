@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>노형뜨란채 오름막</name>
+    <desc>Strava Segment ID: 20481281
+Distance: 332.0m
+Avg Grade: 4.0%</desc>
+  </metadata>
+  <trk>
+    <name>노형뜨란채 오름막</name>
+    <trkseg>
+      <trkpt lat="33.48934" lon="126.47118">
+      </trkpt>
+      <trkpt lat="33.48922" lon="126.4713">
+      </trkpt>
+      <trkpt lat="33.48912" lon="126.47144">
+      </trkpt>
+      <trkpt lat="33.48899" lon="126.47155">
+      </trkpt>
+      <trkpt lat="33.48888" lon="126.47174">
+      </trkpt>
+      <trkpt lat="33.48884" lon="126.47191">
+      </trkpt>
+      <trkpt lat="33.48869" lon="126.47205">
+      </trkpt>
+      <trkpt lat="33.48849" lon="126.4722">
+      </trkpt>
+      <trkpt lat="33.48827" lon="126.47244">
+      </trkpt>
+      <trkpt lat="33.48808" lon="126.47259">
+      </trkpt>
+      <trkpt lat="33.48761" lon="126.47309">
+      </trkpt>
+      <trkpt lat="33.48719" lon="126.4736">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

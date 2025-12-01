@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>坂ダッシュ</name>
+    <desc>Strava Segment ID: 11197364
+Distance: 105.9m
+Avg Grade: 5.5%</desc>
+  </metadata>
+  <trk>
+    <name>坂ダッシュ</name>
+    <trkseg>
+      <trkpt lat="33.5197" lon="130.46915">
+      </trkpt>
+      <trkpt lat="33.51974" lon="130.46879">
+      </trkpt>
+      <trkpt lat="33.51976" lon="130.46832">
+      </trkpt>
+      <trkpt lat="33.51987" lon="130.46805">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

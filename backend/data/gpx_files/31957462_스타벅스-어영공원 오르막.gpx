@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>스타벅스-어영공원 오르막</name>
+    <desc>Strava Segment ID: 31957462
+Distance: 601.9m
+Avg Grade: 1.8%</desc>
+  </metadata>
+  <trk>
+    <name>스타벅스-어영공원 오르막</name>
+    <trkseg>
+      <trkpt lat="33.51152" lon="126.48389">
+      </trkpt>
+      <trkpt lat="33.51198" lon="126.48399">
+      </trkpt>
+      <trkpt lat="33.51217" lon="126.484">
+      </trkpt>
+      <trkpt lat="33.5123" lon="126.48403">
+      </trkpt>
+      <trkpt lat="33.51257" lon="126.48416">
+      </trkpt>
+      <trkpt lat="33.51286" lon="126.48427">
+      </trkpt>
+      <trkpt lat="33.51367" lon="126.48445">
+      </trkpt>
+      <trkpt lat="33.51443" lon="126.48467">
+      </trkpt>
+      <trkpt lat="33.51489" lon="126.48495">
+      </trkpt>
+      <trkpt lat="33.51537" lon="126.48528">
+      </trkpt>
+      <trkpt lat="33.51568" lon="126.48543">
+      </trkpt>
+      <trkpt lat="33.51603" lon="126.48557">
+      </trkpt>
+      <trkpt lat="33.51641" lon="126.48585">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

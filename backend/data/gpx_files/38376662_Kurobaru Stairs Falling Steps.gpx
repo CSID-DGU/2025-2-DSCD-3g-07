@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>Kurobaru Stairs Falling Steps</name>
+    <desc>Strava Segment ID: 38376662
+Distance: 247.4m
+Avg Grade: -14.5%</desc>
+  </metadata>
+  <trk>
+    <name>Kurobaru Stairs Falling Steps</name>
+    <trkseg>
+      <trkpt lat="33.86236" lon="130.9021">
+      </trkpt>
+      <trkpt lat="33.8624" lon="130.90204">
+      </trkpt>
+      <trkpt lat="33.86241" lon="130.902">
+      </trkpt>
+      <trkpt lat="33.86231" lon="130.90166">
+      </trkpt>
+      <trkpt lat="33.86225" lon="130.90141">
+      </trkpt>
+      <trkpt lat="33.86223" lon="130.9011">
+      </trkpt>
+      <trkpt lat="33.86235" lon="130.9006">
+      </trkpt>
+      <trkpt lat="33.86251" lon="130.90033">
+      </trkpt>
+      <trkpt lat="33.86256" lon="130.90019">
+      </trkpt>
+      <trkpt lat="33.86262" lon="130.89993">
+      </trkpt>
+      <trkpt lat="33.86264" lon="130.89967">
+      </trkpt>
+      <trkpt lat="33.86268" lon="130.89951">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

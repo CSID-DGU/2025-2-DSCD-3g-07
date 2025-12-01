@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>TakeoTrack400m</name>
+    <desc>Strava Segment ID: 40356455
+Distance: 396.6m
+Avg Grade: 0.1%</desc>
+  </metadata>
+  <trk>
+    <name>TakeoTrack400m</name>
+    <trkseg>
+      <trkpt lat="33.18906" lon="130.02883">
+      </trkpt>
+      <trkpt lat="33.18895" lon="130.02888">
+      </trkpt>
+      <trkpt lat="33.18885" lon="130.02899">
+      </trkpt>
+      <trkpt lat="33.18879" lon="130.02914">
+      </trkpt>
+      <trkpt lat="33.18879" lon="130.02925">
+      </trkpt>
+      <trkpt lat="33.18879" lon="130.02932">
+      </trkpt>
+      <trkpt lat="33.18885" lon="130.02948">
+      </trkpt>
+      <trkpt lat="33.18895" lon="130.02957">
+      </trkpt>
+      <trkpt lat="33.18905" lon="130.02963">
+      </trkpt>
+      <trkpt lat="33.18914" lon="130.02964">
+      </trkpt>
+      <trkpt lat="33.1899" lon="130.02952">
+      </trkpt>
+      <trkpt lat="33.19009" lon="130.02942">
+      </trkpt>
+      <trkpt lat="33.19016" lon="130.02933">
+      </trkpt>
+      <trkpt lat="33.19021" lon="130.02917">
+      </trkpt>
+      <trkpt lat="33.19019" lon="130.02898">
+      </trkpt>
+      <trkpt lat="33.19008" lon="130.0288">
+      </trkpt>
+      <trkpt lat="33.18998" lon="130.02872">
+      </trkpt>
+      <trkpt lat="33.18988" lon="130.02869">
+      </trkpt>
+      <trkpt lat="33.18981" lon="130.0287">
+      </trkpt>
+      <trkpt lat="33.18941" lon="130.02879">
+      </trkpt>
+      <trkpt lat="33.1891" lon="130.02883">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

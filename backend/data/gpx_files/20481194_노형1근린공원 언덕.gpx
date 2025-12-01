@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>노형1근린공원 언덕</name>
+    <desc>Strava Segment ID: 20481194
+Distance: 450.0m
+Avg Grade: 3.2%</desc>
+  </metadata>
+  <trk>
+    <name>노형1근린공원 언덕</name>
+    <trkseg>
+      <trkpt lat="33.48696" lon="126.4682">
+      </trkpt>
+      <trkpt lat="33.48691" lon="126.46835">
+      </trkpt>
+      <trkpt lat="33.48664" lon="126.46863">
+      </trkpt>
+      <trkpt lat="33.48629" lon="126.46896">
+      </trkpt>
+      <trkpt lat="33.48614" lon="126.46914">
+      </trkpt>
+      <trkpt lat="33.48612" lon="126.46922">
+      </trkpt>
+      <trkpt lat="33.4859" lon="126.4696">
+      </trkpt>
+      <trkpt lat="33.48583" lon="126.46971">
+      </trkpt>
+      <trkpt lat="33.4857" lon="126.46981">
+      </trkpt>
+      <trkpt lat="33.4855" lon="126.47012">
+      </trkpt>
+      <trkpt lat="33.48536" lon="126.47051">
+      </trkpt>
+      <trkpt lat="33.48529" lon="126.47066">
+      </trkpt>
+      <trkpt lat="33.48509" lon="126.47073">
+      </trkpt>
+      <trkpt lat="33.48492" lon="126.47072">
+      </trkpt>
+      <trkpt lat="33.48477" lon="126.4706">
+      </trkpt>
+      <trkpt lat="33.48466" lon="126.47053">
+      </trkpt>
+      <trkpt lat="33.48451" lon="126.47047">
+      </trkpt>
+      <trkpt lat="33.48403" lon="126.47016">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

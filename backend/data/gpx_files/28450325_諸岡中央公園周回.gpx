@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>諸岡中央公園周回</name>
+    <desc>Strava Segment ID: 28450325
+Distance: 297.6m
+Avg Grade: 0.0%</desc>
+  </metadata>
+  <trk>
+    <name>諸岡中央公園周回</name>
+    <trkseg>
+      <trkpt lat="33.55025" lon="130.45298">
+      </trkpt>
+      <trkpt lat="33.55037" lon="130.45289">
+      </trkpt>
+      <trkpt lat="33.55041" lon="130.45284">
+      </trkpt>
+      <trkpt lat="33.55042" lon="130.45275">
+      </trkpt>
+      <trkpt lat="33.55039" lon="130.45268">
+      </trkpt>
+      <trkpt lat="33.55019" lon="130.45232">
+      </trkpt>
+      <trkpt lat="33.54999" lon="130.45201">
+      </trkpt>
+      <trkpt lat="33.54992" lon="130.45195">
+      </trkpt>
+      <trkpt lat="33.5498" lon="130.45197">
+      </trkpt>
+      <trkpt lat="33.5496" lon="130.4521">
+      </trkpt>
+      <trkpt lat="33.54955" lon="130.45218">
+      </trkpt>
+      <trkpt lat="33.54964" lon="130.45243">
+      </trkpt>
+      <trkpt lat="33.54969" lon="130.45252">
+      </trkpt>
+      <trkpt lat="33.54999" lon="130.45292">
+      </trkpt>
+      <trkpt lat="33.55012" lon="130.45301">
+      </trkpt>
+      <trkpt lat="33.55022" lon="130.45303">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

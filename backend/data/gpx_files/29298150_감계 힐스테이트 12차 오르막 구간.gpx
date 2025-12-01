@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>감계 힐스테이트 1,2차 오르막 구간</name>
+    <desc>Strava Segment ID: 29298150
+Distance: 438.0m
+Avg Grade: 4.0%</desc>
+  </metadata>
+  <trk>
+    <name>감계 힐스테이트 1,2차 오르막 구간</name>
+    <trkseg>
+      <trkpt lat="35.30236" lon="128.60069">
+      </trkpt>
+      <trkpt lat="35.30238" lon="128.60042">
+      </trkpt>
+      <trkpt lat="35.30237" lon="128.60006">
+      </trkpt>
+      <trkpt lat="35.30245" lon="128.5998">
+      </trkpt>
+      <trkpt lat="35.30244" lon="128.59966">
+      </trkpt>
+      <trkpt lat="35.30246" lon="128.59959">
+      </trkpt>
+      <trkpt lat="35.30254" lon="128.59942">
+      </trkpt>
+      <trkpt lat="35.30262" lon="128.59932">
+      </trkpt>
+      <trkpt lat="35.30262" lon="128.59928">
+      </trkpt>
+      <trkpt lat="35.30256" lon="128.59915">
+      </trkpt>
+      <trkpt lat="35.30253" lon="128.59896">
+      </trkpt>
+      <trkpt lat="35.30249" lon="128.59884">
+      </trkpt>
+      <trkpt lat="35.30249" lon="128.59859">
+      </trkpt>
+      <trkpt lat="35.30241" lon="128.59846">
+      </trkpt>
+      <trkpt lat="35.3024" lon="128.59838">
+      </trkpt>
+      <trkpt lat="35.30242" lon="128.59822">
+      </trkpt>
+      <trkpt lat="35.30253" lon="128.59811">
+      </trkpt>
+      <trkpt lat="35.30258" lon="128.59788">
+      </trkpt>
+      <trkpt lat="35.30256" lon="128.59777">
+      </trkpt>
+      <trkpt lat="35.30245" lon="128.59747">
+      </trkpt>
+      <trkpt lat="35.30241" lon="128.59689">
+      </trkpt>
+      <trkpt lat="35.30244" lon="128.59648">
+      </trkpt>
+      <trkpt lat="35.30243" lon="128.5964">
+      </trkpt>
+      <trkpt lat="35.30238" lon="128.59623">
+      </trkpt>
+      <trkpt lat="35.30239" lon="128.59617">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

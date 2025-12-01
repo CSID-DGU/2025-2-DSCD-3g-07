@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>彦島大橋</name>
+    <desc>Strava Segment ID: 40450263
+Distance: 253.7m
+Avg Grade: -0.8%</desc>
+  </metadata>
+  <trk>
+    <name>彦島大橋</name>
+    <trkseg>
+      <trkpt lat="33.95231" lon="130.90509">
+      </trkpt>
+      <trkpt lat="33.95296" lon="130.90554">
+      </trkpt>
+      <trkpt lat="33.95427" lon="130.90649">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>Chase the Rabbit. White Rabbit. Watermelon.</name>
+    <desc>Strava Segment ID: 29329637
+Distance: 265.2m
+Avg Grade: 0.1%</desc>
+  </metadata>
+  <trk>
+    <name>Chase the Rabbit. White Rabbit. Watermelon.</name>
+    <trkseg>
+      <trkpt lat="33.28004" lon="126.27344">
+      </trkpt>
+      <trkpt lat="33.27992" lon="126.27322">
+      </trkpt>
+      <trkpt lat="33.27992" lon="126.27315">
+      </trkpt>
+      <trkpt lat="33.27996" lon="126.27309">
+      </trkpt>
+      <trkpt lat="33.28012" lon="126.27296">
+      </trkpt>
+      <trkpt lat="33.28016" lon="126.27296">
+      </trkpt>
+      <trkpt lat="33.28036" lon="126.27278">
+      </trkpt>
+      <trkpt lat="33.28044" lon="126.27273">
+      </trkpt>
+      <trkpt lat="33.28077" lon="126.27247">
+      </trkpt>
+      <trkpt lat="33.28115" lon="126.2722">
+      </trkpt>
+      <trkpt lat="33.28167" lon="126.27179">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

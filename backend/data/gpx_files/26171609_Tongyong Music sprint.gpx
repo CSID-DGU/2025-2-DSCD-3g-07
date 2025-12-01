@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>Tongyong Music sprint</name>
+    <desc>Strava Segment ID: 26171609
+Distance: 179.2m
+Avg Grade: 9.7%</desc>
+  </metadata>
+  <trk>
+    <name>Tongyong Music sprint</name>
+    <trkseg>
+      <trkpt lat="34.82677" lon="128.43834">
+      </trkpt>
+      <trkpt lat="34.82671" lon="128.4384">
+      </trkpt>
+      <trkpt lat="34.82658" lon="128.43849">
+      </trkpt>
+      <trkpt lat="34.82628" lon="128.43865">
+      </trkpt>
+      <trkpt lat="34.82584" lon="128.43879">
+      </trkpt>
+      <trkpt lat="34.82569" lon="128.43886">
+      </trkpt>
+      <trkpt lat="34.82557" lon="128.43904">
+      </trkpt>
+      <trkpt lat="34.82551" lon="128.43921">
+      </trkpt>
+      <trkpt lat="34.8255" lon="128.43933">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

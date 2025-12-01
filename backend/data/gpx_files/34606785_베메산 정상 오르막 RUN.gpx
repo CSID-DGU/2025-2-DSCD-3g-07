@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>베메산 정상 오르막 RUN</name>
+    <desc>Strava Segment ID: 34606785
+Distance: 266.2m
+Avg Grade: 14.7%</desc>
+  </metadata>
+  <trk>
+    <name>베메산 정상 오르막 RUN</name>
+    <trkseg>
+      <trkpt lat="35.01557" lon="126.79078">
+      </trkpt>
+      <trkpt lat="35.01563" lon="126.79095">
+      </trkpt>
+      <trkpt lat="35.01572" lon="126.79099">
+      </trkpt>
+      <trkpt lat="35.01604" lon="126.79105">
+      </trkpt>
+      <trkpt lat="35.01635" lon="126.79109">
+      </trkpt>
+      <trkpt lat="35.01652" lon="126.79116">
+      </trkpt>
+      <trkpt lat="35.01663" lon="126.79123">
+      </trkpt>
+      <trkpt lat="35.01671" lon="126.79124">
+      </trkpt>
+      <trkpt lat="35.01676" lon="126.79117">
+      </trkpt>
+      <trkpt lat="35.01676" lon="126.79112">
+      </trkpt>
+      <trkpt lat="35.01673" lon="126.79109">
+      </trkpt>
+      <trkpt lat="35.01661" lon="126.79099">
+      </trkpt>
+      <trkpt lat="35.01653" lon="126.79089">
+      </trkpt>
+      <trkpt lat="35.01653" lon="126.7908">
+      </trkpt>
+      <trkpt lat="35.01657" lon="126.79078">
+      </trkpt>
+      <trkpt lat="35.01664" lon="126.79079">
+      </trkpt>
+      <trkpt lat="35.01675" lon="126.79085">
+      </trkpt>
+      <trkpt lat="35.01688" lon="126.79087">
+      </trkpt>
+      <trkpt lat="35.01699" lon="126.79077">
+      </trkpt>
+      <trkpt lat="35.01701" lon="126.79073">
+      </trkpt>
+      <trkpt lat="35.01697" lon="126.79063">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>청학로 소우정 오르막</name>
+    <desc>Strava Segment ID: 36489385
+Distance: 840.8m
+Avg Grade: 1.8%</desc>
+  </metadata>
+  <trk>
+    <name>청학로 소우정 오르막</name>
+    <trkseg>
+      <trkpt lat="35.39533" lon="128.60113">
+      </trkpt>
+      <trkpt lat="35.39503" lon="128.60149">
+      </trkpt>
+      <trkpt lat="35.39509" lon="128.60141">
+      </trkpt>
+      <trkpt lat="35.39469" lon="128.60195">
+      </trkpt>
+      <trkpt lat="35.3943" lon="128.60265">
+      </trkpt>
+      <trkpt lat="35.3943" lon="128.60269">
+      </trkpt>
+      <trkpt lat="35.39387" lon="128.60333">
+      </trkpt>
+      <trkpt lat="35.39362" lon="128.60354">
+      </trkpt>
+      <trkpt lat="35.39344" lon="128.60414">
+      </trkpt>
+      <trkpt lat="35.39311" lon="128.6044">
+      </trkpt>
+      <trkpt lat="35.39301" lon="128.60462">
+      </trkpt>
+      <trkpt lat="35.39267" lon="128.60479">
+      </trkpt>
+      <trkpt lat="35.39237" lon="128.60514">
+      </trkpt>
+      <trkpt lat="35.39194" lon="128.60544">
+      </trkpt>
+      <trkpt lat="35.39185" lon="128.60562">
+      </trkpt>
+      <trkpt lat="35.39176" lon="128.60592">
+      </trkpt>
+      <trkpt lat="35.39138" lon="128.60617">
+      </trkpt>
+      <trkpt lat="35.39121" lon="128.60634">
+      </trkpt>
+      <trkpt lat="35.39085" lon="128.60691">
+      </trkpt>
+      <trkpt lat="35.39039" lon="128.60728">
+      </trkpt>
+      <trkpt lat="35.39027" lon="128.60748">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

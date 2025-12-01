@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>고내봉 Climb</name>
+    <desc>Strava Segment ID: 26403241
+Distance: 526.4m
+Avg Grade: 11.6%</desc>
+  </metadata>
+  <trk>
+    <name>고내봉 Climb</name>
+    <trkseg>
+      <trkpt lat="33.45626" lon="126.33812">
+      </trkpt>
+      <trkpt lat="33.45624" lon="126.3382">
+      </trkpt>
+      <trkpt lat="33.45622" lon="126.33835">
+      </trkpt>
+      <trkpt lat="33.45625" lon="126.33848">
+      </trkpt>
+      <trkpt lat="33.45621" lon="126.33859">
+      </trkpt>
+      <trkpt lat="33.4562" lon="126.33864">
+      </trkpt>
+      <trkpt lat="33.45649" lon="126.33908">
+      </trkpt>
+      <trkpt lat="33.45664" lon="126.33924">
+      </trkpt>
+      <trkpt lat="33.45666" lon="126.33946">
+      </trkpt>
+      <trkpt lat="33.45672" lon="126.33957">
+      </trkpt>
+      <trkpt lat="33.4569" lon="126.33982">
+      </trkpt>
+      <trkpt lat="33.45692" lon="126.33992">
+      </trkpt>
+      <trkpt lat="33.45696" lon="126.34">
+      </trkpt>
+      <trkpt lat="33.45705" lon="126.3401">
+      </trkpt>
+      <trkpt lat="33.45714" lon="126.34024">
+      </trkpt>
+      <trkpt lat="33.45718" lon="126.34028">
+      </trkpt>
+      <trkpt lat="33.4574" lon="126.34031">
+      </trkpt>
+      <trkpt lat="33.45779" lon="126.34028">
+      </trkpt>
+      <trkpt lat="33.4579" lon="126.34031">
+      </trkpt>
+      <trkpt lat="33.45805" lon="126.34044">
+      </trkpt>
+      <trkpt lat="33.45809" lon="126.34054">
+      </trkpt>
+      <trkpt lat="33.45811" lon="126.34075">
+      </trkpt>
+      <trkpt lat="33.45822" lon="126.3409">
+      </trkpt>
+      <trkpt lat="33.45836" lon="126.34101">
+      </trkpt>
+      <trkpt lat="33.45862" lon="126.34127">
+      </trkpt>
+      <trkpt lat="33.45871" lon="126.34133">
+      </trkpt>
+      <trkpt lat="33.45885" lon="126.34136">
+      </trkpt>
+      <trkpt lat="33.45903" lon="126.34142">
+      </trkpt>
+      <trkpt lat="33.45923" lon="126.34141">
+      </trkpt>
+      <trkpt lat="33.4593" lon="126.34142">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

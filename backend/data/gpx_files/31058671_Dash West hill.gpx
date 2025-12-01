@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>Dash! West hill</name>
+    <desc>Strava Segment ID: 31058671
+Distance: 496.3m
+Avg Grade: 3.5%</desc>
+  </metadata>
+  <trk>
+    <name>Dash! West hill</name>
+    <trkseg>
+      <trkpt lat="33.56674" lon="130.2959">
+      </trkpt>
+      <trkpt lat="33.56669" lon="130.29614">
+      </trkpt>
+      <trkpt lat="33.56663" lon="130.29653">
+      </trkpt>
+      <trkpt lat="33.56663" lon="130.29668">
+      </trkpt>
+      <trkpt lat="33.56665" lon="130.29705">
+      </trkpt>
+      <trkpt lat="33.56669" lon="130.29724">
+      </trkpt>
+      <trkpt lat="33.56671" lon="130.29772">
+      </trkpt>
+      <trkpt lat="33.5667" lon="130.29796">
+      </trkpt>
+      <trkpt lat="33.56676" lon="130.29895">
+      </trkpt>
+      <trkpt lat="33.56676" lon="130.29929">
+      </trkpt>
+      <trkpt lat="33.56673" lon="130.29952">
+      </trkpt>
+      <trkpt lat="33.56669" lon="130.29972">
+      </trkpt>
+      <trkpt lat="33.56662" lon="130.29993">
+      </trkpt>
+      <trkpt lat="33.56648" lon="130.30016">
+      </trkpt>
+      <trkpt lat="33.56617" lon="130.30049">
+      </trkpt>
+      <trkpt lat="33.56581" lon="130.3007">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

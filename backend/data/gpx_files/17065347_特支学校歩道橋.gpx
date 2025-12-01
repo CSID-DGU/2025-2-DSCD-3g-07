@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>特支学校→歩道橋</name>
+    <desc>Strava Segment ID: 17065347
+Distance: 1211.5m
+Avg Grade: 0.4%</desc>
+  </metadata>
+  <trk>
+    <name>特支学校→歩道橋</name>
+    <trkseg>
+      <trkpt lat="33.48749" lon="130.54598">
+      </trkpt>
+      <trkpt lat="33.48839" lon="130.54642">
+      </trkpt>
+      <trkpt lat="33.48912" lon="130.54683">
+      </trkpt>
+      <trkpt lat="33.49022" lon="130.5474">
+      </trkpt>
+      <trkpt lat="33.49091" lon="130.54779">
+      </trkpt>
+      <trkpt lat="33.49128" lon="130.54795">
+      </trkpt>
+      <trkpt lat="33.49287" lon="130.5488">
+      </trkpt>
+      <trkpt lat="33.4936" lon="130.54916">
+      </trkpt>
+      <trkpt lat="33.49377" lon="130.54927">
+      </trkpt>
+      <trkpt lat="33.49628" lon="130.5506">
+      </trkpt>
+      <trkpt lat="33.4973" lon="130.55116">
+      </trkpt>
+      <trkpt lat="33.49749" lon="130.55125">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

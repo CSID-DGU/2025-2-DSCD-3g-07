@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>Polytechnics_track</name>
+    <desc>Strava Segment ID: 34386218
+Distance: 272.8m
+Avg Grade: 0.0%</desc>
+  </metadata>
+  <trk>
+    <name>Polytechnics_track</name>
+    <trkseg>
+      <trkpt lat="35.2276" lon="128.66912">
+      </trkpt>
+      <trkpt lat="35.22777" lon="128.66883">
+      </trkpt>
+      <trkpt lat="35.22784" lon="128.66867">
+      </trkpt>
+      <trkpt lat="35.22784" lon="128.6686">
+      </trkpt>
+      <trkpt lat="35.22781" lon="128.66847">
+      </trkpt>
+      <trkpt lat="35.22776" lon="128.6684">
+      </trkpt>
+      <trkpt lat="35.22762" lon="128.66831">
+      </trkpt>
+      <trkpt lat="35.22756" lon="128.66831">
+      </trkpt>
+      <trkpt lat="35.22745" lon="128.66835">
+      </trkpt>
+      <trkpt lat="35.2274" lon="128.66839">
+      </trkpt>
+      <trkpt lat="35.22729" lon="128.66857">
+      </trkpt>
+      <trkpt lat="35.22715" lon="128.66882">
+      </trkpt>
+      <trkpt lat="35.22705" lon="128.66905">
+      </trkpt>
+      <trkpt lat="35.22706" lon="128.66925">
+      </trkpt>
+      <trkpt lat="35.22715" lon="128.66937">
+      </trkpt>
+      <trkpt lat="35.22731" lon="128.66943">
+      </trkpt>
+      <trkpt lat="35.22748" lon="128.66935">
+      </trkpt>
+      <trkpt lat="35.22762" lon="128.66912">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

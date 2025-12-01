@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>国道201号線 Climb</name>
+    <desc>Strava Segment ID: 4810615
+Distance: 975.2m
+Avg Grade: 4.3%</desc>
+  </metadata>
+  <trk>
+    <name>国道201号線 Climb</name>
+    <trkseg>
+      <trkpt lat="33.61905" lon="130.57302">
+      </trkpt>
+      <trkpt lat="33.61883" lon="130.57333">
+      </trkpt>
+      <trkpt lat="33.61865" lon="130.57343">
+      </trkpt>
+      <trkpt lat="33.6179" lon="130.57361">
+      </trkpt>
+      <trkpt lat="33.61771" lon="130.5738">
+      </trkpt>
+      <trkpt lat="33.61763" lon="130.57411">
+      </trkpt>
+      <trkpt lat="33.61766" lon="130.57491">
+      </trkpt>
+      <trkpt lat="33.61766" lon="130.57574">
+      </trkpt>
+      <trkpt lat="33.6176" lon="130.57648">
+      </trkpt>
+      <trkpt lat="33.61728" lon="130.57809">
+      </trkpt>
+      <trkpt lat="33.61734" lon="130.57842">
+      </trkpt>
+      <trkpt lat="33.61772" lon="130.57903">
+      </trkpt>
+      <trkpt lat="33.61896" lon="130.58058">
+      </trkpt>
+      <trkpt lat="33.61944" lon="130.58109">
+      </trkpt>
+      <trkpt lat="33.61968" lon="130.58116">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

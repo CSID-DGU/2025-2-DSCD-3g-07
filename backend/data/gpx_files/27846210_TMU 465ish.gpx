@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>TMU 465ish</name>
+    <desc>Strava Segment ID: 27846210
+Distance: 478.2m
+Avg Grade: -0.0%</desc>
+  </metadata>
+  <trk>
+    <name>TMU 465ish</name>
+    <trkseg>
+      <trkpt lat="35.12178" lon="129.10054">
+      </trkpt>
+      <trkpt lat="35.12147" lon="129.10044">
+      </trkpt>
+      <trkpt lat="35.12138" lon="129.10055">
+      </trkpt>
+      <trkpt lat="35.12124" lon="129.10093">
+      </trkpt>
+      <trkpt lat="35.1212" lon="129.10141">
+      </trkpt>
+      <trkpt lat="35.12126" lon="129.10156">
+      </trkpt>
+      <trkpt lat="35.12142" lon="129.10166">
+      </trkpt>
+      <trkpt lat="35.12186" lon="129.10183">
+      </trkpt>
+      <trkpt lat="35.12205" lon="129.10188">
+      </trkpt>
+      <trkpt lat="35.12227" lon="129.10188">
+      </trkpt>
+      <trkpt lat="35.12232" lon="129.10185">
+      </trkpt>
+      <trkpt lat="35.12242" lon="129.10168">
+      </trkpt>
+      <trkpt lat="35.12252" lon="129.10126">
+      </trkpt>
+      <trkpt lat="35.12261" lon="129.10098">
+      </trkpt>
+      <trkpt lat="35.12262" lon="129.10087">
+      </trkpt>
+      <trkpt lat="35.12258" lon="129.10084">
+      </trkpt>
+      <trkpt lat="35.12218" lon="129.10071">
+      </trkpt>
+      <trkpt lat="35.12169" lon="129.1005">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

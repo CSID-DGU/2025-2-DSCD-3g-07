@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>Ocean City_sprint TT</name>
+    <desc>Strava Segment ID: 20824465
+Distance: 1413.9m
+Avg Grade: 0.1%</desc>
+  </metadata>
+  <trk>
+    <name>Ocean City_sprint TT</name>
+    <trkseg>
+      <trkpt lat="35.07903" lon="128.91116">
+      </trkpt>
+      <trkpt lat="35.07902" lon="128.91069">
+      </trkpt>
+      <trkpt lat="35.07906" lon="128.90973">
+      </trkpt>
+      <trkpt lat="35.07907" lon="128.90926">
+      </trkpt>
+      <trkpt lat="35.07909" lon="128.90409">
+      </trkpt>
+      <trkpt lat="35.07912" lon="128.90258">
+      </trkpt>
+      <trkpt lat="35.07909" lon="128.90201">
+      </trkpt>
+      <trkpt lat="35.07911" lon="128.90054">
+      </trkpt>
+      <trkpt lat="35.07907" lon="128.89987">
+      </trkpt>
+      <trkpt lat="35.07907" lon="128.89848">
+      </trkpt>
+      <trkpt lat="35.07904" lon="128.89759">
+      </trkpt>
+      <trkpt lat="35.07905" lon="128.89565">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>빛가람 트렉(400m) 한 바퀴</name>
+    <desc>Strava Segment ID: 20929197
+Distance: 403.8m
+Avg Grade: -0.0%</desc>
+  </metadata>
+  <trk>
+    <name>빛가람 트렉(400m) 한 바퀴</name>
+    <trkseg>
+      <trkpt lat="35.01901" lon="126.79663">
+      </trkpt>
+      <trkpt lat="35.01886" lon="126.79673">
+      </trkpt>
+      <trkpt lat="35.01881" lon="126.79681">
+      </trkpt>
+      <trkpt lat="35.01875" lon="126.79696">
+      </trkpt>
+      <trkpt lat="35.01875" lon="126.79701">
+      </trkpt>
+      <trkpt lat="35.01879" lon="126.79719">
+      </trkpt>
+      <trkpt lat="35.01882" lon="126.79725">
+      </trkpt>
+      <trkpt lat="35.0189" lon="126.79734">
+      </trkpt>
+      <trkpt lat="35.01897" lon="126.79739">
+      </trkpt>
+      <trkpt lat="35.01904" lon="126.79741">
+      </trkpt>
+      <trkpt lat="35.01936" lon="126.79738">
+      </trkpt>
+      <trkpt lat="35.01992" lon="126.79738">
+      </trkpt>
+      <trkpt lat="35.0201" lon="126.79728">
+      </trkpt>
+      <trkpt lat="35.0202" lon="126.79713">
+      </trkpt>
+      <trkpt lat="35.02022" lon="126.79691">
+      </trkpt>
+      <trkpt lat="35.02011" lon="126.79671">
+      </trkpt>
+      <trkpt lat="35.01993" lon="126.79659">
+      </trkpt>
+      <trkpt lat="35.0194" lon="126.79659">
+      </trkpt>
+      <trkpt lat="35.01903" lon="126.79662">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

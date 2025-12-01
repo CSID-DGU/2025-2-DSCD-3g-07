@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>Segment</name>
+    <desc>Strava Segment ID: 5921528
+Distance: 512.2m
+Avg Grade: 8.8%</desc>
+  </metadata>
+  <trk>
+    <name>Segment</name>
+    <trkseg>
+      <trkpt lat="34.83598" lon="128.40121">
+      </trkpt>
+      <trkpt lat="34.83594" lon="128.40097">
+      </trkpt>
+      <trkpt lat="34.83593" lon="128.40083">
+      </trkpt>
+      <trkpt lat="34.83594" lon="128.4007">
+      </trkpt>
+      <trkpt lat="34.83593" lon="128.40056">
+      </trkpt>
+      <trkpt lat="34.83586" lon="128.40023">
+      </trkpt>
+      <trkpt lat="34.83571" lon="128.39989">
+      </trkpt>
+      <trkpt lat="34.83569" lon="128.39978">
+      </trkpt>
+      <trkpt lat="34.83561" lon="128.39931">
+      </trkpt>
+      <trkpt lat="34.83559" lon="128.39904">
+      </trkpt>
+      <trkpt lat="34.83555" lon="128.3989">
+      </trkpt>
+      <trkpt lat="34.83553" lon="128.39853">
+      </trkpt>
+      <trkpt lat="34.83548" lon="128.39842">
+      </trkpt>
+      <trkpt lat="34.83548" lon="128.39817">
+      </trkpt>
+      <trkpt lat="34.83537" lon="128.3977">
+      </trkpt>
+      <trkpt lat="34.83524" lon="128.39751">
+      </trkpt>
+      <trkpt lat="34.83515" lon="128.39743">
+      </trkpt>
+      <trkpt lat="34.83505" lon="128.39737">
+      </trkpt>
+      <trkpt lat="34.8349" lon="128.39722">
+      </trkpt>
+      <trkpt lat="34.83471" lon="128.39694">
+      </trkpt>
+      <trkpt lat="34.83463" lon="128.39688">
+      </trkpt>
+      <trkpt lat="34.83457" lon="128.39679">
+      </trkpt>
+      <trkpt lat="34.8345" lon="128.39671">
+      </trkpt>
+      <trkpt lat="34.83443" lon="128.39663">
+      </trkpt>
+      <trkpt lat="34.83426" lon="128.39631">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>浜浦climb</name>
+    <desc>Strava Segment ID: 15197457
+Distance: 847.1m
+Avg Grade: 2.9%</desc>
+  </metadata>
+  <trk>
+    <name>浜浦climb</name>
+    <trkseg>
+      <trkpt lat="33.98046" lon="130.97368">
+      </trkpt>
+      <trkpt lat="33.98056" lon="130.97376">
+      </trkpt>
+      <trkpt lat="33.98079" lon="130.9739">
+      </trkpt>
+      <trkpt lat="33.98187" lon="130.9748">
+      </trkpt>
+      <trkpt lat="33.98244" lon="130.97521">
+      </trkpt>
+      <trkpt lat="33.9832" lon="130.97564">
+      </trkpt>
+      <trkpt lat="33.98332" lon="130.97573">
+      </trkpt>
+      <trkpt lat="33.98346" lon="130.97578">
+      </trkpt>
+      <trkpt lat="33.98352" lon="130.97584">
+      </trkpt>
+      <trkpt lat="33.98373" lon="130.97599">
+      </trkpt>
+      <trkpt lat="33.98394" lon="130.97615">
+      </trkpt>
+      <trkpt lat="33.98436" lon="130.97638">
+      </trkpt>
+      <trkpt lat="33.98446" lon="130.97647">
+      </trkpt>
+      <trkpt lat="33.98471" lon="130.97661">
+      </trkpt>
+      <trkpt lat="33.98511" lon="130.9769">
+      </trkpt>
+      <trkpt lat="33.98525" lon="130.97705">
+      </trkpt>
+      <trkpt lat="33.98536" lon="130.9771">
+      </trkpt>
+      <trkpt lat="33.98558" lon="130.97713">
+      </trkpt>
+      <trkpt lat="33.98572" lon="130.9772">
+      </trkpt>
+      <trkpt lat="33.98613" lon="130.97737">
+      </trkpt>
+      <trkpt lat="33.9863" lon="130.97742">
+      </trkpt>
+      <trkpt lat="33.98666" lon="130.97761">
+      </trkpt>
+      <trkpt lat="33.987" lon="130.97775">
+      </trkpt>
+      <trkpt lat="33.98718" lon="130.97786">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

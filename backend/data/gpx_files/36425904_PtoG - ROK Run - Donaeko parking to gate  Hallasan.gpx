@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>PtoG - ROK Run - Donaeko parking to gate  Hallasan Jeju</name>
+    <desc>Strava Segment ID: 36425904
+Distance: 376.0m
+Avg Grade: 16.0%</desc>
+  </metadata>
+  <trk>
+    <name>PtoG - ROK Run - Donaeko parking to gate  Hallasan Jeju</name>
+    <trkseg>
+      <trkpt lat="33.3109" lon="126.57141">
+      </trkpt>
+      <trkpt lat="33.31139" lon="126.57131">
+      </trkpt>
+      <trkpt lat="33.31159" lon="126.57124">
+      </trkpt>
+      <trkpt lat="33.31249" lon="126.57105">
+      </trkpt>
+      <trkpt lat="33.31289" lon="126.57094">
+      </trkpt>
+      <trkpt lat="33.3131" lon="126.57091">
+      </trkpt>
+      <trkpt lat="33.31328" lon="126.57084">
+      </trkpt>
+      <trkpt lat="33.31331" lon="126.57088">
+      </trkpt>
+      <trkpt lat="33.31336" lon="126.57105">
+      </trkpt>
+      <trkpt lat="33.3135" lon="126.57134">
+      </trkpt>
+      <trkpt lat="33.31363" lon="126.57146">
+      </trkpt>
+      <trkpt lat="33.3137" lon="126.57149">
+      </trkpt>
+      <trkpt lat="33.31379" lon="126.57151">
+      </trkpt>
+      <trkpt lat="33.31387" lon="126.5715">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+  <metadata>
+    <name>global arena坂ダッシュ</name>
+    <desc>Strava Segment ID: 39319544
+Distance: 596.0m
+Avg Grade: 5.7%</desc>
+  </metadata>
+  <trk>
+    <name>global arena坂ダッシュ</name>
+    <trkseg>
+      <trkpt lat="33.79921" lon="130.62993">
+      </trkpt>
+      <trkpt lat="33.79886" lon="130.63005">
+      </trkpt>
+      <trkpt lat="33.79881" lon="130.63007">
+      </trkpt>
+      <trkpt lat="33.79873" lon="130.63015">
+      </trkpt>
+      <trkpt lat="33.7983" lon="130.63075">
+      </trkpt>
+      <trkpt lat="33.79747" lon="130.63198">
+      </trkpt>
+      <trkpt lat="33.79732" lon="130.63213">
+      </trkpt>
+      <trkpt lat="33.79708" lon="130.63229">
+      </trkpt>
+      <trkpt lat="33.79701" lon="130.63235">
+      </trkpt>
+      <trkpt lat="33.7968" lon="130.63276">
+      </trkpt>
+      <trkpt lat="33.7966" lon="130.63309">
+      </trkpt>
+      <trkpt lat="33.79636" lon="130.6334">
+      </trkpt>
+      <trkpt lat="33.79622" lon="130.6335">
+      </trkpt>
+      <trkpt lat="33.79524" lon="130.63394">
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

@@ -319,20 +319,20 @@ export async function extractNavigationLogData(
     const slopeFactor = routeInfo.slopeAnalysis?.factors?.slope_factor;
     const weatherFactor = routeInfo.slopeAnalysis?.factors?.weather_factor;
 
-    // 예상 시간 (초)
+    // 예상 시간 (초) - 횡단보도 제외, 개인속도+경사도+날씨만 적용
     // transit: 전체 이동시간 (대중교통 탑승 + 보행)
     // walking: 보행시간만
     let estimatedTimeSeconds: number;
     if (routeMode === 'transit') {
         // 대중교통: 경사도 보정된 보행시간 + 대중교통 탑승시간
-        const adjustedWalkTime = routeInfo.slopeAnalysis?.total_time_with_crosswalk
+        const adjustedWalkTime = routeInfo.slopeAnalysis?.total_adjusted_walk_time
             || routeInfo.totalWalkTime
             || 0;
         const transitTime = (routeInfo.totalTime || 0) - (routeInfo.totalWalkTime || 0);
         estimatedTimeSeconds = adjustedWalkTime + transitTime;
     } else {
-        // 도보: 경사도 보정된 보행시간
-        estimatedTimeSeconds = routeInfo.slopeAnalysis?.total_time_with_crosswalk
+        // 도보: 경사도 보정된 보행시간 (횡단보도 제외)
+        estimatedTimeSeconds = routeInfo.slopeAnalysis?.total_adjusted_walk_time
             || routeInfo.totalTime
             || 0;
     }

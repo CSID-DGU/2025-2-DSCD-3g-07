@@ -203,7 +203,7 @@ const RouteDetailComponent: React.FC<RouteDetailComponentProps> = ({
                     </View>
                     {slopeAnalysis.total_time_with_crosswalk && (
                       <Text style={styles.crosswalkTotalTime}>
-                        횡단보도 포함 최종 보정 시간:{' '}
+                        (참고용)횡단보도 포함 최종 보정 시간:{' '}
                         {(() => {
                           // 대중교통: 보행시간 + 대중교통 탑승시간
                           // 도보: 보행시간만

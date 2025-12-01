@@ -418,7 +418,7 @@ export default function HomeScreen() {
     const fetchWalkingSpeed = async () => {
       try {
         const result = await apiService.getSpeedProfile();
-        if (result.success && result.data?.speed_case1) {
+        if (result.data?.speed_case1) {
           // km/h를 m/s로 변환
           const speedMs = result.data.speed_case1 / 3.6;
           setWalkingSpeedCase1(speedMs);
@@ -467,7 +467,7 @@ export default function HomeScreen() {
         setTimeout(() => setCenterOnLocation(false), 1000);
 
         Alert.alert(
-          '위치 추적 시작', 
+          '위치 추적 시작',
           '실시간 위치 추적이 시작되었습니다.\n\n• 5m 이상 이동 시 지도가 따라갑니다\n• 지도를 움직이면 추적이 일시 중지되고\n  3초 후 자동으로 다시 추적합니다'
         );
       } else {
@@ -645,7 +645,7 @@ export default function HomeScreen() {
       let resultMessage =
         `총 소요 시간: ${Math.floor(duration / 60)}분 ${Math.floor(duration % 60)}초\n` +
         `실제 걷기: ${Math.floor(trackingData.activeWalkingTime / 60)}분 ${trackingData.activeWalkingTime % 60}초\n` +
-        `대기 시간: ${Math.floor(trackingData.pausedTime / 60)}분 ${trackingData.pausedTime % 60}초\n` +
+        `보행 멈춤 시간: ${Math.floor(trackingData.pausedTime / 60)}분 ${trackingData.pausedTime % 60}초\n` +
         `평균 속도: ${(trackingData.realSpeed * 3.6).toFixed(2)} km/h`;
 
       // DB에 저장 (로그인한 경우만)
@@ -679,7 +679,7 @@ export default function HomeScreen() {
           }
         } catch (error) {
           console.error('❌ 네비게이션 로그 저장 실패:', error);
-          resultMessage += '\n\n⚠️ 로그 저장에 실패했지만 기록은 완료되었습니다.';
+          resultMessage += '\n\n⚠️ 서버 저장에 실패했습니다.\n데이터는 앱 내에만 임시 저장되었으며,\n앱을 종료하면 사라집니다.';
         }
       } else if (!user) {
         console.log('ℹ️ 로그인하지 않아 네비게이션 로그를 저장하지 않습니다.');
@@ -695,7 +695,7 @@ export default function HomeScreen() {
           '안내 종료',
           `총 소요 시간: ${Math.floor(duration / 60)}분 ${Math.floor(duration % 60)}초\n` +
           `실제 걷기: ${Math.floor(trackingData.activeWalkingTime / 60)}분 ${trackingData.activeWalkingTime % 60}초\n` +
-          `대기 시간: ${Math.floor(trackingData.pausedTime / 60)}분 ${trackingData.pausedTime % 60}초\n` +
+          `보행 멈춤 시간: ${Math.floor(trackingData.pausedTime / 60)}분 ${trackingData.pausedTime % 60}초\n` +
           `평균 속도: ${(trackingData.realSpeed * 3.6).toFixed(2)} km/h`
         );
       }
@@ -1528,7 +1528,7 @@ export default function HomeScreen() {
                         )
                         : formatMinutes(routeInfo.totalWalkTime)}
                     </Text>
-                    <Text style={styles.statLabel}>도보 시간 (기준)</Text>
+                    <Text style={styles.statLabel}>도보 시간(보정 전)</Text>
                   </View>
                 </View>
 
@@ -1782,7 +1782,7 @@ export default function HomeScreen() {
                             lineHeight: 16,
                           }}
                         >
-                          💡 기준 시간({Math.floor(routeInfo.slopeAnalysis.total_original_walk_time / 60)}분 {routeInfo.slopeAnalysis.total_original_walk_time % 60}초)에 모든 요소를 순차 적용한 결과입니다.
+                          💡 보정 전 도보 시간({Math.floor(routeInfo.slopeAnalysis.total_original_walk_time / 60)}분 {routeInfo.slopeAnalysis.total_original_walk_time % 60}초)에 모든 요소를 순차 적용한 결과입니다.
                         </Text>
                         {routeInfo.slopeAnalysis.walk_legs_analysis.some(
                           leg => leg.is_transfer
@@ -1874,7 +1874,7 @@ export default function HomeScreen() {
                     </View>
                   )}
 
-                {/* 횡단보도 개수 및 대기시간 */}
+                {/* 횡단보도 개수 및 예상 대기시간 */}
                 {routeInfo.slopeAnalysis?.crosswalk_count !== undefined &&
                   routeInfo.slopeAnalysis.crosswalk_count > 0 && (
                     <View style={styles.crosswalkCountContainer}>
@@ -1904,21 +1904,24 @@ export default function HomeScreen() {
                   routeInfo.slopeAnalysis.crosswalk_count > 0 &&
                   typeof routeInfo.slopeAnalysis.crosswalk_wait_time === "number" &&
                   routeInfo.slopeAnalysis.crosswalk_wait_time > 0 &&
-                  typeof routeInfo.slopeAnalysis.total_time_with_crosswalk === "number" && (
+                  typeof routeInfo.slopeAnalysis.total_adjusted_walk_time === "number" && (
                     <View style={styles.crosswalkFinalTimeContainer}>
                       <Text style={styles.crosswalkFinalTimeTitle}>
-                        횡단보도 포함 최종 보정 시간
+                        (참고용)횡단보도 포함 보정 시간
                       </Text>
                       <Text style={styles.crosswalkFinalTimeValue}>
                         {(() => {
                           // 대중교통: 보행시간 + 대중교통 탑승시간
                           // 도보: 보행시간만
                           const finalTime = routeMode === 'transit'
-                            ? routeInfo.slopeAnalysis.total_time_with_crosswalk +
+                            ? routeInfo.slopeAnalysis.total_adjusted_walk_time +
                             (routeInfo.totalTime - routeInfo.totalWalkTime)
-                            : routeInfo.slopeAnalysis.total_time_with_crosswalk;
+                            : routeInfo.slopeAnalysis.total_adjusted_walk_time;
                           return `${Math.floor(finalTime / 60)}분 ${finalTime % 60}초`;
                         })()}
+                      </Text>
+                      <Text style={styles.crosswalkFinalTimeNote}>
+                        모든 횡단보도를 최대로 기다린다는 가정하에{'\n'}도출된 예상 시간입니다.
                       </Text>
                     </View>
                   )}
@@ -2316,6 +2319,7 @@ const styles = StyleSheet.create({
   statLabel: {
     fontSize: 12,
     color: SECONDARY_TEXT,
+    textAlign: 'center',
   },
   statDivider: {
     width: 1,
@@ -2619,26 +2623,28 @@ const styles = StyleSheet.create({
   // 횡단보도 포함 최종 시간 스타일
   crosswalkFinalTimeContainer: {
     marginTop: 12,
-    padding: 16,
-    backgroundColor: '#effbf0ff',
-    borderRadius: 12,
-    borderLeftWidth: 4,
-    borderLeftColor: '#6ebb71ff',
-    borderRightWidth: 4,
-    borderRightColor: '#6ebb71ff',
+    padding: 14,
+    backgroundColor: '#F3E5F5',
+    borderRadius: 10,
+    borderLeftWidth: 3,
+    borderLeftColor: '#AB47BC',
   },
   crosswalkFinalTimeTitle: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '600',
-    color: '#000000ff',
-    marginBottom: 6,
-    textAlign: 'center',
+    color: '#000000',
+    marginBottom: 4,
   },
   crosswalkFinalTimeValue: {
-    fontSize: 18,
+    fontSize: 15,
     fontWeight: '700',
-    color: '#000000ff',
-    textAlign: 'center',
+    color: '#000000',
+    marginBottom: 4,
+  },
+  crosswalkFinalTimeNote: {
+    fontSize: 11,
+    color: '#000000',
+    lineHeight: 15,
   },
   // 레거시 (사용 안함)
   crosswalkTotalTime: {

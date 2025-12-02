@@ -40,6 +40,11 @@ import { saveNavigationLog, extractNavigationLogData } from '@/services/navigati
 import { movementTrackingService } from '@/services/movementTrackingService';
 import WeatherButton from '@/components/WeatherButton';
 import { useRouter } from 'expo-router';
+import {
+  initializePermissions,
+  ensureNavigationPermissions,
+  type PermissionCheckResult
+} from '@/utils/permissionUtils';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 const PRIMARY_COLOR = '#2C6DE7';
@@ -377,40 +382,24 @@ export default function HomeScreen() {
     })
   ).current;
 
-  // 앱 첫 실행 시 알림 권한 요청 (Android 13+)
+  // 앱 첫 실행 시 권한 초기화 (통합 권한 유틸리티 사용)
   useEffect(() => {
-    const requestNotificationPermission = async () => {
+    const initPermissions = async () => {
       try {
-        const { PermissionsAndroid, Platform } = await import('react-native');
-        if (Platform.OS === 'android' && Platform.Version >= 33) {
-          const granted = await PermissionsAndroid.check(
-            PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS
-          );
+        console.log('📋 앱 시작 - 권한 초기화 중...');
+        const result = await initializePermissions();
 
-          if (!granted) {
-            const result = await PermissionsAndroid.request(
-              PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
-              {
-                title: '알림 권한 필요',
-                message: '경로 안내 중 백그라운드에서도 위치 추적 상태를 알림바에 표시하기 위해 알림 권한이 필요합니다.',
-                buttonPositive: '허용',
-                buttonNegative: '거부',
-              }
-            );
-
-            if (result === PermissionsAndroid.RESULTS.GRANTED) {
-              console.log('✅ 알림 권한 허용됨');
-            } else {
-              console.log('⚠️ 알림 권한 거부됨');
-            }
-          }
+        if (result.allGranted) {
+          console.log('✅ 모든 권한 허용됨');
+        } else {
+          console.log(`⚠️ 일부 권한 누락: ${result.missingPermissions.join(', ')}`);
         }
       } catch (error) {
-        console.warn('⚠️ 알림 권한 확인 실패:', error);
+        console.warn('⚠️ 권한 초기화 실패:', error);
       }
     };
 
-    requestNotificationPermission();
+    initPermissions();
   }, []);
 
   // DB에서 사용자 보행 속도 가져오기 (로그인 시에만)
@@ -714,6 +703,13 @@ export default function HomeScreen() {
       setIsNavigating(false);
       setNavigationStartTime(null);
     } else {
+      // 안내 시작 전 권한 확인
+      const hasPermissions = await ensureNavigationPermissions();
+      if (!hasPermissions) {
+        console.warn('⚠️ 필수 권한이 없어 안내를 시작할 수 없습니다.');
+        return;
+      }
+
       // 안내 시작
       setIsNavigating(true);
       setNavigationStartTime(new Date());

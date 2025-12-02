@@ -25,6 +25,8 @@ class MainApplication : Application(), ReactApplication {
             PackageList(this).packages.apply {
               // Health Connect custom module
               add(HealthConnectPackage())
+              // Sensor Service custom module (백그라운드 센서)
+              add(SensorServicePackage())
             }
 
           override fun getJSMainModuleName(): String = ".expo/.virtual-metro-entry"

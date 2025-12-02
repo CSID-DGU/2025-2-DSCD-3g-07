@@ -4,12 +4,26 @@
   <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION"/>
   <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
   <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION"/>
+  <uses-permission android:name="android.permission.FOREGROUND_SERVICE_HEALTH"/>
   <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
   <uses-permission android:name="android.permission.INTERNET"/>
   <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
   <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
   <uses-permission android:name="android.permission.VIBRATE"/>
   <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+  
+  <!-- 센서 권한 (Pedometer, 가속도계 백그라운드용) -->
+  <!-- ACTIVITY_RECOGNITION: Step Counter, Step Detector 센서 접근에 필요 (Android 10+) -->
+  <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION"/>
+  
+  <!-- HIGH_SAMPLING_RATE_SENSORS: 200Hz 이상 센서 샘플링에 필요 (Android 12+) -->
+  <uses-permission android:name="android.permission.HIGH_SAMPLING_RATE_SENSORS"/>
+  
+  <!-- BODY_SENSORS: 심박수, 체온 등 생체신호 센서용 (현재 앱에서는 불필요하지만 향후 확장용으로 유지) -->
+  <!-- <uses-permission android:name="android.permission.BODY_SENSORS"/> -->
+  <!-- <uses-permission android:name="android.permission.BODY_SENSORS_BACKGROUND"/> -->
+  
+  <!-- Health Connect 권한 -->
   <uses-permission android:name="android.permission.health.READ_ACTIVE_CALORIES_BURNED"/>
   <uses-permission android:name="android.permission.health.READ_DISTANCE"/>
   <uses-permission android:name="android.permission.health.READ_EXERCISE"/>
@@ -86,6 +100,14 @@
         android:name="expo.modules.taskManager.TaskService"
         android:exported="false"
         android:foregroundServiceType="location">
+    </service>
+    
+    <!-- 센서 백그라운드 서비스 (Pedometer, 가속도계) -->
+    <!-- foregroundServiceType: location|health 둘 다 선언하여 위치+건강 데이터 수집 허용 -->
+    <service
+        android:name=".SensorService"
+        android:exported="false"
+        android:foregroundServiceType="location|health">
     </service>
   </application>
 </manifest>

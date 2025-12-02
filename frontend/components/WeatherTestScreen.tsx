@@ -47,7 +47,7 @@ export default function WeatherTestScreen() {
   );
   const [locationLoading, setLocationLoading] = useState(false);
   const [useCurrentLocation, setUseCurrentLocation] = useState(false);
-  
+
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<PlaceSearchResult[]>([]);
   const [showSearchResults, setShowSearchResults] = useState(false);
@@ -195,7 +195,7 @@ export default function WeatherTestScreen() {
 
   const handleSearch = async (query: string) => {
     setSearchQuery(query);
-    
+
     if (query.trim().length < 2) {
       setSearchResults([]);
       setShowSearchResults(false);
@@ -213,8 +213,8 @@ export default function WeatherTestScreen() {
 
   const handleSelectPlace = async (place: PlaceSearchResult) => {
     const location: LocationCoords = {
-      latitude: place.y,
-      longitude: place.x,
+      latitude: typeof place.y === 'string' ? parseFloat(place.y) : place.y,
+      longitude: typeof place.x === 'string' ? parseFloat(place.x) : place.x,
       locationName: place.place_name,
     };
 
@@ -311,8 +311,8 @@ export default function WeatherTestScreen() {
     return (
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>시간별 예보</Text>
-        <ScrollView 
-          horizontal 
+        <ScrollView
+          horizontal
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.hourlyScroll}
         >
@@ -388,7 +388,7 @@ export default function WeatherTestScreen() {
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" />
-      
+
       {/* 헤더 */}
       <View style={styles.header}>
         <View style={styles.headerTop}>
@@ -402,7 +402,7 @@ export default function WeatherTestScreen() {
           <View style={styles.headerSpacer} />
         </View>
         {renderLocationInfo()}
-        
+
         {/* 검색창 */}
         <View style={styles.searchContainer}>
           <MaterialIcons name="search" size={20} color="#666" style={styles.searchIcon} />
@@ -435,10 +435,10 @@ export default function WeatherTestScreen() {
               disabled={locationLoading}
               style={styles.locationButtonInSearch}
             >
-              <MaterialIcons 
-                name={useCurrentLocation ? "my-location" : "location-on"} 
-                size={20} 
-                color={useCurrentLocation ? "#2C6DE7" : "#666"} 
+              <MaterialIcons
+                name={useCurrentLocation ? "my-location" : "location-on"}
+                size={20}
+                color={useCurrentLocation ? "#2C6DE7" : "#666"}
               />
             </TouchableOpacity>
           )}

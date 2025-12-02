@@ -1,21 +1,30 @@
 /**
- * 움직임 추적 서비스 (하이브리드 방식)
+ * 움직임 추적 서비스 (하이브리드 방식 + 백그라운드 지원)
  * 
  * GPS 속도 + 가속도계 센서를 결합하여 실제 보행 시간을 추적합니다.
  * - GPS 속도가 0.2 m/s (0.72 km/h) 이하일 때 → 가속도계로 움직임 확인
- * - GPS 속도가 5.0 m/s (18 km/h) 이상일 때 → 차량으로 판단
+ * - GPS 속도가 3.6 m/s (13 km/h) 이상일 때 → 차량으로 판단
  * - 연속 5초 이상 정지 시 해당 구간을 pausedTime에 누적
  * - realWalkingSpeed = distance / activeWalkingTime
+ * 
+ * 백그라운드 지원:
+ * - GPS: backgroundLocationTask와 연동하여 백그라운드에서도 위치 추적
+ * - 가속도계/Pedometer: 네이티브 SensorService로 백그라운드에서도 수집
  */
 
 import * as Location from 'expo-location';
 import { Accelerometer, Pedometer } from 'expo-sensors';
+import { AppState, AppStateStatus, Platform } from 'react-native';
 import type { MovementSegment } from './navigationLogService';
+import { getBackgroundLocations, clearBackgroundLocations } from './backgroundLocationTask';
+import { nativeSensorService } from './nativeSensorService';
 
 const SPEED_THRESHOLD_MIN = 0.2; // m/s (0.72 km/h) - 이하면 정지로 간주 (GPS 오차 고려)
-const SPEED_THRESHOLD_MAX = 5.0; // m/s (18 km/h) - 이상이면 확실히 차량 (일반인 달리기 한계)
+const SPEED_THRESHOLD_MAX = 3.6; // m/s (13 km/h) - 이상이면 차량으로 간주 (일반인 달리기 한계)
 const MIN_PAUSE_DURATION = 5; // 초 - pausedTime에 기록되는 최소 정지 시간
-const STATE_CHANGE_HYSTERESIS = 3; // 초 - 상태 전환을 위한 히스테리시스 시간 (노이즈 방지)
+const STATE_CHANGE_HYSTERESIS = 5; // 초 - 상태 전환을 위한 히스테리시스 시간 (노이즈 방지)
+const VEHICLE_CONFIRM_DURATION = 10; // 초 - 차량 속도가 이 시간 이상 지속되면 확정
+
 
 // 가속도 패턴 분석용 상수
 const ACCEL_STATIONARY_THRESHOLD = 0.15; // 정지 상태
@@ -77,6 +86,12 @@ class MovementTrackingService {
     private lastStepCount: number = 0;
     private lastStepTime: number = 0;
     private recentStepCounts: { time: number; steps: number }[] = [];
+
+    // 🆕 백그라운드 상태 관련
+    private appState: AppStateStatus = 'active';
+    private appStateSubscription: any = null;
+    private backgroundProcessingInterval: any = null;
+    private lastBackgroundProcessedIndex: number = 0;
 
     /**
      * 추적 시작
@@ -159,15 +174,228 @@ class MovementTrackingService {
                 console.warn('⚠️ Pedometer 사용 불가 - 가속도계만 사용');
             }
 
+            // 🆕 앱 상태 변화 감지 (백그라운드/포어그라운드)
+            this.appStateSubscription = AppState.addEventListener('change', this.handleAppStateChange.bind(this));
+            this.lastBackgroundProcessedIndex = 0;
+            clearBackgroundLocations(); // 백그라운드 위치 데이터 초기화
+
+            // 🆕 네이티브 센서 서비스 시작 (Android 백그라운드 센서용)
+            if (Platform.OS === 'android' && nativeSensorService.isServiceAvailable()) {
+                const started = await nativeSensorService.startService();
+                if (started) {
+                    console.log('✅ 네이티브 센서 서비스 시작 (백그라운드 센서 지원)');
+                } else {
+                    console.warn('⚠️ 네이티브 센서 서비스 시작 실패 - 포어그라운드 센서만 사용');
+                }
+            }
+
             this.isTracking = true;
 
             // 첫 걸음 구간 시작
             this.startNewSegment('walking');
 
-            console.log('✅ 움직임 추적 시작');
+            console.log('✅ 움직임 추적 시작 (백그라운드 지원)');
         } catch (error) {
             console.error('❌ 움직임 추적 시작 실패:', error);
             throw error;
+        }
+    }
+
+    /**
+     * 🆕 앱 상태 변화 핸들러 (백그라운드 ↔ 포어그라운드)
+     */
+    private handleAppStateChange(nextAppState: AppStateStatus): void {
+        console.log(`📱 앱 상태 변경: ${this.appState} → ${nextAppState}`);
+
+        if (this.appState.match(/inactive|background/) && nextAppState === 'active') {
+            // 백그라운드 → 포어그라운드: 백그라운드에서 수집된 GPS 데이터 처리
+            this.processBackgroundLocations();
+        }
+
+        this.appState = nextAppState;
+    }
+
+    /**
+     * 🆕 백그라운드에서 수집된 GPS 위치 데이터 처리
+     */
+    private async processBackgroundLocations(): Promise<void> {
+        const backgroundLocations = getBackgroundLocations();
+
+        // 🆕 네이티브 센서 데이터도 가져오기 (Android)
+        let nativeStepCount = 0;
+        let nativeAccelMagnitude = 0;
+
+        if (Platform.OS === 'android' && nativeSensorService.isServiceAvailable()) {
+            try {
+                // 최근 10초간 데이터 조회
+                nativeStepCount = await nativeSensorService.getRecentStepCount(10);
+                nativeAccelMagnitude = await nativeSensorService.getRecentAccelMagnitude(10);
+
+                if (nativeStepCount > 0 || nativeAccelMagnitude > 0) {
+                    console.log(`📱 네이티브 센서: 걸음 ${nativeStepCount}, 가속도 ${nativeAccelMagnitude.toFixed(2)}`);
+                }
+            } catch (error) {
+                console.warn('⚠️ 네이티브 센서 데이터 조회 실패:', error);
+            }
+        }
+
+        if (backgroundLocations.length === 0) {
+            console.log('📍 백그라운드 위치 데이터 없음');
+            return;
+        }
+
+        // 이미 처리한 데이터 이후부터 처리
+        const newLocations = backgroundLocations.slice(this.lastBackgroundProcessedIndex);
+
+        if (newLocations.length === 0) {
+            console.log('📍 새로운 백그라운드 위치 데이터 없음');
+            return;
+        }
+
+        console.log(`📍 백그라운드 위치 ${newLocations.length}개 처리 시작`);
+
+        // 각 위치 데이터를 순차적으로 처리
+        // 네이티브 센서 데이터가 있으면 함께 활용
+        for (const location of newLocations) {
+            this.processLocationForBackground(location, nativeStepCount, nativeAccelMagnitude);
+        }
+
+        this.lastBackgroundProcessedIndex = backgroundLocations.length;
+        console.log(`✅ 백그라운드 위치 처리 완료`);
+    }
+
+    /**
+     * 🆕 백그라운드용 위치 처리 (GPS + 네이티브 센서 데이터)
+     */
+    private processLocationForBackground(
+        location: Location.LocationObject,
+        nativeStepCount: number = 0,
+        nativeAccelMagnitude: number = 0
+    ): void {
+        if (this.isPaused || !this.currentSegment) {
+            return;
+        }
+
+        // GPS 속도 처리
+        let gpsSpeed = location.coords.speed;
+
+        if (gpsSpeed === null || gpsSpeed === undefined) {
+            if (this.lastLocation && this.lastLocationTime > 0) {
+                const distance = this.calculateDistance(
+                    this.lastLocation.coords.latitude,
+                    this.lastLocation.coords.longitude,
+                    location.coords.latitude,
+                    location.coords.longitude
+                );
+                const timeDelta = (location.timestamp - this.lastLocationTime) / 1000;
+                if (timeDelta > 0 && timeDelta < 30) {
+                    gpsSpeed = distance / timeDelta;
+                } else {
+                    gpsSpeed = 0.8; // 기본값
+                }
+            } else {
+                gpsSpeed = 0.8;
+            }
+        }
+
+        // 백그라운드에서는 GPS + 네이티브 센서로 판정
+        const activityType = this.analyzeActivityTypeForBackground(gpsSpeed, nativeStepCount, nativeAccelMagnitude);
+        const isMoving = activityType === 'walking' || activityType === 'running';
+
+        // 거리 계산
+        if (this.lastLocation && isMoving) {
+            const distance = this.calculateDistance(
+                this.lastLocation.coords.latitude,
+                this.lastLocation.coords.longitude,
+                location.coords.latitude,
+                location.coords.longitude
+            );
+            this.currentSegment.distanceM += distance;
+        }
+
+        this.lastLocation = location;
+        this.lastLocationTime = location.timestamp;
+        this.lastGpsSpeed = gpsSpeed;
+
+        // 상태 전환 (히스테리시스 적용)
+        const desiredStatus = isMoving ? 'walking' : 'paused';
+        this.handleStatusChange(desiredStatus);
+    }
+
+    /**
+     * 🆕 백그라운드용 활동 유형 판정 (GPS + 네이티브 센서)
+     */
+    private analyzeActivityTypeForBackground(
+        gpsSpeed: number,
+        nativeStepCount: number,
+        nativeAccelMagnitude: number
+    ): 'stationary' | 'walking' | 'running' | 'vehicle' {
+        // 1. 확실한 차량 (13 km/h 이상)
+        if (gpsSpeed > SPEED_THRESHOLD_MAX) {
+            return 'vehicle';
+        }
+
+        // 2. 네이티브 센서에서 걸음이 감지되면 walking (GPS 느려도)
+        if (nativeStepCount >= 3) {
+            console.log(`👣 백그라운드 걸음 감지: ${nativeStepCount}걸음 → walking`);
+            return gpsSpeed >= 2.0 ? 'running' : 'walking';
+        }
+
+        // 3. GPS 속도 기반 판정
+        return this.analyzeActivityTypeGpsOnly(gpsSpeed);
+    }
+
+    /**
+     * 🆕 GPS 속도만으로 활동 유형 판정 (fallback)
+     */
+    private analyzeActivityTypeGpsOnly(gpsSpeed: number): 'stationary' | 'walking' | 'running' | 'vehicle' {
+        // 차량 (13 km/h 이상)
+        if (gpsSpeed > SPEED_THRESHOLD_MAX) {
+            return 'vehicle';
+        }
+
+        // 정지 (0.72 km/h 이하)
+        if (gpsSpeed < SPEED_THRESHOLD_MIN) {
+            return 'stationary';
+        }
+
+        // 뛰기 (7.2 km/h 이상)
+        if (gpsSpeed >= 2.0) {
+            return 'running';
+        }
+
+        // 걷기
+        return 'walking';
+    }
+
+    /**
+     * 🆕 상태 변경 처리 (히스테리시스 적용)
+     */
+    private handleStatusChange(desiredStatus: 'walking' | 'paused'): void {
+        if (!this.currentSegment) return;
+
+        if (desiredStatus !== this.currentSegment.status) {
+            if (!this.currentSegment.pendingStatusChange) {
+                this.currentSegment.pendingStatusChange = {
+                    newStatus: desiredStatus,
+                    since: new Date(),
+                };
+            } else if (this.currentSegment.pendingStatusChange.newStatus === desiredStatus) {
+                const waitedSeconds = Math.floor(
+                    (Date.now() - this.currentSegment.pendingStatusChange.since.getTime()) / 1000
+                );
+                if (waitedSeconds >= STATE_CHANGE_HYSTERESIS) {
+                    this.finishCurrentSegment();
+                    this.startNewSegment(desiredStatus);
+                }
+            } else {
+                this.currentSegment.pendingStatusChange = {
+                    newStatus: desiredStatus,
+                    since: new Date(),
+                };
+            }
+        } else {
+            this.currentSegment.pendingStatusChange = undefined;
         }
     }
 
@@ -178,6 +406,9 @@ class MovementTrackingService {
         if (!this.isTracking) {
             return;
         }
+
+        // 🆕 백그라운드 데이터 최종 처리
+        this.processBackgroundLocations();
 
         // 현재 진행 중인 구간 종료
         if (this.currentSegment) {
@@ -199,6 +430,19 @@ class MovementTrackingService {
         if (this.pedometerSubscription) {
             this.pedometerSubscription.remove();
             this.pedometerSubscription = null;
+        }
+
+        // 🆕 앱 상태 구독 해제
+        if (this.appStateSubscription) {
+            this.appStateSubscription.remove();
+            this.appStateSubscription = null;
+        }
+
+        // 🆕 네이티브 센서 서비스 중지
+        if (Platform.OS === 'android' && nativeSensorService.isServiceAvailable()) {
+            nativeSensorService.stopService().catch(err => {
+                console.warn('⚠️ 네이티브 센서 서비스 중지 실패:', err);
+            });
         }
 
         this.trackingEndTime = new Date();
@@ -274,39 +518,9 @@ class MovementTrackingService {
 
         this.lastLocation = location;
 
-        // 상태 전환 판단 (히스테리시스 적용)
+        // 상태 전환 판단 (히스테리시스 적용) - 공통 함수 사용
         const desiredStatus = isMoving ? 'walking' : 'paused';
-
-        if (desiredStatus !== this.currentSegment.status) {
-            // 상태 변경 필요
-            if (!this.currentSegment.pendingStatusChange) {
-                // 상태 변경 대기 시작
-                this.currentSegment.pendingStatusChange = {
-                    newStatus: desiredStatus,
-                    since: new Date(),
-                };
-            } else if (this.currentSegment.pendingStatusChange.newStatus === desiredStatus) {
-                // 같은 방향으로 상태 변경 대기 중
-                const waitedSeconds = Math.floor(
-                    (Date.now() - this.currentSegment.pendingStatusChange.since.getTime()) / 1000
-                );
-
-                if (waitedSeconds >= STATE_CHANGE_HYSTERESIS) {
-                    // 충분히 대기했으므로 상태 전환
-                    this.finishCurrentSegment();
-                    this.startNewSegment(desiredStatus);
-                }
-            } else {
-                // 다른 방향으로 바뀜 (노이즈) - 대기 리셋
-                this.currentSegment.pendingStatusChange = {
-                    newStatus: desiredStatus,
-                    since: new Date(),
-                };
-            }
-        } else {
-            // 현재 상태 유지 - 대기 취소
-            this.currentSegment.pendingStatusChange = undefined;
-        }
+        this.handleStatusChange(desiredStatus);
     }
 
     /**
@@ -377,31 +591,31 @@ class MovementTrackingService {
     }
 
     /**
-     * 활동 유형 분석 (Pedometer 최우선, GPS + 가속도계 보조)
+     * 활동 유형 분석 (GPS 차량 판정 최우선, 그 다음 Pedometer, 가속도계 보조)
      */
     private analyzeActivityType(gpsSpeed: number): 'stationary' | 'walking' | 'running' | 'vehicle' {
         const hasAccelData = this.currentAccelReading && this.accelBuffer.length >= 5;
 
-        // ===== 0단계: Pedometer로 걸음 수 확인 (최우선) =====
+        // ===== 0단계: GPS로 확실한 차량 먼저 판단 (13 km/h 이상) =====
+        // 대중교통 탑승 중 흔들림으로 Pedometer가 걸음으로 오인하는 것 방지
+        if (gpsSpeed > SPEED_THRESHOLD_MAX) {
+            console.log(`🚗 GPS 속도 ${(gpsSpeed * 3.6).toFixed(2)} km/h → vehicle 확정`);
+            this.lastActivityType = 'vehicle';
+            return 'vehicle';
+        }
+
+        // ===== 1단계: Pedometer로 걸음 수 확인 =====
         const recentSteps = this.getRecentStepCount(PEDOMETER_CHECK_INTERVAL);
         const hasRecentSteps = recentSteps >= MIN_STEPS_FOR_WALKING;
 
         if (hasRecentSteps) {
-            // 최근 5초간 3걸음 이상 → 무조건 walking (GPS/가속도계 무시)
+            // 최근 5초간 3걸음 이상 → walking (차량 속도가 아닌 경우에만)
             console.log(`👣 Pedometer: 최근 ${PEDOMETER_CHECK_INTERVAL}초간 ${recentSteps}걸음 → walking 확정`);
             this.lastActivityType = 'walking';
             return 'walking';
         }
 
-        // ===== 1단계: GPS로 명확한 경우 먼저 판단 =====
-
-        // 확실한 차량 (18 km/h 이상)
-        if (gpsSpeed > SPEED_THRESHOLD_MAX) {
-            this.lastActivityType = 'vehicle';
-            return 'vehicle';
-        }
-
-        // 매우 느림 (0.72 km/h 이하) → 가속도계 우선 판단
+        // ===== 2단계: 매우 느린 속도 (0.72 km/h 이하) → 가속도계 우선 판단 =====
         if (gpsSpeed < SPEED_THRESHOLD_MIN) {
             if (hasAccelData) {
                 const accelVariance = this.calculateAccelVariance();

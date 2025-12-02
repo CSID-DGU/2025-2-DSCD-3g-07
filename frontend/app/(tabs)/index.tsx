@@ -40,6 +40,11 @@ import { saveNavigationLog, extractNavigationLogData } from '@/services/navigati
 import { movementTrackingService } from '@/services/movementTrackingService';
 import WeatherButton from '@/components/WeatherButton';
 import { useRouter } from 'expo-router';
+import {
+  initializePermissions,
+  ensureNavigationPermissions,
+  type PermissionCheckResult
+} from '@/utils/permissionUtils';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 const PRIMARY_COLOR = '#2C6DE7';
@@ -274,6 +279,9 @@ export default function HomeScreen() {
   const [walkingSpeedCase1, setWalkingSpeedCase1] = useState<number | null>(
     null
   );
+  const [walkingSpeedCase2, setWalkingSpeedCase2] = useState<number | null>(
+    null
+  );
 
   // 경로 옵션 관련 상태 (여러 경로)
   const [routeOptions, setRouteOptions] = useState<Itinerary[]>([]);
@@ -377,61 +385,53 @@ export default function HomeScreen() {
     })
   ).current;
 
-  // 앱 첫 실행 시 알림 권한 요청 (Android 13+)
+  // 앱 첫 실행 시 권한 초기화 (통합 권한 유틸리티 사용)
   useEffect(() => {
-    const requestNotificationPermission = async () => {
+    const initPermissions = async () => {
       try {
-        const { PermissionsAndroid, Platform } = await import('react-native');
-        if (Platform.OS === 'android' && Platform.Version >= 33) {
-          const granted = await PermissionsAndroid.check(
-            PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS
-          );
+        console.log('📋 앱 시작 - 권한 초기화 중...');
+        const result = await initializePermissions();
 
-          if (!granted) {
-            const result = await PermissionsAndroid.request(
-              PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
-              {
-                title: '알림 권한 필요',
-                message: '경로 안내 중 백그라운드에서도 위치 추적 상태를 알림바에 표시하기 위해 알림 권한이 필요합니다.',
-                buttonPositive: '허용',
-                buttonNegative: '거부',
-              }
-            );
-
-            if (result === PermissionsAndroid.RESULTS.GRANTED) {
-              console.log('✅ 알림 권한 허용됨');
-            } else {
-              console.log('⚠️ 알림 권한 거부됨');
-            }
-          }
+        if (result.allGranted) {
+          console.log('✅ 모든 권한 허용됨');
+        } else {
+          console.log(`⚠️ 일부 권한 누락: ${result.missingPermissions.join(', ')}`);
         }
       } catch (error) {
-        console.warn('⚠️ 알림 권한 확인 실패:', error);
+        console.warn('⚠️ 권한 초기화 실패:', error);
       }
     };
 
-    requestNotificationPermission();
+    initPermissions();
   }, []);
 
-  // DB에서 사용자 보행 속도 가져오기 (로그인 시에만)
-  useEffect(() => {
-    const fetchWalkingSpeed = async () => {
-      try {
-        const result = await apiService.getSpeedProfile();
-        if (result.data?.speed_case1) {
-          // km/h를 m/s로 변환
-          const speedMs = result.data.speed_case1 / 3.6;
-          setWalkingSpeedCase1(speedMs);
-          console.log(
-            `✅ 보행 속도 로드 (DB): ${result.data.speed_case1.toFixed(2)} km/h (${speedMs.toFixed(3)} m/s)`
-          );
-        }
-      } catch (error) {
-        // 로그인하지 않은 경우 조용히 무시 (기본값 사용)
-        console.log('ℹ️ 로그인 필요 - 기본 속도 사용');
+  // DB에서 사용자 보행 속도 가져오기 함수 (재사용 가능)
+  const fetchWalkingSpeed = async () => {
+    try {
+      const result = await apiService.getSpeedProfile();
+      if (result.data?.speed_case1) {
+        // km/h를 m/s로 변환
+        const speedMs1 = result.data.speed_case1 / 3.6;
+        setWalkingSpeedCase1(speedMs1);
+        console.log(
+          `✅ 보행 속도 로드 (Case1): ${result.data.speed_case1.toFixed(2)} km/h (${speedMs1.toFixed(3)} m/s)`
+        );
       }
-    };
+      if (result.data?.speed_case2) {
+        const speedMs2 = result.data.speed_case2 / 3.6;
+        setWalkingSpeedCase2(speedMs2);
+        console.log(
+          `✅ 보행 속도 로드 (Case2): ${result.data.speed_case2.toFixed(2)} km/h (${speedMs2.toFixed(3)} m/s)`
+        );
+      }
+    } catch (error) {
+      // 로그인하지 않은 경우 조용히 무시 (기본값 사용)
+      console.log('ℹ️ 로그인 필요 - 기본 속도 사용');
+    }
+  };
 
+  // 컴포넌트 마운트 시 속도 로드
+  useEffect(() => {
     fetchWalkingSpeed();
   }, []);
 
@@ -677,6 +677,10 @@ export default function HomeScreen() {
           if (hasSignificantDifference && trackingData.activeWalkingTime >= 300) {
             resultMessage += `\n\n⚠️ 예상 시간과 ${differencePercent.toFixed(0)}% 차이가 발생했습니다.\n실제 속도를 반영하여 다음 예측을 개선합니다.`;
           }
+
+          // 🔄 속도 프로필 새로고침 (백엔드에서 업데이트된 값 가져오기)
+          await fetchWalkingSpeed();
+          console.log('🔄 속도 프로필 새로고침 완료');
         } catch (error) {
           console.error('❌ 네비게이션 로그 저장 실패:', error);
           resultMessage += '\n\n⚠️ 서버 저장에 실패했습니다.\n데이터는 앱 내에만 임시 저장되었으며,\n앱을 종료하면 사라집니다.';
@@ -714,6 +718,13 @@ export default function HomeScreen() {
       setIsNavigating(false);
       setNavigationStartTime(null);
     } else {
+      // 안내 시작 전 권한 확인
+      const hasPermissions = await ensureNavigationPermissions();
+      if (!hasPermissions) {
+        console.warn('⚠️ 필수 권한이 없어 안내를 시작할 수 없습니다.');
+        return;
+      }
+
       // 안내 시작
       setIsNavigating(true);
       setNavigationStartTime(new Date());

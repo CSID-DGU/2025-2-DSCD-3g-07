@@ -36,7 +36,7 @@ const ApiTestComponent: React.FC = () => {
     const fetchWalkingSpeed = async () => {
       try {
         const result = await apiService.getSpeedProfile();
-        if (result.success && result.data?.speed_case1) {
+        if (result.data?.speed_case1) {
           // km/h를 m/s로 변환
           const speedMs = result.data.speed_case1 / 3.6;
           setWalkingSpeedCase1(speedMs);

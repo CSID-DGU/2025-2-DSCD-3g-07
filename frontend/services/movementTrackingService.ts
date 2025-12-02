@@ -2,17 +2,18 @@
  * 움직임 추적 서비스 (하이브리드 방식)
  * 
  * GPS 속도 + 가속도계 센서를 결합하여 실제 보행 시간을 추적합니다.
- * - GPS 속도가 0.3 m/s 이하 AND 가속도계 변화가 미미할 때 → 정지 상태
+ * - GPS 속도가 0.2 m/s (0.72 km/h) 이하일 때 → 가속도계로 움직임 확인
+ * - GPS 속도가 5.0 m/s (18 km/h) 이상일 때 → 차량으로 판단
  * - 연속 5초 이상 정지 시 해당 구간을 pausedTime에 누적
  * - realWalkingSpeed = distance / activeWalkingTime
  */
 
 import * as Location from 'expo-location';
-import { Accelerometer } from 'expo-sensors';
+import { Accelerometer, Pedometer } from 'expo-sensors';
 import type { MovementSegment } from './navigationLogService';
 
-const SPEED_THRESHOLD_MIN = 0.3; // m/s (1.08 km/h) - 이하면 정지로 간주
-const SPEED_THRESHOLD_MAX = 4.5; // m/s (16.2 km/h) - 이상이면 차량으로 간주
+const SPEED_THRESHOLD_MIN = 0.2; // m/s (0.72 km/h) - 이하면 정지로 간주 (GPS 오차 고려)
+const SPEED_THRESHOLD_MAX = 5.0; // m/s (18 km/h) - 이상이면 확실히 차량 (일반인 달리기 한계)
 const MIN_PAUSE_DURATION = 5; // 초 - pausedTime에 기록되는 최소 정지 시간
 const STATE_CHANGE_HYSTERESIS = 3; // 초 - 상태 전환을 위한 히스테리시스 시간 (노이즈 방지)
 
@@ -22,6 +23,10 @@ const ACCEL_WALKING_MIN = 0.3; // 걷기 최소
 const ACCEL_WALKING_MAX = 2.5; // 걷기 최대
 const ACCEL_RUNNING_MIN = 2.0; // 뛰기 최소
 const ACCEL_BUFFER_SIZE = 20; // 가속도 히스토리 버퍼 크기 (20초)
+
+// Pedometer (만보계) 상수
+const PEDOMETER_CHECK_INTERVAL = 5; // 초 - 걸음 수 체크 간격
+const MIN_STEPS_FOR_WALKING = 3; // 최근 5초간 최소 걸음 수 (걷기 판정)
 
 interface CurrentSegment {
     startTime: Date;
@@ -63,6 +68,16 @@ class MovementTrackingService {
     private lastGpsSpeed: number = 0;
     private lastLocationTime: number = 0;
 
+    // 이전 활동 상태 (GPS 불량 시 상태 유지용)
+    private lastActivityType: 'stationary' | 'walking' | 'running' | 'vehicle' = 'walking';
+
+    // Pedometer (만보계) 관련
+    private pedometerSubscription: any = null;
+    private pedometerAvailable: boolean = false;
+    private lastStepCount: number = 0;
+    private lastStepTime: number = 0;
+    private recentStepCounts: { time: number; steps: number }[] = [];
+
     /**
      * 추적 시작
      */
@@ -81,6 +96,9 @@ class MovementTrackingService {
             this.currentAccelReading = null;
             this.trackingStartTime = new Date();
             this.trackingEndTime = null;
+            this.lastStepCount = 0;
+            this.lastStepTime = Date.now();
+            this.recentStepCounts = [];
 
             // GPS 위치 추적 시작
             this.locationSubscription = await Location.watchPositionAsync(
@@ -115,6 +133,31 @@ class MovementTrackingService {
                     this.accelBuffer.shift();
                 }
             });
+
+            // 🆕 Pedometer (만보계) 추적 시작
+            this.pedometerAvailable = await Pedometer.isAvailableAsync();
+            if (this.pedometerAvailable) {
+                this.pedometerSubscription = Pedometer.watchStepCount((result) => {
+                    const now = Date.now();
+                    const stepDelta = result.steps - this.lastStepCount;
+
+                    if (stepDelta > 0) {
+                        this.recentStepCounts.push({ time: now, steps: stepDelta });
+                        console.log(`👣 걸음 감지: +${stepDelta} (총 ${result.steps})`);
+                    }
+
+                    this.lastStepCount = result.steps;
+                    this.lastStepTime = now;
+
+                    // 최근 10초 이내 데이터만 유지
+                    this.recentStepCounts = this.recentStepCounts.filter(
+                        (r) => now - r.time < 10000
+                    );
+                });
+                console.log('✅ Pedometer 추적 시작');
+            } else {
+                console.warn('⚠️ Pedometer 사용 불가 - 가속도계만 사용');
+            }
 
             this.isTracking = true;
 
@@ -152,6 +195,12 @@ class MovementTrackingService {
             this.accelSubscription = null;
         }
 
+        // 🆕 Pedometer 구독 해제
+        if (this.pedometerSubscription) {
+            this.pedometerSubscription.remove();
+            this.pedometerSubscription = null;
+        }
+
         this.trackingEndTime = new Date();
         this.isTracking = false;
         this.currentSegment = null; // 명시적으로 null 설정
@@ -165,7 +214,7 @@ class MovementTrackingService {
         // GPS 속도 처리 (null 대비)
         let gpsSpeed = location.coords.speed;
 
-        // GPS 속도가 null이면 거리/시간 기반 속도 계산 또는 이전 속도 사용
+        // GPS 속도가 null이면 거리/시간 기반 계산, 실패 시 보행 속도 기본값 사용
         if (gpsSpeed === null || gpsSpeed === undefined) {
             if (this.lastLocation && this.lastLocationTime > 0) {
                 const distance = this.calculateDistance(
@@ -175,13 +224,17 @@ class MovementTrackingService {
                     location.coords.longitude
                 );
                 const timeDelta = (Date.now() - this.lastLocationTime) / 1000; // 초
-                if (timeDelta > 0 && timeDelta < 5) { // 5초 이내
+                if (timeDelta > 0 && timeDelta < 10) { // 10초 이내
                     gpsSpeed = distance / timeDelta; // m/s
                 } else {
-                    gpsSpeed = this.lastGpsSpeed; // 이전 속도 사용
+                    // 시간 차이가 크면 보행 속도 기본값 사용 (차량 속도 유지 안 함)
+                    gpsSpeed = this.lastGpsSpeed > SPEED_THRESHOLD_MAX ? 0.8 : this.lastGpsSpeed;
+                    console.log(`⏱️ GPS null (시간차 ${timeDelta.toFixed(1)}초) → 기본값 ${(gpsSpeed * 3.6).toFixed(2)} km/h`);
                 }
             } else {
-                gpsSpeed = this.lastGpsSpeed; // 이전 속도 사용
+                // 이전 위치가 없으면 느린 걷기 속도로 가정 (보수적)
+                gpsSpeed = 0.8; // m/s (약 2.9 km/h)
+                console.log(`🆕 GPS null (초기) → 기본값 ${(gpsSpeed * 3.6).toFixed(2)} km/h`);
             }
         }
 
@@ -202,6 +255,7 @@ class MovementTrackingService {
 
         // 가속도계 패턴 분석
         const activityType = this.analyzeActivityType(gpsSpeed);
+        console.log(`📊 GPS: ${(gpsSpeed * 3.6).toFixed(2)} km/h → ${activityType}`);
 
         // 하이브리드 판단 (차량은 정지로 취급하여 대기 시간에 포함)
         const isMoving = activityType === 'walking' || activityType === 'running';
@@ -285,13 +339,14 @@ class MovementTrackingService {
             return;
         }
 
-        // walking 구간인데 거리가 0이면 무시 (GPS 신호 불량)
-        if (this.currentSegment.status === 'walking' && this.currentSegment.distanceM < 0.5) {
-            console.log(`⚠️ 구간 무시: walking이지만 거리 ${this.currentSegment.distanceM}m (GPS 신호 불량)`);
+        // walking 구간: 시간 기반 필터링 (거리는 GPS 신호 불량 시 부정확하므로 체크 안 함)
+        // 3초 미만의 짧은 walking 구간만 무시 (노이즈 제거)
+        if (this.currentSegment.status === 'walking' && durationSeconds < 3) {
+            console.log(`⚠️ 구간 무시: walking이지만 ${durationSeconds}초로 너무 짧음 (노이즈)`);
             return;
         }
 
-        // paused 구간도 모두 기록 (5초 미만 포함)
+        // paused 구간도 모두 기록
 
         const avgSpeed = durationSeconds > 0
             ? this.currentSegment.distanceM / durationSeconds
@@ -322,90 +377,128 @@ class MovementTrackingService {
     }
 
     /**
-     * 활동 유형 분석 (GPS + 가속도계 패턴)
+     * 활동 유형 분석 (Pedometer 최우선, GPS + 가속도계 보조)
      */
     private analyzeActivityType(gpsSpeed: number): 'stationary' | 'walking' | 'running' | 'vehicle' {
-        // 가속도계 데이터 먼저 확인 (GPS보다 신뢰도 높음)
         const hasAccelData = this.currentAccelReading && this.accelBuffer.length >= 5;
 
-        if (hasAccelData) {
-            const accelVariance = this.calculateAccelVariance();
-            const isPeriodic = this.detectPeriodicPattern();
-            const avgAccelMagnitude = this.getAverageAccelMagnitude();
+        // ===== 0단계: Pedometer로 걸음 수 확인 (최우선) =====
+        const recentSteps = this.getRecentStepCount(PEDOMETER_CHECK_INTERVAL);
+        const hasRecentSteps = recentSteps >= MIN_STEPS_FOR_WALKING;
 
-            // 가속도계로 명확한 움직임 감지 시 GPS 속도 무시
-            if (isPeriodic && avgAccelMagnitude >= ACCEL_WALKING_MIN) {
-                // 주기적 움직임 = 걷기/뛰기
-                if (avgAccelMagnitude > ACCEL_RUNNING_MIN) {
-                    return 'running';
-                }
-                if (avgAccelMagnitude <= ACCEL_WALKING_MAX) {
-                    return 'walking';
-                }
-            }
-
-            // 명확한 정지 상태
-            if (accelVariance < ACCEL_STATIONARY_THRESHOLD) {
-                return 'stationary';
-            }
+        if (hasRecentSteps) {
+            // 최근 5초간 3걸음 이상 → 무조건 walking (GPS/가속도계 무시)
+            console.log(`👣 Pedometer: 최근 ${PEDOMETER_CHECK_INTERVAL}초간 ${recentSteps}걸음 → walking 확정`);
+            this.lastActivityType = 'walking';
+            return 'walking';
         }
 
-        // 1. GPS 속도로 1차 필터링 (극단적인 경우)
-        if (gpsSpeed < SPEED_THRESHOLD_MIN) {
-            // 매우 느림 → 가속도계로 미세 움직임 체크
-            const accelVariance = this.calculateAccelVariance();
-            return accelVariance < ACCEL_STATIONARY_THRESHOLD ? 'stationary' : 'walking';
-        }
+        // ===== 1단계: GPS로 명확한 경우 먼저 판단 =====
 
-        // 🆕 빠른 속도(> 16.2 km/h)도 가속도계로 걷기 패턴 확인
+        // 확실한 차량 (18 km/h 이상)
         if (gpsSpeed > SPEED_THRESHOLD_MAX) {
-            // 가속도계로 걷기 패턴 재확인 (GPS 튐일 수 있음)
-            if (hasAccelData) {
-                const isPeriodic = this.detectPeriodicPattern();
-                const avgAccelMagnitude = this.getAverageAccelMagnitude();
-
-                // 명확한 걷기/뛰기 패턴이면 GPS 무시
-                if (isPeriodic && avgAccelMagnitude >= ACCEL_WALKING_MIN && avgAccelMagnitude <= ACCEL_WALKING_MAX * 1.5) {
-                    return avgAccelMagnitude > ACCEL_RUNNING_MIN ? 'running' : 'walking';
-                }
-            }
-            // 가속도계로 걷기 패턴이 감지 안 되면 차량
+            this.lastActivityType = 'vehicle';
             return 'vehicle';
         }
 
-        // 2. 보행 속도 범위 (0.3 ~ 4.5 m/s) → 가속도 패턴으로 세부 분석
-        if (!hasAccelData) {
-            // 데이터 부족 시 GPS 속도로만 판단
-            return gpsSpeed > 1.5 ? 'running' : 'walking';
+        // 매우 느림 (0.72 km/h 이하) → 가속도계 우선 판단
+        if (gpsSpeed < SPEED_THRESHOLD_MIN) {
+            if (hasAccelData) {
+                const accelVariance = this.calculateAccelVariance();
+                const isPeriodic = this.detectPeriodicPattern();
+                const avgAccelMagnitude = this.getAverageAccelMagnitude();
+
+                // 가속도계에 움직임이 감지되면 walking (GPS 신호 불량 가능성)
+                if (isPeriodic || accelVariance > ACCEL_STATIONARY_THRESHOLD || avgAccelMagnitude > 0.2) {
+                    console.log(`🚶 느린 GPS(${(gpsSpeed * 3.6).toFixed(2)} km/h)지만 가속도계 움직임 감지 → walking`);
+                    this.lastActivityType = 'walking';
+                    return 'walking';
+                }
+                // 가속도계도 움직임 없으면 정지
+                if (accelVariance < ACCEL_STATIONARY_THRESHOLD && avgAccelMagnitude < 0.15) {
+                    console.log(`🛑 GPS + 가속도계 모두 정지 → stationary`);
+                    this.lastActivityType = 'stationary';
+                    return 'stationary';
+                }
+            }
+            // 가속도계 데이터 없으면: 이전 상태 유지 (GPS 신호 불량 가능성)
+            // 단, 이전이 stationary였으면 walking으로 (보수적 판단 방지)
+            const fallbackActivity = this.lastActivityType === 'stationary' ? 'walking' : this.lastActivityType;
+            console.log(`⚠️ 느린 GPS(${(gpsSpeed * 3.6).toFixed(2)} km/h), 가속도계 없음 → ${fallbackActivity} (이전 상태 유지)`);
+            return fallbackActivity === 'vehicle' ? 'walking' : fallbackActivity;
         }
 
-        // 3. 가속도 패턴 분석
+        // ===== 2단계: 보행 속도 범위 (0.72 ~ 18 km/h) =====
+        // GPS + 가속도계 혼합 판단
+
+        if (!hasAccelData) {
+            // 가속도계 데이터 없으면 GPS 속도만으로 판단
+            if (gpsSpeed < 2.0) {
+                this.lastActivityType = 'walking';
+                return 'walking';      // < 7.2 km/h
+            }
+            if (gpsSpeed < 4.0) {
+                this.lastActivityType = 'running';
+                return 'running';      // < 14.4 km/h
+            }
+            this.lastActivityType = 'vehicle';
+            return 'vehicle';                          // >= 14.4 km/h (차량)
+        }
+
+        // 가속도계 패턴 분석
         const accelVariance = this.calculateAccelVariance();
         const isPeriodic = this.detectPeriodicPattern();
         const avgAccelMagnitude = this.getAverageAccelMagnitude();
 
-        // 차량 진동 감지 (불규칙 + 중간 세기)
-        if (!isPeriodic && accelVariance > 0.5 && accelVariance < 1.5) {
+        // 빠른 속도 (4 m/s = 14.4 km/h 이상) → 대부분 차량
+        if (gpsSpeed >= 4.0) {
+            // 주기적 패턴 + 강한 움직임 → 매우 빠른 뛰기 (드물)
+            if (isPeriodic && avgAccelMagnitude > ACCEL_RUNNING_MIN) {
+                this.lastActivityType = 'running';
+                return 'running';
+            }
+            // 그 외는 차량
+            this.lastActivityType = 'vehicle';
             return 'vehicle';
         }
 
-        // 뛰기 감지 (주기적 + 강한 충격)
-        if (isPeriodic && avgAccelMagnitude > ACCEL_RUNNING_MIN) {
+        // 중간 속도 (2.5 ~ 4 m/s = 9 ~ 14.4 km/h) → 뛰기 또는 느린 차량
+        if (gpsSpeed >= 2.5) {
+            // 주기적 패턴 있으면 뛰기
+            if (isPeriodic && avgAccelMagnitude >= ACCEL_WALKING_MIN) {
+                this.lastActivityType = 'running';
+                return 'running';
+            }
+            // 불규칙 진동 → 차량
+            if (!isPeriodic && accelVariance > 0.3) {
+                this.lastActivityType = 'vehicle';
+                return 'vehicle';
+            }
+            // 애매하면 뛰기
+            this.lastActivityType = 'running';
             return 'running';
         }
 
-        // 걷기 감지 (주기적 + 중간 세기)
-        if (isPeriodic && avgAccelMagnitude >= ACCEL_WALKING_MIN && avgAccelMagnitude <= ACCEL_WALKING_MAX) {
+        // 보행 속도 (0.2 ~ 2.5 m/s = 0.72 ~ 9 km/h)
+        // 주기적 패턴 + 강한 움직임 → 뛰기
+        if (isPeriodic && avgAccelMagnitude > ACCEL_RUNNING_MIN) {
+            this.lastActivityType = 'running';
+            return 'running';
+        }
+
+        // 주기적 패턴 + 중간 움직임 → 걷기
+        if (isPeriodic && avgAccelMagnitude >= ACCEL_WALKING_MIN) {
+            this.lastActivityType = 'walking';
             return 'walking';
         }
 
-        // 정지 (변화 거의 없음)
-        if (accelVariance < ACCEL_STATIONARY_THRESHOLD) {
-            return 'stationary';
+        // 기본값: GPS 속도 기준
+        if (gpsSpeed > 2.0) {
+            this.lastActivityType = 'running';
+            return 'running';   // > 7.2 km/h
         }
-
-        // 기본값: GPS 속도 기반
-        return gpsSpeed > 1.5 ? 'running' : 'walking';
+        this.lastActivityType = 'walking';
+        return 'walking';
     }
 
     /**
@@ -479,6 +572,22 @@ class MovementTrackingService {
 
         const sum = this.accelBuffer.reduce((acc, reading) => acc + reading.magnitude, 0);
         return sum / this.accelBuffer.length;
+    }
+
+    /**
+     * 🆕 최근 N초간 걸음 수 조회
+     */
+    private getRecentStepCount(seconds: number): number {
+        if (!this.pedometerAvailable || this.recentStepCounts.length === 0) {
+            return 0;
+        }
+
+        const cutoffTime = Date.now() - seconds * 1000;
+        const recentSteps = this.recentStepCounts
+            .filter((r) => r.time >= cutoffTime)
+            .reduce((sum, r) => sum + r.steps, 0);
+
+        return recentSteps;
     }
 
     /**

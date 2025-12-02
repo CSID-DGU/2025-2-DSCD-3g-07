@@ -2,7 +2,10 @@
 # 초안만 일단
 # CRUD는 백엔드 개발 중 언제든지 수정될 수 있음
 
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
+
+# 한국 표준시 (KST = UTC+9)
+KST = timezone(timedelta(hours=9))
 
 # app/crud.py
 from sqlalchemy.orm import Session
@@ -240,11 +243,11 @@ def update_speed_profile_with_weighted_avg(
         profile.speed_case2 = round(updated_speed * SLOW_WALK_SPEED_RATIO, 2)
         profile.data_points_count += 1
         
-        # 이력 추가
+        # 이력 추가 (KST 기준 타임스탬프)
         history_entry = {
             "speed_kmh": round(new_speed_kmh, 2),
             "source": source,
-            "timestamp": datetime.now().isoformat(),
+            "timestamp": datetime.now(KST).isoformat(),
             "navigation_log_id": navigation_log_id,
             "old_avg": round(old_speed, 2),
             "new_avg": round(updated_speed, 2),
@@ -266,11 +269,11 @@ def update_speed_profile_with_weighted_avg(
         flag_modified(profile, "speed_history")
         
     else:
-        # 기존 프로필 없음 - 새로 생성
+        # 기존 프로필 없음 - 새로 생성 (KST 기준 타임스탬프)
         history_entry = {
             "speed_kmh": round(new_speed_kmh, 2),
             "source": source,
-            "timestamp": datetime.now().isoformat(),
+            "timestamp": datetime.now(KST).isoformat(),
             "navigation_log_id": navigation_log_id,
             "old_avg": None,
             "new_avg": round(new_speed_kmh, 2),

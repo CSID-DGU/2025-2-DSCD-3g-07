@@ -16,9 +16,10 @@ import org.json.JSONArray
 import org.json.JSONObject
 
 /**
- * 센서 서비스 React Native 모듈
+ * 통합 센서 서비스 React Native 모듈
  * 
  * JavaScript에서 백그라운드 센서 서비스를 제어할 수 있게 합니다.
+ * GPS + 가속도계 + Pedometer를 통합 관리하고 상태 판정 결과를 제공합니다.
  */
 class SensorServiceModule(reactContext: ReactApplicationContext) : 
     ReactContextBaseJavaModule(reactContext) {
@@ -40,7 +41,7 @@ class SensorServiceModule(reactContext: ReactApplicationContext) :
             
             // 권한 체크
             if (!hasRequiredPermissions()) {
-                promise.reject("PERMISSION_DENIED", "필요한 권한이 없습니다. ACTIVITY_RECOGNITION 권한을 허용해주세요.")
+                promise.reject("PERMISSION_DENIED", "필요한 권한이 없습니다. ACTIVITY_RECOGNITION 및 위치 권한을 허용해주세요.")
                 return
             }
             
@@ -141,6 +142,94 @@ class SensorServiceModule(reactContext: ReactApplicationContext) :
     }
 
     /**
+     * 수집된 위치 데이터 가져오기 (및 클리어)
+     */
+    @ReactMethod
+    fun getLocationData(promise: Promise) {
+        try {
+            val dataArray = WritableNativeArray()
+            
+            while (SensorService.locationData.isNotEmpty()) {
+                val data = SensorService.locationData.poll() ?: break
+                
+                val map = WritableNativeMap().apply {
+                    putDouble("timestamp", data.timestamp.toDouble())
+                    putDouble("latitude", data.latitude)
+                    putDouble("longitude", data.longitude)
+                    putDouble("speed", data.speed.toDouble())
+                    putDouble("accuracy", data.accuracy.toDouble())
+                }
+                dataArray.pushMap(map)
+            }
+            
+            promise.resolve(dataArray)
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to get location data", e)
+            promise.reject("GET_DATA_FAILED", e.message)
+        }
+    }
+
+    /**
+     * 🆕 움직임 구간 데이터 가져오기 (백그라운드에서 판정된 walking/paused/vehicle 구간)
+     */
+    @ReactMethod
+    fun getMovementSegments(promise: Promise) {
+        try {
+            val dataArray = WritableNativeArray()
+            
+            for (segment in SensorService.movementSegments) {
+                val map = WritableNativeMap().apply {
+                    putDouble("startTime", segment.startTime.toDouble())
+                    putDouble("endTime", segment.endTime.toDouble())
+                    putString("status", segment.status)
+                    putDouble("distanceM", segment.distanceM)
+                    putDouble("durationMs", segment.durationMs.toDouble())
+                }
+                dataArray.pushMap(map)
+            }
+            
+            promise.resolve(dataArray)
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to get movement segments", e)
+            promise.reject("GET_DATA_FAILED", e.message)
+        }
+    }
+
+    /**
+     * 🆕 추적 통계 조회 (실시간)
+     */
+    @ReactMethod
+    fun getTrackingStats(promise: Promise) {
+        try {
+            val result = WritableNativeMap().apply {
+                putDouble("totalWalkingTimeMs", SensorService.totalWalkingTimeMs.toDouble())
+                putDouble("totalPausedTimeMs", SensorService.totalPausedTimeMs.toDouble())
+                putDouble("totalVehicleTimeMs", SensorService.totalVehicleTimeMs.toDouble())
+                putDouble("totalDistanceM", SensorService.totalDistanceM)
+                putInt("segmentCount", SensorService.movementSegments.size)
+            }
+            promise.resolve(result)
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to get tracking stats", e)
+            promise.reject("GET_STATS_FAILED", e.message)
+        }
+    }
+
+    /**
+     * 🆕 통계 및 구간 데이터 초기화
+     */
+    @ReactMethod
+    fun resetStats(promise: Promise) {
+        try {
+            SensorService.resetStats()
+            promise.resolve(true)
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to reset stats", e)
+            promise.reject("RESET_FAILED", e.message)
+        }
+    }
+
+    /**
      * 최근 N초간 걸음 수 조회
      */
     @ReactMethod
@@ -199,8 +288,6 @@ class SensorServiceModule(reactContext: ReactApplicationContext) :
         val context = reactApplicationContext
         
         // Android 10+ (API 29+)에서 ACTIVITY_RECOGNITION 필요
-        // Step Counter, Step Detector 센서 접근에 필요함
-        // 가속도계(TYPE_ACCELEROMETER)는 별도 권한 불필요
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             if (ContextCompat.checkSelfPermission(
                     context,
@@ -212,8 +299,15 @@ class SensorServiceModule(reactContext: ReactApplicationContext) :
             }
         }
         
-        // 참고: BODY_SENSORS/BODY_SENSORS_BACKGROUND는 심박수, 체온 등 생체신호 센서용
-        // 가속도계, Step Counter에는 필요 없음
+        // 위치 권한 확인
+        if (ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            Log.w(TAG, "ACCESS_FINE_LOCATION 권한 없음")
+            return false
+        }
         
         return true
     }
@@ -226,6 +320,7 @@ class SensorServiceModule(reactContext: ReactApplicationContext) :
         try {
             SensorService.accelerometerData.clear()
             SensorService.stepData.clear()
+            SensorService.locationData.clear()
             promise.resolve(true)
         } catch (e: Exception) {
             promise.reject("CLEAR_FAILED", e.message)
@@ -234,7 +329,6 @@ class SensorServiceModule(reactContext: ReactApplicationContext) :
 
     /**
      * 배터리 최적화 제외 여부 확인
-     * 일부 제조사에서 백그라운드 서비스가 종료되는 것을 방지하기 위해 필요
      */
     @ReactMethod
     fun isIgnoringBatteryOptimizations(promise: Promise) {
@@ -244,7 +338,6 @@ class SensorServiceModule(reactContext: ReactApplicationContext) :
                 val packageName = reactApplicationContext.packageName
                 promise.resolve(powerManager.isIgnoringBatteryOptimizations(packageName))
             } else {
-                // Android 6.0 미만에서는 배터리 최적화가 없음
                 promise.resolve(true)
             }
         } catch (e: Exception) {
@@ -255,7 +348,6 @@ class SensorServiceModule(reactContext: ReactApplicationContext) :
 
     /**
      * 배터리 최적화 제외 설정 화면 열기
-     * 사용자가 직접 배터리 최적화 제외를 설정하도록 안내
      */
     @ReactMethod
     fun requestIgnoreBatteryOptimization(promise: Promise) {
@@ -289,6 +381,7 @@ class SensorServiceModule(reactContext: ReactApplicationContext) :
                 putBoolean("accelerometer", sensorManager.getDefaultSensor(android.hardware.Sensor.TYPE_ACCELEROMETER) != null)
                 putBoolean("stepCounter", sensorManager.getDefaultSensor(android.hardware.Sensor.TYPE_STEP_COUNTER) != null)
                 putBoolean("stepDetector", sensorManager.getDefaultSensor(android.hardware.Sensor.TYPE_STEP_DETECTOR) != null)
+                putBoolean("gps", context.packageManager.hasSystemFeature(android.content.pm.PackageManager.FEATURE_LOCATION_GPS))
             }
             
             promise.resolve(result)

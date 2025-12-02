@@ -34,7 +34,7 @@ export interface MovementSegment {
     distance_m: number;
     duration_seconds: number;
     avg_speed_ms: number;
-    status: 'walking' | 'paused';
+    status: 'walking' | 'paused' | 'vehicle';
     reason?: string;
 }
 
@@ -74,6 +74,7 @@ export interface NavigationLogData {
         detection_method: string;
         total_pauses: number;
         crosswalk_pauses?: number;
+        vehicle_time_seconds?: number;  // 대중교통/차량 이용 시간
     };
 
     // 날씨 및 상세 데이터
@@ -110,12 +111,12 @@ export interface NavigationLogResponse {
     active_walking_time_seconds?: number;
     paused_time_seconds?: number;
     real_walking_speed_kmh?: number;
-    pause_count?: number;
     movement_data?: {
         segments: MovementSegment[];
         detection_method: string;
         total_pauses: number;
         crosswalk_pauses?: number;
+        vehicle_time_seconds?: number;  // 대중교통/차량 이용 시간
     };
 
     weather_id?: number;
@@ -286,6 +287,7 @@ export async function extractNavigationLogData(
     trackingData?: {
         activeWalkingTime: number;
         pausedTime: number;
+        vehicleTime?: number;
         realSpeed: number;
         pauseCount: number;
         segments: MovementSegment[];
@@ -426,7 +428,8 @@ export async function extractNavigationLogData(
             segments: trackingData.segments,
             detection_method: 'gps_accel_hybrid',
             total_pauses: trackingData.pauseCount,
-            crosswalk_pauses: trackingData.segments.filter(s => s.reason === 'crosswalk').length
+            crosswalk_pauses: trackingData.segments.filter(s => s.reason === 'crosswalk').length,
+            vehicle_time_seconds: trackingData.vehicleTime || 0,  // 대중교통/차량 이용 시간
         } : undefined,
         weather_id: weatherId,
         route_data: routeInfo,  // 전체 경로 데이터 저장

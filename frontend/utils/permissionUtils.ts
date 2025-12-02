@@ -8,13 +8,16 @@
  */
 
 import * as Location from 'expo-location';
-import { Platform, PermissionsAndroid, Alert, Linking } from 'react-native';
+import { Platform, PermissionsAndroid, Alert, Linking, NativeModules } from 'react-native';
+
+const { SensorServiceModule } = NativeModules;
 
 export interface PermissionStatus {
     location: boolean;
     backgroundLocation: boolean;
     notification: boolean;
     activityRecognition: boolean;
+    batteryOptimization: boolean;  // 배터리 최적화 제외 여부
 }
 
 export interface PermissionCheckResult extends PermissionStatus {
@@ -31,6 +34,7 @@ export async function checkAllPermissions(): Promise<PermissionCheckResult> {
         backgroundLocation: false,
         notification: true, // 기본값 true (Android 13 미만에서는 불필요)
         activityRecognition: true, // 기본값 true (Android 10 미만에서는 불필요)
+        batteryOptimization: true, // 기본값 true (배터리 최적화 제외)
     };
 
     try {
@@ -62,6 +66,16 @@ export async function checkAllPermissions(): Promise<PermissionCheckResult> {
                 );
                 status.activityRecognition = activityGranted;
             }
+
+            // 5. 배터리 최적화 제외 확인
+            if (SensorServiceModule) {
+                try {
+                    status.batteryOptimization = await SensorServiceModule.isIgnoringBatteryOptimizations();
+                } catch (e) {
+                    console.warn('⚠️ 배터리 최적화 상태 확인 실패:', e);
+                    status.batteryOptimization = false;
+                }
+            }
         }
     } catch (error) {
         console.error('❌ 권한 상태 확인 실패:', error);
@@ -91,6 +105,7 @@ export async function requestAllPermissions(): Promise<PermissionCheckResult> {
         backgroundLocation: false,
         notification: true,
         activityRecognition: true,
+        batteryOptimization: true,
     };
 
     try {
@@ -165,6 +180,54 @@ export async function requestAllPermissions(): Promise<PermissionCheckResult> {
                     console.log('✅ 활동 인식 권한 허용됨');
                 }
             }
+
+            // 5. 배터리 최적화 제외 요청
+            if (SensorServiceModule) {
+                try {
+                    const isIgnoring = await SensorServiceModule.isIgnoringBatteryOptimizations();
+                    if (!isIgnoring) {
+                        console.log('🔋 배터리 최적화 제외 요청 중...');
+                        await new Promise<void>((resolve) => {
+                            Alert.alert(
+                                '배터리 최적화 제외 필요',
+                                '백그라운드에서 정확한 보행 추적을 위해 배터리 최적화를 "제한 없음"으로 설정해주세요.\n\n다음 화면에서 "제한 없음"을 선택해주세요.',
+                                [
+                                    {
+                                        text: '설정하기',
+                                        onPress: async () => {
+                                            await SensorServiceModule.requestIgnoreBatteryOptimization();
+                                            // 설정 후 상태 다시 확인
+                                            setTimeout(async () => {
+                                                status.batteryOptimization = await SensorServiceModule.isIgnoringBatteryOptimizations();
+                                                resolve();
+                                            }, 1000);
+                                        },
+                                    },
+                                    {
+                                        text: '나중에',
+                                        style: 'cancel',
+                                        onPress: () => {
+                                            status.batteryOptimization = false;
+                                            resolve();
+                                        },
+                                    },
+                                ]
+                            );
+                        });
+                        if (status.batteryOptimization) {
+                            console.log('✅ 배터리 최적화 제외됨');
+                        } else {
+                            console.warn('⚠️ 배터리 최적화 제외 거부됨');
+                        }
+                    } else {
+                        status.batteryOptimization = true;
+                        console.log('✅ 배터리 최적화 이미 제외됨');
+                    }
+                } catch (e) {
+                    console.warn('⚠️ 배터리 최적화 요청 실패:', e);
+                    status.batteryOptimization = false;
+                }
+            }
         }
 
         console.log('📋 통합 권한 요청 완료');
@@ -188,6 +251,7 @@ export async function requestMissingPermissions(
         backgroundLocation: currentStatus.backgroundLocation,
         notification: currentStatus.notification,
         activityRecognition: currentStatus.activityRecognition,
+        batteryOptimization: currentStatus.batteryOptimization,
     };
 
     try {
@@ -248,6 +312,24 @@ export async function requestMissingPermissions(
                     console.log('✅ 활동 인식 권한 허용됨');
                 } else {
                     console.warn('⚠️ 활동 인식 권한 거부됨');
+                }
+            }
+
+            // 배터리 최적화 제외가 안 되어 있으면 요청
+            if (SensorServiceModule && !status.batteryOptimization) {
+                try {
+                    const isIgnoring = await SensorServiceModule.isIgnoringBatteryOptimizations();
+                    if (!isIgnoring) {
+                        console.log('🔋 배터리 최적화 제외 요청 중...');
+                        await SensorServiceModule.requestIgnoreBatteryOptimization();
+                        // 잠시 후 상태 확인
+                        await new Promise(r => setTimeout(r, 1000));
+                        status.batteryOptimization = await SensorServiceModule.isIgnoringBatteryOptimizations();
+                    } else {
+                        status.batteryOptimization = true;
+                    }
+                } catch (e) {
+                    console.warn('⚠️ 배터리 최적화 요청 실패:', e);
                 }
             }
         }
@@ -405,6 +487,7 @@ function createResult(status: PermissionStatus): PermissionCheckResult {
     if (!status.backgroundLocation) missingPermissions.push('백그라운드 위치');
     if (!status.notification) missingPermissions.push('알림');
     if (!status.activityRecognition) missingPermissions.push('활동 인식');
+    if (!status.batteryOptimization) missingPermissions.push('배터리 최적화 제외');
 
     return {
         ...status,

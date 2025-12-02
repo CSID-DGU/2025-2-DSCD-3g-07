@@ -622,7 +622,7 @@ export default function HomeScreen() {
 
       // 움직임 추적 중지 및 데이터 수집
       movementTrackingService.stopTracking();
-      const trackingData = movementTrackingService.getCurrentData();
+      const trackingData = await movementTrackingService.getCurrentDataAsync();
 
       console.log('📊 움직임 추적 데이터:', trackingData);
 
@@ -641,12 +641,18 @@ export default function HomeScreen() {
       setNavigationLog(prev => [...prev, log]);
       console.log('📊 Navigation Log:', log);
 
+      // 차량 시간 표시 (대중교통 이용 시)
+      const vehicleTimeStr = trackingData.vehicleTime > 0
+        ? `\n대중교통 이용: ${Math.floor(trackingData.vehicleTime / 60)}분 ${trackingData.vehicleTime % 60}초`
+        : '';
+
       // 기본 결과 메시지 생성
       let resultMessage =
         `총 소요 시간: ${Math.floor(duration / 60)}분 ${Math.floor(duration % 60)}초\n` +
         `실제 걷기: ${Math.floor(trackingData.activeWalkingTime / 60)}분 ${trackingData.activeWalkingTime % 60}초\n` +
         `보행 멈춤 시간: ${Math.floor(trackingData.pausedTime / 60)}분 ${trackingData.pausedTime % 60}초\n` +
-        `평균 속도: ${(trackingData.realSpeed * 3.6).toFixed(2)} km/h`;
+        `평균 속도: ${(trackingData.realSpeed * 3.6).toFixed(2)} km/h` +
+        vehicleTimeStr;
 
       // DB에 저장 (로그인한 경우만)
       if (navigationStartTime && routeInfo && startLocation && endLocation && user) {

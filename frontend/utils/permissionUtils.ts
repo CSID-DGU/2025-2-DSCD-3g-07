@@ -12,6 +12,26 @@ import { Platform, PermissionsAndroid, Alert, Linking, NativeModules } from 'rea
 
 const { SensorServiceModule } = NativeModules;
 
+// 디버깅: SensorServiceModule 로드 상태 확인
+console.log('🔧 SensorServiceModule 로드 상태:', SensorServiceModule ? '✅ 로드됨' : '❌ 없음');
+if (SensorServiceModule) {
+    console.log('🔧 SensorServiceModule 메서드:', Object.keys(SensorServiceModule));
+}
+
+/**
+ * 배터리 최적화 설정 화면을 직접 열기 (fallback)
+ * SensorServiceModule이 없을 때 사용
+ */
+async function openBatteryOptimizationSettings(): Promise<void> {
+    try {
+        // 앱별 배터리 설정 화면 열기 시도
+        const result = await Linking.openSettings();
+        console.log('📱 앱 설정 화면 열기 결과:', result);
+    } catch (error) {
+        console.error('❌ 설정 화면 열기 실패:', error);
+    }
+}
+
 export interface PermissionStatus {
     location: boolean;
     backgroundLocation: boolean;
@@ -34,7 +54,7 @@ export async function checkAllPermissions(): Promise<PermissionCheckResult> {
         backgroundLocation: false,
         notification: true, // 기본값 true (Android 13 미만에서는 불필요)
         activityRecognition: true, // 기본값 true (Android 10 미만에서는 불필요)
-        batteryOptimization: true, // 기본값 true (배터리 최적화 제외)
+        batteryOptimization: false, // 기본값 false (명시적으로 확인 필요)
     };
 
     try {
@@ -105,7 +125,7 @@ export async function requestAllPermissions(): Promise<PermissionCheckResult> {
         backgroundLocation: false,
         notification: true,
         activityRecognition: true,
-        batteryOptimization: true,
+        batteryOptimization: false, // 기본값 false
     };
 
     try {
@@ -182,9 +202,15 @@ export async function requestAllPermissions(): Promise<PermissionCheckResult> {
             }
 
             // 5. 배터리 최적화 제외 요청
-            if (SensorServiceModule) {
+            console.log('🔋 배터리 최적화 제외 확인 시작...');
+            console.log('🔋 SensorServiceModule 존재 여부:', !!SensorServiceModule);
+
+            if (SensorServiceModule && typeof SensorServiceModule.isIgnoringBatteryOptimizations === 'function') {
                 try {
+                    console.log('🔋 네이티브 모듈로 배터리 최적화 상태 확인...');
                     const isIgnoring = await SensorServiceModule.isIgnoringBatteryOptimizations();
+                    console.log('🔋 현재 배터리 최적화 제외 상태:', isIgnoring);
+
                     if (!isIgnoring) {
                         console.log('🔋 배터리 최적화 제외 요청 중...');
                         await new Promise<void>((resolve) => {
@@ -227,6 +253,33 @@ export async function requestAllPermissions(): Promise<PermissionCheckResult> {
                     console.warn('⚠️ 배터리 최적화 요청 실패:', e);
                     status.batteryOptimization = false;
                 }
+            } else {
+                // 네이티브 모듈이 없는 경우 fallback: 설정 화면으로 안내
+                console.log('🔋 SensorServiceModule 없음 - fallback 사용');
+                await new Promise<void>((resolve) => {
+                    Alert.alert(
+                        '배터리 최적화 설정 필요',
+                        '백그라운드에서 정확한 보행 추적을 위해 앱 설정에서 배터리 최적화를 "제한 없음"으로 변경해주세요.\n\n설정 > 배터리 > 배터리 최적화 > PaceTry > "최적화하지 않음" 선택',
+                        [
+                            {
+                                text: '설정 열기',
+                                onPress: async () => {
+                                    await Linking.openSettings();
+                                    status.batteryOptimization = false; // 수동 확인 필요
+                                    resolve();
+                                },
+                            },
+                            {
+                                text: '나중에',
+                                style: 'cancel',
+                                onPress: () => {
+                                    status.batteryOptimization = false;
+                                    resolve();
+                                },
+                            },
+                        ]
+                    );
+                });
             }
         }
 
@@ -321,16 +374,62 @@ export async function requestMissingPermissions(
                     const isIgnoring = await SensorServiceModule.isIgnoringBatteryOptimizations();
                     if (!isIgnoring) {
                         console.log('🔋 배터리 최적화 제외 요청 중...');
-                        await SensorServiceModule.requestIgnoreBatteryOptimization();
-                        // 잠시 후 상태 확인
-                        await new Promise(r => setTimeout(r, 1000));
-                        status.batteryOptimization = await SensorServiceModule.isIgnoringBatteryOptimizations();
+                        await new Promise<void>((resolve) => {
+                            Alert.alert(
+                                '배터리 최적화 제외 필요',
+                                '백그라운드에서 정확한 보행 추적을 위해 배터리 최적화를 "제한 없음"으로 설정해주세요.\n\n다음 화면에서 "제한 없음"을 선택해주세요.',
+                                [
+                                    {
+                                        text: '설정하기',
+                                        onPress: async () => {
+                                            await SensorServiceModule.requestIgnoreBatteryOptimization();
+                                            // 설정 후 상태 다시 확인
+                                            setTimeout(async () => {
+                                                status.batteryOptimization = await SensorServiceModule.isIgnoringBatteryOptimizations();
+                                                resolve();
+                                            }, 1000);
+                                        },
+                                    },
+                                    {
+                                        text: '나중에',
+                                        style: 'cancel',
+                                        onPress: () => {
+                                            status.batteryOptimization = false;
+                                            resolve();
+                                        },
+                                    },
+                                ]
+                            );
+                        });
                     } else {
                         status.batteryOptimization = true;
                     }
                 } catch (e) {
                     console.warn('⚠️ 배터리 최적화 요청 실패:', e);
                 }
+            } else if (!SensorServiceModule && !status.batteryOptimization) {
+                // SensorServiceModule이 없는 경우 fallback
+                console.log('🔋 SensorServiceModule 없음 - fallback 사용');
+                await new Promise<void>((resolve) => {
+                    Alert.alert(
+                        '배터리 최적화 설정 필요',
+                        '백그라운드에서 정확한 보행 추적을 위해 앱 설정에서 배터리 최적화를 "제한 없음"으로 변경해주세요.',
+                        [
+                            {
+                                text: '설정 열기',
+                                onPress: async () => {
+                                    await Linking.openSettings();
+                                    resolve();
+                                },
+                            },
+                            {
+                                text: '나중에',
+                                style: 'cancel',
+                                onPress: () => resolve(),
+                            },
+                        ]
+                    );
+                });
             }
         }
 

@@ -12,6 +12,9 @@
   <uses-permission android:name="android.permission.VIBRATE"/>
   <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
   
+  <!-- 배터리 최적화 제외 요청 권한 -->
+  <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"/>
+  
   <!-- 센서 권한 (Pedometer, 가속도계 백그라운드용) -->
   <!-- ACTIVITY_RECOGNITION: Step Counter, Step Detector 센서 접근에 필요 (Android 10+) -->
   <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION"/>

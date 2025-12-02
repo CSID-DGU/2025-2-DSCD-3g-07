@@ -59,10 +59,21 @@ class NativeSensorService {
     private isAvailable: boolean;
 
     constructor() {
+        console.log('🔧 NativeSensorService 생성자 시작');
+        console.log('🔧 Platform.OS:', Platform.OS);
+        console.log('🔧 SensorServiceModule:', SensorServiceModule);
+        console.log('🔧 NativeModules 키들:', Object.keys(NativeModules));
+
         this.isAvailable = Platform.OS === 'android' && !!SensorServiceModule;
 
         if (!this.isAvailable) {
             console.warn('⚠️ NativeSensorService는 Android에서만 사용 가능합니다.');
+            if (Platform.OS === 'android') {
+                console.error('❌ Android인데 SensorServiceModule이 없습니다! 네이티브 모듈 등록 확인 필요.');
+            }
+        } else {
+            console.log('✅ NativeSensorService 사용 가능');
+            console.log('🔧 SensorServiceModule 메서드들:', typeof SensorServiceModule === 'object' ? Object.keys(SensorServiceModule) : 'N/A');
         }
     }
 

@@ -1,8 +1,11 @@
 import os
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 from typing import Any, Optional
 
 import requests
+
+# 한국 표준시 (KST = UTC+9)
+KST = timezone(timedelta(hours=9))
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -89,8 +92,8 @@ def call_tmap_transit_api(
         "content-type": "application/json",
     }
 
-    # 현재 시간을 yyyymmddhhmm 형식으로 변환
-    current_time = datetime.now().strftime("%Y%m%d%H%M")
+    # 현재 시간을 yyyymmddhhmm 형식으로 변환 (KST 기준)
+    current_time = datetime.now(KST).strftime("%Y%m%d%H%M")
 
     body = {
         "startX": start_x,

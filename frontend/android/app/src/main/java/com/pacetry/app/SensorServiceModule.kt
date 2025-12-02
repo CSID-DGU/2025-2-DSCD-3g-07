@@ -353,11 +353,41 @@ class SensorServiceModule(reactContext: ReactApplicationContext) :
     fun requestIgnoreBatteryOptimization(promise: Promise) {
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                val intent = Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS).apply {
-                    data = Uri.parse("package:${reactApplicationContext.packageName}")
+                val packageName = reactApplicationContext.packageName
+                
+                // 먼저 직접 요청 시도 (시스템 다이얼로그)
+                try {
+                    val directIntent = Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS).apply {
+                        data = Uri.parse("package:$packageName")
+                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    }
+                    reactApplicationContext.startActivity(directIntent)
+                    Log.d(TAG, "Direct battery optimization request started")
+                    promise.resolve(true)
+                    return
+                } catch (e: Exception) {
+                    Log.w(TAG, "Direct request failed, trying app settings: ${e.message}")
+                }
+                
+                // 실패 시 앱별 배터리 설정 화면으로 이동
+                try {
+                    val settingsIntent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                        data = Uri.parse("package:$packageName")
+                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    }
+                    reactApplicationContext.startActivity(settingsIntent)
+                    Log.d(TAG, "Opened app settings for battery configuration")
+                    promise.resolve(true)
+                    return
+                } catch (e2: Exception) {
+                    Log.e(TAG, "Failed to open app settings: ${e2.message}")
+                }
+                
+                // 최종 fallback: 배터리 최적화 전체 목록
+                val listIntent = Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS).apply {
                     addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 }
-                reactApplicationContext.startActivity(intent)
+                reactApplicationContext.startActivity(listIntent)
                 promise.resolve(true)
             } else {
                 promise.resolve(true)

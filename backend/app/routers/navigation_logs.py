@@ -13,6 +13,7 @@ from datetime import datetime, timedelta
 from app.database import get_db
 from app.models import NavigationLogs, Users
 from app.schemas import NavigationLogCreate, NavigationLogResponse, NavigationLogListResponse
+from app import crud
 
 router = APIRouter(
     prefix="/api/navigation",

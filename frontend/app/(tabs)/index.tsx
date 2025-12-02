@@ -279,6 +279,9 @@ export default function HomeScreen() {
   const [walkingSpeedCase1, setWalkingSpeedCase1] = useState<number | null>(
     null
   );
+  const [walkingSpeedCase2, setWalkingSpeedCase2] = useState<number | null>(
+    null
+  );
 
   // 경로 옵션 관련 상태 (여러 경로)
   const [routeOptions, setRouteOptions] = useState<Itinerary[]>([]);
@@ -402,25 +405,33 @@ export default function HomeScreen() {
     initPermissions();
   }, []);
 
-  // DB에서 사용자 보행 속도 가져오기 (로그인 시에만)
-  useEffect(() => {
-    const fetchWalkingSpeed = async () => {
-      try {
-        const result = await apiService.getSpeedProfile();
-        if (result.data?.speed_case1) {
-          // km/h를 m/s로 변환
-          const speedMs = result.data.speed_case1 / 3.6;
-          setWalkingSpeedCase1(speedMs);
-          console.log(
-            `✅ 보행 속도 로드 (DB): ${result.data.speed_case1.toFixed(2)} km/h (${speedMs.toFixed(3)} m/s)`
-          );
-        }
-      } catch (error) {
-        // 로그인하지 않은 경우 조용히 무시 (기본값 사용)
-        console.log('ℹ️ 로그인 필요 - 기본 속도 사용');
+  // DB에서 사용자 보행 속도 가져오기 함수 (재사용 가능)
+  const fetchWalkingSpeed = async () => {
+    try {
+      const result = await apiService.getSpeedProfile();
+      if (result.data?.speed_case1) {
+        // km/h를 m/s로 변환
+        const speedMs1 = result.data.speed_case1 / 3.6;
+        setWalkingSpeedCase1(speedMs1);
+        console.log(
+          `✅ 보행 속도 로드 (Case1): ${result.data.speed_case1.toFixed(2)} km/h (${speedMs1.toFixed(3)} m/s)`
+        );
       }
-    };
+      if (result.data?.speed_case2) {
+        const speedMs2 = result.data.speed_case2 / 3.6;
+        setWalkingSpeedCase2(speedMs2);
+        console.log(
+          `✅ 보행 속도 로드 (Case2): ${result.data.speed_case2.toFixed(2)} km/h (${speedMs2.toFixed(3)} m/s)`
+        );
+      }
+    } catch (error) {
+      // 로그인하지 않은 경우 조용히 무시 (기본값 사용)
+      console.log('ℹ️ 로그인 필요 - 기본 속도 사용');
+    }
+  };
 
+  // 컴포넌트 마운트 시 속도 로드
+  useEffect(() => {
     fetchWalkingSpeed();
   }, []);
 
@@ -666,6 +677,10 @@ export default function HomeScreen() {
           if (hasSignificantDifference && trackingData.activeWalkingTime >= 300) {
             resultMessage += `\n\n⚠️ 예상 시간과 ${differencePercent.toFixed(0)}% 차이가 발생했습니다.\n실제 속도를 반영하여 다음 예측을 개선합니다.`;
           }
+
+          // 🔄 속도 프로필 새로고침 (백엔드에서 업데이트된 값 가져오기)
+          await fetchWalkingSpeed();
+          console.log('🔄 속도 프로필 새로고침 완료');
         } catch (error) {
           console.error('❌ 네비게이션 로그 저장 실패:', error);
           resultMessage += '\n\n⚠️ 서버 저장에 실패했습니다.\n데이터는 앱 내에만 임시 저장되었으며,\n앱을 종료하면 사라집니다.';

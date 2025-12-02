@@ -177,6 +177,91 @@ export async function requestAllPermissions(): Promise<PermissionCheckResult> {
 }
 
 /**
+ * 누락된 권한만 요청
+ * 이미 허용된 권한은 건너뛰고 누락된 권한만 요청합니다.
+ */
+export async function requestMissingPermissions(
+    currentStatus: PermissionCheckResult
+): Promise<PermissionCheckResult> {
+    const status: PermissionStatus = {
+        location: currentStatus.location,
+        backgroundLocation: currentStatus.backgroundLocation,
+        notification: currentStatus.notification,
+        activityRecognition: currentStatus.activityRecognition,
+    };
+
+    try {
+        console.log('📋 누락된 권한만 요청 시작...');
+
+        // 백그라운드 위치 권한이 없고, 포어그라운드 위치 권한이 있으면 요청
+        if (!status.backgroundLocation && status.location) {
+            console.log('📍 백그라운드 위치 권한 요청 중...');
+            const { status: backgroundStatus } = await Location.requestBackgroundPermissionsAsync();
+            status.backgroundLocation = backgroundStatus === 'granted';
+            if (status.backgroundLocation) {
+                console.log('✅ 백그라운드 위치 권한 허용됨');
+            } else {
+                console.warn('⚠️ 백그라운드 위치 권한 거부됨');
+            }
+        }
+
+        // Android 전용 권한들
+        if (Platform.OS === 'android') {
+            const apiLevel = typeof Platform.Version === 'number'
+                ? Platform.Version
+                : parseInt(Platform.Version, 10);
+
+            // 알림 권한이 없으면 요청 (Android 13+)
+            if (apiLevel >= 33 && !status.notification) {
+                console.log('🔔 알림 권한 요청 중...');
+                const notificationResult = await PermissionsAndroid.request(
+                    PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
+                    {
+                        title: '알림 권한',
+                        message: '백그라운드에서 경로 안내 상태를 표시하기 위해 알림 권한이 필요합니다.',
+                        buttonPositive: '허용',
+                        buttonNegative: '거부',
+                    }
+                );
+                status.notification = notificationResult === PermissionsAndroid.RESULTS.GRANTED;
+                if (status.notification) {
+                    console.log('✅ 알림 권한 허용됨');
+                } else {
+                    console.warn('⚠️ 알림 권한 거부됨');
+                }
+            }
+
+            // 활동 인식 권한이 없으면 요청 (Android 10+)
+            if (apiLevel >= 29 && !status.activityRecognition) {
+                console.log('🚶 활동 인식 권한 요청 중...');
+                const activityResult = await PermissionsAndroid.request(
+                    PermissionsAndroid.PERMISSIONS.ACTIVITY_RECOGNITION,
+                    {
+                        title: '활동 인식 권한',
+                        message: '정확한 보행 속도 측정을 위해 활동 인식 권한이 필요합니다.\n\n만보계 센서를 사용하여 걷기, 뛰기, 정지 상태를 정확히 구분합니다.',
+                        buttonPositive: '허용',
+                        buttonNegative: '거부',
+                    }
+                );
+                status.activityRecognition = activityResult === PermissionsAndroid.RESULTS.GRANTED;
+                if (status.activityRecognition) {
+                    console.log('✅ 활동 인식 권한 허용됨');
+                } else {
+                    console.warn('⚠️ 활동 인식 권한 거부됨');
+                }
+            }
+        }
+
+        console.log('📋 누락된 권한 요청 완료');
+
+    } catch (error) {
+        console.error('❌ 권한 요청 중 오류:', error);
+    }
+
+    return createResult(status);
+}
+
+/**
  * 필수 권한만 요청 (위치 + 알림)
  * 안내 시작 전 최소한의 권한만 요청합니다.
  */
@@ -259,16 +344,15 @@ export function showPermissionAlert(result: PermissionCheckResult): void {
 /**
  * 앱 시작 시 권한 체크 및 요청
  * 필수 권한이 없으면 요청하고, 결과를 반환합니다.
+ * 
+ * 권한 요청 시점:
+ * - 위치 권한이 없으면 → 모든 권한 순차 요청
+ * - 위치 권한만 있고 다른 권한이 없으면 → 누락된 권한만 요청
  */
 export async function initializePermissions(): Promise<PermissionCheckResult> {
     // 먼저 현재 권한 상태 확인
     const currentStatus = await checkAllPermissions();
-
-    // 필수 권한(위치)이 없으면 요청
-    if (!currentStatus.location) {
-        console.log('📋 필수 권한 없음 - 권한 요청 시작');
-        return await requestAllPermissions();
-    }
+    console.log('📋 현재 권한 상태:', JSON.stringify(currentStatus, null, 2));
 
     // 이미 모든 권한이 있으면 그대로 반환
     if (currentStatus.allGranted) {
@@ -276,9 +360,15 @@ export async function initializePermissions(): Promise<PermissionCheckResult> {
         return currentStatus;
     }
 
-    // 일부 권한만 없는 경우 (선택적 권한)
+    // 필수 권한(위치)이 없으면 모든 권한 요청
+    if (!currentStatus.location) {
+        console.log('📋 위치 권한 없음 - 전체 권한 요청 시작');
+        return await requestAllPermissions();
+    }
+
+    // 위치 권한은 있지만 다른 권한이 없는 경우 → 누락된 권한만 요청
     console.log(`⚠️ 일부 권한 누락: ${currentStatus.missingPermissions.join(', ')}`);
-    return currentStatus;
+    return await requestMissingPermissions(currentStatus);
 }
 
 /**

@@ -35,6 +35,7 @@ interface ApiResponse<T> {
   data?: T;
   error?: string;
   status: number;
+  success?: boolean;
 }
 
 class ApiService {

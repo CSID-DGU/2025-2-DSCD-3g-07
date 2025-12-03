@@ -366,12 +366,10 @@ export async function extractNavigationLogData(
     // 총 거리 계산 (m)
     const totalDistanceM = routeInfo.totalDistance || 0;
 
-    // 실제 보행 거리 계산 (GPS 추적 데이터 기반)
-    let walkingDistanceM: number | undefined = undefined;
-    if (trackingData?.segments) {
-        const walkingSegments = trackingData.segments.filter(s => s.status === 'walking');
-        walkingDistanceM = walkingSegments.reduce((sum, s) => sum + s.distance_m, 0);
-    }
+    // 🔧 보행 거리: TMap 계획 보행 거리 사용 (속도 계산과 동일한 값으로 일관성 유지)
+    // - 기존: GPS 세그먼트 측정 거리 (부정확, 619m vs 1564m 같은 차이 발생)
+    // - 변경: TMap totalWalkDistance (실제 도로 기반 정확한 거리)
+    const walkingDistanceM: number = routeInfo.totalWalkDistance || routeInfo.totalDistance || 0;
 
     // 교통수단 추출 (대중교통 경로인 경우)
     let transportModes: string[] = [];

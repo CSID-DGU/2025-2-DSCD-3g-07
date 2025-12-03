@@ -156,8 +156,16 @@ class MovementTrackingService {
             });
 
             // 🆕 Pedometer (만보계) 추적 시작
+            // 🔧 웜업된 구독이 있으면 재사용하여 초기화 지연(15-16초) 방지
             this.pedometerAvailable = await Pedometer.isAvailableAsync();
             if (this.pedometerAvailable) {
+                // 웜업 구독이 있으면 해제하고 실제 추적 구독으로 전환
+                if (this.warmupSubscription) {
+                    this.warmupSubscription.remove();
+                    this.warmupSubscription = null;
+                    console.log('🔄 웜업 구독 해제 → 실제 추적 구독으로 전환');
+                }
+
                 this.pedometerSubscription = Pedometer.watchStepCount((result) => {
                     const now = Date.now();
                     const stepDelta = result.steps - this.lastStepCount;
@@ -175,7 +183,13 @@ class MovementTrackingService {
                         (r) => now - r.time < 10000
                     );
                 });
-                console.log('✅ Pedometer 추적 시작');
+
+                // 🔧 웜업이 완료된 상태라면 센서가 이미 활성화되어 있으므로 지연 없음
+                if (this.isWarmedUp) {
+                    console.log('✅ Pedometer 추적 시작 (웜업됨 - 즉시 감지 가능)');
+                } else {
+                    console.log('✅ Pedometer 추적 시작 (초기화 진행 중...)');
+                }
             } else {
                 console.warn('⚠️ Pedometer 사용 불가 - 가속도계만 사용');
             }
@@ -885,33 +899,51 @@ class MovementTrackingService {
             0
         );
 
-        // 시간 동기화: 실제 총 시간과 구간 합계 차이를 마지막 상태에 추가
+        // 시간 동기화: 실제 총 시간과 구간 합계 차이를 조정
+        // 사용자가 누른 시작/종료 시간이 기준 (가장 정확)
         if (this.trackingStartTime && this.trackingEndTime) {
             const actualTotalSeconds = Math.floor(
                 (this.trackingEndTime.getTime() - this.trackingStartTime.getTime()) / 1000
             );
             const measuredTotalSeconds = activeWalkingTime + pausedTime;
-            const lostSeconds = actualTotalSeconds - measuredTotalSeconds;
+            const timeDiff = actualTotalSeconds - measuredTotalSeconds;
 
-            if (lostSeconds > 0) {
+            console.log(`⏱️ 시간 검증: 실제 ${actualTotalSeconds}초, 측정 ${measuredTotalSeconds}초 (걷기:${activeWalkingTime}, 대기:${pausedTime})`);
+
+            if (timeDiff > 0) {
                 // 손실 시간을 마지막 구간의 상태에 추가
                 if (allSegments.length > 0) {
                     const lastSegment = allSegments[allSegments.length - 1];
                     if (lastSegment && lastSegment.status === 'walking') {
-                        activeWalkingTime += lostSeconds;
-                        console.log(`🔄 시간 동기화: ${lostSeconds}초 손실 → 걷기에 추가`);
+                        activeWalkingTime += timeDiff;
+                        console.log(`🔄 시간 동기화: ${timeDiff}초 손실 → 걷기에 추가`);
                     } else {
-                        pausedTime += lostSeconds;
-                        console.log(`🔄 시간 동기화: ${lostSeconds}초 손실 → 대기/이동에 추가`);
+                        pausedTime += timeDiff;
+                        console.log(`🔄 시간 동기화: ${timeDiff}초 손실 → 대기/이동에 추가`);
                     }
                 } else {
-                    // 구간이 없으면 걷기로 간주
-                    activeWalkingTime += lostSeconds;
-                    console.log(`🔄 시간 동기화: ${lostSeconds}초 손실 → 걷기에 추가 (구간 없음)`);
+                    activeWalkingTime += timeDiff;
+                    console.log(`🔄 시간 동기화: ${timeDiff}초 손실 → 걷기에 추가 (구간 없음)`);
                 }
-                console.log(`   측정: ${measuredTotalSeconds}초 (걷기:${activeWalkingTime}, 대기/이동:${pausedTime}), 실제: ${actualTotalSeconds}초`);
-            } else if (lostSeconds < 0) {
-                console.warn(`⚠️ 측정 시간이 실제보다 ${-lostSeconds}초 더 많음 (비정상)`);
+            } else if (timeDiff < 0) {
+                // 🔧 측정 시간이 실제보다 많음 → 비율에 따라 축소 조정
+                // 총 소요시간이 가장 정확하므로, 측정값을 실제 시간에 맞춤
+                const excessSeconds = -timeDiff;
+                console.warn(`⚠️ 측정 시간 초과: ${excessSeconds}초 (측정: ${measuredTotalSeconds}초 > 실제: ${actualTotalSeconds}초)`);
+
+                if (measuredTotalSeconds > 0) {
+                    // 걷기/대기 비율 유지하며 실제 시간에 맞춤
+                    const walkingRatio = activeWalkingTime / measuredTotalSeconds;
+                    const pausedRatio = pausedTime / measuredTotalSeconds;
+
+                    const adjustedWalkingTime = Math.round(actualTotalSeconds * walkingRatio);
+                    const adjustedPausedTime = actualTotalSeconds - adjustedWalkingTime; // 나머지는 대기
+
+                    console.log(`🔧 시간 조정: 걷기 ${activeWalkingTime}→${adjustedWalkingTime}초, 대기 ${pausedTime}→${adjustedPausedTime}초 (비율: ${(walkingRatio * 100).toFixed(1)}%/${(pausedRatio * 100).toFixed(1)}%)`);
+
+                    activeWalkingTime = adjustedWalkingTime;
+                    pausedTime = adjustedPausedTime;
+                }
             }
         }
 
@@ -1016,6 +1048,79 @@ class MovementTrackingService {
      */
     getIsPaused(): boolean {
         return this.isPaused;
+    }
+
+    // 🔧 센서 웜업 관련 변수
+    private isWarmedUp: boolean = false;
+    private warmupSubscription: any = null;
+
+    /**
+     * 🔧 센서 웜업 (앱 시작 시 호출)
+     * Step Counter 초기화 지연(15-16초)을 방지하기 위해 미리 센서를 활성화합니다.
+     * 실제 추적은 하지 않고 센서만 깨워둡니다.
+     */
+    async warmupSensors(): Promise<boolean> {
+        if (this.isWarmedUp) {
+            console.log('✅ 센서가 이미 웜업되어 있습니다.');
+            return true;
+        }
+
+        try {
+            // Pedometer 사용 가능 여부 확인
+            this.pedometerAvailable = await Pedometer.isAvailableAsync();
+
+            if (this.pedometerAvailable) {
+                // Pedometer 구독 시작 (실제 데이터 수집 X, 센서만 활성화)
+                this.warmupSubscription = Pedometer.watchStepCount((result) => {
+                    // 웜업 중에는 로그만 출력 (실제 추적 X)
+                    if (!this.isTracking) {
+                        // 첫 걸음 감지 시 웜업 완료 로그
+                        if (!this.isWarmedUp && result.steps > 0) {
+                            console.log('🔥 센서 웜업 완료! Step Counter 준비됨.');
+                            this.isWarmedUp = true;
+                        }
+                    }
+                });
+
+                console.log('🔄 센서 웜업 시작... (Step Counter 초기화 중)');
+
+                // Android 네이티브 센서 서비스도 웜업
+                if (Platform.OS === 'android' && nativeSensorService.isServiceAvailable()) {
+                    const hasPermission = await nativeSensorService.hasPermissions();
+                    if (hasPermission) {
+                        console.log('📱 네이티브 센서 권한 확인됨');
+                    }
+                }
+
+                this.isWarmedUp = true;
+                return true;
+            } else {
+                console.warn('⚠️ Pedometer 사용 불가 - 센서 웜업 건너뜀');
+                return false;
+            }
+        } catch (error) {
+            console.error('❌ 센서 웜업 실패:', error);
+            return false;
+        }
+    }
+
+    /**
+     * 🔧 센서 웜업 상태 확인
+     */
+    isWarmupComplete(): boolean {
+        return this.isWarmedUp;
+    }
+
+    /**
+     * 🔧 센서 웜업 해제 (앱 종료 시 호출)
+     */
+    cleanupWarmup(): void {
+        if (this.warmupSubscription) {
+            this.warmupSubscription.remove();
+            this.warmupSubscription = null;
+        }
+        this.isWarmedUp = false;
+        console.log('🧹 센서 웜업 해제됨');
     }
 }
 

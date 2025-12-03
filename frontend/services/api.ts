@@ -166,6 +166,7 @@ class ApiService {
       const authToken = token || await AsyncStorage.getItem(TOKEN_KEY);
       if (!authToken) {
         // 로그인하지 않은 경우 조용히 실패 응답 반환
+        console.log('ℹ️ [getSpeedProfile] 토큰 없음 - 기본 속도 사용');
         return {
           status: 0,
           success: false,
@@ -174,6 +175,8 @@ class ApiService {
       }
 
       const url = `${apiClient.getBaseUrl()}/api/profile/speed`;
+      console.log(`🔍 [getSpeedProfile] 요청: ${url}`);
+
       const response = await fetch(url, {
         method: 'GET',
         headers: {
@@ -181,21 +184,42 @@ class ApiService {
         },
       });
 
+      // 🔧 401 에러 특별 처리: 토큰 만료/유효하지 않음
+      if (response.status === 401) {
+        console.warn('⚠️ [getSpeedProfile] 401 인증 실패 - 토큰이 만료되었거나 유효하지 않습니다.');
+        // 토큰 삭제하여 재로그인 유도
+        await AsyncStorage.removeItem(TOKEN_KEY);
+        return {
+          status: 401,
+          success: false,
+          error: '인증 만료 - 다시 로그인해주세요',
+        };
+      }
+
       if (!response.ok) {
         const errorText = await response.text();
-        throw new Error(`API 오류: ${response.status} - ${errorText}`);
+        console.warn(`⚠️ [getSpeedProfile] API 오류: ${response.status} - ${errorText}`);
+        // 오류가 발생해도 앱은 계속 동작 (기본값 사용)
+        return {
+          status: response.status,
+          success: false,
+          error: `API 오류: ${response.status}`,
+        };
       }
 
       const data = await response.json();
+      console.log('✅ [getSpeedProfile] 성공:', data);
       return {
         status: response.status,
         data,
         success: true,
       };
     } catch (error) {
-      console.error('❌ Speed profile get failed:', error);
+      // 네트워크 오류 등 - 조용히 실패 (기본값 사용)
+      console.warn('⚠️ [getSpeedProfile] 실패 (기본 속도 사용):', error);
       return {
         status: 0,
+        success: false,
         error: error instanceof Error ? error.message : 'Unknown error',
       };
     }

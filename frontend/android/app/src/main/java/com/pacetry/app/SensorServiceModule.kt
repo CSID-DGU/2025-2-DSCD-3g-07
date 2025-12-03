@@ -170,7 +170,7 @@ class SensorServiceModule(reactContext: ReactApplicationContext) :
     }
 
     /**
-     * 🆕 움직임 구간 데이터 가져오기 (백그라운드에서 판정된 walking/paused/vehicle 구간)
+     * 🆕 움직임 구간 데이터 가져오기 (백그라운드에서 판정된 walking/paused 구간)
      */
     @ReactMethod
     fun getMovementSegments(promise: Promise) {
@@ -204,7 +204,6 @@ class SensorServiceModule(reactContext: ReactApplicationContext) :
             val result = WritableNativeMap().apply {
                 putDouble("totalWalkingTimeMs", SensorService.totalWalkingTimeMs.toDouble())
                 putDouble("totalPausedTimeMs", SensorService.totalPausedTimeMs.toDouble())
-                putDouble("totalVehicleTimeMs", SensorService.totalVehicleTimeMs.toDouble())
                 putDouble("totalDistanceM", SensorService.totalDistanceM)
                 putInt("segmentCount", SensorService.movementSegments.size)
             }

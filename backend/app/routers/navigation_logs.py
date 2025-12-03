@@ -32,6 +32,11 @@ async def create_navigation_log(
     
     경로 안내가 종료되면 프론트엔드에서 이 API를 호출하여 로그를 저장합니다.
     """
+    import logging
+    logger = logging.getLogger(__name__)
+    logger.info(f"📥 Navigation log save request: user_id={user_id}")
+    logger.info(f"📥 Log data: {log_data.model_dump()}")
+    
     # 사용자 존재 확인
     user = db.query(Users).filter(Users.user_id == user_id).first()
     if not user:
@@ -67,9 +72,15 @@ async def create_navigation_log(
         ended_at=log_data.ended_at,
     )
     
-    db.add(nav_log)
-    db.commit()
-    db.refresh(nav_log)
+    try:
+        db.add(nav_log)
+        db.commit()
+        db.refresh(nav_log)
+        logger.info(f"✅ Navigation log saved: log_id={nav_log.log_id}")
+    except Exception as e:
+        db.rollback()
+        logger.error(f"❌ DB commit failed: {e}")
+        raise HTTPException(status_code=500, detail=f"DB 저장 실패: {str(e)}")
     
     # 🔄 자동 프로필 업데이트: 실측 속도로 사용자 기준 속도 갱신
     if (

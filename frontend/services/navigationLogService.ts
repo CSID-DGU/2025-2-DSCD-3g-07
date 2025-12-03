@@ -6,6 +6,7 @@
 
 import Config from '@/config';
 import { apiClient } from '@/utils/apiClient';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const normalizeBaseUrl = async (): Promise<string> => {
     const base = await Config.initializeApiUrl();
@@ -34,7 +35,7 @@ export interface MovementSegment {
     distance_m: number;
     duration_seconds: number;
     avg_speed_ms: number;
-    status: 'walking' | 'paused' | 'vehicle';
+    status: 'walking' | 'paused';
     reason?: string;
 }
 
@@ -74,7 +75,6 @@ export interface NavigationLogData {
         detection_method: string;
         total_pauses: number;
         crosswalk_pauses?: number;
-        vehicle_time_seconds?: number;  // 대중교통/차량 이용 시간
     };
 
     // 날씨 및 상세 데이터
@@ -116,7 +116,6 @@ export interface NavigationLogResponse {
         detection_method: string;
         total_pauses: number;
         crosswalk_pauses?: number;
-        vehicle_time_seconds?: number;  // 대중교통/차량 이용 시간
     };
 
     weather_id?: number;
@@ -147,6 +146,8 @@ export async function saveNavigationLog(
     userId: number,
     logData: NavigationLogData
 ): Promise<NavigationLogResponse> {
+    const timestamp = new Date().toISOString();
+
     try {
         const endpoint = `/api/navigation/logs?user_id=${userId}`;
         console.log('[navLog] save request', { endpoint, logData });
@@ -154,15 +155,85 @@ export async function saveNavigationLog(
         const result = await apiClient.post<NavigationLogResponse>(endpoint, logData);
 
         console.log('[navLog] save success', result);
+
+        // 🔧 성공 로그 저장 (Release에서도 확인 가능)
+        await saveDebugLog({
+            timestamp,
+            status: 'SUCCESS',
+            userId,
+            logId: result.log_id,
+        });
+
         return result;
     } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
         console.error('[navLog] save failed', {
             error,
-            message: error instanceof Error ? error.message : String(error),
+            message: errorMessage,
             stack: error instanceof Error ? error.stack : undefined,
         });
+
+        // 🔧 실패 로그 저장 (Release에서도 확인 가능)
+        await saveDebugLog({
+            timestamp,
+            status: 'FAILED',
+            userId,
+            error: errorMessage,
+            requestData: {
+                route_mode: logData.route_mode,
+                start_lat: logData.start_lat,
+                start_lon: logData.start_lon,
+                end_lat: logData.end_lat,
+                end_lon: logData.end_lon,
+                total_distance_m: logData.total_distance_m,
+                estimated_time_seconds: logData.estimated_time_seconds,
+                actual_time_seconds: logData.actual_time_seconds,
+                active_walking_time_seconds: logData.active_walking_time_seconds,
+                paused_time_seconds: logData.paused_time_seconds,
+                real_walking_speed_kmh: logData.real_walking_speed_kmh,
+                weather_id: logData.weather_id,
+            },
+        });
+
         throw new Error(error instanceof Error ? error.message : 'Failed to save navigation log');
     }
+}
+
+/**
+ * 🔧 디버그 로그 저장 (Release에서도 확인 가능)
+ */
+async function saveDebugLog(log: any): Promise<void> {
+    try {
+        const existing = await AsyncStorage.getItem('DEBUG_NAV_LOGS');
+        const logs = existing ? JSON.parse(existing) : [];
+        logs.push(log);
+        // 최근 20개만 유지
+        if (logs.length > 20) {
+            logs.shift();
+        }
+        await AsyncStorage.setItem('DEBUG_NAV_LOGS', JSON.stringify(logs));
+    } catch (e) {
+        // 로그 저장 실패는 무시
+    }
+}
+
+/**
+ * 🔧 디버그 로그 조회 (개발자 메뉴에서 사용)
+ */
+export async function getDebugLogs(): Promise<any[]> {
+    try {
+        const existing = await AsyncStorage.getItem('DEBUG_NAV_LOGS');
+        return existing ? JSON.parse(existing) : [];
+    } catch (e) {
+        return [];
+    }
+}
+
+/**
+ * 🔧 디버그 로그 초기화
+ */
+export async function clearDebugLogs(): Promise<void> {
+    await AsyncStorage.removeItem('DEBUG_NAV_LOGS');
 }
 
 /**
@@ -287,7 +358,6 @@ export async function extractNavigationLogData(
     trackingData?: {
         activeWalkingTime: number;
         pausedTime: number;
-        vehicleTime?: number;
         realSpeed: number;
         pauseCount: number;
         segments: MovementSegment[];
@@ -414,22 +484,21 @@ export async function extractNavigationLogData(
         total_distance_m: totalDistanceM,
         walking_distance_m: walkingDistanceM,
         transport_modes: transportModes.length > 0 ? transportModes : undefined,
-        crosswalk_count: crosswalkCount,
+        crosswalk_count: Math.round(crosswalkCount) || 0,  // 🔧 정수로 변환
         user_speed_factor: userSpeedFactor,
         slope_factor: slopeFactor,
         weather_factor: weatherFactor,
-        estimated_time_seconds: estimatedTimeSeconds,
-        actual_time_seconds: actualTimeSeconds,
-        active_walking_time_seconds: trackingData?.activeWalkingTime,
-        paused_time_seconds: trackingData?.pausedTime || 0,
-        real_walking_speed_kmh: trackingData?.realSpeed ? trackingData.realSpeed * 3.6 : undefined,
-        pause_count: trackingData?.pauseCount || 0,
+        estimated_time_seconds: Math.round(estimatedTimeSeconds) || 0,  // 🔧 정수로 변환
+        actual_time_seconds: Math.round(actualTimeSeconds) || 0,  // 🔧 정수로 변환
+        active_walking_time_seconds: trackingData?.activeWalkingTime ? Math.round(trackingData.activeWalkingTime) : undefined,  // 🔧 정수로 변환
+        paused_time_seconds: Math.round(trackingData?.pausedTime || 0),  // 🔧 정수로 변환
+        real_walking_speed_kmh: trackingData?.realSpeed ? Math.round(trackingData.realSpeed * 3.6 * 100) / 100 : undefined,  // 🔧 소수점 2자리
+        pause_count: Math.round(trackingData?.pauseCount || 0),  // 🔧 정수로 변환
         movement_data: trackingData ? {
             segments: trackingData.segments,
-            detection_method: 'gps_accel_hybrid',
+            detection_method: 'step_counter_hybrid',
             total_pauses: trackingData.pauseCount,
             crosswalk_pauses: trackingData.segments.filter(s => s.reason === 'crosswalk').length,
-            vehicle_time_seconds: trackingData.vehicleTime || 0,  // 대중교통/차량 이용 시간
         } : undefined,
         weather_id: weatherId,
         route_data: routeInfo,  // 전체 경로 데이터 저장

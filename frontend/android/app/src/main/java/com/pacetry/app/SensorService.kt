@@ -30,11 +30,16 @@ import kotlin.math.sqrt
  * 통합 센서 백그라운드 서비스
  * 
  * 앱이 백그라운드에 있을 때도 GPS, 가속도계, 만보계 데이터를 수집하고
- * walking/paused/vehicle 상태를 실시간으로 판정합니다.
+ * walking/paused 상태를 실시간으로 판정합니다.
+ * 
+ * 상태 판정 기준:
+ * - walking: 최근 3초간 1보 이상 걸음 감지
+ * - paused: 그 외 (정지, 대중교통 이용 등)
+ * 
+ * 거리 누적 조건:
+ * - walking 상태 + 순간 GPS 속도 < 13km/h 일 때만
  * 
  * GPS: Google Fused Location Provider 사용 (공식 권장)
- * - GPS + Network + 센서 융합으로 더 정확
- * - 배터리 최적화 자동 처리
  */
 class SensorService : Service(), SensorEventListener {
 
@@ -44,12 +49,9 @@ class SensorService : Service(), SensorEventListener {
         private const val CHANNEL_ID = "sensor_service_channel"
         
         // ===== 상태 판정 상수 =====
-        private const val SPEED_THRESHOLD_MIN = 0.2f  // m/s (0.72 km/h) - 정지 판정
-        private const val SPEED_THRESHOLD_MAX = 3.6f  // m/s (13 km/h) - 차량 판정
-        private const val MIN_STEPS_FOR_WALKING = 3   // 최근 5초간 최소 걸음 수
-        private const val STEP_CHECK_INTERVAL = 5000L // 5초
-        private const val VEHICLE_HYSTERESIS = 2000L  // 2초 (차량 판정 히스테리시스)
-        private const val STATE_HYSTERESIS = 5000L    // 5초 (일반 상태 히스테리시스)
+        private const val WALKING_SPEED_MAX = 3.6f    // m/s (13 km/h) - 거리 누적 상한
+        private const val MIN_STEPS_FOR_WALKING = 1   // 최근 3초간 최소 걸음 수
+        private const val STEP_CHECK_INTERVAL = 3000L // 3초
         
         // 수집된 데이터 저장 (스레드 안전)
         val accelerometerData = ConcurrentLinkedQueue<AccelData>()
@@ -74,15 +76,12 @@ class SensorService : Service(), SensorEventListener {
             private set
         var totalPausedTimeMs = 0L
             private set
-        var totalVehicleTimeMs = 0L
-            private set
         var totalDistanceM = 0.0
             private set
         
         fun resetStats() {
             totalWalkingTimeMs = 0L
             totalPausedTimeMs = 0L
-            totalVehicleTimeMs = 0L
             totalDistanceM = 0.0
             movementSegments.clear()
         }
@@ -114,7 +113,7 @@ class SensorService : Service(), SensorEventListener {
     data class MovementSegment(
         val startTime: Long,
         val endTime: Long,
-        val status: String,  // "walking", "paused", "vehicle"
+        val status: String,  // "walking", "paused"
         val distanceM: Double,
         val durationMs: Long
     )
@@ -136,8 +135,6 @@ class SensorService : Service(), SensorEventListener {
     private var currentStatus: String = "walking"
     private var currentSegmentStartTime: Long = 0
     private var currentSegmentDistance: Double = 0.0
-    private var pendingStatus: String? = null
-    private var pendingStatusSince: Long = 0
     private var lastGpsSpeed: Float = 0f
     
     // ===== 최근 걸음 수 추적 =====
@@ -470,8 +467,13 @@ class SensorService : Service(), SensorEventListener {
             locationData.poll()
         }
         
-        // 거리 계산 (walking 상태일 때만)
-        if (lastLocation != null && currentStatus == "walking") {
+        // 상태 판정 (Step Counter 기반)
+        lastGpsSpeed = speed
+        analyzeAndUpdateStatus(now)
+        
+        // GPS 거리 계산 (보조용 - 실제 속도 계산은 TMap 거리 사용)
+        // walking 상태 + 속도 < 13km/h 일 때만 누적
+        if (lastLocation != null && currentStatus == "walking" && speed < WALKING_SPEED_MAX) {
             val distance = lastLocation!!.distanceTo(location)
             // 정확도가 너무 낮은 위치는 무시 (50m 이상 오차)
             if (location.accuracy < 50) {
@@ -480,88 +482,28 @@ class SensorService : Service(), SensorEventListener {
             }
         }
         
-        lastGpsSpeed = speed
         lastLocation = location
         lastLocationTime = now
-        
-        // 상태 판정
-        analyzeAndUpdateStatus(speed, now)
     }
     
-    // ===== 상태 판정 로직 =====
-    private fun analyzeAndUpdateStatus(gpsSpeed: Float, now: Long) {
-        val activityType = analyzeActivityType(gpsSpeed, now)
-        
-        val desiredStatus = when (activityType) {
-            "vehicle" -> "vehicle"
-            "walking", "running" -> "walking"
-            else -> "paused"
-        }
-        
-        // 히스테리시스 적용
-        if (desiredStatus != currentStatus) {
-            if (pendingStatus != desiredStatus) {
-                pendingStatus = desiredStatus
-                pendingStatusSince = now
-            } else {
-                val waitedMs = now - pendingStatusSince
-                val requiredMs = if (desiredStatus == "vehicle") VEHICLE_HYSTERESIS else STATE_HYSTERESIS
-                
-                if (waitedMs >= requiredMs) {
-                    // 상태 전환
-                    finishCurrentSegment()
-                    currentStatus = desiredStatus
-                    currentSegmentStartTime = now
-                    currentSegmentDistance = 0.0
-                    pendingStatus = null
-                    
-                    Log.d(TAG, "Status changed to: $currentStatus")
-                }
-            }
-        } else {
-            pendingStatus = null
-        }
-    }
-    
-    private fun analyzeActivityType(gpsSpeed: Float, now: Long): String {
-        // 1. GPS로 확실한 차량 판단 (13 km/h 이상)
-        if (gpsSpeed > SPEED_THRESHOLD_MAX) {
-            return "vehicle"
-        }
-        
-        // 2. 최근 5초간 걸음 수 확인
+    // ===== 상태 판정 로직 (Step Counter 기반 단순화) =====
+    private fun analyzeAndUpdateStatus(now: Long) {
+        // 최근 3초간 걸음 수 확인
         val cutoffTime = now - STEP_CHECK_INTERVAL
         val recentStepCount = recentSteps.filter { it.first >= cutoffTime }.sumOf { it.second }
         
-        if (recentStepCount >= MIN_STEPS_FOR_WALKING) {
-            return if (gpsSpeed >= 2.0f) "running" else "walking"
+        // 1보 이상 → walking, 아니면 → paused
+        val newStatus = if (recentStepCount >= MIN_STEPS_FOR_WALKING) "walking" else "paused"
+        
+        // 상태 변경 시 세그먼트 종료
+        if (newStatus != currentStatus) {
+            finishCurrentSegment()
+            currentStatus = newStatus
+            currentSegmentStartTime = now
+            currentSegmentDistance = 0.0
+            
+            Log.d(TAG, "Status changed to: $currentStatus (recent steps: $recentStepCount)")
         }
-        
-        // 3. 매우 느린 속도 (0.72 km/h 이하)
-        if (gpsSpeed < SPEED_THRESHOLD_MIN) {
-            // 가속도계로 움직임 확인
-            val recentAccel = getRecentAccelVariance(now)
-            if (recentAccel > 0.15) {
-                return "walking"  // 움직임 있음
-            }
-            return "stationary"
-        }
-        
-        // 4. 중간 속도 → GPS 기반 판정
-        return if (gpsSpeed >= 2.0f) "running" else "walking"
-    }
-    
-    private fun getRecentAccelVariance(now: Long): Float {
-        val cutoffTime = now - 5000
-        val recentData = accelerometerData.filter { it.timestamp >= cutoffTime }
-        
-        if (recentData.size < 5) return 0f
-        
-        val magnitudes = recentData.map { it.magnitude }
-        val mean = magnitudes.average().toFloat()
-        val variance = magnitudes.map { (it - mean) * (it - mean) }.average().toFloat()
-        
-        return sqrt(variance)
     }
     
     private fun finishCurrentSegment() {
@@ -584,7 +526,6 @@ class SensorService : Service(), SensorEventListener {
         when (currentStatus) {
             "walking" -> totalWalkingTimeMs += durationMs
             "paused" -> totalPausedTimeMs += durationMs
-            "vehicle" -> totalVehicleTimeMs += durationMs
         }
         
         Log.d(TAG, "Segment finished: $currentStatus, ${durationMs}ms, ${currentSegmentDistance}m")

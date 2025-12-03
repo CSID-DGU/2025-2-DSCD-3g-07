@@ -17,7 +17,7 @@ import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { useAuth } from "../../contexts/AuthContext";
-import { getNavigationLogs, getNavigationStatistics, type NavigationLogResponse, type NavigationStatistics } from "../../services/navigationLogService";
+import { getNavigationLogs, getNavigationStatistics, getDebugLogs, clearDebugLogs, type NavigationLogResponse, type NavigationStatistics } from "../../services/navigationLogService";
 
 const PRIMARY = "#2C6DE7";
 const MUTED = "#6B7280";
@@ -497,6 +497,44 @@ export default function SettingsScreen() {
     ]);
   };
 
+  // 🔧 디버그 로그 확인 (Release에서도 사용 가능)
+  const handleShowDebugLogs = async () => {
+    try {
+      const logs = await getDebugLogs();
+      if (logs.length === 0) {
+        Alert.alert('디버그 로그', '저장된 로그가 없습니다.');
+        return;
+      }
+
+      const logText = logs.map((log: any, i: number) => {
+        const time = new Date(log.timestamp).toLocaleString('ko-KR');
+        if (log.status === 'SUCCESS') {
+          return `[${i + 1}] ✅ ${time}\n   log_id: ${log.logId}`;
+        } else {
+          return `[${i + 1}] ❌ ${time}\n   에러: ${log.error}\n   요청: ${JSON.stringify(log.requestData, null, 2)}`;
+        }
+      }).join('\n\n');
+
+      Alert.alert(
+        `디버그 로그 (${logs.length}개)`,
+        logText.substring(0, 2000) + (logText.length > 2000 ? '\n\n... (더 많은 로그 있음)' : ''),
+        [
+          { text: '닫기', style: 'cancel' },
+          {
+            text: '로그 초기화',
+            style: 'destructive',
+            onPress: async () => {
+              await clearDebugLogs();
+              Alert.alert('완료', '디버그 로그가 초기화되었습니다.');
+            }
+          },
+        ]
+      );
+    } catch (error) {
+      Alert.alert('에러', '디버그 로그를 불러올 수 없습니다.');
+    }
+  };
+
   const handleLogin = () => router.push('/(auth)/login');
 
   const onRefresh = useCallback(() => {
@@ -777,7 +815,11 @@ export default function SettingsScreen() {
                 </View>
                 <TouchableOpacity style={styles.ghostButton} onPress={onRefresh}>
                   <Ionicons name="refresh" size={14} color={PRIMARY} />
-                  <Text style={styles.ghostButtonText}>데이터 새로고침</Text>
+                  <Text style={styles.ghostButtonText}>새로고침</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.ghostButton} onPress={handleShowDebugLogs}>
+                  <Ionicons name="bug" size={14} color={WARNING} />
+                  <Text style={[styles.ghostButtonText, { color: WARNING }]}>디버그</Text>
                 </TouchableOpacity>
               </View>
             </View>

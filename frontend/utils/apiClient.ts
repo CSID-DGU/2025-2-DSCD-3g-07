@@ -164,7 +164,14 @@ class ApiClient {
     });
 
     if (!response.ok) {
-      throw new Error(`API 오류: ${response.status} ${response.statusText}`);
+      const errorBody = await response.text();
+      console.error(`❌ API POST 오류:`, {
+        status: response.status,
+        statusText: response.statusText,
+        body: errorBody,
+        requestData: data,
+      });
+      throw new Error(`API 오류: ${response.status} ${response.statusText} - ${errorBody}`);
     }
 
     const result = await response.json() as T;

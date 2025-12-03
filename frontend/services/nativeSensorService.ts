@@ -3,7 +3,11 @@
  * 
  * Android 네이티브 SensorService를 React Native에서 사용할 수 있게 하는 래퍼입니다.
  * 백그라운드에서도 GPS, 가속도계, Pedometer 데이터를 수집하고
- * walking/paused/vehicle 상태를 실시간으로 판정합니다.
+ * walking/paused 상태를 실시간으로 판정합니다.
+ * 
+ * 상태 판정 기준:
+ * - walking: 최근 3초간 1보 이상 걸음 감지
+ * - paused: 그 외 (정지, 대중교통 이용 등)
  */
 
 import { NativeModules, Platform, PermissionsAndroid } from 'react-native';
@@ -35,7 +39,7 @@ export interface LocationData {
 export interface MovementSegment {
     startTime: number;
     endTime: number;
-    status: 'walking' | 'paused' | 'vehicle';
+    status: 'walking' | 'paused';
     distanceM: number;
     durationMs: number;
 }
@@ -43,7 +47,6 @@ export interface MovementSegment {
 export interface TrackingStats {
     totalWalkingTimeMs: number;
     totalPausedTimeMs: number;
-    totalVehicleTimeMs: number;
     totalDistanceM: number;
     segmentCount: number;
 }
@@ -249,7 +252,7 @@ class NativeSensorService {
             const segments = await SensorServiceModule.getMovementSegments();
             return segments.map((s: any) => ({
                 ...s,
-                status: s.status as 'walking' | 'paused' | 'vehicle',
+                status: s.status as 'walking' | 'paused',
             }));
         } catch (error) {
             console.error('❌ 움직임 구간 조회 실패:', error);
@@ -265,7 +268,6 @@ class NativeSensorService {
             return {
                 totalWalkingTimeMs: 0,
                 totalPausedTimeMs: 0,
-                totalVehicleTimeMs: 0,
                 totalDistanceM: 0,
                 segmentCount: 0,
             };
@@ -278,7 +280,6 @@ class NativeSensorService {
             return {
                 totalWalkingTimeMs: 0,
                 totalPausedTimeMs: 0,
-                totalVehicleTimeMs: 0,
                 totalDistanceM: 0,
                 segmentCount: 0,
             };

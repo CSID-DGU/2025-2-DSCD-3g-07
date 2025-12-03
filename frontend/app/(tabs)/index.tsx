@@ -65,6 +65,7 @@ interface LocationData {
 interface RouteInfo {
   totalTime: number;
   totalWalkTime: number;
+  totalWalkDistance: number; // TMap 보행 거리 (m)
   walkRatio: number;
   personalizedWalkTime: number;
   slopeAnalysis?: RouteElevationAnalysis | null;
@@ -641,18 +642,12 @@ export default function HomeScreen() {
       setNavigationLog(prev => [...prev, log]);
       console.log('📊 Navigation Log:', log);
 
-      // 차량 시간 표시 (대중교통 이용 시)
-      const vehicleTimeStr = trackingData.vehicleTime > 0
-        ? `\n대중교통 이용: ${Math.floor(trackingData.vehicleTime / 60)}분 ${trackingData.vehicleTime % 60}초`
-        : '';
-
       // 기본 결과 메시지 생성
       let resultMessage =
         `총 소요 시간: ${Math.floor(duration / 60)}분 ${Math.floor(duration % 60)}초\n` +
         `실제 걷기: ${Math.floor(trackingData.activeWalkingTime / 60)}분 ${trackingData.activeWalkingTime % 60}초\n` +
-        `보행 멈춤 시간: ${Math.floor(trackingData.pausedTime / 60)}분 ${trackingData.pausedTime % 60}초\n` +
-        `평균 속도: ${(trackingData.realSpeed * 3.6).toFixed(2)} km/h` +
-        vehicleTimeStr;
+        `대기/대중교통 이용 시간: ${Math.floor(trackingData.pausedTime / 60)}분 ${trackingData.pausedTime % 60}초\n` +
+        `평균 속도: ${(trackingData.realSpeed * 3.6).toFixed(2)} km/h`;
 
       // DB에 저장 (로그인한 경우만)
       if (navigationStartTime && routeInfo && startLocation && endLocation && user) {
@@ -705,7 +700,7 @@ export default function HomeScreen() {
           '안내 종료',
           `총 소요 시간: ${Math.floor(duration / 60)}분 ${Math.floor(duration % 60)}초\n` +
           `실제 걷기: ${Math.floor(trackingData.activeWalkingTime / 60)}분 ${trackingData.activeWalkingTime % 60}초\n` +
-          `보행 멈춤 시간: ${Math.floor(trackingData.pausedTime / 60)}분 ${trackingData.pausedTime % 60}초\n` +
+          `대기/대중교통 이용 시간: ${Math.floor(trackingData.pausedTime / 60)}분 ${trackingData.pausedTime % 60}초\n` +
           `평균 속도: ${(trackingData.realSpeed * 3.6).toFixed(2)} km/h`
         );
       }
@@ -755,7 +750,8 @@ export default function HomeScreen() {
 
       // 움직임 추적 시작
       try {
-        await movementTrackingService.startTracking();
+        const walkDistance = routeInfo?.totalWalkDistance || 0;
+        await movementTrackingService.startTracking(walkDistance);
         Alert.alert(
           '안내 시작',
           backgroundSuccess
@@ -864,6 +860,7 @@ export default function HomeScreen() {
       setRouteInfo({
         totalTime: totalTimeSec,
         totalWalkTime: totalWalkTimeSec,
+        totalWalkDistance: firstItinerary.totalWalkDistance || 0, // TMap 보행 거리
         walkRatio:
           totalTimeSec > 0 ? (totalWalkTimeSec / totalTimeSec) * 100 : 0,
         personalizedWalkTime:
@@ -1016,6 +1013,7 @@ export default function HomeScreen() {
       setRouteInfo({
         totalTime: totalTime,
         totalWalkTime: totalTime,
+        totalWalkDistance: totalDistance, // 도보는 전체 거리 = 보행 거리
         walkRatio: 100, // 100% 도보
         personalizedWalkTime:
           slopeAnalysis?.total_adjusted_walk_time || totalTime,
@@ -1082,6 +1080,7 @@ export default function HomeScreen() {
       setRouteInfo({
         totalTime: totalTimeSec,
         totalWalkTime: totalWalkTimeSec,
+        totalWalkDistance: selected.totalWalkDistance || 0, // TMap 보행 거리
         walkRatio:
           totalTimeSec > 0 ? (totalWalkTimeSec / totalTimeSec) * 100 : 0,
         personalizedWalkTime:

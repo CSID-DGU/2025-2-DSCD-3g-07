@@ -125,6 +125,9 @@ android {
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
             def enablePngCrunchInRelease = findProperty('android.enablePngCrunchInReleaseBuilds') ?: 'true'
             crunchPngs enablePngCrunchInRelease.toBoolean()
+            
+            // 🔧 Release에서도 로그 확인 가능하도록 설정
+            debuggable true
         }
     }
     packagingOptions {

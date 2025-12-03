@@ -266,7 +266,7 @@ export default function HomeScreen() {
   const { weatherData } = useWeatherContext();
 
   // 인증 Context 사용
-  const { user } = useAuth();
+  const { user, token, isLoading: isAuthLoading } = useAuth();
 
   // Router
   const router = useRouter();
@@ -311,6 +311,7 @@ export default function HomeScreen() {
   const [isNavigating, setIsNavigating] = useState(false);
   const [navigationStartTime, setNavigationStartTime] = useState<Date | null>(null);
   const [navigationLog, setNavigationLog] = useState<any[]>([]);
+  const [isSavingLog, setIsSavingLog] = useState(false); // 🔧 중복 저장 방지 플래그
 
   // 애니메이션
   const searchBarTranslateY = useSharedValue(0);
@@ -386,7 +387,7 @@ export default function HomeScreen() {
     })
   ).current;
 
-  // 앱 첫 실행 시 권한 초기화 (통합 권한 유틸리티 사용)
+  // 앱 첫 실행 시 권한 초기화 및 센서 웜업 (통합 권한 유틸리티 사용)
   useEffect(() => {
     const initPermissions = async () => {
       try {
@@ -398,19 +399,36 @@ export default function HomeScreen() {
         } else {
           console.log(`⚠️ 일부 권한 누락: ${result.missingPermissions.join(', ')}`);
         }
+
+        // 🔧 센서 웜업: Step Counter 초기화 지연(15-16초) 방지
+        // 권한 획득 후 즉시 센서를 미리 활성화하여 내비게이션 시작 시 즉시 걸음 감지 가능
+        console.log('🔄 센서 웜업 시작...');
+        const warmupSuccess = await movementTrackingService.warmupSensors();
+        if (warmupSuccess) {
+          console.log('✅ 센서 웜업 완료 - Step Counter 준비됨');
+        } else {
+          console.warn('⚠️ 센서 웜업 실패 - 내비게이션 시작 시 지연 발생 가능');
+        }
       } catch (error) {
         console.warn('⚠️ 권한 초기화 실패:', error);
       }
     };
 
     initPermissions();
+
+    // 🧹 컴포넌트 언마운트 시 센서 웜업 해제
+    return () => {
+      movementTrackingService.cleanupWarmup();
+    };
   }, []);
 
   // DB에서 사용자 보행 속도 가져오기 함수 (재사용 가능)
   const fetchWalkingSpeed = async () => {
-    try {
-      const result = await apiService.getSpeedProfile();
-      if (result.data?.speed_case1) {
+    const result = await apiService.getSpeedProfile();
+
+    // 🔧 성공한 경우에만 속도 설정
+    if (result.success && result.data) {
+      if (result.data.speed_case1) {
         // km/h를 m/s로 변환
         const speedMs1 = result.data.speed_case1 / 3.6;
         setWalkingSpeedCase1(speedMs1);
@@ -418,23 +436,29 @@ export default function HomeScreen() {
           `✅ 보행 속도 로드 (Case1): ${result.data.speed_case1.toFixed(2)} km/h (${speedMs1.toFixed(3)} m/s)`
         );
       }
-      if (result.data?.speed_case2) {
+      if (result.data.speed_case2) {
         const speedMs2 = result.data.speed_case2 / 3.6;
         setWalkingSpeedCase2(speedMs2);
         console.log(
           `✅ 보행 속도 로드 (Case2): ${result.data.speed_case2.toFixed(2)} km/h (${speedMs2.toFixed(3)} m/s)`
         );
       }
-    } catch (error) {
-      // 로그인하지 않은 경우 조용히 무시 (기본값 사용)
-      console.log('ℹ️ 로그인 필요 - 기본 속도 사용');
+    } else if (result.status === 401) {
+      // 401 에러: 토큰 만료 - 기본값 유지, 사용자에게 알림 없이 진행
+      console.log('ℹ️ 토큰 만료 - 기본 속도 사용 (4.0 km/h)');
+    } else {
+      // 기타 실패: 조용히 기본값 사용
+      console.log('ℹ️ 속도 프로필 로드 실패 - 기본 속도 사용');
     }
   };
 
-  // 컴포넌트 마운트 시 속도 로드
+  // 🔧 인증 로드 완료 후 속도 로드 (토큰 복원 완료 대기)
   useEffect(() => {
-    fetchWalkingSpeed();
-  }, []);
+    if (!isAuthLoading) {
+      fetchWalkingSpeed();
+      console.log(`🔄 속도 로드 시도 (토큰: ${token ? '있음' : '없음'})`);
+    }
+  }, [isAuthLoading, token]);
 
   // 컴포넌트 언마운트 시 위치 추적 중지
   useEffect(() => {
@@ -615,6 +639,13 @@ export default function HomeScreen() {
   // 안내 시작/종료 핸들러
   const handleNavigationToggle = async () => {
     if (isNavigating) {
+      // 🔧 중복 저장 방지: 이미 저장 중이면 무시
+      if (isSavingLog) {
+        console.log('⚠️ 이미 로그 저장 중입니다. 중복 호출 무시.');
+        return;
+      }
+      setIsSavingLog(true);
+
       // 안내 종료
       const endTime = new Date();
       const duration = navigationStartTime
@@ -718,6 +749,7 @@ export default function HomeScreen() {
 
       setIsNavigating(false);
       setNavigationStartTime(null);
+      setIsSavingLog(false); // 🔧 저장 완료 후 플래그 해제
     } else {
       // 안내 시작 전 권한 확인
       const hasPermissions = await ensureNavigationPermissions();

@@ -92,7 +92,7 @@ class UserCreate(BaseModel):
 class WeatherCacheCreate(BaseModel):
     latitude: float
     longitude: float
-    location_name: Optional[str]
+    location_name: Optional[str] = None
     weather_time: datetime
     temperature_celsius: Optional[float]
     humidity_percent: Optional[int]
@@ -107,7 +107,7 @@ class WeatherCacheResponse(BaseModel):
     weather_id: int
     latitude: float
     longitude: float
-    location_name: Optional[str]
+    location_name: Optional[str] = None
     weather_time: datetime
     temperature_celsius: Optional[float]
     humidity_percent: Optional[int]

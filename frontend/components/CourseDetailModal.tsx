@@ -118,6 +118,23 @@ const RouteDetailModal: React.FC<RouteDetailModalProps> = ({
         }
     };
 
+    // 예상 시간 계산 (비정상적인 값이면 거리 기반으로 재계산)
+    const getEstimatedDuration = () => {
+        const duration = route.estimated_duration_minutes;
+        const distance = route.distance_km;
+        
+        // 합리적인 시간 범위 체크 (도보 기준 1km당 10~20분)
+        const minReasonable = distance * 8;   // 매우 빠른 속도 (7.5km/h)
+        const maxReasonable = distance * 25;  // 매우 느린 속도 (2.4km/h)
+        
+        if (duration >= minReasonable && duration <= maxReasonable) {
+            return Math.round(duration);
+        }
+        
+        // 비정상적인 값이면 평균 도보 속도(5km/h)로 재계산
+        return Math.round((distance / 5) * 60);
+    };
+
     return (
         <Modal
             visible={visible}
@@ -228,7 +245,7 @@ const RouteDetailModal: React.FC<RouteDetailModalProps> = ({
 
                         <View style={styles.statBox}>
                             <MaterialIcons name="schedule" size={24} color={PRIMARY_COLOR} />
-                            <Text style={styles.statValue}>{Math.round(route.estimated_duration_minutes)}분</Text>
+                            <Text style={styles.statValue}>{getEstimatedDuration()}분</Text>
                             <Text style={styles.statLabel}>예상 시간</Text>
                         </View>
 
@@ -374,64 +391,36 @@ function generateMapHTML(
         level: 5
       });
 
-      const createCircleMarker = (lat, lng, color, size = 28, stroke = '#FFFFFF', strokeWidth = 3) => {
-        const svg = \`<svg xmlns="http://www.w3.org/2000/svg" width="\${size}" height="\${size}" viewBox="0 0 \${size} \${size}">
-          <circle cx="\${size / 2}" cy="\${size / 2}" r="\${size / 2 - strokeWidth}" fill="\${color}" stroke="\${stroke}" stroke-width="\${strokeWidth}"/>
-          <circle cx="\${size / 2}" cy="\${size / 2}" r="\${size / 2 - strokeWidth - 4}" fill="white"/>
-        </svg>\`;
+      // 핀 마커 생성 함수 (Home 탭과 동일한 스타일)
+      const createPinMarker = (lat, lng, color, label) => {
+        // 글자 수에 따라 마커 크기 조정
+        const isLong = label.length > 2;
+        const width = isLong ? 44 : 36;
+        const height = isLong ? 52 : 44;
+        const cx = width / 2;
+        const pinTop = 2;
+        const pinBottom = height - 2;
+        const circleY = 16;
+        const circleR = isLong ? 10 : 8;
+        const fontSize = isLong ? 7 : 8;
+        const textY = circleY + 3;
+        
+        const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + width + '" height="' + height + '" viewBox="0 0 ' + width + ' ' + height + '">' +
+          '<defs><filter id="shadow" x="-50%" y="-50%" width="200%" height="200%"><feDropShadow dx="0" dy="1" stdDeviation="2" flood-opacity="0.25"/></filter></defs>' +
+          '<path d="M' + cx + ' ' + pinTop + ' C' + (cx-8) + ' ' + pinTop + ' ' + (cx-14) + ' ' + (pinTop+6) + ' ' + (cx-14) + ' ' + (pinTop+14) + ' C' + (cx-14) + ' ' + (pinTop+19) + ' ' + (cx-11) + ' ' + (pinTop+24) + ' ' + (cx-7) + ' ' + (pinTop+28) + ' L' + cx + ' ' + pinBottom + ' L' + (cx+7) + ' ' + (pinTop+28) + ' C' + (cx+11) + ' ' + (pinTop+24) + ' ' + (cx+14) + ' ' + (pinTop+19) + ' ' + (cx+14) + ' ' + (pinTop+14) + ' C' + (cx+14) + ' ' + (pinTop+6) + ' ' + (cx+8) + ' ' + pinTop + ' ' + cx + ' ' + pinTop + ' Z" fill="' + color + '" stroke="white" stroke-width="2" filter="url(#shadow)"/>' +
+          '<circle cx="' + cx + '" cy="' + circleY + '" r="' + circleR + '" fill="white"/>' +
+          '<text x="' + cx + '" y="' + textY + '" font-size="' + fontSize + '" font-weight="bold" text-anchor="middle" fill="' + color + '">' + label + '</text>' +
+          '</svg>';
 
         return new kakao.maps.Marker({
           position: new kakao.maps.LatLng(lat, lng),
           map: map,
           image: new kakao.maps.MarkerImage(
-            'data:image/svg+xml;base64,' + btoa(svg),
-            new kakao.maps.Size(size, size),
-            { offset: new kakao.maps.Point(size / 2, size / 2) }
+            'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg),
+            new kakao.maps.Size(width, height),
+            { offset: new kakao.maps.Point(cx, height) }
           ),
-          zIndex: 10,
-        });
-      };
-
-    const createLabelOverlay = (lat, lng, label, color) => {
-        const content = document.createElement('div');
-        content.style.cssText = [
-          'transform: translate(-50%, -78%);',
-          'display: flex;',
-          'align-items: center;',
-          'gap: 4px;',
-          'padding: 4px 6px;',
-          'background: rgba(255,255,255,0.95);',
-          'border: 1px solid #E5E7EB;',
-          'border-radius: 6px;',
-          'box-shadow: 0 2px 6px rgba(0,0,0,0.12);',
-          'font-size: 10px;',
-          'font-weight: 700;',
-          'color: #111827;',
-          'white-space: nowrap;',
-        ].join('');
-
-        const dot = document.createElement('span');
-        dot.style.cssText = [
-          'display: inline-flex;',
-          'width: 12px;',
-          'height: 12px;',
-          'border-radius: 6px;',
-          'background: ' + color + ';',
-          'border: 2px solid white;',
-          'box-shadow: 0 0 0 1px #d1d5db;',
-        ].join('');
-
-        const text = document.createElement('span');
-        text.innerText = label;
-        content.appendChild(dot);
-        content.appendChild(text);
-
-        return new kakao.maps.CustomOverlay({
-          position: new kakao.maps.LatLng(lat, lng),
-          content,
-          xAnchor: 0.5,
-          yAnchor: 1.0,
-          zIndex: 20,
+          zIndex: 100,
         });
       };
 
@@ -441,9 +430,9 @@ function generateMapHTML(
         
         const polyline = new kakao.maps.Polyline({
           path: linePath,
-          strokeWeight: 4,
+          strokeWeight: 5,
           strokeColor: '#2C6DE7',
-          strokeOpacity: 0.8,
+          strokeOpacity: 0.9,
           strokeStyle: 'solid'
         });
         
@@ -461,24 +450,21 @@ function generateMapHTML(
         map.setBounds(bounds);
       }
 
-      // 2️⃣ 시작점 마커 (노란색)
+      // 2️⃣ 시작점 마커 (노란/주황색 핀)
       if (pathCoords.length > 0) {
         const startCoord = pathCoords[0];
-        createCircleMarker(startCoord.lat, startCoord.lng, '#F9A825');
-        createLabelOverlay(startCoord.lat, startCoord.lng, '시작', '#F9A825').setMap(map);
+        createPinMarker(startCoord.lat, startCoord.lng, '#F9A825', '출발');
       }
 
-      // 3️⃣ 종료점 마커 (빨간색)
+      // 3️⃣ 종료점 마커 (빨간색 핀)
       if (pathCoords.length > 1) {
         const endCoord = pathCoords[pathCoords.length - 1];
-        createCircleMarker(endCoord.lat, endCoord.lng, '#EA4335');
-        createLabelOverlay(endCoord.lat, endCoord.lng, '도착', '#EA4335').setMap(map);
+        createPinMarker(endCoord.lat, endCoord.lng, '#EA4335', '도착');
       }
 
-      // 4️⃣ 현재 위치 마커 (녹색)
+      // 4️⃣ 현재 위치 마커 (녹색 핀) - "나" 한 글자로 표시
       ${currentLocation ? `
-      createCircleMarker(${currentLocation.latitude}, ${currentLocation.longitude}, '#34C759', 32, '#FFFFFF', 3);
-      createLabelOverlay(${currentLocation.latitude}, ${currentLocation.longitude}, '내 위치', '#34C759').setMap(map);
+      createPinMarker(${currentLocation.latitude}, ${currentLocation.longitude}, '#34C759', '나');
       ` : ''}
       
       console.log('✅ 지도 렌더링 완료');

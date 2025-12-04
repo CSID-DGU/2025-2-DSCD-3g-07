@@ -71,6 +71,9 @@ export default function CourseScreen() {
   const [loading, setLoading] = useState(false);
   const [selectedRoute, setSelectedRoute] = useState<GPXRouteRecommendation | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
+  const [targetDistance, setTargetDistance] = useState<number | null>(null); // 검색한 목표 거리
+  const [targetDuration, setTargetDuration] = useState<number | null>(null); // 검색한 목표 시간
+  const [sortMode, setSortMode] = useState<'distance' | 'target'>('distance'); // 정렬 모드
 
   // 장소 검색 상태
   const [locationSearchText, setLocationSearchText] = useState('');
@@ -152,17 +155,14 @@ export default function CourseScreen() {
     }
   }, []);
 
-  // 장소 검색
+  // 장소 검색 - 전국 어디든 검색 가능하도록 중심좌표 없이 검색
   const handleLocationSearch = async (text: string) => {
     setLocationSearchText(text);
 
     if (text.trim().length >= 2) {
       try {
-        const results = await searchPlaces(
-          text,
-          currentLocation?.longitude,
-          currentLocation?.latitude
-        );
+        // 중심좌표 없이 전국 검색 (반경 제한 없음)
+        const results = await searchPlaces(text);
         setLocationSearchResults(results);
         setShowLocationResults(results.length > 0);
       } catch (error) {
@@ -294,17 +294,17 @@ export default function CourseScreen() {
       // 백엔드 GPX API 호출
       // PostgreSQL에 저장된 GPX 경로만 조회
       // 현재 위치에서 가까운 순으로 정렬
-      // 목표 거리/시간에 맞는 코스만 필터링
+      // 목표 거리/시간 외의 경로도 포함 (반복 추천용)
       const recommendedRoutes = await getRecommendedRoutes({
         distance_km: searchMode === 'time' ? undefined : value,
         duration_minutes: searchMode === 'time' ? value : undefined,
         user_lat: currentLocation.latitude,
         user_lng: currentLocation.longitude,
         user_speed_kmh: currentSpeed,
-        max_distance_from_user: 30.0, // 30km 이내 경로 검색 (서울-경기 권역)
-        distance_tolerance: 2.0, // ±2km 허용
-        duration_tolerance: 20, // ±20분 허용
-        limit: 10,
+        max_distance_from_user: 500.0, // 전국 범위 경로 검색 (제한 없음)
+        distance_tolerance: 100.0, // 넓은 범위로 다양한 거리의 경로 포함
+        duration_tolerance: 300, // 넓은 범위로 다양한 시간의 경로 포함
+        limit: 15,
       });
 
       console.log('✅ 경로 검색 완료:', {
@@ -313,11 +313,30 @@ export default function CourseScreen() {
         전체데이터: recommendedRoutes
       });
 
-      if (recommendedRoutes.length === 0) {
-        Alert.alert('검색 결과 없음', `반경 10km 내에 ${searchMode === 'time' ? value + '분' : value + 'km'} 거리의 경로가 없습니다.\n\n검색 조건을 변경해보세요.`);
+      // 중복 경로 제거 (같은 이름의 경로는 첫 번째만 유지)
+      const uniqueRoutes = recommendedRoutes.filter((route, index, self) =>
+        index === self.findIndex((r) => r.route_name === route.route_name)
+      );
+
+      console.log('✅ 중복 제거 후:', {
+        원본개수: recommendedRoutes.length,
+        중복제거후: uniqueRoutes.length
+      });
+
+      if (uniqueRoutes.length === 0) {
+        Alert.alert('검색 결과 없음', `해당 지역 주변에 등록된 경로가 없습니다.\n\n다른 위치를 검색해보세요.`);
       }
 
-      setRoutes(recommendedRoutes);
+      // 목표 거리/시간 저장 (경로 카드에서 비교 표시용)
+      if (searchMode === 'time') {
+        setTargetDuration(value);
+        setTargetDistance(null);
+      } else {
+        setTargetDistance(value);
+        setTargetDuration(null);
+      }
+
+      setRoutes(uniqueRoutes);
 
     } catch (error) {
       console.error('❌ 경로 검색 실패:', error);
@@ -343,6 +362,114 @@ export default function CourseScreen() {
       case 'hard': return '어려움';
       default: return difficulty;
     }
+  };
+
+  // 예상 시간 계산 (비정상적인 값이면 거리 기반으로 재계산)
+  const getEstimatedDuration = (route: GPXRouteRecommendation) => {
+    const duration = route.estimated_duration_minutes;
+    const distance = route.distance_km;
+    
+    // 합리적인 시간 범위 체크 (도보 기준 1km당 8~25분)
+    const minReasonable = distance * 8;   // 매우 빠른 속도 (7.5km/h)
+    const maxReasonable = distance * 25;  // 매우 느린 속도 (2.4km/h)
+    
+    if (duration >= minReasonable && duration <= maxReasonable) {
+      return Math.round(duration);
+    }
+    
+    // 비정상적인 값이면 평균 도보 속도(5km/h)로 재계산
+    return Math.round((distance / 5) * 60);
+  };
+
+  // 목표 대비 경로 비교 정보 생성
+  const getTargetComparisonInfo = (route: GPXRouteRecommendation) => {
+    const estimatedDuration = getEstimatedDuration(route);
+    
+    if (targetDistance) {
+      const diff = route.distance_km - targetDistance;
+      const absDiff = Math.abs(diff);
+      
+      if (absDiff < 0.5) {
+        // 목표와 거의 일치
+        return {
+          type: 'match' as const,
+          text: `목표 ${targetDistance}km와 일치`,
+          repeatInfo: null,
+        };
+      } else if (diff < 0) {
+        // 목표보다 짧음 - 반복 횟수 계산
+        const repeatCount = Math.ceil(targetDistance / route.distance_km);
+        const totalDistance = route.distance_km * repeatCount;
+        return {
+          type: 'short' as const,
+          text: `목표보다 ${absDiff.toFixed(1)}km 짧음`,
+          repeatInfo: `${route.distance_km.toFixed(1)}km 코스 ${repeatCount}회(총 ${totalDistance.toFixed(1)}km)면 목표 ${targetDistance}km 달성`,
+        };
+      } else {
+        // 목표보다 김
+        return {
+          type: 'long' as const,
+          text: `목표보다 ${absDiff.toFixed(1)}km 김`,
+          repeatInfo: `1회 완주로 목표 ${targetDistance}km 초과 달성`,
+        };
+      }
+    } else if (targetDuration) {
+      // 보정된 예상 시간 사용
+      const diff = estimatedDuration - targetDuration;
+      const absDiff = Math.abs(diff);
+      
+      if (absDiff < 5) {
+        return {
+          type: 'match' as const,
+          text: `목표 ${targetDuration}분과 일치`,
+          repeatInfo: null,
+        };
+      } else if (diff < 0) {
+        const repeatCount = Math.ceil(targetDuration / estimatedDuration);
+        const totalDuration = Math.round(estimatedDuration * repeatCount);
+        return {
+          type: 'short' as const,
+          text: `목표보다 ${Math.round(absDiff)}분 짧음`,
+          repeatInfo: `${estimatedDuration}분 코스 ${repeatCount}회(총 ${totalDuration}분)면 목표 ${targetDuration}분 달성`,
+        };
+      } else {
+        return {
+          type: 'long' as const,
+          text: `목표보다 ${Math.round(absDiff)}분 김`,
+          repeatInfo: `1회 완주로 목표 ${targetDuration}분 초과 달성`,
+        };
+      }
+    }
+    return null;
+  };
+
+  // 정렬된 경로 목록 반환
+  const getSortedRoutes = () => {
+    if (routes.length === 0) return [];
+    
+    const sortedRoutes = [...routes];
+    
+    if (sortMode === 'distance') {
+      // 가까운 순 정렬
+      sortedRoutes.sort((a, b) => (a.distance_from_user || 0) - (b.distance_from_user || 0));
+    } else {
+      // 목표에 맞는 순 정렬
+      sortedRoutes.sort((a, b) => {
+        if (targetDistance) {
+          const diffA = Math.abs(a.distance_km - targetDistance);
+          const diffB = Math.abs(b.distance_km - targetDistance);
+          return diffA - diffB;
+        } else if (targetDuration) {
+          // 보정된 예상 시간 사용
+          const diffA = Math.abs(getEstimatedDuration(a) - targetDuration);
+          const diffB = Math.abs(getEstimatedDuration(b) - targetDuration);
+          return diffA - diffB;
+        }
+        return 0;
+      });
+    }
+    
+    return sortedRoutes;
   };
 
   return (
@@ -662,11 +789,49 @@ export default function CourseScreen() {
           {/* 경로 목록 */}
           {routes.length > 0 && (
             <View style={styles.routesSection}>
-              <Text style={styles.routesSectionTitle}>
-                추천 경로 {routes.length}개
-              </Text>
+              <View style={styles.routesSectionHeader}>
+                <Text style={styles.routesSectionTitle}>
+                  추천 경로 {routes.length}개
+                </Text>
+                <View style={styles.sortButtons}>
+                  <TouchableOpacity
+                    style={[
+                      styles.sortButton,
+                      sortMode === 'distance' && styles.sortButtonActive,
+                    ]}
+                    onPress={() => setSortMode('distance')}
+                  >
+                    <MaterialIcons 
+                      name="near-me" 
+                      size={14} 
+                      color={sortMode === 'distance' ? 'white' : SECONDARY_TEXT} 
+                    />
+                    <Text style={[
+                      styles.sortButtonText,
+                      sortMode === 'distance' && styles.sortButtonTextActive,
+                    ]}>가까운순</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[
+                      styles.sortButton,
+                      sortMode === 'target' && styles.sortButtonActive,
+                    ]}
+                    onPress={() => setSortMode('target')}
+                  >
+                    <MaterialIcons 
+                      name="flag" 
+                      size={14} 
+                      color={sortMode === 'target' ? 'white' : SECONDARY_TEXT} 
+                    />
+                    <Text style={[
+                      styles.sortButtonText,
+                      sortMode === 'target' && styles.sortButtonTextActive,
+                    ]}>목표순</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
 
-              {routes.map((route) => (
+              {getSortedRoutes().map((route) => (
                 <TouchableOpacity
                   key={route.route_id}
                   style={styles.routeCard}
@@ -705,7 +870,7 @@ export default function CourseScreen() {
                     <View style={styles.routeStat}>
                       <MaterialIcons name="schedule" size={16} color={SECONDARY_TEXT} />
                       <Text style={styles.routeStatText}>
-                        {Math.round(route.estimated_duration_minutes)}분
+                        {getEstimatedDuration(route)}분
                       </Text>
                     </View>
 
@@ -727,6 +892,56 @@ export default function CourseScreen() {
                       </View>
                     )}
                   </View>
+
+                  {/* 목표 대비 정보 박스 */}
+                  {(() => {
+                    const comparisonInfo = getTargetComparisonInfo(route);
+                    if (!comparisonInfo) return null;
+                    
+                    // 타입별 색상 설정
+                    const getBoxColors = () => {
+                      switch (comparisonInfo.type) {
+                        case 'match':
+                          return { bg: '#E8F5E9', border: '#A5D6A7', text: '#2E7D32' }; // 초록 (일치)
+                        case 'short':
+                          return { bg: '#E3F2FD', border: '#90CAF9', text: '#1565C0' }; // 파랑 (짧음)
+                        case 'long':
+                          return { bg: '#FFF3E0', border: '#FFCC80', text: '#E65100' }; // 주황 (김)
+                        default:
+                          return { bg: '#FFF8E1', border: '#FFE082', text: '#FF9500' };
+                      }
+                    };
+                    const colors = getBoxColors();
+                    
+                    return (
+                      <View style={[
+                        styles.targetComparisonBox,
+                        { backgroundColor: colors.bg, borderColor: colors.border }
+                      ]}>
+                        <View style={styles.targetComparisonHeader}>
+                          <Ionicons 
+                            name={comparisonInfo.type === 'short' ? 'arrow-down-circle' : comparisonInfo.type === 'long' ? 'arrow-up-circle' : 'checkmark-circle'} 
+                            size={16} 
+                            color={colors.text} 
+                          />
+                          <Text style={[
+                            styles.targetComparisonTitle,
+                            { color: colors.text }
+                          ]}>
+                            목표 {targetDistance ? `${targetDistance}km` : `${targetDuration}분`} 기준
+                          </Text>
+                        </View>
+                        <Text style={[styles.targetComparisonDiff, { color: colors.text }]}>
+                          {comparisonInfo.text}
+                        </Text>
+                        {comparisonInfo.repeatInfo && (
+                          <Text style={styles.targetComparisonRepeat}>
+                            {comparisonInfo.repeatInfo}
+                          </Text>
+                        )}
+                      </View>
+                    );
+                  })()}
 
                   <Text style={styles.routeDescription}>
                     {route.description}
@@ -1052,11 +1267,43 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingBottom: 32,
   },
+  routesSectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
   routesSectionTitle: {
     fontSize: 18,
     fontWeight: '700',
     color: '#1D2A3B',
-    marginBottom: 16,
+  },
+  sortButtons: {
+    flexDirection: 'row',
+    gap: 6,
+  },
+  sortButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    backgroundColor: LIGHT_BACKGROUND,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: BORDER_COLOR,
+  },
+  sortButtonActive: {
+    backgroundColor: PRIMARY_COLOR,
+    borderColor: PRIMARY_COLOR,
+  },
+  sortButtonText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: SECONDARY_TEXT,
+  },
+  sortButtonTextActive: {
+    color: 'white',
   },
   routeCard: {
     backgroundColor: 'white',
@@ -1117,6 +1364,37 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: SECONDARY_TEXT,
     lineHeight: 20,
+  },
+  targetComparisonBox: {
+    backgroundColor: '#FFF8E1',
+    borderRadius: 10,
+    padding: 12,
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: '#FFE082',
+  },
+  targetComparisonHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: 4,
+  },
+  targetComparisonTitle: {
+    fontSize: 13,
+    fontWeight: '700',
+  },
+  targetComparisonDiff: {
+    fontSize: 13,
+    color: '#1D2A3B',
+    fontWeight: '500',
+    marginLeft: 22,
+  },
+  targetComparisonRepeat: {
+    fontSize: 12,
+    color: SECONDARY_TEXT,
+    marginTop: 4,
+    marginLeft: 22,
+    lineHeight: 18,
   },
   emptyState: {
     alignItems: 'center',

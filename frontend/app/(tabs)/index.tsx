@@ -697,19 +697,6 @@ export default function HomeScreen() {
           const savedLog = await saveNavigationLog(user.user_id, logData);
           console.log('✅ 네비게이션 로그 저장 완료:', savedLog);
 
-          // 🔔 예측 시간과 실제 시간 차이 확인 (±20% 이상이면 알림)
-          const estimatedTime = logData.estimated_time_seconds;
-          const actualTime = logData.actual_time_seconds;
-          const timeDifference = Math.abs(actualTime - estimatedTime);
-          const differencePercent = (timeDifference / estimatedTime) * 100;
-
-          const hasSignificantDifference = differencePercent >= 20;
-
-          // 5분 이상 걸었고 차이가 크면 자동 업데이트 알림 추가
-          if (hasSignificantDifference && trackingData.activeWalkingTime >= 300) {
-            resultMessage += `\n\n⚠️ 예상 시간과 ${differencePercent.toFixed(0)}% 차이가 발생했습니다.\n실제 속도를 반영하여 다음 예측을 개선합니다.`;
-          }
-
           // 🔄 속도 프로필 새로고침 (백엔드에서 업데이트된 값 가져오기)
           await fetchWalkingSpeed();
           console.log('🔄 속도 프로필 새로고침 완료');

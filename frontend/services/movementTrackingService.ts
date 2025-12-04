@@ -1,15 +1,18 @@
 /**
  * 움직임 추적 서비스 (하이브리드 방식 + 백그라운드 지원)
  * 
- * GPS 속도 + Step Counter 센서를 결합하여 실제 보행 시간을 추적합니다.
- * - 최근 3초간 걸음 ≥ 1보 → walking
- * - 그 외 → paused (정지, 대중교통 이용 등)
- * - 거리 누적: walking 상태 + GPS 속도 < 13km/h 일 때만
- * - realWalkingSpeed = walkingDistance / walkingTime
+ * Step Counter(만보기) + GPS + 가속도계를 결합하여 실제 보행 시간을 추적합니다.
  * 
- * 백그라운드 지원:
- * - GPS: backgroundLocationTask와 연동
- * - Pedometer: 네이티브 SensorService에서 Step Counter 기반 상태 판정
+ * 포어그라운드 (TypeScript):
+ * - 1순위: 최근 3초간 걸음 ≥ 1보 → walking 확정
+ * - 2순위: GPS 느림(0.72km/h 이하) + 가속도계로 움직임 판단
+ * - 3순위: GPS 속도만으로 판단 (< 7.2km/h → walking, ≥ 7.2km/h → running)
+ * 
+ * 백그라운드 (Kotlin SensorService):
+ * - 최근 3초간 걸음 ≥ 1보 → walking, 그 외 → paused
+ * - 거리 누적: walking 상태 + GPS 속도 < 13km/h 일 때만
+ * 
+ * 속도 계산: realWalkingSpeed = TMap 계획 거리 / 걷기 시간
  */
 
 import * as Location from 'expo-location';
@@ -32,9 +35,9 @@ const ACCEL_WALKING_MAX = 2.5; // 걷기 최대
 const ACCEL_RUNNING_MIN = 2.0; // 뛰기 최소
 const ACCEL_BUFFER_SIZE = 20; // 가속도 히스토리 버퍼 크기 (20초)
 
-// Pedometer (만보계) 상수
-const PEDOMETER_CHECK_INTERVAL = 5; // 초 - 걸음 수 체크 간격
-const MIN_STEPS_FOR_WALKING = 3; // 최근 5초간 최소 걸음 수 (걷기 판정)
+// Pedometer (만보계) 상수 - Kotlin SensorService.kt와 동일하게 설정
+const PEDOMETER_CHECK_INTERVAL = 3; // 초 - 걸음 수 체크 간격
+const MIN_STEPS_FOR_WALKING = 1; // 최근 3초간 최소 걸음 수 (걷기 판정)
 
 interface CurrentSegment {
     startTime: Date;
@@ -349,7 +352,9 @@ class MovementTrackingService {
 
     /**
      * 🆕 백그라운드용 활동 유형 판정 (GPS + 네이티브 센서)
-     * Note: 이제 네이티브 SensorService에서 Step Counter 기반으로 처리
+     * - 걸음 감지 시: GPS 속도로 walking/running 구분 (< 7.2km/h → walking, ≥ 7.2km/h → running)
+     * - 걸음 미감지 시: GPS 속도만으로 판정 (fallback)
+     * Note: 실제 Android 백그라운드에서는 Kotlin SensorService가 walking/paused만 판정
      */
     private analyzeActivityTypeForBackground(
         gpsSpeed: number,
@@ -613,8 +618,10 @@ class MovementTrackingService {
     }
 
     /**
-     * 활동 유형 분석 (Pedometer 우선, 가속도계 보조)
-     * Note: 네이티브 SensorService에서 Step Counter 기반으로 처리하므로 이 함수는 폴백용
+     * 활동 유형 분석 (포어그라운드용)
+     * 1순위: Pedometer - 최근 3초간 1걸음 이상 → walking 확정
+     * 2순위: GPS 느림(0.72km/h 이하) → 가속도계로 움직임 판단
+     * 3순위: GPS 속도만으로 판단 (가속도계 데이터 없을 때)
      */
     private analyzeActivityType(gpsSpeed: number): 'stationary' | 'walking' | 'running' {
         const hasAccelData = this.currentAccelReading && this.accelBuffer.length >= 5;
@@ -624,7 +631,7 @@ class MovementTrackingService {
         const hasRecentSteps = recentSteps >= MIN_STEPS_FOR_WALKING;
 
         if (hasRecentSteps) {
-            // 최근 5초간 3걸음 이상 → walking
+            // 최근 3초간 1걸음 이상 → walking 확정
             console.log(`👣 Pedometer: 최근 ${PEDOMETER_CHECK_INTERVAL}초간 ${recentSteps}걸음 → walking 확정`);
             this.lastActivityType = 'walking';
             return 'walking';
@@ -1056,7 +1063,7 @@ class MovementTrackingService {
 
     /**
      * 🔧 센서 웜업 (앱 시작 시 호출)
-     * Step Counter 초기화 지연(15-16초)을 방지하기 위해 미리 센서를 활성화합니다.
+     * Step Counter 초기화 지연(약 17-18초)을 방지하기 위해 미리 센서를 활성화합니다.
      * 실제 추적은 하지 않고 센서만 깨워둡니다.
      */
     async warmupSensors(): Promise<boolean> {

@@ -184,6 +184,11 @@ class NavigationLogCreate(BaseModel):
     estimated_time_seconds: int = Field(..., description="예상 시간 (초)")
     actual_time_seconds: int = Field(..., description="실제 소요 시간 (초)")
     
+    # 보행 시간 예측 정확도 측정
+    estimated_walk_time_seconds: Optional[int] = Field(None, description="예측 보행 시간 (횡단보도 1/3 포함)")
+    walk_time_difference_seconds: Optional[int] = Field(None, description="보행 시간 차이 (실제 - 예측)")
+    walk_accuracy_percent: Optional[float] = Field(None, description="보행 예측 정확도 (%)")
+    
     # 실제 보행속도 측정 (하이브리드 방식)
     active_walking_time_seconds: Optional[int] = Field(None, description="실제 걷는 시간 (정지 제외)")
     paused_time_seconds: int = Field(0, description="5초 이상 정지한 시간")
@@ -230,6 +235,11 @@ class NavigationLogResponse(BaseModel):
     estimated_time_seconds: int
     actual_time_seconds: int
     time_difference_seconds: int = Field(description="실제 - 예상 시간 차이")
+    
+    # 보행 시간 예측 정확도 측정
+    estimated_walk_time_seconds: Optional[int] = None
+    walk_time_difference_seconds: Optional[int] = None
+    walk_accuracy_percent: Optional[float] = None
     
     # 실제 보행속도 측정 (하이브리드 방식) - 기존 데이터 호환성을 위해 Optional
     active_walking_time_seconds: Optional[int] = None

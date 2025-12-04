@@ -65,6 +65,11 @@ export interface NavigationLogData {
     estimated_time_seconds: number;
     actual_time_seconds: number;
 
+    // 보행 시간 예측 정확도 측정
+    estimated_walk_time_seconds?: number;  // 예측 보행 시간 (횡단보도 1/3 포함)
+    walk_time_difference_seconds?: number;  // 보행 시간 차이 (실제 - 예측)
+    walk_accuracy_percent?: number;  // 보행 예측 정확도 (%)
+
     // 실제 보행속도 측정 (하이브리드 방식)
     active_walking_time_seconds?: number;
     paused_time_seconds?: number;
@@ -106,6 +111,11 @@ export interface NavigationLogResponse {
     estimated_time_seconds: number;
     actual_time_seconds: number;
     time_difference_seconds: number;
+
+    // 보행 시간 예측 정확도 측정
+    estimated_walk_time_seconds?: number;
+    walk_time_difference_seconds?: number;
+    walk_accuracy_percent?: number;
 
     // 실제 보행속도 측정 (하이브리드 방식)
     active_walking_time_seconds?: number;
@@ -389,26 +399,39 @@ export async function extractNavigationLogData(
     const slopeFactor = routeInfo.slopeAnalysis?.factors?.slope_factor;
     const weatherFactor = routeInfo.slopeAnalysis?.factors?.weather_factor;
 
-    // 예상 시간 (초) - 횡단보도 제외, 개인속도+경사도+날씨만 적용
-    // transit: 전체 이동시간 (대중교통 탑승 + 보행)
-    // walking: 보행시간만
+    // 예상 시간 (초) - 횡단보도 대기 시간 1/3 포함, 개인속도+경사도+날씨 적용
+    // transit: 전체 이동시간 (대중교통 탑승 + 보행 + 횡단보도 1/3)
+    // walking: 보행시간 + 횡단보도 1/3
     let estimatedTimeSeconds: number;
+    let estimatedWalkTimeSeconds: number;  // 예측 보행 시간 (횡단보도 1/3 포함)
+
     if (routeMode === 'transit') {
-        // 대중교통: 경사도 보정된 보행시간 + 대중교통 탑승시간
-        const adjustedWalkTime = routeInfo.slopeAnalysis?.total_adjusted_walk_time
+        // 대중교통: 횡단보도 포함 보정된 보행시간 + 대중교통 탑승시간
+        const adjustedWalkTimeWithCrosswalk = routeInfo.slopeAnalysis?.total_time_with_crosswalk
+            || routeInfo.slopeAnalysis?.total_adjusted_walk_time
             || routeInfo.totalWalkTime
             || 0;
         const transitTime = (routeInfo.totalTime || 0) - (routeInfo.totalWalkTime || 0);
-        estimatedTimeSeconds = adjustedWalkTime + transitTime;
+        estimatedTimeSeconds = adjustedWalkTimeWithCrosswalk + transitTime;
+        estimatedWalkTimeSeconds = adjustedWalkTimeWithCrosswalk;  // 보행 시간만
     } else {
-        // 도보: 경사도 보정된 보행시간 (횡단보도 제외)
-        estimatedTimeSeconds = routeInfo.slopeAnalysis?.total_adjusted_walk_time
+        // 도보: 횡단보도 포함 보정된 보행시간
+        estimatedTimeSeconds = routeInfo.slopeAnalysis?.total_time_with_crosswalk
+            || routeInfo.slopeAnalysis?.total_adjusted_walk_time
             || routeInfo.totalTime
             || 0;
+        estimatedWalkTimeSeconds = estimatedTimeSeconds;  // 도보는 전체가 보행
     }
 
     // 실제 시간 (초)
     const actualTimeSeconds = Math.floor((endTime.getTime() - startTime.getTime()) / 1000);
+
+    // 보행 시간 예측 정확도 계산
+    const activeWalkingTime = trackingData?.activeWalkingTime || 0;
+    const walkTimeDifference = activeWalkingTime > 0 ? activeWalkingTime - estimatedWalkTimeSeconds : 0;
+    const walkAccuracyPercent = (estimatedWalkTimeSeconds > 0 && activeWalkingTime > 0)
+        ? Math.round((100 - Math.abs(walkTimeDifference / estimatedWalkTimeSeconds) * 100) * 100) / 100
+        : undefined;
 
     // 좌표 추출 (여러 형식 지원)
     let startLat = startLocation?.y || startLocation?.lat || routeInfo.rawItinerary?.legs?.[0]?.start?.lat;
@@ -488,6 +511,11 @@ export async function extractNavigationLogData(
         weather_factor: weatherFactor,
         estimated_time_seconds: Math.round(estimatedTimeSeconds) || 0,  // 🔧 정수로 변환
         actual_time_seconds: Math.round(actualTimeSeconds) || 0,  // 🔧 정수로 변환
+        // 보행 시간 예측 정확도
+        estimated_walk_time_seconds: Math.round(estimatedWalkTimeSeconds) || 0,
+        walk_time_difference_seconds: activeWalkingTime > 0 ? Math.round(walkTimeDifference) : undefined,
+        walk_accuracy_percent: walkAccuracyPercent,
+        // 실제 보행 측정
         active_walking_time_seconds: trackingData?.activeWalkingTime ? Math.round(trackingData.activeWalkingTime) : undefined,  // 🔧 정수로 변환
         paused_time_seconds: Math.round(trackingData?.pausedTime || 0),  // 🔧 정수로 변환
         real_walking_speed_kmh: trackingData?.realSpeed ? Math.round(trackingData.realSpeed * 3.6 * 100) / 100 : undefined,  // 🔧 소수점 2자리

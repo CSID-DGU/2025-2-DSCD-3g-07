@@ -1670,9 +1670,9 @@ export default function HomeScreen() {
                           <Text style={styles.slopeStatLabel}>예상 시간</Text>
                           <Text style={styles.slopeStatValue}>
                             {Math.floor(
-                              routeInfo.slopeAnalysis.total_adjusted_walk_time / 60
+                              (routeInfo.slopeAnalysis.total_time_with_crosswalk ?? routeInfo.slopeAnalysis.total_adjusted_walk_time) / 60
                             )}
-                            분 {routeInfo.slopeAnalysis.total_adjusted_walk_time % 60}초
+                            분 {(routeInfo.slopeAnalysis.total_time_with_crosswalk ?? routeInfo.slopeAnalysis.total_adjusted_walk_time) % 60}초
                           </Text>
                         </View>
                       </View>
@@ -1952,19 +1952,22 @@ export default function HomeScreen() {
                   routeInfo.slopeAnalysis.crosswalk_count > 0 &&
                   typeof routeInfo.slopeAnalysis.crosswalk_wait_time === "number" &&
                   routeInfo.slopeAnalysis.crosswalk_wait_time > 0 &&
-                  typeof routeInfo.slopeAnalysis.total_time_with_crosswalk === "number" && (
+                  (typeof routeInfo.slopeAnalysis.total_time_with_crosswalk_full === "number" ||
+                    typeof routeInfo.slopeAnalysis.total_time_with_crosswalk === "number") && (
                     <View style={styles.crosswalkFinalTimeContainer}>
                       <Text style={styles.crosswalkFinalTimeTitle}>
                         (참고용)횡단보도 포함 보정 시간
                       </Text>
                       <Text style={styles.crosswalkFinalTimeValue}>
                         {(() => {
+                          // 횡단보도 100% 적용된 시간 사용
+                          const crosswalkFullTime = routeInfo.slopeAnalysis.total_time_with_crosswalk_full
+                            ?? (routeInfo.slopeAnalysis.total_adjusted_walk_time + routeInfo.slopeAnalysis.crosswalk_wait_time);
                           // 대중교통: 보행시간 + 대중교통 탑승시간
                           // 도보: 보행시간만
                           const finalTime = routeMode === 'transit'
-                            ? routeInfo.slopeAnalysis.total_time_with_crosswalk +
-                            (routeInfo.totalTime - routeInfo.totalWalkTime)
-                            : routeInfo.slopeAnalysis.total_time_with_crosswalk;
+                            ? crosswalkFullTime + (routeInfo.totalTime - routeInfo.totalWalkTime)
+                            : crosswalkFullTime;
                           return `${Math.floor(finalTime / 60)}분 ${finalTime % 60}초`;
                         })()}
                       </Text>

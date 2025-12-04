@@ -984,6 +984,9 @@ async def analyze_route_elevation(
     print(f"    - 날씨: {avg_weather_factor:.3f}")
     print(f"    - 최종: {avg_final_factor:.3f}")
 
+    # 횡단보도 대기 시간은 1/3만 적용 (평균적으로 신호를 기다리는 시간 반영)
+    crosswalk_wait_time_adjusted = int(crosswalk_wait_time / 3)
+    
     result = {
         "walk_legs_analysis": all_analysis,  # 실외 + 환승 모두 포함
         "total_original_walk_time": total_original_walk_time,
@@ -992,8 +995,10 @@ async def analyze_route_elevation(
         - total_original_walk_time,
         # 횡단보도 정보
         "crosswalk_count": crosswalk_count,
-        "crosswalk_wait_time": crosswalk_wait_time,
-        "total_time_with_crosswalk": int(total_adjusted_walk_time + crosswalk_wait_time),
+        "crosswalk_wait_time": crosswalk_wait_time,  # 원본 대기 시간 (최대치)
+        "crosswalk_wait_time_adjusted": crosswalk_wait_time_adjusted,  # 1/3 적용된 대기 시간
+        "total_time_with_crosswalk": int(total_adjusted_walk_time + crosswalk_wait_time_adjusted),  # 예상 시간 (1/3 적용)
+        "total_time_with_crosswalk_full": int(total_adjusted_walk_time + crosswalk_wait_time),  # 참고용 (100% 적용)
         # 통합 계수 정보
         "factors": {
             "user_speed_factor": avg_user_factor,

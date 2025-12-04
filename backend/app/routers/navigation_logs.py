@@ -61,6 +61,11 @@ async def create_navigation_log(
         weather_factor=log_data.weather_factor,
         estimated_time_seconds=log_data.estimated_time_seconds,
         actual_time_seconds=log_data.actual_time_seconds,
+        # 보행 시간 예측 정확도
+        estimated_walk_time_seconds=log_data.estimated_walk_time_seconds,
+        walk_time_difference_seconds=log_data.walk_time_difference_seconds,
+        walk_accuracy_percent=log_data.walk_accuracy_percent,
+        # 실제 보행 측정
         active_walking_time_seconds=log_data.active_walking_time_seconds,
         paused_time_seconds=log_data.paused_time_seconds,
         real_walking_speed_kmh=log_data.real_walking_speed_kmh,
@@ -135,6 +140,11 @@ async def create_navigation_log(
         estimated_time_seconds=nav_log.estimated_time_seconds,
         actual_time_seconds=nav_log.actual_time_seconds,
         time_difference_seconds=nav_log.actual_time_seconds - nav_log.estimated_time_seconds,
+        # 보행 시간 예측 정확도
+        estimated_walk_time_seconds=nav_log.estimated_walk_time_seconds,
+        walk_time_difference_seconds=nav_log.walk_time_difference_seconds,
+        walk_accuracy_percent=float(nav_log.walk_accuracy_percent) if nav_log.walk_accuracy_percent else None,
+        # 실제 보행 측정
         active_walking_time_seconds=nav_log.active_walking_time_seconds,
         paused_time_seconds=nav_log.paused_time_seconds or 0,
         real_walking_speed_kmh=float(nav_log.real_walking_speed_kmh) if nav_log.real_walking_speed_kmh else None,
@@ -212,6 +222,11 @@ async def get_navigation_logs(
             estimated_time_seconds=log.estimated_time_seconds,
             actual_time_seconds=log.actual_time_seconds,
             time_difference_seconds=log.actual_time_seconds - log.estimated_time_seconds,
+            # 보행 시간 예측 정확도
+            estimated_walk_time_seconds=log.estimated_walk_time_seconds,
+            walk_time_difference_seconds=log.walk_time_difference_seconds,
+            walk_accuracy_percent=float(log.walk_accuracy_percent) if log.walk_accuracy_percent else None,
+            # 실제 보행 측정
             active_walking_time_seconds=log.active_walking_time_seconds,
             paused_time_seconds=log.paused_time_seconds or 0,
             real_walking_speed_kmh=float(log.real_walking_speed_kmh) if log.real_walking_speed_kmh else None,
@@ -269,6 +284,16 @@ async def get_navigation_log_detail(
         estimated_time_seconds=log.estimated_time_seconds,
         actual_time_seconds=log.actual_time_seconds,
         time_difference_seconds=log.actual_time_seconds - log.estimated_time_seconds,
+        # 보행 시간 예측 정확도
+        estimated_walk_time_seconds=log.estimated_walk_time_seconds,
+        walk_time_difference_seconds=log.walk_time_difference_seconds,
+        walk_accuracy_percent=float(log.walk_accuracy_percent) if log.walk_accuracy_percent else None,
+        # 실제 보행 측정
+        active_walking_time_seconds=log.active_walking_time_seconds,
+        paused_time_seconds=log.paused_time_seconds or 0,
+        real_walking_speed_kmh=float(log.real_walking_speed_kmh) if log.real_walking_speed_kmh else None,
+        pause_count=log.pause_count or 0,
+        movement_data=log.movement_data,
         weather_id=log.weather_id,
         route_data=log.route_data,
         started_at=log.started_at,

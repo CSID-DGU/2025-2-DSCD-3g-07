@@ -178,7 +178,9 @@ export interface RouteElevationAnalysis {
   // 횡단보도 정보
   crosswalk_count?: number;
   crosswalk_wait_time?: number;
-  total_time_with_crosswalk?: number;
+  crosswalk_wait_time_adjusted?: number;  // 1/3 적용된 대기 시간
+  total_time_with_crosswalk?: number;  // 예상 시간 (1/3 적용)
+  total_time_with_crosswalk_full?: number;  // 참고용 (100% 적용)
   // 기타 정보
   sampled_coords_count?: number;
   original_coords_count?: number;

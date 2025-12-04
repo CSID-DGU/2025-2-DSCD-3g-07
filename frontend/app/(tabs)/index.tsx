@@ -1,7 +1,7 @@
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import * as Location from 'expo-location';
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import {
   View,
   Text,
@@ -85,6 +85,14 @@ const formatMinutes = (seconds: number): string => {
     return `${minutes}분`;
   }
   return `${minutes}분 ${remainingSeconds}초`;
+};
+
+const formatTimeOfDay = (date: Date): string => {
+  return date.toLocaleTimeString('ko-KR', {
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true,
+  });
 };
 
 const extractRoutePath = (itinerary: Itinerary): RoutePath[] => {
@@ -300,6 +308,7 @@ export default function HomeScreen() {
   const [showRouteDetails, setShowRouteDetails] = useState(false);
   const [showRouteList, setShowRouteList] = useState(true); // 경로 목록 표시 여부
   const [routeMode, setRouteMode] = useState<'transit' | 'walking'>('transit'); // 경로 모드 (대중교통 / 도보)
+  const [now, setNow] = useState<Date>(new Date());
 
   // 현재 위치 추적 상태
   const [currentLocation, setCurrentLocation] = useState<CurrentLocation | null>(null);
@@ -420,7 +429,12 @@ export default function HomeScreen() {
     return () => {
       movementTrackingService.cleanupWarmup();
     };
+    useEffect(() => {
+    const timer = setInterval(() => setNow(new Date()), 30000);
+    return () => clearInterval(timer);
   }, []);
+
+}, []);
 
   // DB에서 사용자 보행 속도 가져오기 함수 (재사용 가능)
   const fetchWalkingSpeed = async () => {
@@ -1129,6 +1143,58 @@ export default function HomeScreen() {
     [routeOptions, weatherData, walkingSpeedCase1]
   );
 
+  const computeAdjustedTotalSeconds = useCallback(
+    (
+      baseTotal: number,
+      baseWalk: number,
+      slopeAnalysis?: RouteElevationAnalysis | null,
+      personalizedWalkTime?: number | null
+    ) => {
+      const safeBaseTotal = Number.isFinite(baseTotal) && baseTotal > 0 ? baseTotal : 0;
+      const safeBaseWalk = Number.isFinite(baseWalk) && baseWalk > 0 ? baseWalk : 0;
+
+      const crosswalkFull =
+        slopeAnalysis && typeof slopeAnalysis.total_time_with_crosswalk_full === 'number'
+          ? slopeAnalysis.total_time_with_crosswalk_full
+          : undefined;
+      const crosswalkPartial =
+        slopeAnalysis && typeof slopeAnalysis.total_time_with_crosswalk === 'number'
+          ? slopeAnalysis.total_time_with_crosswalk
+          : undefined;
+
+      let adjustedWalk = safeBaseWalk;
+      if (typeof crosswalkFull === 'number') {
+        adjustedWalk = crosswalkFull;
+      } else if (typeof crosswalkPartial === 'number') {
+        adjustedWalk = crosswalkPartial;
+      } else if (typeof personalizedWalkTime === 'number' && personalizedWalkTime >= 0) {
+        adjustedWalk = personalizedWalkTime;
+      }
+
+      const nonWalk = Math.max(0, safeBaseTotal - safeBaseWalk);
+      return routeMode === 'walking' ? adjustedWalk : nonWalk + adjustedWalk;
+    },
+    [routeMode],
+  );
+
+  const selectedAdjustedDurationSec = useMemo(() => {
+    if (!routeInfo) return 0;
+    return computeAdjustedTotalSeconds(
+      routeInfo.totalTime || 0,
+      routeInfo.totalWalkTime || 0,
+      routeInfo.slopeAnalysis,
+      routeInfo.personalizedWalkTime,
+    );
+  }, [computeAdjustedTotalSeconds, routeInfo]);
+
+  const departureTimeLabel = useMemo(() => formatTimeOfDay(now), [now]);
+
+  const selectedArrivalTimeLabel = useMemo(() => {
+    if (!routeInfo) return null;
+    const arrival = new Date(now.getTime() + selectedAdjustedDurationSec * 1000);
+    return formatTimeOfDay(arrival);
+  }, [now, routeInfo, selectedAdjustedDurationSec]);
+
   const animatedSearchBarStyle = useAnimatedStyle(() => {
     return {
       transform: [{ translateY: searchBarTranslateY.value }],
@@ -1429,80 +1495,102 @@ export default function HomeScreen() {
                 <Text style={styles.routeListTitle}>
                   경로 옵션 ({routeOptions.length}개)
                 </Text>
-                {routeOptions.map((option, index) => (
-                  <TouchableOpacity
-                    key={index}
-                    style={[
-                      styles.routeOptionItem,
-                      selectedRouteIndex === index &&
-                      styles.routeOptionItemSelected,
-                    ]}
-                    onPress={() => handleSelectRoute(index)}
-                  >
-                    <View style={styles.routeOptionHeader}>
-                      <Text style={styles.routeOptionNumber}>
-                        경로 {index + 1}
-                      </Text>
-                      {selectedRouteIndex === index && (
-                        <MaterialIcons
-                          name="check-circle"
-                          size={20}
-                          color={PRIMARY_COLOR}
-                        />
-                      )}
-                    </View>
-                    <View style={styles.routeOptionStats}>
-                      <View style={styles.routeOptionStat}>
+                {routeOptions.map((option, index) => {
+                  const optionDurationSec = computeAdjustedTotalSeconds(
+                    option.totalTime || 0,
+                    option.totalWalkTime || 0,
+                    selectedRouteIndex === index ? routeInfo?.slopeAnalysis : null,
+                    selectedRouteIndex === index ? routeInfo?.personalizedWalkTime : option.totalWalkTime,
+                  );
+                  const optionArrivalTimeLabel = formatTimeOfDay(
+                    new Date(now.getTime() + optionDurationSec * 1000)
+                  );
+
+                  return (
+                    <TouchableOpacity
+                      key={index}
+                      style={[
+                        styles.routeOptionItem,
+                        selectedRouteIndex === index &&
+                        styles.routeOptionItemSelected,
+                      ]}
+                      onPress={() => handleSelectRoute(index)}
+                    >
+                      <View style={styles.routeOptionHeader}>
+                        <Text style={styles.routeOptionNumber}>
+                          경로 {index + 1}
+                        </Text>
+                        {selectedRouteIndex === index && (
+                          <MaterialIcons
+                            name="check-circle"
+                            size={20}
+                            color={PRIMARY_COLOR}
+                          />
+                        )}
+                      </View>
+                      <View style={styles.routeOptionEtaRow}>
                         <MaterialIcons
                           name="schedule"
-                          size={16}
+                          size={14}
                           color={SECONDARY_TEXT}
                         />
-                        <Text style={styles.routeOptionStatText}>
-                          {formatMinutes(option.totalTime || 0)}
+                        <Text style={styles.routeOptionEtaText}>
+                          {departureTimeLabel} 출발 · {optionArrivalTimeLabel} 도착
                         </Text>
                       </View>
-                      <View style={styles.routeOptionStat}>
-                        <MaterialIcons
-                          name="directions-walk"
-                          size={16}
-                          color={SECONDARY_TEXT}
-                        />
-                        <Text style={styles.routeOptionStatText}>
-                          {formatMinutes(option.totalWalkTime || 0)}
-                        </Text>
+                      <View style={styles.routeOptionStats}>
+                        <View style={styles.routeOptionStat}>
+                          <MaterialIcons
+                            name="schedule"
+                            size={16}
+                            color={SECONDARY_TEXT}
+                          />
+                          <Text style={styles.routeOptionStatText}>
+                            {formatMinutes(option.totalTime || 0)}
+                          </Text>
+                        </View>
+                        <View style={styles.routeOptionStat}>
+                          <MaterialIcons
+                            name="directions-walk"
+                            size={16}
+                            color={SECONDARY_TEXT}
+                          />
+                          <Text style={styles.routeOptionStatText}>
+                            {formatMinutes(option.totalWalkTime || 0)}
+                          </Text>
+                        </View>
+                        <View style={styles.routeOptionStat}>
+                          <MaterialIcons
+                            name="straighten"
+                            size={16}
+                            color={SECONDARY_TEXT}
+                          />
+                          <Text style={styles.routeOptionStatText}>
+                            {((option.totalDistance || 0) / 1000).toFixed(1)}km
+                          </Text>
+                        </View>
                       </View>
-                      <View style={styles.routeOptionStat}>
-                        <MaterialIcons
-                          name="straighten"
-                          size={16}
-                          color={SECONDARY_TEXT}
-                        />
-                        <Text style={styles.routeOptionStatText}>
-                          {((option.totalDistance || 0) / 1000).toFixed(1)}km
-                        </Text>
+                      {/* 경로 미리보기 (버스/지하철) */}
+                      <View style={styles.routePreview}>
+                        {option.legs?.map((leg, legIdx) => {
+                          if (leg.mode === 'WALK') return null;
+                          return (
+                            <View key={legIdx} style={styles.routePreviewItem}>
+                              <MaterialIcons
+                                name={getModeIcon(leg.mode) as any}
+                                size={14}
+                                color={getModeColor(leg.mode)}
+                              />
+                              <Text style={styles.routePreviewText}>
+                                {leg.route || getModeLabel(leg.mode)}
+                              </Text>
+                            </View>
+                          );
+                        })}
                       </View>
-                    </View>
-                    {/* 경로 미리보기 (버스/지하철) */}
-                    <View style={styles.routePreview}>
-                      {option.legs?.map((leg, legIdx) => {
-                        if (leg.mode === 'WALK') return null;
-                        return (
-                          <View key={legIdx} style={styles.routePreviewItem}>
-                            <MaterialIcons
-                              name={getModeIcon(leg.mode) as any}
-                              size={14}
-                              color={getModeColor(leg.mode)}
-                            />
-                            <Text style={styles.routePreviewText}>
-                              {leg.route || getModeLabel(leg.mode)}
-                            </Text>
-                          </View>
-                        );
-                      })}
-                    </View>
-                  </TouchableOpacity>
-                ))}
+                    </TouchableOpacity>
+                  );
+                })}
                 <TouchableOpacity
                   style={styles.hideRouteListButton}
                   onPress={() => setShowRouteList(false)}
@@ -1532,6 +1620,19 @@ export default function HomeScreen() {
                     size={24}
                     color={SECONDARY_TEXT}
                   />
+                </View>
+                <View style={styles.routeEtaRow}>
+                  <MaterialIcons
+                    name="schedule"
+                    size={16}
+                    color={SECONDARY_TEXT}
+                  />
+                  <Text style={styles.routeEtaText}>
+                    {departureTimeLabel} 출발 · {selectedArrivalTimeLabel || '-'} 도착
+                  </Text>
+                  {routeInfo?.slopeAnalysis ? (
+                    <Text style={styles.routeEtaHint}>보정 적용</Text>
+                  ) : null}
                 </View>
 
                 <View style={styles.routeStats}>
@@ -2012,6 +2113,19 @@ export default function HomeScreen() {
                 </TouchableOpacity>
 
                 <Text style={styles.routeDetailsTitle}>상세 경로</Text>
+                <View style={styles.detailEtaRow}>
+                  <MaterialIcons
+                    name="schedule"
+                    size={18}
+                    color={SECONDARY_TEXT}
+                  />
+                  <Text style={styles.detailEtaText}>
+                    {departureTimeLabel} 출발 · {selectedArrivalTimeLabel || '-'} 도착
+                  </Text>
+                  {routeInfo?.slopeAnalysis ? (
+                    <Text style={styles.detailEtaHint}>보정 적용</Text>
+                  ) : null}
+                </View>
 
                 {routeInfo.legs.map((leg, index) => (
                   <View key={index} style={styles.legItem}>
@@ -2349,6 +2463,27 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#1D2A3B',
   },
+  routeEtaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginTop: 4,
+  },
+  routeEtaText: {
+    flex: 1,
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#1D2A3B',
+  },
+  routeEtaHint: {
+    fontSize: 12,
+    color: SECONDARY_TEXT,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 10,
+    backgroundColor: `${PRIMARY_COLOR}15`,
+    fontWeight: '600',
+  },
   routeStats: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -2393,6 +2528,23 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#1D2A3B',
     marginBottom: 16,
+  },
+  detailEtaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 12,
+  },
+  detailEtaText: {
+    flex: 1,
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#1D2A3B',
+  },
+  detailEtaHint: {
+    fontSize: 12,
+    color: PRIMARY_COLOR,
+    fontWeight: '600',
   },
   legItem: {
     marginBottom: 16,
@@ -2485,6 +2637,17 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 12,
+  },
+  routeOptionEtaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: 8,
+  },
+  routeOptionEtaText: {
+    fontSize: 13,
+    color: SECONDARY_TEXT,
+    fontWeight: '600',
   },
   routeOptionNumber: {
     fontSize: 16,

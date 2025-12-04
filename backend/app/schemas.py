@@ -183,6 +183,8 @@ class NavigationLogCreate(BaseModel):
     # 시간 정보
     estimated_time_seconds: int = Field(..., description="예상 시간 (초)")
     actual_time_seconds: int = Field(..., description="실제 소요 시간 (초)")
+    time_difference_seconds: Optional[int] = Field(None, description="시간 차이 (실제 - 예상)")
+    accuracy_percent: Optional[float] = Field(None, description="전체 시간 예측 정확도 (%)")
     
     # 보행 시간 예측 정확도 측정
     estimated_walk_time_seconds: Optional[int] = Field(None, description="예측 보행 시간 (횡단보도 1/3 포함)")
@@ -234,7 +236,8 @@ class NavigationLogResponse(BaseModel):
     # 시간 정보
     estimated_time_seconds: int
     actual_time_seconds: int
-    time_difference_seconds: int = Field(description="실제 - 예상 시간 차이")
+    time_difference_seconds: Optional[int] = Field(None, description="시간 차이 (실제 - 예상)")
+    accuracy_percent: Optional[float] = Field(None, description="전체 시간 예측 정확도 (%)")
     
     # 보행 시간 예측 정확도 측정
     estimated_walk_time_seconds: Optional[int] = None

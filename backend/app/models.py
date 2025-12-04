@@ -439,6 +439,8 @@ class NavigationLogs(Base):
     # 시간 정보
     estimated_time_seconds = Column(Integer, nullable=False)  # 예상 시간 (초) - 전체 (보행+대중교통)
     actual_time_seconds = Column(Integer, nullable=False)  # 실제 소요 시간 (초) - 전체
+    time_difference_seconds = Column(Integer)  # 시간 차이 (실제 - 예상)
+    accuracy_percent = Column(Numeric(5, 2))  # 전체 시간 예측 정확도 (%)
     
     # 보행 시간 예측 정확도 측정
     estimated_walk_time_seconds = Column(Integer)  # 예측 보행 시간 (횡단보도 1/3 포함)

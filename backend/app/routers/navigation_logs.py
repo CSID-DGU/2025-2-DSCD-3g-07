@@ -61,6 +61,8 @@ async def create_navigation_log(
         weather_factor=log_data.weather_factor,
         estimated_time_seconds=log_data.estimated_time_seconds,
         actual_time_seconds=log_data.actual_time_seconds,
+        time_difference_seconds=log_data.time_difference_seconds,
+        accuracy_percent=log_data.accuracy_percent,
         # 보행 시간 예측 정확도
         estimated_walk_time_seconds=log_data.estimated_walk_time_seconds,
         walk_time_difference_seconds=log_data.walk_time_difference_seconds,
@@ -139,7 +141,8 @@ async def create_navigation_log(
         weather_factor=float(nav_log.weather_factor) if nav_log.weather_factor else None,
         estimated_time_seconds=nav_log.estimated_time_seconds,
         actual_time_seconds=nav_log.actual_time_seconds,
-        time_difference_seconds=nav_log.actual_time_seconds - nav_log.estimated_time_seconds,
+        time_difference_seconds=nav_log.time_difference_seconds,
+        accuracy_percent=float(nav_log.accuracy_percent) if nav_log.accuracy_percent else None,
         # 보행 시간 예측 정확도
         estimated_walk_time_seconds=nav_log.estimated_walk_time_seconds,
         walk_time_difference_seconds=nav_log.walk_time_difference_seconds,
@@ -221,7 +224,8 @@ async def get_navigation_logs(
             weather_factor=float(log.weather_factor) if log.weather_factor else None,
             estimated_time_seconds=log.estimated_time_seconds,
             actual_time_seconds=log.actual_time_seconds,
-            time_difference_seconds=log.actual_time_seconds - log.estimated_time_seconds,
+            time_difference_seconds=log.time_difference_seconds,
+            accuracy_percent=float(log.accuracy_percent) if log.accuracy_percent else None,
             # 보행 시간 예측 정확도
             estimated_walk_time_seconds=log.estimated_walk_time_seconds,
             walk_time_difference_seconds=log.walk_time_difference_seconds,
@@ -283,7 +287,8 @@ async def get_navigation_log_detail(
         weather_factor=float(log.weather_factor) if log.weather_factor else None,
         estimated_time_seconds=log.estimated_time_seconds,
         actual_time_seconds=log.actual_time_seconds,
-        time_difference_seconds=log.actual_time_seconds - log.estimated_time_seconds,
+        time_difference_seconds=log.time_difference_seconds,
+        accuracy_percent=float(log.accuracy_percent) if log.accuracy_percent else None,
         # 보행 시간 예측 정확도
         estimated_walk_time_seconds=log.estimated_walk_time_seconds,
         walk_time_difference_seconds=log.walk_time_difference_seconds,

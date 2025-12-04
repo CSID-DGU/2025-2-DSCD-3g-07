@@ -64,6 +64,8 @@ export interface NavigationLogData {
     // 시간 정보
     estimated_time_seconds: number;
     actual_time_seconds: number;
+    time_difference_seconds?: number;  // 시간 차이 (실제 - 예상)
+    accuracy_percent?: number;  // 전체 시간 예측 정확도 (%)
 
     // 보행 시간 예측 정확도 측정
     estimated_walk_time_seconds?: number;  // 예측 보행 시간 (횡단보도 1/3 포함)
@@ -110,7 +112,8 @@ export interface NavigationLogResponse {
     weather_factor?: number;
     estimated_time_seconds: number;
     actual_time_seconds: number;
-    time_difference_seconds: number;
+    time_difference_seconds?: number;
+    accuracy_percent?: number;
 
     // 보행 시간 예측 정확도 측정
     estimated_walk_time_seconds?: number;
@@ -433,6 +436,12 @@ export async function extractNavigationLogData(
         ? Math.round((100 - Math.abs(walkTimeDifference / estimatedWalkTimeSeconds) * 100) * 100) / 100
         : undefined;
 
+    // 전체 시간 정확도 계산
+    const timeDifferenceSeconds = actualTimeSeconds - estimatedTimeSeconds;
+    const accuracyPercent = estimatedTimeSeconds > 0
+        ? Math.round((100 - Math.abs(timeDifferenceSeconds / estimatedTimeSeconds) * 100) * 100) / 100
+        : undefined;
+
     // 좌표 추출 (여러 형식 지원)
     let startLat = startLocation?.y || startLocation?.lat || routeInfo.rawItinerary?.legs?.[0]?.start?.lat;
     let startLon = startLocation?.x || startLocation?.lng || startLocation?.lon || routeInfo.rawItinerary?.legs?.[0]?.start?.lon;
@@ -511,6 +520,8 @@ export async function extractNavigationLogData(
         weather_factor: weatherFactor,
         estimated_time_seconds: Math.round(estimatedTimeSeconds) || 0,  // 🔧 정수로 변환
         actual_time_seconds: Math.round(actualTimeSeconds) || 0,  // 🔧 정수로 변환
+        time_difference_seconds: timeDifferenceSeconds,  // 전체 시간 차이
+        accuracy_percent: accuracyPercent,  // 전체 시간 예측 정확도
         // 보행 시간 예측 정확도
         estimated_walk_time_seconds: Math.round(estimatedWalkTimeSeconds) || 0,
         walk_time_difference_seconds: activeWalkingTime > 0 ? Math.round(walkTimeDifference) : undefined,

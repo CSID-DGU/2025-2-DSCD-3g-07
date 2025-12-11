@@ -817,10 +817,6 @@ export default function SettingsScreen() {
                   <Ionicons name="refresh" size={14} color={PRIMARY} />
                   <Text style={styles.ghostButtonText}>새로고침</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.ghostButton} onPress={handleShowDebugLogs}>
-                  <Ionicons name="bug" size={14} color={WARNING} />
-                  <Text style={[styles.ghostButtonText, { color: WARNING }]}>디버그</Text>
-                </TouchableOpacity>
               </View>
             </View>
             <TouchableOpacity style={styles.secondaryButton} onPress={handleLogout}>

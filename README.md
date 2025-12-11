@@ -17,7 +17,7 @@ PaceTry는 사용자의 건강 데이터와 보행 패턴을 분석하여 개인
 - **📊 자동 보행 속도 보정**: 
   - 경로 안내 사용 기록 기반 자동 학습
   - GPS + 가속도계 센서 융합으로 정확한 실제 보행 시간 측정
-  - 가중 평균 (7:3) 방식의 점진적 속도 업데이트
+  - 동적 가중 평균 (Dynamic Weighted Average) 방식의 점진적 속도 업데이트 (데이터 누적량에 따라 가중치 자동 조절)
 - **🚶 백그라운드 위치 추적**: 앱이 백그라운드에 있어도 정확한 보행 기록 유지
 - **🔒 데이터 보안**: 건강 데이터 로컬 저장 및 개인정보 보호
 
@@ -187,8 +187,6 @@ python -m pytest
 - **걸음 수** (Steps): 일일 활동량 추적
 - **이동 거리** (Distance): 보행 거리 측정
 - **보행 속도** (Speed): 실시간 보행 속도 분석
-- **소모 칼로리** (Active Calories): 에너지 소비 계산
-- **운동 세션** (Exercise): 운동 패턴 분석
 
 ### 주요 기능
 
@@ -219,12 +217,7 @@ python -m pytest
 ### 핵심 알고리즘
 - **Tobler's Hiking Function**: 경사도에 따른 보행 속도 계산
 - **WeatherSpeedModel**: 날씨가 보행 속도에 미치는 영향 분석
-- **가중 평균 학습**: 기존 70% + 새 데이터 30% 비율로 점진적 업데이트
-
-### DevOps
-- **GitHub Actions** (CI/CD)
-- **ESLint** + **Prettier** (코드 품질)
-- **Jest** + **pytest** (테스트)
+- **동적 가중 평균 학습**: 데이터 누적량에 따라 신규 데이터 반영 비율 자동 조절 (초기 50% → 안정화 후 15%)
 
 ## 📊 API 문서
 
@@ -269,11 +262,6 @@ npm run type-check:all
 
 - **Frontend**: React Native + Health Connect 통합
 - **Backend**: FastAPI + AI 경로 최적화
-- **DevOps**: CI/CD + 배포 자동화
-
-## 🐛 문제 신고
-
-버그나 기능 요청은 [GitHub Issues](https://github.com/your-username/pacetry/issues)에서 신고해 주세요.
 
 ## 📚 주요 문서
 
